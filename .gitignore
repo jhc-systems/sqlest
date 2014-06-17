@@ -1,0 +1,13 @@
+target/
+bin/
+lib_managed/
+*~
+.project
+.settings/
+.metadata/
+.history
+.cache
+.classpath
+
+*.sublime-project
+*.sublime-workspace
