@@ -3,6 +3,7 @@ import sbt.Keys._
 
 import com.typesafe.sbt.SbtScalariform
 import spray.boilerplate.BoilerplatePlugin.Boilerplate
+import xerial.sbt.Sonatype._
 
 object SqlestBuild extends Build {
 
@@ -10,10 +11,10 @@ object SqlestBuild extends Build {
     id = "sqlest",
     base = file("."),
 
-    settings = SbtScalariform.scalariformSettings ++ Boilerplate.settings ++ Seq(
-      organization := "jhc",
+    settings = SbtScalariform.scalariformSettings ++ Boilerplate.settings ++ sonatypeSettings ++ Seq(
+      organization := "uk.co.jhc",
       name := "sqlest",
-      version := "0.1.0-SNAPSHOT",
+      version := "0.2.0-SNAPSHOT",
 
       scalaVersion := "2.11.1",
       scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
