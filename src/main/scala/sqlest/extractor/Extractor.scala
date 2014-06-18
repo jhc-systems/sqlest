@@ -233,26 +233,3 @@ case class GroupedExtractor[A, B](inner: Extractor[A], groupBy: Extractor[B]) ex
 
   def emit(accumulator: ListMap[B, inner.Accumulator]) = accumulator.values.map(inner.emit).toList
 }
-
-case class Tuple1Extractor[A1](e1: Extractor[A1]) extends ProductExtractor[Tuple1[A1]] {
-  type Accumulator = Tuple1[e1.Accumulator]
-  val columns = e1.columns.distinct
-  val nonOptionalColumns = e1.nonOptionalColumns.distinct
-
-  val innerExtractors = List(e1)
-
-  def initialize(row: ResultSet) =
-    Tuple1(e1.initialize(row))
-
-  def accumulate(row: ResultSet, accumulator: Accumulator) =
-    Tuple1(e1.accumulate(row, accumulator._1))
-
-  def emit(accumulator: Accumulator) =
-    Tuple1(e1.emit(accumulator._1))
-
-  // def map[B](func: (A1) => B): MappedExtractor[(A1), B] =
-  //   MappedExtractor(this, func.tupled)
-
-  // def as[B](func: (A1) => B)(implicit names: ProductNames[B]): MappedExtractor[(A1), B] =
-  //   sqlest.untyped.extractor.NamedExtractor(this, func.tupled, names.names)
-}
