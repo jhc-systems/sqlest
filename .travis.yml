@@ -4,4 +4,9 @@ scala:
   - 2.11.1
 
 after_success:
-  - "[[ $TRAVIS_BRANCH == \"master\" ]] && sbt publish"
+  - '[[ $TRAVIS_BRANCH == "master" ]] && sbt publish'
+
+env:
+  global:
+    - secure: bY18Su7LC6f/YGpqnozbXzI1wPBRh50/ouG1RdBA6BPSQ5c+eHcthsr21T2OLSoWkxKr5N6+gUPm/Y9srXUpwyjFD2DPsfqeUK3LNT8bADwS4g5JoigCYdWBqcpBdVmpgWVy0h/vAq+BWMb1lUR6So/eV0tSFvTisf8R/F96+i8=
+    - secure: KnD5loPz0o2ZHKxPX98XgbNIZcwiH7HY8V55aX0UdCywm+V82uA+ODnuOZholpnWVudqkHfJ5y+SSiKJjd3CEAyyLPpHfxEpmga12xL5CGIDmYHRVTIyoF08JYmR5y80jnSJMnb7XFPLPZbnQjkguIdw1moKJWeMmlmevRn2ybk=

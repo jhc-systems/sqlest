@@ -33,6 +33,7 @@ object SqlestBuild extends Build {
         else
           Some("releases"  at nexus + "service/local/staging/deploy/maven2")
       },
+      credentials := credentialsSettings,
       pomIncludeRepository := { _ => false },
       pomExtra := (
         <url>https://github.com/jhc-systems/sqlest</url>
@@ -59,4 +60,14 @@ object SqlestBuild extends Build {
         </developers>)
     )
   )
+
+  lazy val credentialsSettings = Seq(
+    Seq("SONATYPE_USER", "SONATYPE_PASSWORD").map(key => sys.env.get(key)) match {
+      case Seq(Some(user), Some(password)) =>
+        Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", user, password)
+      case _                           =>
+        Credentials(Path.userHome / ".ivy2" / ".credentials")
+    }
+  )
+
 }
