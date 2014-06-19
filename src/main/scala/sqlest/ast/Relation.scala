@@ -110,7 +110,7 @@ case class Select(
     startWith: Option[Column[Boolean]] = None,
     connectBy: Option[Column[Boolean]] = None,
     groupBy: List[Column[_]] = Nil,
-    order: List[Order] = Nil,
+    orderBy: List[Order] = Nil,
     limit: Option[Long] = None,
     offset: Option[Long] = None) extends Relation with Query {
 
@@ -132,8 +132,8 @@ case class Select(
   def groupBy(groupBys: Column[_]*): Select =
     this.copy(groupBy = this.groupBy ++ groupBys)
 
-  def order(orders: Order*): Select =
-    this.copy(order = this.order ++ orders)
+  def orderBy(orders: Order*): Select =
+    this.copy(orderBy = this.orderBy ++ orders)
 
   def limit(limit: Long): Select =
     this.copy(limit = Some(limit))

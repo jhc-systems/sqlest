@@ -28,7 +28,7 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
         selectStartWithSql(select.startWith),
         selectConnectBySql(select.connectBy),
         selectGroupBySql(select.groupBy),
-        selectOrderSql(select.order),
+        selectOrderBySql(select.orderBy),
         selectLimitSql(select.limit),
         selectOffsetSql(select.offset)
       ).flatten mkString ("", " ", "")
@@ -52,7 +52,7 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
   def selectGroupBySql(columns: Seq[Column[_]]): Option[String] =
     if (columns.isEmpty) None else Some(s"""group by ${columns.map(columnSql).mkString(", ")}""")
 
-  def selectOrderSql(order: Seq[Order]): Option[String] =
+  def selectOrderBySql(order: Seq[Order]): Option[String] =
     if (order.isEmpty) None else Some(s"order by ${orderListSql(order)}")
 
   def selectLimitSql(limit: Option[Long]): Option[String] =
@@ -80,7 +80,7 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
       selectWhereArgs(select.where) ++
       selectStartWithArgs(select.startWith) ++
       selectConnectByArgs(select.connectBy) ++
-      selectOrderArgs(select.order) ++
+      selectOrderByArgs(select.orderBy) ++
       selectLimitArgs(select.limit) ++
       selectOffsetArgs(select.offset)
   }
@@ -100,7 +100,7 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
   def selectConnectByArgs(connectBy: Option[Column[Boolean]]): List[LiteralColumn[_]] =
     connectBy map columnArgs getOrElse Nil
 
-  def selectOrderArgs(order: Seq[Order]): List[LiteralColumn[_]] =
+  def selectOrderByArgs(order: Seq[Order]): List[LiteralColumn[_]] =
     order.toList flatMap orderArgs
 
   def selectLimitArgs(limit: Option[Long]): List[LiteralColumn[_]] =

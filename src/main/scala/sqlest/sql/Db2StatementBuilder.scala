@@ -41,7 +41,7 @@ trait DB2StatementBuilder extends StatementBuilder {
 
   def rowNumberSelectSql(select: Select, offset: Long, limit: Option[Long]): String = {
     val subquery = Seq(
-      s"${selectWhatSql(select.columns)}, row_number() over (${selectOrderSql(select.order) getOrElse ""}) as rownum",
+      s"${selectWhatSql(select.columns)}, row_number() over (${selectOrderBySql(select.orderBy) getOrElse ""}) as rownum",
       selectFromSql(select.from)
     ) ++ Seq(
         selectWhereSql(select.where),
@@ -76,7 +76,7 @@ trait DB2StatementBuilder extends StatementBuilder {
   def rowNumberSelectArgs(select: Select, offset: Long, limit: Option[Long]): List[LiteralColumn[_]] = {
     val subqueryArgs =
       selectWhatArgs(select.columns) ++
-        selectOrderArgs(select.order) ++
+        selectOrderByArgs(select.orderBy) ++
         selectFromArgs(select.from) ++
         selectWhereArgs(select.where)
 

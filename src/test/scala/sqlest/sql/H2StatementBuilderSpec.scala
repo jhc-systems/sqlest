@@ -145,7 +145,7 @@ class H2StatementBuilderSpec extends BaseStatementBuilderSpec
       select(1.column as "a", sum(2) as "b", (3.column + 4.column) as "c")
         .from(TableOne innerJoin TableTwo on (5.column === 6 && 7.column =!= 8))
         .where(9.column === 10 && 11.column =!= 12.column)
-        .order(13.column.asc, 14.column.desc)
+        .orderBy(13.column.asc, 14.column.desc)
         .page(15, 16)
     } should equal(
       s"""

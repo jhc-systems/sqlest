@@ -33,7 +33,7 @@ class SelectSpec extends FlatSpec with Matchers {
     query.columns should equal(List(MyTable.col1, MyTable.col2))
     query.from should equal(MyTable)
     query.where should equal(None)
-    query.order should equal(Nil)
+    query.orderBy should equal(Nil)
     query.limit should equal(None)
     query.offset should equal(None)
   }
@@ -44,7 +44,7 @@ class SelectSpec extends FlatSpec with Matchers {
     query.columns should equal(List(MyTable.col1))
     query.from should equal(MyTable)
     query.where should equal(None)
-    query.order should equal(Nil)
+    query.orderBy should equal(Nil)
     query.limit should equal(None)
     query.offset should equal(None)
   }
@@ -54,7 +54,7 @@ class SelectSpec extends FlatSpec with Matchers {
     query.where should equal(Some(MyTable.col1 > 1 && MyTable.col1 < 2))
   }
 
-  "repeated calls to select.order()" should "append new orders" in {
+  "repeated calls to select.orderBy()" should "append new orders" in {
     val query = select.from(MyTable)
     query.columns should equal(List(MyTable.col1, MyTable.col2))
   }

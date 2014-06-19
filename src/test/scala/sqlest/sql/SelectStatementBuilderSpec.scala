@@ -39,7 +39,7 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
       select(MyTable.col1, MyTable.col2, func)
         .from(MyTable)
         .where(MyTable.col1 === 123)
-        .order(func.asc)
+        .orderBy(func.asc)
     } should equal(
       s"""
        |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2, sum(mytable.col1) as count
@@ -86,8 +86,8 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
       select
         .from(MyTable)
         .where(MyTable.col1 === 123)
-        .order(MyTable.col1.asc)
-        .order(MyTable.col1.asc)
+        .orderBy(MyTable.col1.asc)
+        .orderBy(MyTable.col1.asc)
     } should equal(
       s"""
        |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
