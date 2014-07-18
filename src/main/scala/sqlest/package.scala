@@ -30,7 +30,6 @@ package object sqlest extends SqlestCore
   with MappedColumnTypes
   with TableFunctions
   with ScalarFunctions
-  with GroupFunctions
   with AggregateFunctionSyntax
   with ScalarFunctionSyntax
   with GroupFunctionSyntax

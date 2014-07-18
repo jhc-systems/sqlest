@@ -18,7 +18,7 @@ package sqlest.ast.syntax
 
 import sqlest.ast._
 
-trait GroupFunctionSyntax extends GroupFunctions {
+trait GroupFunctionSyntax {
   def cube[A: ColumnType](columns: Column[A]*) = GroupFunctionColumn[A]("cube", columns)
   def rollUp[A: ColumnType](columns: Column[A]*) = GroupFunctionColumn[A]("rollup", columns)
   def groupingSets[A: ColumnType](columns: Column[A]*) = GroupFunctionColumn[A]("grouping sets", columns)
