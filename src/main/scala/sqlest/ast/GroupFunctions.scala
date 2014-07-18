@@ -1,0 +1,135 @@
+/*
+ * Copyright 2014 JHC Systems Limited
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package sqlest.ast
+
+trait GroupFunctions {
+
+  def GroupFunctionN[A, R: ColumnType](name: String) = new {
+    def apply(columns: Column[A]*) =
+      GroupFunctionColumn[R](name, columns)
+  }
+
+  def GroupFunction1[A1, R: ColumnType](name: String) = new {
+    def apply[B1](column1: Column[B1])(implicit column1Equivalence: ColumnTypeEquivalence[A1, B1]) =
+      GroupFunctionColumn[R](name, Seq(column1))
+  }
+
+  def GroupFunction2[A1, A2, R: ColumnType](name: String) = new {
+    def apply[B1, B2](column1: Column[B1], column2: Column[B2])(implicit column1Equivalence: ColumnTypeEquivalence[A1, B1], column2Equivalence: ColumnTypeEquivalence[A2, B2]) =
+      GroupFunctionColumn[R](name, Seq(column1, column2))
+  }
+
+  def GroupFunction3[A1, A2, A3, R: ColumnType](name: String) = new {
+    def apply[B1, B2, B3](column1: Column[B1], column2: Column[B2], column3: Column[B3])(implicit column1Equivalence: ColumnTypeEquivalence[A1, B1], column2Equivalence: ColumnTypeEquivalence[A2, B2], column3Equivalence: ColumnTypeEquivalence[A3, B3]) =
+      GroupFunctionColumn[R](name, Seq(column1, column2, column3))
+  }
+
+  def GroupFunction4[A1, A2, A3, A4, R: ColumnType](name: String) = new {
+    def apply[B1, B2, B3, B4](column1: Column[B1], column2: Column[B2], column3: Column[B3], column4: Column[B4])(implicit column1Equivalence: ColumnTypeEquivalence[A1, B1], column2Equivalence: ColumnTypeEquivalence[A2, B2], column3Equivalence: ColumnTypeEquivalence[A3, B3], column4Equivalence: ColumnTypeEquivalence[A4, B4]) =
+      GroupFunctionColumn[R](name, Seq(column1, column2, column3, column4))
+  }
+
+  def GroupFunction5[A1, A2, A3, A4, A5, R: ColumnType](name: String) = new {
+    def apply[B1, B2, B3, B4, B5](column1: Column[B1], column2: Column[B2], column3: Column[B3], column4: Column[B4], column5: Column[B5])(implicit column1Equivalence: ColumnTypeEquivalence[A1, B1], column2Equivalence: ColumnTypeEquivalence[A2, B2], column3Equivalence: ColumnTypeEquivalence[A3, B3], column4Equivalence: ColumnTypeEquivalence[A4, B4], column5Equivalence: ColumnTypeEquivalence[A5, B5]) =
+      GroupFunctionColumn[R](name, Seq(column1, column2, column3, column4, column5))
+  }
+
+  def GroupFunction6[A1, A2, A3, A4, A5, A6, R: ColumnType](name: String) = new {
+    def apply[B1, B2, B3, B4, B5, B6](column1: Column[B1], column2: Column[B2], column3: Column[B3], column4: Column[B4], column5: Column[B5], column6: Column[B6])(implicit column1Equivalence: ColumnTypeEquivalence[A1, B1], column2Equivalence: ColumnTypeEquivalence[A2, B2], column3Equivalence: ColumnTypeEquivalence[A3, B3], column4Equivalence: ColumnTypeEquivalence[A4, B4], column5Equivalence: ColumnTypeEquivalence[A5, B5], column6Equivalence: ColumnTypeEquivalence[A6, B6]) =
+      GroupFunctionColumn[R](name, Seq(column1, column2, column3, column4, column5, column6))
+  }
+
+  def GroupFunction7[A1, A2, A3, A4, A5, A6, A7, R: ColumnType](name: String) = new {
+    def apply[B1, B2, B3, B4, B5, B6, B7](column1: Column[B1], column2: Column[B2], column3: Column[B3], column4: Column[B4], column5: Column[B5], column6: Column[B6], column7: Column[B7])(implicit column1Equivalence: ColumnTypeEquivalence[A1, B1], column2Equivalence: ColumnTypeEquivalence[A2, B2], column3Equivalence: ColumnTypeEquivalence[A3, B3], column4Equivalence: ColumnTypeEquivalence[A4, B4], column5Equivalence: ColumnTypeEquivalence[A5, B5], column6Equivalence: ColumnTypeEquivalence[A6, B6], column7Equivalence: ColumnTypeEquivalence[A7, B7]) =
+      GroupFunctionColumn[R](name, Seq(column1, column2, column3, column4, column5, column6, column7))
+  }
+
+  def GroupFunction8[A1, A2, A3, A4, A5, A6, A7, A8, R: ColumnType](name: String) = new {
+    def apply[B1, B2, B3, B4, B5, B6, B7, B8](column1: Column[B1], column2: Column[B2], column3: Column[B3], column4: Column[B4], column5: Column[B5], column6: Column[B6], column7: Column[B7], column8: Column[B8])(implicit column1Equivalence: ColumnTypeEquivalence[A1, B1], column2Equivalence: ColumnTypeEquivalence[A2, B2], column3Equivalence: ColumnTypeEquivalence[A3, B3], column4Equivalence: ColumnTypeEquivalence[A4, B4], column5Equivalence: ColumnTypeEquivalence[A5, B5], column6Equivalence: ColumnTypeEquivalence[A6, B6], column7Equivalence: ColumnTypeEquivalence[A7, B7], column8Equivalence: ColumnTypeEquivalence[A8, B8]) =
+      GroupFunctionColumn[R](name, Seq(column1, column2, column3, column4, column5, column6, column7, column8))
+  }
+
+  def GroupFunction9[A1, A2, A3, A4, A5, A6, A7, A8, A9, R: ColumnType](name: String) = new {
+    def apply[B1, B2, B3, B4, B5, B6, B7, B8, B9](column1: Column[B1], column2: Column[B2], column3: Column[B3], column4: Column[B4], column5: Column[B5], column6: Column[B6], column7: Column[B7], column8: Column[B8], column9: Column[B9])(implicit column1Equivalence: ColumnTypeEquivalence[A1, B1], column2Equivalence: ColumnTypeEquivalence[A2, B2], column3Equivalence: ColumnTypeEquivalence[A3, B3], column4Equivalence: ColumnTypeEquivalence[A4, B4], column5Equivalence: ColumnTypeEquivalence[A5, B5], column6Equivalence: ColumnTypeEquivalence[A6, B6], column7Equivalence: ColumnTypeEquivalence[A7, B7], column8Equivalence: ColumnTypeEquivalence[A8, B8], column9Equivalence: ColumnTypeEquivalence[A9, B9]) =
+      GroupFunctionColumn[R](name, Seq(column1, column2, column3, column4, column5, column6, column7, column8, column9))
+  }
+
+  def GroupFunction10[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, R: ColumnType](name: String) = new {
+    def apply[B1, B2, B3, B4, B5, B6, B7, B8, B9, B10](column1: Column[B1], column2: Column[B2], column3: Column[B3], column4: Column[B4], column5: Column[B5], column6: Column[B6], column7: Column[B7], column8: Column[B8], column9: Column[B9], column10: Column[B10])(implicit column1Equivalence: ColumnTypeEquivalence[A1, B1], column2Equivalence: ColumnTypeEquivalence[A2, B2], column3Equivalence: ColumnTypeEquivalence[A3, B3], column4Equivalence: ColumnTypeEquivalence[A4, B4], column5Equivalence: ColumnTypeEquivalence[A5, B5], column6Equivalence: ColumnTypeEquivalence[A6, B6], column7Equivalence: ColumnTypeEquivalence[A7, B7], column8Equivalence: ColumnTypeEquivalence[A8, B8], column9Equivalence: ColumnTypeEquivalence[A9, B9], column10Equivalence: ColumnTypeEquivalence[A10, B10]) =
+      GroupFunctionColumn[R](name, Seq(column1, column2, column3, column4, column5, column6, column7, column8, column9, column10))
+  }
+
+  def GroupFunction11[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, R: ColumnType](name: String) = new {
+    def apply[B1, B2, B3, B4, B5, B6, B7, B8, B9, B10, B11](column1: Column[B1], column2: Column[B2], column3: Column[B3], column4: Column[B4], column5: Column[B5], column6: Column[B6], column7: Column[B7], column8: Column[B8], column9: Column[B9], column10: Column[B10], column11: Column[B11])(implicit column1Equivalence: ColumnTypeEquivalence[A1, B1], column2Equivalence: ColumnTypeEquivalence[A2, B2], column3Equivalence: ColumnTypeEquivalence[A3, B3], column4Equivalence: ColumnTypeEquivalence[A4, B4], column5Equivalence: ColumnTypeEquivalence[A5, B5], column6Equivalence: ColumnTypeEquivalence[A6, B6], column7Equivalence: ColumnTypeEquivalence[A7, B7], column8Equivalence: ColumnTypeEquivalence[A8, B8], column9Equivalence: ColumnTypeEquivalence[A9, B9], column10Equivalence: ColumnTypeEquivalence[A10, B10], column11Equivalence: ColumnTypeEquivalence[A11, B11]) =
+      GroupFunctionColumn[R](name, Seq(column1, column2, column3, column4, column5, column6, column7, column8, column9, column10, column11))
+  }
+
+  def GroupFunction12[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, R: ColumnType](name: String) = new {
+    def apply[B1, B2, B3, B4, B5, B6, B7, B8, B9, B10, B11, B12](column1: Column[B1], column2: Column[B2], column3: Column[B3], column4: Column[B4], column5: Column[B5], column6: Column[B6], column7: Column[B7], column8: Column[B8], column9: Column[B9], column10: Column[B10], column11: Column[B11], column12: Column[B12])(implicit column1Equivalence: ColumnTypeEquivalence[A1, B1], column2Equivalence: ColumnTypeEquivalence[A2, B2], column3Equivalence: ColumnTypeEquivalence[A3, B3], column4Equivalence: ColumnTypeEquivalence[A4, B4], column5Equivalence: ColumnTypeEquivalence[A5, B5], column6Equivalence: ColumnTypeEquivalence[A6, B6], column7Equivalence: ColumnTypeEquivalence[A7, B7], column8Equivalence: ColumnTypeEquivalence[A8, B8], column9Equivalence: ColumnTypeEquivalence[A9, B9], column10Equivalence: ColumnTypeEquivalence[A10, B10], column11Equivalence: ColumnTypeEquivalence[A11, B11], column12Equivalence: ColumnTypeEquivalence[A12, B12]) =
+      GroupFunctionColumn[R](name, Seq(column1, column2, column3, column4, column5, column6, column7, column8, column9, column10, column11, column12))
+  }
+
+  def GroupFunction13[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, R: ColumnType](name: String) = new {
+    def apply[B1, B2, B3, B4, B5, B6, B7, B8, B9, B10, B11, B12, B13](column1: Column[B1], column2: Column[B2], column3: Column[B3], column4: Column[B4], column5: Column[B5], column6: Column[B6], column7: Column[B7], column8: Column[B8], column9: Column[B9], column10: Column[B10], column11: Column[B11], column12: Column[B12], column13: Column[B13])(implicit column1Equivalence: ColumnTypeEquivalence[A1, B1], column2Equivalence: ColumnTypeEquivalence[A2, B2], column3Equivalence: ColumnTypeEquivalence[A3, B3], column4Equivalence: ColumnTypeEquivalence[A4, B4], column5Equivalence: ColumnTypeEquivalence[A5, B5], column6Equivalence: ColumnTypeEquivalence[A6, B6], column7Equivalence: ColumnTypeEquivalence[A7, B7], column8Equivalence: ColumnTypeEquivalence[A8, B8], column9Equivalence: ColumnTypeEquivalence[A9, B9], column10Equivalence: ColumnTypeEquivalence[A10, B10], column11Equivalence: ColumnTypeEquivalence[A11, B11], column12Equivalence: ColumnTypeEquivalence[A12, B12], column13Equivalence: ColumnTypeEquivalence[A13, B13]) =
+      GroupFunctionColumn[R](name, Seq(column1, column2, column3, column4, column5, column6, column7, column8, column9, column10, column11, column12, column13))
+  }
+
+  def GroupFunction14[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, R: ColumnType](name: String) = new {
+    def apply[B1, B2, B3, B4, B5, B6, B7, B8, B9, B10, B11, B12, B13, B14](column1: Column[B1], column2: Column[B2], column3: Column[B3], column4: Column[B4], column5: Column[B5], column6: Column[B6], column7: Column[B7], column8: Column[B8], column9: Column[B9], column10: Column[B10], column11: Column[B11], column12: Column[B12], column13: Column[B13], column14: Column[B14])(implicit column1Equivalence: ColumnTypeEquivalence[A1, B1], column2Equivalence: ColumnTypeEquivalence[A2, B2], column3Equivalence: ColumnTypeEquivalence[A3, B3], column4Equivalence: ColumnTypeEquivalence[A4, B4], column5Equivalence: ColumnTypeEquivalence[A5, B5], column6Equivalence: ColumnTypeEquivalence[A6, B6], column7Equivalence: ColumnTypeEquivalence[A7, B7], column8Equivalence: ColumnTypeEquivalence[A8, B8], column9Equivalence: ColumnTypeEquivalence[A9, B9], column10Equivalence: ColumnTypeEquivalence[A10, B10], column11Equivalence: ColumnTypeEquivalence[A11, B11], column12Equivalence: ColumnTypeEquivalence[A12, B12], column13Equivalence: ColumnTypeEquivalence[A13, B13], column14Equivalence: ColumnTypeEquivalence[A14, B14]) =
+      GroupFunctionColumn[R](name, Seq(column1, column2, column3, column4, column5, column6, column7, column8, column9, column10, column11, column12, column13, column14))
+  }
+
+  def GroupFunction15[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, R: ColumnType](name: String) = new {
+    def apply[B1, B2, B3, B4, B5, B6, B7, B8, B9, B10, B11, B12, B13, B14, B15](column1: Column[B1], column2: Column[B2], column3: Column[B3], column4: Column[B4], column5: Column[B5], column6: Column[B6], column7: Column[B7], column8: Column[B8], column9: Column[B9], column10: Column[B10], column11: Column[B11], column12: Column[B12], column13: Column[B13], column14: Column[B14], column15: Column[B15])(implicit column1Equivalence: ColumnTypeEquivalence[A1, B1], column2Equivalence: ColumnTypeEquivalence[A2, B2], column3Equivalence: ColumnTypeEquivalence[A3, B3], column4Equivalence: ColumnTypeEquivalence[A4, B4], column5Equivalence: ColumnTypeEquivalence[A5, B5], column6Equivalence: ColumnTypeEquivalence[A6, B6], column7Equivalence: ColumnTypeEquivalence[A7, B7], column8Equivalence: ColumnTypeEquivalence[A8, B8], column9Equivalence: ColumnTypeEquivalence[A9, B9], column10Equivalence: ColumnTypeEquivalence[A10, B10], column11Equivalence: ColumnTypeEquivalence[A11, B11], column12Equivalence: ColumnTypeEquivalence[A12, B12], column13Equivalence: ColumnTypeEquivalence[A13, B13], column14Equivalence: ColumnTypeEquivalence[A14, B14], column15Equivalence: ColumnTypeEquivalence[A15, B15]) =
+      GroupFunctionColumn[R](name, Seq(column1, column2, column3, column4, column5, column6, column7, column8, column9, column10, column11, column12, column13, column14, column15))
+  }
+
+  def GroupFunction16[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, R: ColumnType](name: String) = new {
+    def apply[B1, B2, B3, B4, B5, B6, B7, B8, B9, B10, B11, B12, B13, B14, B15, B16](column1: Column[B1], column2: Column[B2], column3: Column[B3], column4: Column[B4], column5: Column[B5], column6: Column[B6], column7: Column[B7], column8: Column[B8], column9: Column[B9], column10: Column[B10], column11: Column[B11], column12: Column[B12], column13: Column[B13], column14: Column[B14], column15: Column[B15], column16: Column[B16])(implicit column1Equivalence: ColumnTypeEquivalence[A1, B1], column2Equivalence: ColumnTypeEquivalence[A2, B2], column3Equivalence: ColumnTypeEquivalence[A3, B3], column4Equivalence: ColumnTypeEquivalence[A4, B4], column5Equivalence: ColumnTypeEquivalence[A5, B5], column6Equivalence: ColumnTypeEquivalence[A6, B6], column7Equivalence: ColumnTypeEquivalence[A7, B7], column8Equivalence: ColumnTypeEquivalence[A8, B8], column9Equivalence: ColumnTypeEquivalence[A9, B9], column10Equivalence: ColumnTypeEquivalence[A10, B10], column11Equivalence: ColumnTypeEquivalence[A11, B11], column12Equivalence: ColumnTypeEquivalence[A12, B12], column13Equivalence: ColumnTypeEquivalence[A13, B13], column14Equivalence: ColumnTypeEquivalence[A14, B14], column15Equivalence: ColumnTypeEquivalence[A15, B15], column16Equivalence: ColumnTypeEquivalence[A16, B16]) =
+      GroupFunctionColumn[R](name, Seq(column1, column2, column3, column4, column5, column6, column7, column8, column9, column10, column11, column12, column13, column14, column15, column16))
+  }
+
+  def GroupFunction17[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, R: ColumnType](name: String) = new {
+    def apply[B1, B2, B3, B4, B5, B6, B7, B8, B9, B10, B11, B12, B13, B14, B15, B16, B17](column1: Column[B1], column2: Column[B2], column3: Column[B3], column4: Column[B4], column5: Column[B5], column6: Column[B6], column7: Column[B7], column8: Column[B8], column9: Column[B9], column10: Column[B10], column11: Column[B11], column12: Column[B12], column13: Column[B13], column14: Column[B14], column15: Column[B15], column16: Column[B16], column17: Column[B17])(implicit column1Equivalence: ColumnTypeEquivalence[A1, B1], column2Equivalence: ColumnTypeEquivalence[A2, B2], column3Equivalence: ColumnTypeEquivalence[A3, B3], column4Equivalence: ColumnTypeEquivalence[A4, B4], column5Equivalence: ColumnTypeEquivalence[A5, B5], column6Equivalence: ColumnTypeEquivalence[A6, B6], column7Equivalence: ColumnTypeEquivalence[A7, B7], column8Equivalence: ColumnTypeEquivalence[A8, B8], column9Equivalence: ColumnTypeEquivalence[A9, B9], column10Equivalence: ColumnTypeEquivalence[A10, B10], column11Equivalence: ColumnTypeEquivalence[A11, B11], column12Equivalence: ColumnTypeEquivalence[A12, B12], column13Equivalence: ColumnTypeEquivalence[A13, B13], column14Equivalence: ColumnTypeEquivalence[A14, B14], column15Equivalence: ColumnTypeEquivalence[A15, B15], column16Equivalence: ColumnTypeEquivalence[A16, B16], column17Equivalence: ColumnTypeEquivalence[A17, B17]) =
+      GroupFunctionColumn[R](name, Seq(column1, column2, column3, column4, column5, column6, column7, column8, column9, column10, column11, column12, column13, column14, column15, column16, column17))
+  }
+
+  def GroupFunction18[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, R: ColumnType](name: String) = new {
+    def apply[B1, B2, B3, B4, B5, B6, B7, B8, B9, B10, B11, B12, B13, B14, B15, B16, B17, B18](column1: Column[B1], column2: Column[B2], column3: Column[B3], column4: Column[B4], column5: Column[B5], column6: Column[B6], column7: Column[B7], column8: Column[B8], column9: Column[B9], column10: Column[B10], column11: Column[B11], column12: Column[B12], column13: Column[B13], column14: Column[B14], column15: Column[B15], column16: Column[B16], column17: Column[B17], column18: Column[B18])(implicit column1Equivalence: ColumnTypeEquivalence[A1, B1], column2Equivalence: ColumnTypeEquivalence[A2, B2], column3Equivalence: ColumnTypeEquivalence[A3, B3], column4Equivalence: ColumnTypeEquivalence[A4, B4], column5Equivalence: ColumnTypeEquivalence[A5, B5], column6Equivalence: ColumnTypeEquivalence[A6, B6], column7Equivalence: ColumnTypeEquivalence[A7, B7], column8Equivalence: ColumnTypeEquivalence[A8, B8], column9Equivalence: ColumnTypeEquivalence[A9, B9], column10Equivalence: ColumnTypeEquivalence[A10, B10], column11Equivalence: ColumnTypeEquivalence[A11, B11], column12Equivalence: ColumnTypeEquivalence[A12, B12], column13Equivalence: ColumnTypeEquivalence[A13, B13], column14Equivalence: ColumnTypeEquivalence[A14, B14], column15Equivalence: ColumnTypeEquivalence[A15, B15], column16Equivalence: ColumnTypeEquivalence[A16, B16], column17Equivalence: ColumnTypeEquivalence[A17, B17], column18Equivalence: ColumnTypeEquivalence[A18, B18]) =
+      GroupFunctionColumn[R](name, Seq(column1, column2, column3, column4, column5, column6, column7, column8, column9, column10, column11, column12, column13, column14, column15, column16, column17, column18))
+  }
+
+  def GroupFunction19[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, R: ColumnType](name: String) = new {
+    def apply[B1, B2, B3, B4, B5, B6, B7, B8, B9, B10, B11, B12, B13, B14, B15, B16, B17, B18, B19](column1: Column[B1], column2: Column[B2], column3: Column[B3], column4: Column[B4], column5: Column[B5], column6: Column[B6], column7: Column[B7], column8: Column[B8], column9: Column[B9], column10: Column[B10], column11: Column[B11], column12: Column[B12], column13: Column[B13], column14: Column[B14], column15: Column[B15], column16: Column[B16], column17: Column[B17], column18: Column[B18], column19: Column[B19])(implicit column1Equivalence: ColumnTypeEquivalence[A1, B1], column2Equivalence: ColumnTypeEquivalence[A2, B2], column3Equivalence: ColumnTypeEquivalence[A3, B3], column4Equivalence: ColumnTypeEquivalence[A4, B4], column5Equivalence: ColumnTypeEquivalence[A5, B5], column6Equivalence: ColumnTypeEquivalence[A6, B6], column7Equivalence: ColumnTypeEquivalence[A7, B7], column8Equivalence: ColumnTypeEquivalence[A8, B8], column9Equivalence: ColumnTypeEquivalence[A9, B9], column10Equivalence: ColumnTypeEquivalence[A10, B10], column11Equivalence: ColumnTypeEquivalence[A11, B11], column12Equivalence: ColumnTypeEquivalence[A12, B12], column13Equivalence: ColumnTypeEquivalence[A13, B13], column14Equivalence: ColumnTypeEquivalence[A14, B14], column15Equivalence: ColumnTypeEquivalence[A15, B15], column16Equivalence: ColumnTypeEquivalence[A16, B16], column17Equivalence: ColumnTypeEquivalence[A17, B17], column18Equivalence: ColumnTypeEquivalence[A18, B18], column19Equivalence: ColumnTypeEquivalence[A19, B19]) =
+      GroupFunctionColumn[R](name, Seq(column1, column2, column3, column4, column5, column6, column7, column8, column9, column10, column11, column12, column13, column14, column15, column16, column17, column18, column19))
+  }
+
+  def GroupFunction20[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, R: ColumnType](name: String) = new {
+    def apply[B1, B2, B3, B4, B5, B6, B7, B8, B9, B10, B11, B12, B13, B14, B15, B16, B17, B18, B19, B20](column1: Column[B1], column2: Column[B2], column3: Column[B3], column4: Column[B4], column5: Column[B5], column6: Column[B6], column7: Column[B7], column8: Column[B8], column9: Column[B9], column10: Column[B10], column11: Column[B11], column12: Column[B12], column13: Column[B13], column14: Column[B14], column15: Column[B15], column16: Column[B16], column17: Column[B17], column18: Column[B18], column19: Column[B19], column20: Column[B20])(implicit column1Equivalence: ColumnTypeEquivalence[A1, B1], column2Equivalence: ColumnTypeEquivalence[A2, B2], column3Equivalence: ColumnTypeEquivalence[A3, B3], column4Equivalence: ColumnTypeEquivalence[A4, B4], column5Equivalence: ColumnTypeEquivalence[A5, B5], column6Equivalence: ColumnTypeEquivalence[A6, B6], column7Equivalence: ColumnTypeEquivalence[A7, B7], column8Equivalence: ColumnTypeEquivalence[A8, B8], column9Equivalence: ColumnTypeEquivalence[A9, B9], column10Equivalence: ColumnTypeEquivalence[A10, B10], column11Equivalence: ColumnTypeEquivalence[A11, B11], column12Equivalence: ColumnTypeEquivalence[A12, B12], column13Equivalence: ColumnTypeEquivalence[A13, B13], column14Equivalence: ColumnTypeEquivalence[A14, B14], column15Equivalence: ColumnTypeEquivalence[A15, B15], column16Equivalence: ColumnTypeEquivalence[A16, B16], column17Equivalence: ColumnTypeEquivalence[A17, B17], column18Equivalence: ColumnTypeEquivalence[A18, B18], column19Equivalence: ColumnTypeEquivalence[A19, B19], column20Equivalence: ColumnTypeEquivalence[A20, B20]) =
+      GroupFunctionColumn[R](name, Seq(column1, column2, column3, column4, column5, column6, column7, column8, column9, column10, column11, column12, column13, column14, column15, column16, column17, column18, column19, column20))
+  }
+
+  def GroupFunction21[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, R: ColumnType](name: String) = new {
+    def apply[B1, B2, B3, B4, B5, B6, B7, B8, B9, B10, B11, B12, B13, B14, B15, B16, B17, B18, B19, B20, B21](column1: Column[B1], column2: Column[B2], column3: Column[B3], column4: Column[B4], column5: Column[B5], column6: Column[B6], column7: Column[B7], column8: Column[B8], column9: Column[B9], column10: Column[B10], column11: Column[B11], column12: Column[B12], column13: Column[B13], column14: Column[B14], column15: Column[B15], column16: Column[B16], column17: Column[B17], column18: Column[B18], column19: Column[B19], column20: Column[B20], column21: Column[B21])(implicit column1Equivalence: ColumnTypeEquivalence[A1, B1], column2Equivalence: ColumnTypeEquivalence[A2, B2], column3Equivalence: ColumnTypeEquivalence[A3, B3], column4Equivalence: ColumnTypeEquivalence[A4, B4], column5Equivalence: ColumnTypeEquivalence[A5, B5], column6Equivalence: ColumnTypeEquivalence[A6, B6], column7Equivalence: ColumnTypeEquivalence[A7, B7], column8Equivalence: ColumnTypeEquivalence[A8, B8], column9Equivalence: ColumnTypeEquivalence[A9, B9], column10Equivalence: ColumnTypeEquivalence[A10, B10], column11Equivalence: ColumnTypeEquivalence[A11, B11], column12Equivalence: ColumnTypeEquivalence[A12, B12], column13Equivalence: ColumnTypeEquivalence[A13, B13], column14Equivalence: ColumnTypeEquivalence[A14, B14], column15Equivalence: ColumnTypeEquivalence[A15, B15], column16Equivalence: ColumnTypeEquivalence[A16, B16], column17Equivalence: ColumnTypeEquivalence[A17, B17], column18Equivalence: ColumnTypeEquivalence[A18, B18], column19Equivalence: ColumnTypeEquivalence[A19, B19], column20Equivalence: ColumnTypeEquivalence[A20, B20], column21Equivalence: ColumnTypeEquivalence[A21, B21]) =
+      GroupFunctionColumn[R](name, Seq(column1, column2, column3, column4, column5, column6, column7, column8, column9, column10, column11, column12, column13, column14, column15, column16, column17, column18, column19, column20, column21))
+  }
+
+  def GroupFunction22[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, A16, A17, A18, A19, A20, A21, A22, R: ColumnType](name: String) = new {
+    def apply[B1, B2, B3, B4, B5, B6, B7, B8, B9, B10, B11, B12, B13, B14, B15, B16, B17, B18, B19, B20, B21, B22](column1: Column[B1], column2: Column[B2], column3: Column[B3], column4: Column[B4], column5: Column[B5], column6: Column[B6], column7: Column[B7], column8: Column[B8], column9: Column[B9], column10: Column[B10], column11: Column[B11], column12: Column[B12], column13: Column[B13], column14: Column[B14], column15: Column[B15], column16: Column[B16], column17: Column[B17], column18: Column[B18], column19: Column[B19], column20: Column[B20], column21: Column[B21], column22: Column[B22])(implicit column1Equivalence: ColumnTypeEquivalence[A1, B1], column2Equivalence: ColumnTypeEquivalence[A2, B2], column3Equivalence: ColumnTypeEquivalence[A3, B3], column4Equivalence: ColumnTypeEquivalence[A4, B4], column5Equivalence: ColumnTypeEquivalence[A5, B5], column6Equivalence: ColumnTypeEquivalence[A6, B6], column7Equivalence: ColumnTypeEquivalence[A7, B7], column8Equivalence: ColumnTypeEquivalence[A8, B8], column9Equivalence: ColumnTypeEquivalence[A9, B9], column10Equivalence: ColumnTypeEquivalence[A10, B10], column11Equivalence: ColumnTypeEquivalence[A11, B11], column12Equivalence: ColumnTypeEquivalence[A12, B12], column13Equivalence: ColumnTypeEquivalence[A13, B13], column14Equivalence: ColumnTypeEquivalence[A14, B14], column15Equivalence: ColumnTypeEquivalence[A15, B15], column16Equivalence: ColumnTypeEquivalence[A16, B16], column17Equivalence: ColumnTypeEquivalence[A17, B17], column18Equivalence: ColumnTypeEquivalence[A18, B18], column19Equivalence: ColumnTypeEquivalence[A19, B19], column20Equivalence: ColumnTypeEquivalence[A20, B20], column21Equivalence: ColumnTypeEquivalence[A21, B21], column22Equivalence: ColumnTypeEquivalence[A22, B22]) =
+      GroupFunctionColumn[R](name, Seq(column1, column2, column3, column4, column5, column6, column7, column8, column9, column10, column11, column12, column13, column14, column15, column16, column17, column18, column19, column20, column21, column22))
+  }
+}

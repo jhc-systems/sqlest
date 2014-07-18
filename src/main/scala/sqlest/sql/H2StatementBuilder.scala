@@ -16,4 +16,13 @@
 
 package sqlest.sql
 
-object H2StatementBuilder extends StatementBuilder
+import sqlest.ast.{ Column, GroupFunctionColumn }
+
+trait H2StatementBuilder extends StatementBuilder {
+  override def columnSql(column: Column[_]): String = column match {
+    case column: GroupFunctionColumn[_] => throw new UnsupportedOperationException
+    case column => super.columnSql(column)
+  }
+}
+
+object H2StatementBuilder extends H2StatementBuilder

@@ -14,24 +14,12 @@
  * limitations under the License.
  */
 
-import sqlest.ast._
-import sqlest.ast.syntax._
-import sqlest.executor._
-import sqlest.extractor._
-import sqlest.untyped._
+package sqlest.ast.syntax
 
-package object sqlest extends SqlestCore
-  with QuerySyntax
-  with ColumnSyntax
-  with JoinSyntax
-  with OrderSyntax
-  with ExtractorSyntax
-  with ExecutorSyntax
-  with MappedColumnTypes
-  with TableFunctions
-  with ScalarFunctions
-  with GroupFunctions
-  with AggregateFunctionSyntax
-  with ScalarFunctionSyntax
-  with GroupFunctionSyntax
-  with SqlestUntyped
+import sqlest.ast._
+
+trait GroupFunctionSyntax extends GroupFunctions {
+  def cube[A: ColumnType](columns: Column[A]*) = GroupFunctionColumn[A]("cube", columns)
+  def rollUp[A: ColumnType](columns: Column[A]*) = GroupFunctionColumn[A]("rollup", columns)
+  def groupingSets[A: ColumnType](columns: Column[A]*) = GroupFunctionColumn[A]("grouping sets", columns)
+}
