@@ -142,7 +142,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec
     )
   }
 
-  "select with group by & rollup" should "use group by rollup()" in {
+  "select with group by rollup" should "produce the right sql" in {
     sql {
       select(sum(MyTable.col1).as("sum"))
         .from(MyTable)
@@ -159,36 +159,37 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec
     )
   }
 
-  "select with nested group functions" should "produce the right sql" in {
+  "select with group by column, tuple & function" should "produce the right sql" in {
     sql {
       select(sum(MyTable.col1).as("sum"))
         .from(MyTable)
         .where(MyTable.col1 > 123)
-        .groupBy(groupingSets(MyTable.col1, cube(MyTable.col1, MyTable.col2), rollUp(MyTable.col2)))
+        .groupBy(MyTable.col1, (MyTable.col1, MyTable.col2), rollUp(MyTable.col2))
     } should equal(
       s"""
        |select sum(mytable.col1) as sum
        |from mytable
        |where (mytable.col1 > ?)
-       |group by grouping sets(mytable.col1, cube(mytable.col1, mytable.col2), rollup(mytable.col2))
+       |group by mytable.col1, (mytable.col1, mytable.col2), rollup(mytable.col2)
        """.trim.stripMargin.split(lineSeparator).mkString(" "),
       List(123)
     )
   }
 
-  "select with rollup as aliased column" should "throw an AssertionError" in {
-    an[AssertionError] should be thrownBy sql {
-      select(sum(MyTable.col1).as("sum"), rollUp(MyTable.col2).as("rollup"))
-        .from(MyTable)
-        .where(MyTable.col1 > 123)
-    }
-  }
-
-  "select with rollup as where clause" should "throw an AssertionError" in {
-    an[AssertionError] should be thrownBy sql {
+  "select with nested group functions" should "produce the right sql" in {
+    sql {
       select(sum(MyTable.col1).as("sum"))
         .from(MyTable)
-        .where(MyTable.col1 > 123 && rollUp(MyTable.col2) > 123)
-    }
+        .where(MyTable.col1 > 123)
+        .groupBy(groupingSets(MyTable.col1, cube((MyTable.col1, MyTable.col2), MyTable.col2), rollUp(MyTable.col2)), MyTable.col2)
+    } should equal(
+      s"""
+       |select sum(mytable.col1) as sum
+       |from mytable
+       |where (mytable.col1 > ?)
+       |group by grouping sets(mytable.col1, cube((mytable.col1, mytable.col2), mytable.col2), rollup(mytable.col2)), mytable.col2
+       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+      List(123)
+    )
   }
 }

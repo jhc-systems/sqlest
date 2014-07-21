@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2014 JHC Systems Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,24 +14,15 @@
  * limitations under the License.
  */
 
-import sqlest.ast._
-import sqlest.ast.syntax._
-import sqlest.executor._
-import sqlest.extractor._
-import sqlest.untyped._
+package sqlest.ast.syntax
 
-package object sqlest extends SqlestCore
-  with QuerySyntax
-  with ColumnSyntax
-  with JoinSyntax
-  with OrderSyntax
-  with ExtractorSyntax
-  with ExecutorSyntax
-  with MappedColumnTypes
-  with TableFunctions
-  with ScalarFunctions
-  with AggregateFunctionSyntax
-  with ScalarFunctionSyntax
-  with GroupSyntax
-  with Groups
-  with SqlestUntyped
+import sqlest.ast._
+import scala.language.implicitConversions
+
+trait GroupSyntax {
+  implicit def columnGroup(column: Column[_]) = ColumnGroup(column)
+
+  def cube(columns: Group*) = FunctionGroup("cube", columns: _*)
+  def rollUp(columns: Group*) = FunctionGroup("rollup", columns: _*)
+  def groupingSets(columns: Group*) = FunctionGroup("grouping sets", columns: _*)
+}

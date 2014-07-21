@@ -16,12 +16,12 @@
 
 package sqlest.sql
 
-import sqlest.ast.{ Column, GroupFunctionColumn }
+import sqlest.ast._
 
 trait H2StatementBuilder extends StatementBuilder {
-  override def columnSql(column: Column[_]): String = column match {
-    case column: GroupFunctionColumn[_] => throw new UnsupportedOperationException
-    case column => super.columnSql(column)
+  override def groupSql(group: Group): String = group match {
+    case group: FunctionGroup => throw new UnsupportedOperationException
+    case group => super.groupSql(group)
   }
 }
 

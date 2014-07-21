@@ -43,7 +43,6 @@ trait BaseStatementBuilder {
     case column: PostfixFunctionColumn[_] => postfixSql(column.name, column.parameter)
     case column: DoubleInfixFunctionColumn[_] => doubleInfixSql(column.infix1, column.infix2, column.parameter1, column.parameter2, column.parameter3)
     case column: ScalarFunctionColumn[_] => functionSql(column.name, column.parameters: _*)
-    case column: GroupFunctionColumn[_] => functionSql(column.name, column.parameters: _*)
     case column: TableColumn[_] => identifierSql(column.tableAlias) + "." + identifierSql(column.columnName)
     case column: AliasColumn[_] => identifierSql(column.columnAlias)
   }
@@ -66,12 +65,21 @@ trait BaseStatementBuilder {
   def orderListSql(order: Seq[Order]) =
     order map orderSql mkString ", "
 
+  def groupListSql(group: Seq[Group]) =
+    group map groupSql mkString ", "
+
   def orderSql(order: Order) = {
     if (order.ascending) {
       columnSql(order.column)
     } else {
       columnSql(order.column) + " desc"
     }
+  }
+
+  def groupSql(group: Group): String = group match {
+    case group: ColumnGroup => columnSql(group.column)
+    case group: TupleGroup => s"(${group.columns map groupSql mkString ", "})"
+    case group: FunctionGroup => s"${group.name}(${group.columns map groupSql mkString ", "})"
   }
 
   def literalSql[A](literal: A) =
@@ -116,7 +124,6 @@ trait BaseStatementBuilder {
     case PostfixFunctionColumn(_, a) => columnArgs(a)
     case DoubleInfixFunctionColumn(_, _, a, b, c) => columnArgs(a) ++ columnArgs(b) ++ columnArgs(c)
     case ScalarFunctionColumn(_, parameters) => parameters.toList flatMap columnArgs
-    case column: GroupFunctionColumn[_] => throw new AssertionError("Grouping functions cannot be used outside group by")
     case column: TableColumn[_] => Nil
     case column: AliasColumn[_] => Nil
   }

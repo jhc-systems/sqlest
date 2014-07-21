@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2014 JHC Systems Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package sqlest.ast.syntax
+package sqlest.ast
 
-import sqlest.ast._
+sealed trait Group
 
-trait GroupFunctionSyntax {
-  def cube[A: ColumnType](columns: Column[A]*) = GroupFunctionColumn[A]("cube", columns)
-  def rollUp[A: ColumnType](columns: Column[A]*) = GroupFunctionColumn[A]("rollup", columns)
-  def groupingSets[A: ColumnType](columns: Column[A]*) = GroupFunctionColumn[A]("grouping sets", columns)
-}
+case class ColumnGroup(column: Column[_]) extends Group
+
+case class TupleGroup(columns: Group*) extends Group
+case class FunctionGroup(name: String, columns: Group*) extends Group
