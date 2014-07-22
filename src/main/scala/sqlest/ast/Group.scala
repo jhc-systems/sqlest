@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2014 JHC Systems Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,5 +20,5 @@ sealed trait Group
 
 case class ColumnGroup(column: Column[_]) extends Group
 
-case class TupleGroup(columns: Group*) extends Group
-case class FunctionGroup(name: String, columns: Group*) extends Group
+case class TupleGroup(columns: List[Group]) extends Group
+case class FunctionGroup(name: String, columns: List[Group]) extends Group

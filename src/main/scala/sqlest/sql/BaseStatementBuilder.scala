@@ -78,7 +78,7 @@ trait BaseStatementBuilder {
 
   def groupSql(group: Group): String = group match {
     case group: ColumnGroup => columnSql(group.column)
-    case group: TupleGroup => s"(${group.columns map groupSql mkString ", "})"
+    case group: TupleGroup => group.columns.map(groupSql).mkString("(", ", ", ")")
     case group: FunctionGroup => s"${group.name}(${group.columns map groupSql mkString ", "})"
   }
 

@@ -22,7 +22,7 @@ import scala.language.implicitConversions
 trait GroupSyntax {
   implicit def columnGroup(column: Column[_]) = ColumnGroup(column)
 
-  def cube(columns: Group*) = FunctionGroup("cube", columns: _*)
-  def rollUp(columns: Group*) = FunctionGroup("rollup", columns: _*)
-  def groupingSets(columns: Group*) = FunctionGroup("grouping sets", columns: _*)
+  def cube(columns: Group*) = FunctionGroup("cube", columns.toList)
+  def rollUp(columns: Group*) = FunctionGroup("rollup", columns.toList)
+  def groupingSets(columns: Group*) = FunctionGroup("grouping sets", columns.toList)
 }
