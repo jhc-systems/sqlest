@@ -1,6 +1,6 @@
 # sqlest
 
-**sqlest** is a database library for Scala. It allows you to write SQL directly in Scala with type safety guarantees while also providing a simple mechanism of extracting domain specific case classes from the results. 
+**sqlest** is a database library for Scala. It allows you to write SQL directly in Scala with type safety guarantees while also providing a simple mechanism of extracting domain specific case classes from the results.
 
 [![Build Status](https://travis-ci.org/jhc-systems/sqlest.svg?branch=master)](https://travis-ci.org/jhc-systems/sqlest)
 
@@ -122,7 +122,7 @@ select(smoothyExtractor.columns)    // Extractors maintain a list of columns the
 
 ==> Some(
       Smoothy(
-        "Magic dream shake", 
+        "Magic dream shake",
         List(
           Fruit("Banana", 2),
           Fruit("Orange", 7),
@@ -134,11 +134,14 @@ select(smoothyExtractor.columns)    // Extractors maintain a list of columns the
 ```
 
 ## Authors
-- Dave Gurnell
-- Brendan Maginnis
+- [Dave Gurnell](https://github.com/davegurnell)
+- [Brendan Maginnis](https://github.com/brendator)
+
+## Contributors
+- [David Gregory](https://github.com/DavidGregory084)
 
 ## Acknowledgements
-- Dean Chapman - author of Sqler which inspired sqlest
-- Frank Wallis - ideas, feedback and contributions
+- [Dean Chapman](https://github.com/p14n) - author of Sqler which inspired sqlest
+- [Frank Wallis](https://github.com/frankwallis) - ideas, feedback and contributions
 - [Slick](https://github.com/slick/slick) - a great project which contains many ideas used in sqlest
 - [jOOQ](https://github.com/jOOQ/jOOQ) - a similar project written in Java which provided many ideas used in sqlest
