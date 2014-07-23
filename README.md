@@ -135,7 +135,7 @@ select(smoothyExtractor.columns)    // Extractors maintain a list of columns the
 
 ## Authors
 - [Dave Gurnell](https://github.com/davegurnell)
-- [Brendan Maginnis](https://github.com/brendator)
+- [Brendan Maginnis](https://github.com/brendantor)
 
 ## Contributors
 - [David Gregory](https://github.com/DavidGregory084)
