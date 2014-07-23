@@ -19,7 +19,8 @@ object SqlestBuild extends Build {
       scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
 
       libraryDependencies ++= Seq(
-        "joda-time" % "joda-time" % "2.2",
+        "joda-time" % "joda-time" % "2.3",
+        "org.joda" % "joda-convert" % "1.6",
         "com.typesafe.scala-logging" %% "scala-logging-slf4j" % "2.1.2",
         "org.scalatest" %% "scalatest" % "2.1.7" % "test"
       ),
