@@ -126,8 +126,6 @@ case class ColumnExtractor[A](column: AliasedColumn[A]) extends SingleExtractor[
         .asInstanceOf[B] // ugly cast but it will always work
       case mapped: MappedColumnType[B, _] => mapped.read(read(row, mapped.baseType))
     }
-
-  def as[B](func: A => B) = MappedExtractor(this, func)
 }
 
 trait ProductExtractor[A <: Product] extends SingleExtractor[A] {
