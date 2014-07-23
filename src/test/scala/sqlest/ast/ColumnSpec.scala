@@ -98,8 +98,4 @@ class ColumnSpec extends FlatSpec with Matchers {
   //   """)
   // }
 
-  "sum" should "produce a unary column" in {
-    sum(1) should equal(ScalarFunction1[Int, Int]("sum")(intColumnType)(1))
-  }
-
 }

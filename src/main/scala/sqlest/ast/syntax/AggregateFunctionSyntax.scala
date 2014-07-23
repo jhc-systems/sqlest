@@ -19,9 +19,9 @@ package sqlest.ast.syntax
 import sqlest.ast._
 
 trait AggregateFunctionSyntax {
-  def count[A](column: Column[A] = AliasColumn[String](ConstantColumn("*"), "*")) = ScalarFunctionColumn[Int]("count", Seq(column))
-  def sum[A: Numeric](column: Column[A]) = (ScalarFunctionColumn[A]("sum", Seq(column))(column.columnType))
-  def min[A: Numeric](column: Column[A]) = (ScalarFunctionColumn[A]("min", Seq(column))(column.columnType))
-  def max[A: Numeric](column: Column[A]) = (ScalarFunctionColumn[A]("max", Seq(column))(column.columnType))
-  def avg[A: Numeric](column: Column[A]) = ScalarFunctionColumn[Double]("avg", Seq(column))
+  def count[A](column: Column[A] = AliasColumn[String](ConstantColumn("*"), "*")) = ScalarFunctionColumn[Int]("count", Seq(column)).as("count")
+  def sum[A: Numeric](column: Column[A]) = AliasColumn((ScalarFunctionColumn[A]("sum", Seq(column))(column.columnType)), "sum")(column.columnType)
+  def min[A: Numeric](column: Column[A]) = AliasColumn((ScalarFunctionColumn[A]("min", Seq(column))(column.columnType)), "min")(column.columnType)
+  def max[A: Numeric](column: Column[A]) = AliasColumn((ScalarFunctionColumn[A]("max", Seq(column))(column.columnType)), "max")(column.columnType)
+  def avg[A: Numeric](column: Column[A]) = AliasColumn[Double](ScalarFunctionColumn[Double]("avg", Seq(column)), "avg")
 }

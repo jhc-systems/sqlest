@@ -33,7 +33,7 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
   }
 
   "select with aliased column function" should "produce the right sql" in {
-    val func = sum(MyTable.col1) as "count"
+    val func = sum(MyTable.col1) as "sum-function"
 
     sql {
       select(MyTable.col1, MyTable.col2, func)
@@ -42,10 +42,10 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
         .orderBy(func.asc)
     } should equal(
       s"""
-       |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2, sum(mytable.col1) as count
+       |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2, sum(mytable.col1) as sum-function
        |from mytable
        |where (mytable.col1 = ?)
-       |order by count
+       |order by sum-function
        """.trim.stripMargin.split(lineSeparator).mkString(" "),
       List(123)
     )

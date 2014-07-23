@@ -53,8 +53,15 @@ trait ColumnSyntax {
     Setter[A, B](pair._1, pair._2.column)
 
   implicit class AliasColumnOps[A](left: Column[A])(implicit leftType: ColumnType[A]) {
-    def as(alias: String) = AliasColumn[A](left, alias)
-    def as(tableAlias: String, alias: String) = AliasColumn[A](left, tableAlias + "_" + alias)
+    def as(alias: String) = left match {
+      case AliasColumn(column, _) => AliasColumn[A](column, alias)
+      case _ => AliasColumn[A](left, alias)
+    }
+
+    def as(tableAlias: String, alias: String) = left match {
+      case AliasColumn(column, _) => AliasColumn[A](column, tableAlias + "_" + alias)
+      case _ => AliasColumn[A](left, tableAlias + "_" + alias)
+    }
   }
 
   implicit class NullableColumnsOps[A](left: Column[A])(implicit leftType: ColumnType[A]) {
