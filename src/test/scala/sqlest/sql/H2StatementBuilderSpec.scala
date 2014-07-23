@@ -140,6 +140,15 @@ class H2StatementBuilderSpec extends BaseStatementBuilderSpec
     )
   }
 
+  "select with group by & rollup" should "throw UnsupportedOperationException" in {
+    an[UnsupportedOperationException] should be thrownBy sql {
+      select(sum(MyTable.col1).as("sum"))
+        .from(MyTable)
+        .where(MyTable.col1 > 123)
+        .groupBy(rollUp(MyTable.col1, MyTable.col2))
+    }
+  }
+
   "select with multiple placeholders" should "produce the right sql" in {
     sql {
       select(1.column as "a", sum(2) as "b", (3.column + 4.column) as "c")

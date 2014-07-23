@@ -14,15 +14,11 @@
  * limitations under the License.
  */
 
-package sqlest.sql
+package sqlest.ast
 
-import sqlest.ast._
+sealed trait Group
 
-trait H2StatementBuilder extends StatementBuilder {
-  override def groupSql(group: Group): String = group match {
-    case group: FunctionGroup => throw new UnsupportedOperationException
-    case group => super.groupSql(group)
-  }
-}
+case class ColumnGroup(column: Column[_]) extends Group
 
-object H2StatementBuilder extends H2StatementBuilder
+case class TupleGroup(columns: List[Group]) extends Group
+case class FunctionGroup(name: String, columns: List[Group]) extends Group

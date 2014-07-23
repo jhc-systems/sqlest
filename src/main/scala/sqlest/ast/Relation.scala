@@ -109,7 +109,7 @@ case class Select(
     where: Option[Column[Boolean]] = None,
     startWith: Option[Column[Boolean]] = None,
     connectBy: Option[Column[Boolean]] = None,
-    groupBy: List[Column[_]] = Nil,
+    groupBy: List[Group] = Nil,
     orderBy: List[Order] = Nil,
     limit: Option[Long] = None,
     offset: Option[Long] = None) extends Relation with Query {
@@ -129,7 +129,7 @@ case class Select(
   def connectBy(expr: Column[Boolean]): Select =
     this.copy(connectBy = this.connectBy map (_ && expr) orElse Some(expr))
 
-  def groupBy(groupBys: Column[_]*): Select =
+  def groupBy(groupBys: Group*): Select =
     this.copy(groupBy = this.groupBy ++ groupBys)
 
   def orderBy(orders: Order*): Select =

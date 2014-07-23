@@ -65,12 +65,21 @@ trait BaseStatementBuilder {
   def orderListSql(order: Seq[Order]) =
     order map orderSql mkString ", "
 
+  def groupListSql(group: Seq[Group]) =
+    group map groupSql mkString ", "
+
   def orderSql(order: Order) = {
     if (order.ascending) {
       columnSql(order.column)
     } else {
       columnSql(order.column) + " desc"
     }
+  }
+
+  def groupSql(group: Group): String = group match {
+    case group: ColumnGroup => columnSql(group.column)
+    case group: TupleGroup => group.columns.map(groupSql).mkString("(", ", ", ")")
+    case group: FunctionGroup => s"${group.name}(${group.columns map groupSql mkString ", "})"
   }
 
   def literalSql[A](literal: A) =

@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2014 JHC Systems Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package sqlest.sql
+package sqlest.ast.syntax
 
 import sqlest.ast._
+import scala.language.implicitConversions
 
-trait H2StatementBuilder extends StatementBuilder {
-  override def groupSql(group: Group): String = group match {
-    case group: FunctionGroup => throw new UnsupportedOperationException
-    case group => super.groupSql(group)
-  }
+trait GroupSyntax {
+  implicit def columnGroup(column: Column[_]) = ColumnGroup(column)
+
+  def cube(columns: Group*) = FunctionGroup("cube", columns.toList)
+  def rollUp(columns: Group*) = FunctionGroup("rollup", columns.toList)
+  def groupingSets(columns: Group*) = FunctionGroup("grouping sets", columns.toList)
 }
-
-object H2StatementBuilder extends H2StatementBuilder

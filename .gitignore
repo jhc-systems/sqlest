@@ -5,6 +5,7 @@ lib_managed/
 .project
 .settings/
 .metadata/
+.idea/
 .history
 .cache
 .classpath

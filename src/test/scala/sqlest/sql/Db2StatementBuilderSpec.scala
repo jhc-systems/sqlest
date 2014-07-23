@@ -142,4 +142,71 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec
     )
   }
 
+  "select with group by rollup" should "produce the right sql" in {
+    sql {
+      select(sum(MyTable.col1).as("sum"))
+        .from(MyTable)
+        .where(MyTable.col1 > 123)
+        .groupBy(rollUp(MyTable.col1, MyTable.col2))
+    } should equal(
+      s"""
+       |select sum(mytable.col1) as sum
+       |from mytable
+       |where (mytable.col1 > ?)
+       |group by rollup(mytable.col1, mytable.col2)
+       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+      List(123)
+    )
+  }
+
+  "select with group by column, tuple & function" should "produce the right sql" in {
+    sql {
+      select(sum(MyTable.col1).as("sum"))
+        .from(MyTable)
+        .where(MyTable.col1 > 123)
+        .groupBy(MyTable.col1, cube((MyTable.col1, MyTable.col2), MyTable.col2))
+    } should equal(
+      s"""
+       |select sum(mytable.col1) as sum
+       |from mytable
+       |where (mytable.col1 > ?)
+       |group by mytable.col1, cube((mytable.col1, mytable.col2), mytable.col2)
+       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+      List(123)
+    )
+  }
+
+  "select with nested group functions" should "produce the right sql" in {
+    sql {
+      select(sum(MyTable.col1).as("sum"))
+        .from(MyTable)
+        .where(MyTable.col1 > 123)
+        .groupBy(groupingSets(MyTable.col1, cube((MyTable.col1, MyTable.col2), MyTable.col2), rollUp(MyTable.col2)), MyTable.col2)
+    } should equal(
+      s"""
+       |select sum(mytable.col1) as sum
+       |from mytable
+       |where (mytable.col1 > ?)
+       |group by grouping sets(mytable.col1, cube((mytable.col1, mytable.col2), mytable.col2), rollup(mytable.col2)), mytable.col2
+       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+      List(123)
+    )
+  }
+
+  "select with grouping sets & empty tuple" should "produce the right sql" in {
+    sql {
+      select(sum(MyTable.col1).as("sum"))
+        .from(MyTable)
+        .where(MyTable.col1 > 123)
+        .groupBy(groupingSets(MyTable.col1, ()))
+    } should equal(
+      s"""
+       |select sum(mytable.col1) as sum
+       |from mytable
+       |where (mytable.col1 > ?)
+       |group by grouping sets(mytable.col1, ())
+       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+      List(123)
+    )
+  }
 }

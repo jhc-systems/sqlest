@@ -49,8 +49,8 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
   def selectConnectBySql(connectBy: Option[Column[Boolean]]): Option[String] =
     connectBy map (connectBy => s"connect by ${columnSql(connectBy)}")
 
-  def selectGroupBySql(columns: Seq[Column[_]]): Option[String] =
-    if (columns.isEmpty) None else Some(s"""group by ${columns.map(columnSql).mkString(", ")}""")
+  def selectGroupBySql(group: Seq[Group]): Option[String] =
+    if (group.isEmpty) None else Some(s"group by ${groupListSql(group)}")
 
   def selectOrderBySql(order: Seq[Order]): Option[String] =
     if (order.isEmpty) None else Some(s"order by ${orderListSql(order)}")
