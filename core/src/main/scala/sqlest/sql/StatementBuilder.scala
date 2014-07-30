@@ -84,7 +84,7 @@ trait StatementBuilder extends BaseStatementBuilder
     }
 
     operation match {
-      case insert: InsertValues => parameters.grouped(insert.columns.size) map {
+      case insert: InsertValues => parameters.grouped(insert.columns.size).foreach {
         params =>
           innerSetParameters(params)
           statement.addBatch

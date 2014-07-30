@@ -9,6 +9,6 @@ lib_managed/
 .history
 .cache
 .classpath
-
 *.sublime-project
 *.sublime-workspace
+test.*.db

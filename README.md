@@ -37,11 +37,11 @@ val dataSource = {
 }
 
 // Choose the StatementBuilder that is compatible with the database you are using
-val statementBuilder = H2StatementBuilder
+val statementBuilder = sqlest.sql.H2StatementBuilder
 
 // Use the DataSource and the StatementBuilder to create an implicit database
 // This database is used in all execute calls
-implicit val database = Database.withDataSource(dataSource, H2StatementBuilder)
+implicit val database = Database.withDataSource(dataSource, statementBuilder)
 ```
 
 ### Table and column definitions

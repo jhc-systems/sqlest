@@ -114,7 +114,7 @@ trait InsertStatementBuilderSpec extends BaseStatementBuilderSpec {
        |insert
        |into one
        |(col1, col2)
-       |select one.col1 as one_col1, one.col2 as one_col2 from one where (one.col2 = ?) 
+       |select one.col1 as one_col1, one.col2 as one_col2 from one where (one.col2 = ?)
        """.trim.stripMargin.split(lineSeparator).mkString(" "),
       List("abc")
     )
@@ -133,7 +133,7 @@ trait InsertStatementBuilderSpec extends BaseStatementBuilderSpec {
        |insert
        |into one
        |(col1)
-       |select one.col1 as one_col1, one.col2 as one_col2 from one where (one.col2 = ?) 
+       |select one.col1 as one_col1, one.col2 as one_col2 from one where (one.col2 = ?)
        """.trim.stripMargin.split(lineSeparator).mkString(" "),
       List("abc")
     )

@@ -72,7 +72,7 @@ trait Database extends Logging {
       val preparedStatement = statementBuilder(connection, insert)
       try {
         logger.debug(s"Executing insert")
-        preparedStatement.executeUpdate
+        preparedStatement.executeBatch.sum
       } finally {
         try {
           if (preparedStatement != null) preparedStatement.close
@@ -129,7 +129,7 @@ trait Database extends Logging {
     }
   }
 
-  private def executeWithConnection[A](thunk: Connection => A): A =
+  def executeWithConnection[A](thunk: Connection => A): A =
     transactionConnection.value match {
       case Some(connection) => thunk(connection)
       case None =>
