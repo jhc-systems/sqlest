@@ -23,9 +23,7 @@ import scala.language.implicitConversions
  * A source of columns from the database.
  * Tables, joins, and select statements are all types of relation.
  */
-sealed trait Relation {
-  def columns: Seq[AliasedColumn[_]]
-}
+sealed trait Relation
 
 /**
  * A BaseTable allows columns to be defined on it.
@@ -87,7 +85,6 @@ case class TableFunction(
 sealed trait Join extends Relation {
   def left: Relation
   def right: Relation
-  def columns = left.columns ++ right.columns
 }
 
 /** A left join between two tables. */
@@ -104,7 +101,7 @@ case class OuterJoin(left: Relation, right: Relation) extends Join
 
 /** A select statement or subselect. */
 case class Select(
-    what: Option[Seq[AliasedColumn[_]]] = None,
+    what: Seq[AliasedColumn[_]],
     from: Relation,
     where: Option[Column[Boolean]] = None,
     startWith: Option[Column[Boolean]] = None,
@@ -115,7 +112,7 @@ case class Select(
     offset: Option[Long] = None) extends Relation with Query {
 
   def columns =
-    what getOrElse from.columns
+    what
 
   def from(relation: Relation): Select =
     this.copy(from = relation)

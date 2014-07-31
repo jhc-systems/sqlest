@@ -20,7 +20,7 @@ import sqlest.ast._
 
 trait SelectSyntax {
   /** Select all columns from a relation: `select.from(...)`. */
-  def from(from: Relation) = Select(from = from)
+  def from(from: Relation) = Select(Nil, from = from)
 
   /** Select a subset of columns from a relation: `select(...).from(...)`. */
   def apply(what: AliasedColumn[_]*) = new SelectBuilder(what.toSeq)
@@ -31,5 +31,5 @@ trait SelectSyntax {
 
 /** Helper class to enable the `select(...).from(...)` syntax. */
 class SelectBuilder(what: Seq[AliasedColumn[_]]) {
-  def from(from: Relation) = Select(what = Some(what), from = from)
+  def from(from: Relation) = Select(what = what, from = from)
 }
