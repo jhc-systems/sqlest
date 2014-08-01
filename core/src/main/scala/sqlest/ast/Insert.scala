@@ -16,6 +16,9 @@
 
 package sqlest.ast
 
+import shapeless._
+import shapeless.UnaryTCConstraint._
+
 sealed trait Insert extends Command
 
 case class InsertValues(into: Table, setterLists: Seq[Seq[Setter[_, _]]]) extends Insert {
@@ -36,4 +39,5 @@ case class InsertValues(into: Table, setterLists: Seq[Seq[Setter[_, _]]]) extend
   }
 }
 
-case class InsertFromSelect(into: Table, columns: Seq[TableColumn[_]], select: Select) extends Insert
+// TODO - Constrain columns to be related type to select
+case class InsertFromSelect[AliasedColumns <: HList: *->*[AliasedColumn]#λ](into: Table, columns: Seq[TableColumn[_]], select: Select[AliasedColumns]) extends Insert

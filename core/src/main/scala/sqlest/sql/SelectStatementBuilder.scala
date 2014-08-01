@@ -19,7 +19,7 @@ package sqlest.sql
 import sqlest.ast._
 
 trait SelectStatementBuilder extends BaseStatementBuilder {
-  def selectSql(select: Select): String = {
+  def selectSql(select: Select[_]): String = {
     Seq(
       selectWhatSql(select.columns),
       selectFromSql(select.from)
@@ -69,12 +69,12 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
     case RightJoin(left, right, condition) => "(" + joinSql(left) + " right join " + joinSql(right) + " on " + columnSql(condition) + ")"
     case InnerJoin(left, right, condition) => "(" + joinSql(left) + " inner join " + joinSql(right) + " on " + columnSql(condition) + ")"
     case OuterJoin(left, right) => "(" + joinSql(left) + " outer join " + joinSql(right) + ")"
-    case select: Select => "(" + selectSql(select) + ")"
+    case select: Select[_] => "(" + selectSql(select) + ")"
   }
 
   // -------------------------------------------------
 
-  def selectArgs(select: Select): List[LiteralColumn[_]] = {
+  def selectArgs(select: Select[_]): List[LiteralColumn[_]] = {
     selectWhatArgs(select.columns) ++
       selectFromArgs(select.from) ++
       selectWhereArgs(select.where) ++
@@ -116,6 +116,6 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
     case RightJoin(left, right, condition) => joinArgs(left) ++ joinArgs(right) ++ columnArgs(condition)
     case InnerJoin(left, right, condition) => joinArgs(left) ++ joinArgs(right) ++ columnArgs(condition)
     case OuterJoin(left, right) => joinArgs(left) ++ joinArgs(right)
-    case select: Select => selectArgs(select)
+    case select: Select[_] => selectArgs(select)
   }
 }

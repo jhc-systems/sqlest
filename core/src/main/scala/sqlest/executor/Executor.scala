@@ -16,11 +16,13 @@
 
 package sqlest.executor
 
+import shapeless._
+import shapeless.UnaryTCConstraint._
 import sqlest.ast._
 import sqlest.extractor._
 
 trait ExecutorSyntax {
-  implicit class SelectExecutorOps(select: Select)(implicit database: Database) {
+  implicit class SelectExecutorOps[AliasedColumns <: HList: *->*[AliasedColumn]#λ](select: Select[AliasedColumns])(implicit database: Database) {
     def fetchOne[A](extractor: Extractor[A]): Option[extractor.SingleResult] =
       database.executeSelect(select)(row => extractor.extractOne(row))
 

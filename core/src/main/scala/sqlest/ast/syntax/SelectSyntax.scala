@@ -17,10 +17,12 @@
 package sqlest.ast.syntax
 
 import sqlest.ast._
+import shapeless._
+import shapeless.UnaryTCConstraint._
 
 trait SelectSyntax {
   /** Select all columns from a relation: `select.from(...)`. */
-  def from(from: Relation) = Select(Nil, from = from)
+  def from(from: Relation) = Select(HNil, from = from)(new UnaryTCConstraint[HNil.type, AliasedColumn] {})
 
   /** Select a subset of columns from a relation: `select(...).from(...)`. */
   def apply(what: AliasedColumn[_]*) = new SelectBuilder(what.toSeq)
@@ -31,5 +33,6 @@ trait SelectSyntax {
 
 /** Helper class to enable the `select(...).from(...)` syntax. */
 class SelectBuilder(what: Seq[AliasedColumn[_]]) {
-  def from(from: Relation) = Select(what = what, from = from)
+  // TODO - Generate different arity versions of this
+  def from(from: Relation) = Select(HNil, from = from)(new UnaryTCConstraint[HNil.type, AliasedColumn] {})
 }

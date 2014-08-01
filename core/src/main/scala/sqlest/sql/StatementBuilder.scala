@@ -58,7 +58,7 @@ trait StatementBuilder extends BaseStatementBuilder
   }
 
   def sql(operation: Operation): String = operation match {
-    case select: Select => selectSql(select)
+    case select: Select[_] => selectSql(select)
     case insert: Insert => insertSql(insert)
     case update: Update => updateSql(update)
     case delete: Delete => deleteSql(delete)
@@ -66,7 +66,7 @@ trait StatementBuilder extends BaseStatementBuilder
   }
 
   def parameters(operation: Operation): List[LiteralColumn[_]] = operation match {
-    case select: Select => selectArgs(select)
+    case select: Select[_] => selectArgs(select)
     case insert: Insert => insertArgs(insert)
     case update: Update => updateArgs(update)
     case delete: Delete => deleteArgs(delete)
@@ -89,7 +89,7 @@ trait StatementBuilder extends BaseStatementBuilder
           innerSetParameters(params)
           statement.addBatch
       }
-      case _: InsertFromSelect =>
+      case _: InsertFromSelect[_] =>
         innerSetParameters(parameters)
         statement.addBatch
       case _ => innerSetParameters(parameters)
