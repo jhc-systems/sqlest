@@ -135,6 +135,9 @@ trait ProductExtractor[A <: Product] extends SingleExtractor[A] {
   def innerExtractors: List[Extractor[_]]
 }
 
+/**
+ * An extractor that takes an HList of AliasedColumn and emits the related tuple 
+ */
 case class HListExtractor[AliasedColumns <: HList: *->*[AliasedColumn]#λ, EH <: HList, SingleResult](columnHList: AliasedColumns)(implicit comapped: Comapped.Aux[AliasedColumns, AliasedColumn, EH], tupler: Tupler.Aux[EH, SingleResult]) extends SingleExtractor[SingleResult] {
   type Accumulator = SingleResult
   def columns = ???
