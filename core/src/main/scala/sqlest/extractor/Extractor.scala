@@ -19,6 +19,9 @@ package sqlest.extractor
 import java.sql.ResultSet
 import org.joda.time.DateTime
 import scala.collection.immutable._
+import shapeless._
+import shapeless.ops.hlist._
+import shapeless.UnaryTCConstraint._
 import sqlest.ast._
 import sqlest.util._
 
@@ -130,6 +133,16 @@ case class ColumnExtractor[A](column: AliasedColumn[A]) extends SingleExtractor[
 
 trait ProductExtractor[A <: Product] extends SingleExtractor[A] {
   def innerExtractors: List[Extractor[_]]
+}
+
+case class HListExtractor[AliasedColumns <: HList: *->*[AliasedColumn]#λ, EH <: HList, SingleResult](columnHList: AliasedColumns)(implicit comapped: Comapped.Aux[AliasedColumns, AliasedColumn, EH], tupler: Tupler.Aux[EH, SingleResult]) extends SingleExtractor[SingleResult] {
+  type Accumulator = SingleResult
+  def columns = ???
+  def nonOptionalColumns = columns
+
+  def initialize(row: ResultSet) = ???
+  def accumulate(row: ResultSet, accumulator: Accumulator) = ???
+  def emit(accumulator: Accumulator) = accumulator
 }
 
 /**

@@ -17,6 +17,7 @@
 package sqlest.executor
 
 import shapeless._
+import shapeless.ops.hlist._
 import shapeless.UnaryTCConstraint._
 import sqlest.ast._
 import sqlest.extractor._
@@ -28,6 +29,13 @@ trait ExecutorSyntax {
 
     def fetchAll[A](extractor: Extractor[A]): List[extractor.SingleResult] =
       database.executeSelect(select)(row => extractor.extractAll(row))
+
+    def fetchOne[EH <: HList, SingleResult](implicit comapped: Comapped.Aux[AliasedColumns, AliasedColumn, EH], tupler: Tupler.Aux[EH, SingleResult]): Option[SingleResult] =
+      fetchOne(HListExtractor(select.what))
+
+    def fetchAll[EH <: HList, SingleResult](implicit comapped: Comapped.Aux[AliasedColumns, AliasedColumn, EH], tupler: Tupler.Aux[EH, SingleResult]): List[SingleResult] =
+      fetchAll(HListExtractor(select.what))
+
   }
 
   implicit class InsertExecutorOps(insert: Insert) {
