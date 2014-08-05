@@ -73,6 +73,26 @@ trait EnumerationMappedColumnTypes {
     def read(database: DatabaseType) = toValueMappings(database)
     def write(value: ValueType) = toDatabaseMappings(value)
   }
+
+  case class OrderedEnumerationColumnType[ValueType: ru.TypeTag, DatabaseType](mappings: (ValueType, DatabaseType)*)(implicit base: BaseColumnType[DatabaseType]) extends MappedColumnType[ValueType, DatabaseType] with OrderedColumnType[ValueType] {
+    val baseType = base
+
+    lazy val toDatabaseMappings = mappings.toMap
+    lazy val toValueMappings = mappings.map { case (value, database) => (database, value) }.toMap
+
+    def read(database: DatabaseType) = toValueMappings(database)
+    def write(value: ValueType) = toDatabaseMappings(value)
+
+    def orderColumn(column: Column[ValueType]) = {
+      val caseMappings =
+        mappings
+          .zipWithIndex
+          .map { case ((value, _), index) => (ConstantColumn(value)(this), ConstantColumn(index)) }
+          .toList
+
+      CaseColumnColumn(column, caseMappings)
+    }
+  }
 }
 
 trait NumericMappedColumnTypes {

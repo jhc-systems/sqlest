@@ -17,3 +17,7 @@
 package sqlest.ast
 
 case class Order(column: Column[_], ascending: Boolean)
+
+trait OrderedColumnType[A] {
+  def orderColumn(column: Column[A]): Column[_]
+}

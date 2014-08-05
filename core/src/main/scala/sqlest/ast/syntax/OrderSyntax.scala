@@ -19,11 +19,18 @@ package sqlest.ast.syntax
 import sqlest.ast._
 
 trait OrderSyntax {
-  implicit class OrderOps[A](left: Column[A]) {
-    def asc = Order(left, true)
-    def desc = Order(left, false)
+  implicit class OrderOps[A](column: Column[A]) {
+    def asc = Order(convertToSortedColumn(column), true)
+    def desc = Order(convertToSortedColumn(column), false)
   }
 
   implicit def orderAsc(column: Column[_]) =
-    Order(column, true)
+    Order(convertToSortedColumn(column), true)
+
+  private def convertToSortedColumn[A](column: Column[A]): Column[_] = {
+    column.columnType match {
+      case orderedColumnType: OrderedColumnType[A] => orderedColumnType.orderColumn(column)
+      case _ => column
+    }
+  }
 }

@@ -72,13 +72,11 @@ trait BaseStatementBuilder {
   def groupListSql(group: Seq[Group]) =
     group map groupSql mkString ", "
 
-  def orderSql(order: Order) = {
-    if (order.ascending) {
+  def orderSql(order: Order) =
+    if (order.ascending)
       columnSql(order.column)
-    } else {
+    else
       columnSql(order.column) + " desc"
-    }
-  }
 
   def groupSql(group: Group): String = group match {
     case group: ColumnGroup => columnSql(group.column)

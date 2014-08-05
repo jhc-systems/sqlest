@@ -193,6 +193,21 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
     )
   }
 
+  "select with order by on OrderedColumnType" should "produce the right sql" in {
+    sql {
+      select(TableFour.orderedColumn)
+        .from(TableFour)
+        .orderBy(TableFour.orderedColumn.desc)
+    } should equal(
+      s"""
+       |select four.orderedColumn as four_orderedColumn
+       |from four
+       |order by case four.orderedColumn when 'G' then 0 when 'S' then 1 when 'B' then 2 end desc
+       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+      List()
+    )
+  }
+
   "select scalar function" should "produce the right sql" in {
     sql {
       select(TableThree.col3, TableThree.col4, testFunction(TableThree.col3, "abc").as("testFunction"))
