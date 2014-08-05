@@ -47,6 +47,8 @@ trait BaseStatementBuilder {
     case column: AliasColumn[_] => identifierSql(column.columnAlias)
     case column: CaseWhenColumn[_] => caseSql(column.whens, None)
     case column: CaseWhenElseColumn[_] => caseSql(column.whens, Some(column.`else`))
+    case column: CaseColumnColumn[_, _] => caseColumnSql(column.column, column.mappings, None)
+    case column: CaseColumnElseColumn[_, _] => caseColumnSql(column.column, column.mappings, Some(column.`else`))
   }
 
   def prefixSql(op: String, parameter: Column[_]): String =
@@ -112,6 +114,13 @@ trait BaseStatementBuilder {
     val elseSql = `else`.map(`else` => s"else ${columnSql(`else`)} ").getOrElse("")
     s"case $whenSql ${elseSql}end"
   }
+
+  def caseColumnSql(column: Column[_], mappings: List[(Column[_], Column[_])], `else`: Option[Column[_]]) = {
+    val whenSql = mappings.map(mapping => s"when ${columnSql(mapping._1)} then ${columnSql(mapping._2)}").mkString(" ")
+    val elseSql = `else`.map(`else` => s"else ${columnSql(`else`)} ").getOrElse("")
+    s"case ${columnSql(column)} $whenSql ${elseSql}end"
+  }
+
   // -------------------------------------------------
 
   def columnAliasListArgs(columns: Seq[Column[_]]): List[LiteralColumn[_]] =
@@ -137,6 +146,10 @@ trait BaseStatementBuilder {
       column.whens.flatMap(when => columnArgs(when.condition) ++ columnArgs(when.result))
     case column: CaseWhenElseColumn[_] =>
       column.whens.flatMap(when => columnArgs(when.condition) ++ columnArgs(when.result)) ++ columnArgs(column.`else`)
+    case column: CaseColumnColumn[_, _] =>
+      columnArgs(column.column) ++ column.mappings.flatMap(mapping => columnArgs(mapping._1) ++ columnArgs(mapping._2))
+    case column: CaseColumnElseColumn[_, _] =>
+      columnArgs(column.column) ++ column.mappings.flatMap(mapping => columnArgs(mapping._1) ++ columnArgs(mapping._2)) ++ columnArgs(column.`else`)
   }
 
   def orderListArgs(order: Seq[Order]): List[LiteralColumn[_]] =

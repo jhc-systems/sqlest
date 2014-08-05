@@ -86,8 +86,48 @@ sealed trait CaseColumn[A] extends Column[A]
 /** A when clause in a CaseColumn **/
 case class When[A](condition: Column[Boolean], result: Column[A])
 
-/** A case statement with no else clause **/
+/**
+ * A case statement with no else clause
+ *
+ *  case
+ *    when position = 1 then 'Gold'
+ *    when position = 2 then 'Silver'
+ *    when position = 3 then 'Bronze'
+ *  end
+ */
 case class CaseWhenColumn[A](whens: List[When[A]])(implicit val columnType: ColumnType[A]) extends CaseColumn[A]
 
-/** A case statement with an else clause **/
+/**
+ * A case statement with an else clause
+ *
+ *  case
+ *    when position = 1 then 'Gold'
+ *    when position = 2 then 'Silver'
+ *    when position = 3 then 'Bronze'
+ *    else 'Other'
+ *  end
+ */
 case class CaseWhenElseColumn[A](whens: List[When[A]], `else`: Column[A])(implicit val columnType: ColumnType[A]) extends CaseColumn[A]
+
+/**
+ * A case statement that compares a column to multiple values. e.g.
+ *
+ *  case position
+ *    when 1 then 'Gold'
+ *    when 2 then 'Silver'
+ *    when 3 then 'Bronze'
+ *  end
+ */
+case class CaseColumnColumn[A, B](column: Column[B], mappings: List[(Column[_], Column[A])])(implicit val columnType: ColumnType[A]) extends CaseColumn[A]
+
+/**
+ * A case statement that compares a column to multiple values e.g.
+ *
+ *  case position
+ *    when 1 then 'Gold'
+ *    when 2 then 'Silver'
+ *    when 3 then 'Bronze'
+ *    else 'Other'
+ *  end
+ */
+case class CaseColumnElseColumn[A, B](column: Column[B], mappings: List[(Column[_], Column[A])], `else`: Column[A])(implicit val columnType: ColumnType[A]) extends CaseColumn[A]

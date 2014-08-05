@@ -135,6 +135,62 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
        """.trim.stripMargin.split(lineSeparator).map(_.trim).mkString(" "),
       List(1, 2)
     )
+
+    sql {
+      select(
+        decode()
+          .when(MyTable.col1 === 1, 2)
+          .when(MyTable.col2 === 2.constant, 3.constant))
+        .from(MyTable)
+    } should equal(
+      s"""
+       |select
+       |  case
+       |    when (mytable.col1 = ?) then ?
+       |    when (mytable.col2 = 2) then 3
+       |  end as case
+       |from mytable
+       """.trim.stripMargin.split(lineSeparator).map(_.trim).mkString(" "),
+      List(1, 2)
+    )
+
+    sql {
+      select(
+        `case`(MyTable.col1)
+          .when(1, 2)
+          .when(2.constant, 3.constant))
+        .from(MyTable)
+    } should equal(
+      s"""
+       |select
+       |  case mytable.col1
+       |    when ? then ?
+       |    when 2 then 3
+       |  end as case
+       |from mytable
+       """.trim.stripMargin.split(lineSeparator).map(_.trim).mkString(" "),
+      List(1, 2)
+    )
+
+    sql {
+      select(
+        `case`(MyTable.col1)
+          .when(1, 2)
+          .when(2.constant, 3.constant)
+          .`else`(4))
+        .from(MyTable)
+    } should equal(
+      s"""
+       |select
+       |  case mytable.col1
+       |    when ? then ?
+       |    when 2 then 3
+       |    else ?
+       |  end as case
+       |from mytable
+       """.trim.stripMargin.split(lineSeparator).map(_.trim).mkString(" "),
+      List(1, 2, 4)
+    )
   }
 
   "select scalar function" should "produce the right sql" in {

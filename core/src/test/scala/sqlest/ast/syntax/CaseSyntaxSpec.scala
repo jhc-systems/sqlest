@@ -73,4 +73,40 @@ class CaseSyntaxSpec extends FlatSpec with Matchers with CustomMatchers {
       .when(MyTable.col2 === "abc", 3)
       .otherwise(5) should be(CaseWhenElseColumn(List(When(MyTable.col1 === 1, 2), When(MyTable.col2 === "abc", 3)), 5))
   }
+
+  "case column statement" should "work as a builder" in {
+    `case`(MyTable.col1).when(1, 2) should be(
+      CaseColumnColumn(MyTable.col1, List(LiteralColumn(1) -> LiteralColumn(2)))
+    )
+
+    `case`(MyTable.col1).when(1, 2).when(2, 3) should be(
+      CaseColumnColumn(MyTable.col1, List(LiteralColumn(1) -> LiteralColumn(2), LiteralColumn(2) -> LiteralColumn(3)))
+    )
+
+    `case`(MyTable.col1).when(1, 2).when(2, 3).`else`(4) should be(
+      CaseColumnElseColumn(MyTable.col1, List(LiteralColumn(1) -> LiteralColumn(2), LiteralColumn(2) -> LiteralColumn(3)), LiteralColumn(4))
+    )
+
+    `case`(MyTable.col1).when(1, 2).when(2, 3).otherwise(4) should be(
+      CaseColumnElseColumn(MyTable.col1, List(LiteralColumn(1) -> LiteralColumn(2), LiteralColumn(2) -> LiteralColumn(3)), LiteralColumn(4))
+    )
+  }
+
+  "decode column statement" should "work as a builder" in {
+    decode(MyTable.col1).when(1, 2) should be(
+      CaseColumnColumn(MyTable.col1, List(LiteralColumn(1) -> LiteralColumn(2)))
+    )
+
+    decode(MyTable.col1).when(1, 2).when(2, 3) should be(
+      CaseColumnColumn(MyTable.col1, List(LiteralColumn(1) -> LiteralColumn(2), LiteralColumn(2) -> LiteralColumn(3)))
+    )
+
+    decode(MyTable.col1).when(1, 2).when(2, 3).`else`(4) should be(
+      CaseColumnElseColumn(MyTable.col1, List(LiteralColumn(1) -> LiteralColumn(2), LiteralColumn(2) -> LiteralColumn(3)), LiteralColumn(4))
+    )
+
+    decode(MyTable.col1).when(1, 2).when(2, 3).otherwise(4) should be(
+      CaseColumnElseColumn(MyTable.col1, List(LiteralColumn(1) -> LiteralColumn(2), LiteralColumn(2) -> LiteralColumn(3)), LiteralColumn(4))
+    )
+  }
 }
