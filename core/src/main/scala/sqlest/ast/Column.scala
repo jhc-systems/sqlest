@@ -79,3 +79,15 @@ case class TableColumn[A](tableAlias: String, columnName: String)(implicit val c
 
 /** Alias for a column expression, e.g. `expression as alias` */
 case class AliasColumn[A](column: Column[_], columnAlias: String)(implicit val columnType: ColumnType[A]) extends AliasedColumn[A]
+
+/** Case statement **/
+sealed trait CaseColumn[A] extends Column[A]
+
+/** A when clause in a CaseColumn **/
+case class When[A](condition: Column[Boolean], result: Column[A])
+
+/** A case statement with no else clause **/
+case class CaseWhenColumn[A](whens: List[When[A]])(implicit val columnType: ColumnType[A]) extends CaseColumn[A]
+
+/** A case statement with an else clause **/
+case class CaseWhenElseColumn[A](whens: List[When[A]], `else`: Column[A])(implicit val columnType: ColumnType[A]) extends CaseColumn[A]

@@ -31,6 +31,7 @@ package object sqlest extends SqlestCore
   with TableFunctions
   with ScalarFunctions
   with AggregateFunctionSyntax
+  with CaseSyntax
   with ScalarFunctionSyntax
   with GroupSyntax
   with TupleGroups

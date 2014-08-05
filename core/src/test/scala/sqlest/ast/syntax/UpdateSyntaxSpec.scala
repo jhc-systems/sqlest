@@ -36,7 +36,7 @@ class UpdateSyntaxSpec extends FlatSpec with Matchers with CustomMatchers {
   // TODO
   // "update" should "not compile with wrong value type in the setter" in {
   //   illTyped("""
-  //     update(MyTable).set(MyTable.col1 -> "1") 
+  //     update(MyTable).set(MyTable.col1 -> "1")
   //   """)
   // }
 

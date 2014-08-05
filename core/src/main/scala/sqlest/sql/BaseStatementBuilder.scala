@@ -45,6 +45,8 @@ trait BaseStatementBuilder {
     case column: ScalarFunctionColumn[_] => functionSql(column.name, column.parameters: _*)
     case column: TableColumn[_] => identifierSql(column.tableAlias) + "." + identifierSql(column.columnName)
     case column: AliasColumn[_] => identifierSql(column.columnAlias)
+    case column: CaseWhenColumn[_] => caseSql(column.whens, None)
+    case column: CaseWhenElseColumn[_] => caseSql(column.whens, Some(column.`else`))
   }
 
   def prefixSql(op: String, parameter: Column[_]): String =
@@ -105,6 +107,11 @@ trait BaseStatementBuilder {
   def escapeSqlString(string: String) =
     string.replace("'", "''")
 
+  def caseSql(whens: List[When[_]], `else`: Option[Column[_]]) = {
+    val whenSql = whens.map(when => s"when ${columnSql(when.condition)} then ${columnSql(when.result)}").mkString(" ")
+    val elseSql = `else`.map(`else` => s"else ${columnSql(`else`)} ").getOrElse("")
+    s"case $whenSql ${elseSql}end"
+  }
   // -------------------------------------------------
 
   def columnAliasListArgs(columns: Seq[Column[_]]): List[LiteralColumn[_]] =
@@ -126,6 +133,10 @@ trait BaseStatementBuilder {
     case ScalarFunctionColumn(_, parameters) => parameters.toList flatMap columnArgs
     case column: TableColumn[_] => Nil
     case column: AliasColumn[_] => Nil
+    case column: CaseWhenColumn[_] =>
+      column.whens.flatMap(when => columnArgs(when.condition) ++ columnArgs(when.result))
+    case column: CaseWhenElseColumn[_] =>
+      column.whens.flatMap(when => columnArgs(when.condition) ++ columnArgs(when.result)) ++ columnArgs(column.`else`)
   }
 
   def orderListArgs(order: Seq[Order]): List[LiteralColumn[_]] =

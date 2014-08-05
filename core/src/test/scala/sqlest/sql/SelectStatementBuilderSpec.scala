@@ -115,6 +115,28 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
     )
   }
 
+  "select with case statement" should "produce the right sql" in {
+    sql {
+      select(
+        `case`()
+          .when(MyTable.col1 === 1, 2)
+          .when(MyTable.col2 === 2.constant, 3.constant)
+          .`else`(5.constant))
+        .from(MyTable)
+    } should equal(
+      s"""
+       |select
+       |  case
+       |    when (mytable.col1 = ?) then ?
+       |    when (mytable.col2 = 2) then 3
+       |    else 5
+       |  end as case
+       |from mytable
+       """.trim.stripMargin.split(lineSeparator).map(_.trim).mkString(" "),
+      List(1, 2)
+    )
+  }
+
   "select scalar function" should "produce the right sql" in {
     sql {
       select(TableThree.col3, TableThree.col4, testFunction(TableThree.col3, "abc").as("testFunction"))
