@@ -16,8 +16,6 @@
 
 package sqlest.ast
 
-import scala.language.implicitConversions
-
 trait TupleGroups {
 
   implicit def TupleGroup0(t: Unit) =

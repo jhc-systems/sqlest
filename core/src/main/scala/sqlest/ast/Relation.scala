@@ -17,7 +17,6 @@
 package sqlest.ast
 
 import scala.collection.mutable
-import scala.language.implicitConversions
 
 /**
  * A source of columns from the database.

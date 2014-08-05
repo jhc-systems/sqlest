@@ -16,7 +16,6 @@
 
 package sqlest.extractor
 
-import scala.language.implicitConversions
 import sqlest.ast._
 
 trait Extractors {

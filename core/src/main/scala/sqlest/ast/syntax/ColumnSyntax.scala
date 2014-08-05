@@ -17,7 +17,6 @@
 package sqlest.ast.syntax
 
 import sqlest.ast._
-import scala.language.implicitConversions
 
 trait ColumnSyntax {
   implicit def literalColumn[A](value: A)(implicit columnType: ColumnType[A]): Column[A] =

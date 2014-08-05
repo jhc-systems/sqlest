@@ -17,7 +17,6 @@
 package sqlest.ast.syntax
 
 import sqlest.ast._
-import scala.language.implicitConversions
 
 trait OrderSyntax {
   implicit class OrderOps[A](left: Column[A]) {

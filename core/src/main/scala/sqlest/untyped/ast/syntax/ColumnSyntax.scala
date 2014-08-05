@@ -18,7 +18,6 @@ package sqlest.untyped.ast.syntax
 
 import org.joda.time.DateTime
 import scala.reflect.runtime.{ universe => ru }
-import scala.language.implicitConversions
 import scala.util.Try
 import sqlest.ast._
 import sqlest.untyped.ast._

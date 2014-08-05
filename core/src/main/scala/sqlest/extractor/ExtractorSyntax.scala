@@ -18,7 +18,6 @@ package sqlest.extractor
 
 import java.sql.ResultSet
 import org.joda.time.DateTime
-import scala.language.implicitConversions
 import sqlest.ast._
 
 /**
