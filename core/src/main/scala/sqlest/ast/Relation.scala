@@ -19,6 +19,7 @@ package sqlest.ast
 import scala.collection.mutable
 import scala.language.implicitConversions
 import shapeless._
+import shapeless.ops.hlist._
 import shapeless.UnaryTCConstraint._
 
 /**
@@ -102,7 +103,7 @@ case class InnerJoin(left: Relation, right: Relation, condition: Column[Boolean]
 case class OuterJoin(left: Relation, right: Relation) extends Join
 
 /** A select statement or subselect. */
-case class Select[AliasedColumns <: HList: *->*[AliasedColumn]#λ](
+case class Select[AliasedColumns <: HList](
     what: AliasedColumns,
     from: Relation,
     where: Option[Column[Boolean]] = None,
@@ -111,11 +112,10 @@ case class Select[AliasedColumns <: HList: *->*[AliasedColumn]#λ](
     groupBy: List[Group] = Nil,
     orderBy: List[Order] = Nil,
     limit: Option[Long] = None,
-    offset: Option[Long] = None) extends Relation with Query {
+    offset: Option[Long] = None)(implicit toList: ToList[AliasedColumns, AliasedColumn[_]]) extends Relation with Query {
 
-  // TODO - Why can this not be written as what.toList[AliasedColumn[_]] ??
   def columns =
-    what.toList.asInstanceOf[Seq[AliasedColumn[_]]]
+    what.toList[AliasedColumn[_]]
 
   def from(relation: Relation): Select[AliasedColumns] =
     this.copy(from = relation)

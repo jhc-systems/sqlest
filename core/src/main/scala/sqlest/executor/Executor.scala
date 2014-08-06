@@ -16,26 +16,50 @@
 
 package sqlest.executor
 
+import java.sql.ResultSet
 import shapeless._
 import shapeless.ops.hlist._
-import shapeless.UnaryTCConstraint._
+import shapeless.poly._
 import sqlest.ast._
 import sqlest.extractor._
 
+private object columnExtractor extends (AliasedColumn ~> Extractor) {
+  def apply[T](column: AliasedColumn[T]) = ColumnExtractor(column)
+}
+
 trait ExecutorSyntax {
-  implicit class SelectExecutorOps[AliasedColumns <: HList: *->*[AliasedColumn]#λ](select: Select[AliasedColumns])(implicit database: Database) {
+  implicit class SelectExecutorOps[AliasedColumns <: HList](select: Select[AliasedColumns])(implicit database: Database) {
     def fetchOne[A](extractor: Extractor[A]): Option[extractor.SingleResult] =
       database.executeSelect(select)(row => extractor.extractOne(row))
 
     def fetchAll[A](extractor: Extractor[A]): List[extractor.SingleResult] =
       database.executeSelect(select)(row => extractor.extractAll(row))
 
-    def fetchOne[EH <: HList, SingleResult](implicit comapped: Comapped.Aux[AliasedColumns, AliasedColumn, EH], tupler: Tupler.Aux[EH, SingleResult]): Option[SingleResult] =
-      fetchOne(HListExtractor(select.what))
+    def fetchOne[IdHList <: HList, Extractors <: HList, Emitter <: HList, ResultSets <: HList, SingleResult](implicit mapper: Mapper.Aux[columnExtractor.type, AliasedColumns, Extractors],
+      extractorComapped: Comapped.Aux[Extractors, Extractor, IdHList],
+      isHCons: IsHCons[IdHList],
+      columnComapped: Comapped.Aux[AliasedColumns, AliasedColumn, IdHList],
+      toList: ToList[Extractors, Extractor[_]],
+      initializerMapper: Mapper.Aux[extractorEmitter.type, Extractors, Emitter],
+      constMapper: ConstMapper.Aux[ResultSet, Extractors, ResultSets],
+      zipper: ZipApply.Aux[Emitter, ResultSets, IdHList],
+      tupler: Tupler.Aux[IdHList, SingleResult]): Option[SingleResult] = {
 
-    def fetchAll[EH <: HList, SingleResult](implicit comapped: Comapped.Aux[AliasedColumns, AliasedColumn, EH], tupler: Tupler.Aux[EH, SingleResult]): List[SingleResult] =
-      fetchAll(HListExtractor(select.what))
+      fetchOne(HListExtractor(select.what.map(columnExtractor))).map(_.tupled)
+    }
 
+    def fetchAll[IdHList <: HList, Extractors <: HList, Emitter <: HList, ResultSets <: HList, SingleResult](implicit mapper: Mapper.Aux[columnExtractor.type, AliasedColumns, Extractors],
+      extractorComapped: Comapped.Aux[Extractors, Extractor, IdHList],
+      isHCons: IsHCons[IdHList],
+      columnComapped: Comapped.Aux[AliasedColumns, AliasedColumn, IdHList],
+      toList: ToList[Extractors, Extractor[_]],
+      initializerMapper: Mapper.Aux[extractorEmitter.type, Extractors, Emitter],
+      constMapper: ConstMapper.Aux[ResultSet, Extractors, ResultSets],
+      zipper: ZipApply.Aux[Emitter, ResultSets, IdHList],
+      tupler: Tupler.Aux[IdHList, SingleResult]): List[SingleResult] = {
+
+      fetchAll(HListExtractor(select.what.map(columnExtractor))).map(_.tupled)
+    }
   }
 
   implicit class InsertExecutorOps(insert: Insert) {

@@ -30,7 +30,7 @@ class SelectSpec extends FlatSpec with Matchers {
   "simplest select possible" should "produce the right sql" in {
     val query = select.from(MyTable)
 
-    query.columns should equal(List(MyTable.col1, MyTable.col2))
+    query.columns should equal(Nil)
     query.from should equal(MyTable)
     query.where should equal(None)
     query.orderBy should equal(Nil)
@@ -55,8 +55,8 @@ class SelectSpec extends FlatSpec with Matchers {
   }
 
   "repeated calls to select.orderBy()" should "append new orders" in {
-    val query = select.from(MyTable)
-    query.columns should equal(List(MyTable.col1, MyTable.col2))
+    val query = select.from(MyTable).orderBy(MyTable.col1).orderBy(MyTable.col2.desc)
+    query.orderBy should equal(List(Order(MyTable.col1, true), Order(MyTable.col2, false)))
   }
 
   "repeated calls to select.page()" should "override the old values" in {

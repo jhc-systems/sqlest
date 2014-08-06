@@ -42,9 +42,17 @@ class ExecutorSpec extends FlatSpec with Matchers {
   }
 
   it should "be able to return all results" in {
-    val actual = selectStatement.fetchAll(extractor)
+    val actual = select(TableOne.col1, TableOne.col2).from(TableOne).fetchAll
 
     actual should equal(Seq(
+      (1, "a"),
+      (3, "c"),
+      (-1, "e")
+    ))
+
+    val actualExtracted = selectStatement.fetchAll(extractor)
+
+    actualExtracted should equal(Seq(
       One(1, "a"),
       One(3, "c"),
       One(-1, "e")

@@ -30,7 +30,7 @@ class H2StatementBuilderSpec extends BaseStatementBuilderSpec
 
   "where between" should "produce the right sql" in {
     sql {
-      select
+      select(MyTable.col1, MyTable.col2)
         .from(MyTable)
         .where(MyTable.col1.between(123, 234))
     } should equal(
@@ -45,7 +45,7 @@ class H2StatementBuilderSpec extends BaseStatementBuilderSpec
 
   "where in" should "produce the right sql" in {
     sql {
-      select
+      select(MyTable.col1, MyTable.col2)
         .from(MyTable)
         .where(MyTable.col1 in (123, 234.constant, 345))
     } should equal(
@@ -60,7 +60,7 @@ class H2StatementBuilderSpec extends BaseStatementBuilderSpec
 
   "where in list" should "produce the right sql" in {
     sql {
-      select
+      select(MyTable.col1, MyTable.col2)
         .from(MyTable)
         .where(MyTable.col1 in List(123, 234, 345))
     } should equal(
@@ -75,7 +75,7 @@ class H2StatementBuilderSpec extends BaseStatementBuilderSpec
 
   "select with limit only" should "produce the right sql" in {
     sql {
-      select
+      select(MyTable.col1, MyTable.col2)
         .from(MyTable)
         .where(MyTable.col1 === 123)
         .limit(10)
@@ -92,7 +92,7 @@ class H2StatementBuilderSpec extends BaseStatementBuilderSpec
 
   "select with offset only" should "produce the right sql" in {
     sql {
-      select
+      select(MyTable.col1, MyTable.col2)
         .from(MyTable)
         .offset(20)
     } should equal(
@@ -107,7 +107,7 @@ class H2StatementBuilderSpec extends BaseStatementBuilderSpec
 
   "select with limit and offset" should "produce the right sql" in {
     sql {
-      select
+      select(MyTable.col1, MyTable.col2)
         .from(MyTable)
         .where(MyTable.col1 === 123)
         .page(2, 10)
@@ -171,7 +171,7 @@ class H2StatementBuilderSpec extends BaseStatementBuilderSpec
 
   "where clauses for option columns" should "produce the right sql" in {
     sql {
-      select
+      select(TableThree.col3, TableThree.col4)
         .from(TableThree)
         .where(TableThree.col3 === "abc")
     } should equal(

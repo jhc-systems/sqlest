@@ -25,7 +25,8 @@ import sqlest.ast._
 trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
   "empty query" should "render ok" in {
     sql {
-      select.from(MyTable)
+      select(MyTable.col1, MyTable.col2)
+        .from(MyTable)
     } should equal(
       """select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2 from mytable""",
       Nil
@@ -53,7 +54,7 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
 
   "query with simple where clause" should "render ok" in {
     sql {
-      select
+      select(MyTable.col1, MyTable.col2)
         .from(MyTable)
         .where(MyTable.col1 === 1)
     } should equal(
@@ -68,7 +69,7 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
 
   "query with compound where clause" should "render ok" in {
     sql {
-      select
+      select(MyTable.col1, MyTable.col2)
         .from(MyTable)
         .where(MyTable.col1 === 1 && MyTable.col2 =!= 2)
     } should equal(
@@ -83,7 +84,7 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
 
   "select from a single table" should "produce the right sql" in {
     sql {
-      select
+      select(MyTable.col1, MyTable.col2)
         .from(MyTable)
         .where(MyTable.col1 === 123)
         .orderBy(MyTable.col1.asc)
@@ -101,7 +102,7 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
 
   "select from a three table join" should "produce the right sql" in {
     sql {
-      select
+      select(TableOne.col1, TableOne.col2, TableTwo.col2, TableTwo.col3, TableThree.col3, TableThree.col4)
         .from(
           TableOne
             .innerJoin(TableTwo).on(TableOne.col2 === TableTwo.col2)

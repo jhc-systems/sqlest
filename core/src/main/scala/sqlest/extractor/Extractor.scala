@@ -21,7 +21,6 @@ import org.joda.time.DateTime
 import scala.collection.immutable._
 import shapeless._
 import shapeless.ops.hlist._
-import shapeless.UnaryTCConstraint._
 import sqlest.ast._
 import sqlest.util._
 
@@ -135,16 +134,29 @@ trait ProductExtractor[A <: Product] extends SingleExtractor[A] {
   def innerExtractors: List[Extractor[_]]
 }
 
+object extractorEmitter extends Poly1 {
+  implicit def default[T] = at[Extractor[T]](extractor => (row: ResultSet) => extractor.emit(extractor.initialize(row)))
+}
 /**
- * An extractor that takes an HList of AliasedColumn and emits the related tuple 
+ * An extractor that takes an HList of AliasedColumn and emits the related tuple
  */
-case class HListExtractor[AliasedColumns <: HList: *->*[AliasedColumn]#λ, EH <: HList, SingleResult](columnHList: AliasedColumns)(implicit comapped: Comapped.Aux[AliasedColumns, AliasedColumn, EH], tupler: Tupler.Aux[EH, SingleResult]) extends SingleExtractor[SingleResult] {
-  type Accumulator = SingleResult
-  def columns = ???
-  def nonOptionalColumns = columns
+case class HListExtractor[Extractors <: HList, Emitter <: HList, ResultSets <: HList, SingleResult <: HList](extractorHList: Extractors)(implicit comapped: Comapped.Aux[Extractors, Extractor, SingleResult],
+    toList: ToList[Extractors, Extractor[_]],
+    mapper: Mapper.Aux[extractorEmitter.type, Extractors, Emitter],
+    constMapper: ConstMapper.Aux[ResultSet, Extractors, ResultSets],
+    zipper: ZipApply.Aux[Emitter, ResultSets, SingleResult]) extends SingleExtractor[SingleResult] {
 
-  def initialize(row: ResultSet) = ???
-  def accumulate(row: ResultSet, accumulator: Accumulator) = ???
+  type Accumulator = SingleResult
+
+  val columns = extractorHList.toList.flatMap(_.columns)
+  val nonOptionalColumns = extractorHList.toList.flatMap(_.nonOptionalColumns)
+
+  /* TODO - Do this properly:
+   *   Accumulator should be HList of all Accumulators in the extracorHList
+   *   initialize, accumulate and emit should delegate to the extractorHList directly
+   */
+  def initialize(row: ResultSet): Accumulator = extractorHList.map(extractorEmitter).zipApply(extractorHList.mapConst(row))
+  def accumulate(row: ResultSet, accumulator: Accumulator): Accumulator = extractorHList.map(extractorEmitter).zipApply(extractorHList.mapConst(row))
   def emit(accumulator: Accumulator) = accumulator
 }
 
