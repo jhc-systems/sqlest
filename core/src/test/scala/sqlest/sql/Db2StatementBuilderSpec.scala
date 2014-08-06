@@ -42,7 +42,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec
        |from mytable
        |where (mytable.col1 = ?)
        |fetch first 10 rows only
-       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+       """.formatSql,
       List(123)
     )
   }
@@ -62,7 +62,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec
        |select mytable_col1, mytable_col2
        |from subquery
        |where rownum >= ?
-       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+       """.formatSql,
       List(123, 2 * 10 + 1)
     )
   }
@@ -82,7 +82,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec
        |select mytable_col1, mytable_col2
        |from subquery
        |where rownum between ? and ?
-       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+       """.formatSql,
       List(123, 2 * 10 + 1, 2 * 10 + 10)
     )
   }
@@ -103,7 +103,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec
        |select mytable_col1, mytable_col2
        |from subquery
        |where rownum between ? and ?
-       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+       """.formatSql,
       List(123, 2 * 10 + 1, 2 * 10 + 10)
     )
   }
@@ -124,7 +124,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec
        |select a, b, c
        |from subquery
        |where rownum between ? and ?
-       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+       """.formatSql,
       List(2, 4, 13, 14, 5, 6, 7, 8, 9, 10, 11, 12, 15 * 16 + 1, 15 * 16 + 16)
     )
   }
@@ -137,7 +137,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec
       s"""
        |select three.col3 as three_col3, three.col4 as three_col4, testTableFunction.col5 as testTableFunction_col5, testTableFunction.col6 as testTableFunction_col6
        |from (three outer join table(testTableFunction(three.col3, ?)) as testTableFunction)
-       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+       """.formatSql,
       List("abc")
     )
   }
@@ -154,7 +154,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec
        |from mytable
        |where (mytable.col1 > ?)
        |group by rollup(mytable.col1, mytable.col2)
-       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+       """.formatSql,
       List(123)
     )
   }
@@ -171,7 +171,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec
        |from mytable
        |where (mytable.col1 > ?)
        |group by mytable.col1, cube((mytable.col1, mytable.col2), mytable.col2)
-       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+       """.formatSql,
       List(123)
     )
   }
@@ -188,7 +188,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec
        |from mytable
        |where (mytable.col1 > ?)
        |group by grouping sets(mytable.col1, cube((mytable.col1, mytable.col2), mytable.col2), rollup(mytable.col2)), mytable.col2
-       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+       """.formatSql,
       List(123)
     )
   }
@@ -205,7 +205,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec
        |from mytable
        |where (mytable.col1 > ?)
        |group by grouping sets(mytable.col1, ())
-       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+       """.formatSql,
       List(123)
     )
   }

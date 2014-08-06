@@ -38,7 +38,7 @@ class H2StatementBuilderSpec extends BaseStatementBuilderSpec
        |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
        |from mytable
        |where (mytable.col1 between ? and ?)
-       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+       """.formatSql,
       List(123, 234)
     )
   }
@@ -53,7 +53,7 @@ class H2StatementBuilderSpec extends BaseStatementBuilderSpec
        |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
        |from mytable
        |where (mytable.col1 in (?, 234, ?))
-       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+       """.formatSql,
       List(123, 345)
     )
   }
@@ -68,7 +68,7 @@ class H2StatementBuilderSpec extends BaseStatementBuilderSpec
        |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
        |from mytable
        |where (mytable.col1 in (123, 234, 345))
-       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+       """.formatSql,
       List()
     )
   }
@@ -85,7 +85,7 @@ class H2StatementBuilderSpec extends BaseStatementBuilderSpec
        |from mytable
        |where (mytable.col1 = ?)
        |limit ?
-       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+       """.formatSql,
       List(123, 10)
     )
   }
@@ -100,7 +100,7 @@ class H2StatementBuilderSpec extends BaseStatementBuilderSpec
        |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
        |from mytable
        |offset ?
-       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+       """.formatSql,
       List(20)
     )
   }
@@ -118,7 +118,7 @@ class H2StatementBuilderSpec extends BaseStatementBuilderSpec
        |where (mytable.col1 = ?)
        |limit ?
        |offset ?
-       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+       """.formatSql,
       List(123, 10, 20)
     )
   }
@@ -135,7 +135,7 @@ class H2StatementBuilderSpec extends BaseStatementBuilderSpec
        |from mytable
        |where (mytable.col1 > ?)
        |group by mytable.col1, mytable.col2
-       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+       """.formatSql,
       List(123)
     )
   }
@@ -164,7 +164,7 @@ class H2StatementBuilderSpec extends BaseStatementBuilderSpec
        |order by ?, ? desc
        |limit ?
        |offset ?
-       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+       """.formatSql,
       List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 15 * 16)
     )
   }
@@ -179,7 +179,7 @@ class H2StatementBuilderSpec extends BaseStatementBuilderSpec
        |select three.col3 as three_col3, three.col4 as three_col4
        |from three
        |where (three.col3 = ?)
-       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+       """.formatSql,
       List("abc")
     )
   }

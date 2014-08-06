@@ -32,7 +32,7 @@ trait DeleteStatementBuilderSpec extends BaseStatementBuilderSpec {
        |delete
        |from one
        |where ((? = ?) and (? <> ?))
-       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+       """.formatSql,
       List(1, 2, 3, 4)
     )
   }

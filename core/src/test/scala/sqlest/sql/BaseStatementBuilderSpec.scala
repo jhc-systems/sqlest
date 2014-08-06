@@ -22,8 +22,9 @@ import sqlest._
 import sqlest.ast._
 
 trait BaseStatementBuilderSpec extends FlatSpec with Matchers {
-  val lineSeparator = scala.util.Properties.lineSeparator
-
+  implicit class StringFormatOps(sql: String) {
+    def formatSql = sql.trim.stripMargin.split(scala.util.Properties.lineSeparator).map(_.trim).mkString(" ")
+  }
   implicit def statementBuilder: StatementBuilder
 
   def sql(operation: Operation) = (

@@ -46,7 +46,7 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
        |from mytable
        |where (mytable.col1 = ?)
        |order by sum-function
-       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+       """.formatSql,
       List(123)
     )
   }
@@ -61,7 +61,7 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
        |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
        |from mytable
        |where (mytable.col1 = ?)
-       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+       """.formatSql,
       List(1)
     )
   }
@@ -76,7 +76,7 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
        |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
        |from mytable
        |where ((mytable.col1 = ?) and (mytable.col2 <> ?))
-       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+       """.formatSql,
       List(1, 2)
     )
   }
@@ -94,7 +94,7 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
        |from mytable
        |where (mytable.col1 = ?)
        |order by mytable.col1, mytable.col1
-       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+       """.formatSql,
       List(123)
     )
   }
@@ -110,7 +110,7 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
       s"""
        |select one.col1 as one_col1, one.col2 as one_col2, two.col2 as two_col2, two.col3 as two_col3, three.col3 as three_col3, three.col4 as three_col4
        |from ((one inner join two on (one.col2 = two.col2)) inner join three on (two.col3 = three.col3))
-       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+       """.formatSql,
       Nil
     )
   }
@@ -132,7 +132,7 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
        |    else 5
        |  end as case
        |from mytable
-       """.trim.stripMargin.split(lineSeparator).map(_.trim).mkString(" "),
+       """.formatSql,
       List(1, 2)
     )
 
@@ -150,7 +150,7 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
        |    when (mytable.col2 = 2) then 3
        |  end as case
        |from mytable
-       """.trim.stripMargin.split(lineSeparator).map(_.trim).mkString(" "),
+       """.formatSql,
       List(1, 2)
     )
 
@@ -168,7 +168,7 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
        |    when 2 then 3
        |  end as case
        |from mytable
-       """.trim.stripMargin.split(lineSeparator).map(_.trim).mkString(" "),
+       """.formatSql,
       List(1, 2)
     )
 
@@ -188,7 +188,7 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
        |    else ?
        |  end as case
        |from mytable
-       """.trim.stripMargin.split(lineSeparator).map(_.trim).mkString(" "),
+       """.formatSql,
       List(1, 2, 4)
     )
   }
@@ -203,7 +203,7 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
        |select four.orderedColumn as four_orderedColumn
        |from four
        |order by case four.orderedColumn when 'G' then 0 when 'S' then 1 when 'B' then 2 end desc
-       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+       """.formatSql,
       List()
     )
   }
@@ -216,7 +216,7 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
       s"""
        |select three.col3 as three_col3, three.col4 as three_col4, testFunction(three.col3, ?) as testFunction
        |from three
-       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+       """.formatSql,
       List("abc")
     )
   }
@@ -233,7 +233,7 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
        |from one
        |start with (one.col1 = ?)
        |connect by (prior(one.col2) = one.col2)
-       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+       """.formatSql,
       List("abc")
     )
   }

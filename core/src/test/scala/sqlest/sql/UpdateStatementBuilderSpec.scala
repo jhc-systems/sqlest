@@ -35,7 +35,7 @@ trait UpdateStatementBuilderSpec extends BaseStatementBuilderSpec {
        |update one
        |set col1 = ?, col2 = ?
        |where ((? = ?) and (? = ?))
-       """.trim.stripMargin.split(lineSeparator).mkString(" "),
+       """.formatSql,
       List("a", "b", "c", "d", "e", "f")
     )
   }
