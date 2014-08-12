@@ -83,6 +83,15 @@ trait ColumnSyntax {
     def untypedGte(right: String) = helpers.infixExpression(">=", left, right, left.columnType)
     def untypedLte(right: String) = helpers.infixExpression("<=", left, right, left.columnType)
 
+    def untypedIn(right: List[String]) = {
+      val mappedValues = right.map(value => helpers.mappedArgument(value, left.columnType))
+      if (mappedValues.forall(_.isDefined)) {
+        val inColumns = mappedValues.flatten.map(value => LiteralColumn(value)(left.columnType))
+        Some(InfixFunctionColumn[Boolean]("in", left, ScalarFunctionColumn("", inColumns)(left.columnType)))
+      } else
+        None
+    }
+
     def untypedContains(right: String): Option[InfixFunctionColumn[Boolean]] =
       helpers.likeExpression(left, right, left.columnType, str => s"%${helpers.likeEncode(right)}%")
 

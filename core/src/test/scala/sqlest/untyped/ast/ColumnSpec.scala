@@ -80,6 +80,11 @@ class ColumnSpec extends FlatSpec with Matchers {
     (TableOne.intCol untypedGte "1") should equal(Some(TableOne.intCol >= 1))
   }
 
+  "untypedIn" should "allow comparison with a valid list of strings" in {
+    (TableOne.intCol untypedIn List("A", "2", "3")) should equal(None)
+    (TableOne.intCol untypedIn List("1", "2", "3")) should equal(Some(TableOne.intCol in (1, 2, 3)))
+  }
+
   "untypedStartsWith" should "allow comparison with a string" in {
     (TableOne.stringCol untypedStartsWith "a%b_c^") should equal(Some(TableOne.stringCol like "a^%b^_c^^%"))
   }
