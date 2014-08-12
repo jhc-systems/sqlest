@@ -20,7 +20,7 @@ import sqlest.ast._
 
 trait ScalarFunctionSyntax extends ScalarFunctions {
   val trim = ScalarFunction1[String, String]("trim")
-  val subString = ScalarFunction3[String, Int, Int, String]("substring")
+  val substring = ScalarFunction3[String, Int, Int, String]("substring")
 
   def coalesce[A: ColumnType](columns: Column[A]*) = ScalarFunctionColumn[A]("coalesce", columns)
 

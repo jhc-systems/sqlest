@@ -114,8 +114,8 @@ case class Select[AliasedColumns <: HList](
     limit: Option[Long] = None,
     offset: Option[Long] = None)(implicit toList: ToList[AliasedColumns, AliasedColumn[_]]) extends Relation with Query {
 
-  def columns =
-    what.toList[AliasedColumn[_]]
+  def columns: Seq[AliasedColumn[_]] =
+    what.toList
 
   def from(relation: Relation): Select[AliasedColumns] =
     this.copy(from = relation)

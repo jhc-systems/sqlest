@@ -29,8 +29,11 @@ private object columnExtractor extends (AliasedColumn ~> Extractor) {
 
 trait ExecutorSyntax {
   implicit class SelectExecutorOps[AliasedColumns <: HList](select: Select[AliasedColumns])(implicit database: Database) {
-    def fetchOne[A](extractor: Extractor[A]): Option[extractor.SingleResult] =
+    def fetchHeadOption[A](extractor: Extractor[A]): Option[extractor.SingleResult] =
       database.executeSelect(select)(row => extractor.extractOne(row))
+
+    def fetchHead[A](extractor: Extractor[A]): extractor.SingleResult =
+      fetchHeadOption(extractor).get
 
     def fetchAll[A](extractor: Extractor[A]): List[extractor.SingleResult] =
       database.executeSelect(select)(row => extractor.extractAll(row))
@@ -48,7 +51,8 @@ trait ExecutorSyntax {
       fetchOne(HListExtractor(select.what.map(columnExtractor))).map(_.tupled)
     }
 
-    def fetchAll[IdHList <: HList, Extractors <: HList, Emitter <: HList, ResultSets <: HList, SingleResult](implicit mapper: Mapper.Aux[columnExtractor.type, AliasedColumns, Extractors],
+    def fetchAll[IdHList <: HList, Extractors <: HList, Emitter <: HList, ResultSets <: HList, SingleResult]
+      (implicit mapper: Mapper.Aux[columnExtractor.type, AliasedColumns, Extractors],
       extractorComapped: Comapped.Aux[Extractors, Extractor, IdHList],
       isHCons: IsHCons[IdHList],
       columnComapped: Comapped.Aux[AliasedColumns, AliasedColumn, IdHList],
