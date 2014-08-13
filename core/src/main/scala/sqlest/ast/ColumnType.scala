@@ -149,4 +149,7 @@ trait ColumnTypeEquivalences {
 
   implicit def optionOptionEquivalence[A: NonNumericBaseColumnType](implicit left: ColumnType[Option[A]], right: ColumnType[Option[A]]) =
     ColumnTypeEquivalence(left, right)
+
+  implicit def mappedColumnTypeEquivalence[A, B](implicit left: MappedColumnType[A, B], right: MappedColumnType[A, B]) =
+    ColumnTypeEquivalence(left, right)
 }

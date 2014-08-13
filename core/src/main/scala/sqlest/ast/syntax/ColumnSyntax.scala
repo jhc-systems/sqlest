@@ -25,8 +25,8 @@ trait ColumnSyntax {
   implicit def literalColumn[A](value: Some[A])(implicit columnType: BaseColumnType[A]): Column[Option[A]] =
     LiteralColumn[Option[A]](value)
 
-  implicit class LiteralColumnOps[A](left: A)(implicit columnType: ColumnType[A]) {
-    def column = LiteralColumn(left)
+  implicit class LiteralColumnOps[A](left: A) {
+    def column[B >: A](implicit columnType: ColumnType[B]) = LiteralColumn[B](left)
   }
 
   /**
@@ -34,8 +34,8 @@ trait ColumnSyntax {
    * the constant value into the generated sql statement. Do not use this on user input as
    * you will enable SQL injection attacks
    */
-  implicit class ConstantColumnOps[A](value: A)(implicit columnType: ColumnType[A]) {
-    def constant = ConstantColumn(value)
+  implicit class ConstantColumnOps[A](value: A) {
+    def constant[B >: A](implicit columnType: ColumnType[B]) = ConstantColumn[B](value)
   }
 
   /**
@@ -68,7 +68,9 @@ trait ColumnSyntax {
     def isNotNull = PostfixFunctionColumn[Boolean]("is not null", left)
   }
 
-  implicit class ComparisonColumnOps[A](left: Column[A])(implicit leftType: ColumnType[A]) {
+  implicit class ComparisonColumnOps[A](left: Column[A]) {
+    implicit val leftType: ColumnType[A] = left.columnType
+
     def ===[B](right: Column[B])(implicit equivalence: ColumnTypeEquivalence[A, B]) = {
       val (mappedLeft, mappedRight) = mapLiterals(left, right, equivalence)
       InfixFunctionColumn[Boolean]("=", mappedLeft, mappedRight)

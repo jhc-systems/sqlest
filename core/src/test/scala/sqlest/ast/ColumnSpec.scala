@@ -23,12 +23,19 @@ import sqlest._
 
 class ColumnSpec extends FlatSpec with Matchers {
 
+  sealed trait Size
+  case object Small extends Size
+  case object Medium extends Size
+  case object Large extends Size
+  implicit val sizeColumnType = EnumerationColumnType[Size, String](Small -> "S", Medium -> "M", Large -> "L")
+
   class TableOne(alias: Option[String]) extends Table("one", alias) {
     val col1 = column[Int]("col1")
     val col2 = column[String]("col2")
     val col3 = column[Int]("col3", MappedColumnType[Int, String](_.toInt, _.toString))
     val col4 = column[Double]("col1")
     val col5 = column[Option[String]]("col5", BlankIsNoneStringColumnType)
+    val col6 = column[Size]("col5", sizeColumnType)
 
     def * = (col1, col2)
 
@@ -63,6 +70,21 @@ class ColumnSpec extends FlatSpec with Matchers {
     val expr2 = (TableOne.col3 === 1)
     expr2 should equal(InfixFunctionColumn[Boolean]("=", TableOne.col3, "1"))
     expr2.parameter2.columnType should equal(TableOne.col2.columnType)
+
+    val expr3 = (TableOne.col5 === "Hi!")
+    expr3 should equal(InfixFunctionColumn[Boolean]("=", TableOne.col5, "Hi!"))
+    expr3.parameter2.columnType should equal(TableOne.col2.columnType)
+  }
+
+  "mapped column types" should "allow comparison operations" in {
+    (TableOne.col6 === Small.constant[Size]) should equal(InfixFunctionColumn[Boolean]("=", TableOne.col6, Small.constant[Size]))
+    (TableOne.col6 =!= Small.constant[Size]) should equal(InfixFunctionColumn[Boolean]("<>", TableOne.col6, Small.constant[Size]))
+    (TableOne.col6 < Small.constant[Size]) should equal(InfixFunctionColumn[Boolean]("<", TableOne.col6, Small.constant[Size]))
+    (TableOne.col6 <= Small.constant[Size]) should equal(InfixFunctionColumn[Boolean]("<=", TableOne.col6, Small.constant[Size]))
+    (TableOne.col6 > Small.constant[Size]) should equal(InfixFunctionColumn[Boolean](">", TableOne.col6, Small.constant[Size]))
+    (TableOne.col6 >= Small.constant[Size]) should equal(InfixFunctionColumn[Boolean](">=", TableOne.col6, Small.constant[Size]))
+    (TableOne.col6 in (Small.constant[Size], Medium.constant[Size])) should equal(InfixFunctionColumn[Boolean]("in", TableOne.col6, ScalarFunctionColumn[Size]("", Seq(Small.constant[Size], Medium.constant[Size]))))
+    (TableOne.col6 in List[Size](Small, Medium)) should equal(InfixFunctionColumn[Boolean]("in", TableOne.col6, ScalarFunctionColumn[Size]("", Seq(Small.constant[Size], Medium.constant[Size]))))
   }
 
   "column comparisons" should "fail for a mapped and an unmapped column" in {
