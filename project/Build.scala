@@ -29,7 +29,6 @@ object SqlestBuild extends Build {
       libraryDependencies ++= Seq(
         "joda-time" % "joda-time" % "2.3",
         "org.joda" % "joda-convert" % "1.6",
-        "com.chuusai" %% "shapeless" % "2.0.0",
         "com.typesafe.scala-logging" %% "scala-logging-slf4j" % "2.1.2",
         "org.scalatest" %% "scalatest" % "2.1.7" % "test"
       )

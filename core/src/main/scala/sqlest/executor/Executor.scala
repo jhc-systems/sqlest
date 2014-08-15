@@ -16,54 +16,28 @@
 
 package sqlest.executor
 
-import java.sql.ResultSet
-import shapeless._
-import shapeless.ops.hlist._
-import shapeless.poly._
 import sqlest.ast._
 import sqlest.extractor._
 
-private object columnExtractor extends (AliasedColumn ~> Extractor) {
-  def apply[T](column: AliasedColumn[T]) = ColumnExtractor(column)
-}
-
 trait ExecutorSyntax {
-  implicit class SelectExecutorOps[AliasedColumns <: HList](select: Select[AliasedColumns])(implicit database: Database) {
-    def fetchHeadOption[A](extractor: Extractor[A]): Option[extractor.SingleResult] =
-      database.executeSelect(select)(row => extractor.extractOne(row))
+  implicit class SelectExecutorOps[A](select: Select[A])(implicit database: Database) {
+    def fetchHead[B](extractor: Extractor[B]): extractor.SingleResult =
+      fetchHeadOption(extractor).getOrElse(throw new NoSuchElementException("fetchHead when no results returned"))
 
-    def fetchHead[A](extractor: Extractor[A]): extractor.SingleResult =
-      fetchHeadOption(extractor).get
+    def fetchHeadOption[B](extractor: Extractor[B]): Option[extractor.SingleResult] =
+      database.executeSelect(select.what(extractor.columns))(row => extractor.extractHeadOption(row))
 
-    def fetchAll[A](extractor: Extractor[A]): List[extractor.SingleResult] =
-      database.executeSelect(select)(row => extractor.extractAll(row))
+    def fetchList[B](extractor: Extractor[B]): List[extractor.SingleResult] =
+      database.executeSelect(select.what(extractor.columns))(row => extractor.extractList(row))
 
-    def fetchOne[IdHList <: HList, Extractors <: HList, Emitter <: HList, ResultSets <: HList, SingleResult](implicit mapper: Mapper.Aux[columnExtractor.type, AliasedColumns, Extractors],
-      extractorComapped: Comapped.Aux[Extractors, Extractor, IdHList],
-      isHCons: IsHCons[IdHList],
-      columnComapped: Comapped.Aux[AliasedColumns, AliasedColumn, IdHList],
-      toList: ToList[Extractors, Extractor[_]],
-      initializerMapper: Mapper.Aux[extractorEmitter.type, Extractors, Emitter],
-      constMapper: ConstMapper.Aux[ResultSet, Extractors, ResultSets],
-      zipper: ZipApply.Aux[Emitter, ResultSets, IdHList],
-      tupler: Tupler.Aux[IdHList, SingleResult]): Option[SingleResult] = {
+    def fetchHead[SingleResult](implicit extractable: Extractable.Aux[A, SingleResult]): SingleResult =
+      fetchHeadOption.getOrElse(throw new NoSuchElementException("fetchHead when no results returned"))
 
-      fetchOne(HListExtractor(select.what.map(columnExtractor))).map(_.tupled)
-    }
+    def fetchHeadOption[SingleResult](implicit extractable: Extractable.Aux[A, SingleResult]): Option[SingleResult] =
+      database.executeSelect(select)(row => extractable.extractor(select.what).extractHeadOption(row))
 
-    def fetchAll[IdHList <: HList, Extractors <: HList, Emitter <: HList, ResultSets <: HList, SingleResult]
-      (implicit mapper: Mapper.Aux[columnExtractor.type, AliasedColumns, Extractors],
-      extractorComapped: Comapped.Aux[Extractors, Extractor, IdHList],
-      isHCons: IsHCons[IdHList],
-      columnComapped: Comapped.Aux[AliasedColumns, AliasedColumn, IdHList],
-      toList: ToList[Extractors, Extractor[_]],
-      initializerMapper: Mapper.Aux[extractorEmitter.type, Extractors, Emitter],
-      constMapper: ConstMapper.Aux[ResultSet, Extractors, ResultSets],
-      zipper: ZipApply.Aux[Emitter, ResultSets, IdHList],
-      tupler: Tupler.Aux[IdHList, SingleResult]): List[SingleResult] = {
-
-      fetchAll(HListExtractor(select.what.map(columnExtractor))).map(_.tupled)
-    }
+    def fetchList[SingleResult](implicit extractable: Extractable.Aux[A, SingleResult]): List[SingleResult] =
+      database.executeSelect(select)(row => extractable.extractor(select.what).extractList(row))
   }
 
   implicit class InsertExecutorOps(insert: Insert) {

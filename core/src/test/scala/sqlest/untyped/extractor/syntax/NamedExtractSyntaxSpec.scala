@@ -56,14 +56,14 @@ class NamedExtractSyntaxSpec extends FlatSpec with Matchers with PathDependenceT
     )
   )
 
-  "simple extractNamed" should "have the correct extractOne behaviour" in {
-    simpleExtractor.extractOne(testResultSet) should equal(Some(
+  "simple extractNamed" should "have the correct extractHeadOption behaviour" in {
+    simpleExtractor.extractHeadOption(testResultSet) should equal(Some(
       One(1, "a")
     ))
   }
 
-  it should "have the correct extractAll behaviour" in {
-    simpleExtractor.extractAll(testResultSet) should equal(List(
+  it should "have the correct extractList behaviour" in {
+    simpleExtractor.extractList(testResultSet) should equal(List(
       One(1, "a"),
       One(3, "c"),
       One(-1, "e")
@@ -76,14 +76,14 @@ class NamedExtractSyntaxSpec extends FlatSpec with Matchers with PathDependenceT
     simpleExtractor.findColumn("c") should equal(None)
   }
 
-  "nested extractNamed" should "have the correct extractOne behaviour" in {
-    nestedExtractor.extractOne(testResultSet) should equal(Some(
+  "nested extractNamed" should "have the correct extractHeadOption behaviour" in {
+    nestedExtractor.extractHeadOption(testResultSet) should equal(Some(
       AggregateOneTwo(One(1, "a"), Two("b", 2))
     ))
   }
 
-  it should "have the correct extractAll behaviour" in {
-    nestedExtractor.extractAll(testResultSet) should equal(List(
+  it should "have the correct extractList behaviour" in {
+    nestedExtractor.extractList(testResultSet) should equal(List(
       AggregateOneTwo(One(1, "a"), Two("b", 2)),
       AggregateOneTwo(One(3, "c"), Two("d", 4)),
       AggregateOneTwo(One(-1, "e"), Two("f", 6))

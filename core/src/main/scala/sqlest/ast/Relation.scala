@@ -17,10 +17,6 @@
 package sqlest.ast
 
 import scala.collection.mutable
-import scala.language.implicitConversions
-import shapeless._
-import shapeless.ops.hlist._
-import shapeless.UnaryTCConstraint._
 
 /**
  * A source of columns from the database.
@@ -103,8 +99,8 @@ case class InnerJoin(left: Relation, right: Relation, condition: Column[Boolean]
 case class OuterJoin(left: Relation, right: Relation) extends Join
 
 /** A select statement or subselect. */
-case class Select[AliasedColumns <: HList](
-    what: AliasedColumns,
+case class Select[A: AliasedColumns](
+    what: A,
     from: Relation,
     where: Option[Column[Boolean]] = None,
     startWith: Option[Column[Boolean]] = None,
@@ -112,35 +108,38 @@ case class Select[AliasedColumns <: HList](
     groupBy: List[Group] = Nil,
     orderBy: List[Order] = Nil,
     limit: Option[Long] = None,
-    offset: Option[Long] = None)(implicit toList: ToList[AliasedColumns, AliasedColumn[_]]) extends Relation with Query {
+    offset: Option[Long] = None) extends Relation with Query {
 
   def columns: Seq[AliasedColumn[_]] =
-    what.toList
+    AliasedColumns[A].toSeq(what)
 
-  def from(relation: Relation): Select[AliasedColumns] =
+  def what[A: AliasedColumns](newWhat: A): Select[A] =
+    this.copy(what = newWhat)
+
+  def from(relation: Relation): Select[A] =
     this.copy(from = relation)
 
-  def where(expr: Column[Boolean]): Select[AliasedColumns] =
+  def where(expr: Column[Boolean]): Select[A] =
     this.copy(where = this.where map (_ && expr) orElse Some(expr))
 
-  def startWith(expr: Column[Boolean]): Select[AliasedColumns] =
+  def startWith(expr: Column[Boolean]): Select[A] =
     this.copy(startWith = this.startWith map (_ && expr) orElse Some(expr))
 
-  def connectBy(expr: Column[Boolean]): Select[AliasedColumns] =
+  def connectBy(expr: Column[Boolean]): Select[A] =
     this.copy(connectBy = this.connectBy map (_ && expr) orElse Some(expr))
 
-  def groupBy(groupBys: Group*): Select[AliasedColumns] =
+  def groupBy(groupBys: Group*): Select[A] =
     this.copy(groupBy = this.groupBy ++ groupBys)
 
-  def orderBy(orders: Order*): Select[AliasedColumns] =
+  def orderBy(orders: Order*): Select[A] =
     this.copy(orderBy = this.orderBy ++ orders)
 
-  def limit(limit: Long): Select[AliasedColumns] =
+  def limit(limit: Long): Select[A] =
     this.copy(limit = Some(limit))
 
-  def offset(offset: Long): Select[AliasedColumns] =
+  def offset(offset: Long): Select[A] =
     this.copy(offset = Some(offset))
 
-  def page(number: Long, size: Long): Select[AliasedColumns] =
+  def page(number: Long, size: Long): Select[A] =
     this.copy(limit = Some(size), offset = Some(number * size))
 }

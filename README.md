@@ -82,7 +82,7 @@ select(FruitTable.name, FruitTable.juiciness)
   .from(FruitTable)
   .where(FruitTable.juiciness >= 8)
   .orderBy(FruitTable.juiciness.desc)
-  .fetchAll(fruitExtractor)    // fruitExtractor is defined below
+  .fetchList(fruitExtractor)    // fruitExtractor is defined below
 
 ==> List(
       Fruit("Watermelon", 10),

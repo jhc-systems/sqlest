@@ -16,8 +16,6 @@
 
 package sqlest.ast.syntax
 
-import shapeless._
-import shapeless.UnaryTCConstraint._
 import sqlest.ast._
 
 trait InsertSyntax {
@@ -34,7 +32,7 @@ class InsertBuilder(into: Table) {
   def values(setters: Setter[_, _]*) =
     InsertValues(into, Seq(setters))
 
-  def from[AliasedColumns <: HList: *->*[AliasedColumn]#λ](select: Select[AliasedColumns]) =
+  def from[A: AliasedColumns](select: Select[A]) =
     InsertFromSelect(into = into, columns = into.columns, select = select)
 
   def set(setters: Setter[_, _]*) =
@@ -48,6 +46,6 @@ class InsertColumnsBuilder(into: Table, columns: Seq[TableColumn[_]]) {
     InsertValues(into, Seq(setters))
   }
 
-  def from[AliasedColumns <: HList: *->*[AliasedColumn]#λ](select: Select[AliasedColumns]) =
+  def from[A: AliasedColumns](select: Select[A]) =
     InsertFromSelect(into = into, columns = columns, select = select)
 }
