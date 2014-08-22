@@ -110,8 +110,7 @@ case class Select[A: AliasedColumns](
     limit: Option[Long] = None,
     offset: Option[Long] = None) extends Relation with Query {
 
-  def columns: Seq[AliasedColumn[_]] =
-    AliasedColumns[A].toSeq(what)
+  def columns = AliasedColumns[A].columns(what)
 
   def what[A: AliasedColumns](newWhat: A): Select[A] =
     this.copy(what = newWhat)
