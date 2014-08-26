@@ -49,7 +49,7 @@ object SqlestBuild extends Build {
 
   def commonSettings = SbtScalariform.scalariformSettings ++ Seq(
     organization := "uk.co.jhc",
-    version := "0.2.0",
+    version := "0.3.0-SNAPSHOT",
     scalaVersion := "2.11.2",
     scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-language:implicitConversions", "-language:existentials")
   )
@@ -62,7 +62,7 @@ object SqlestBuild extends Build {
       if (isSnapshot.value)
         Some("snapshots" at nexus + "content/repositories/snapshots")
       else
-        Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+        Some("releases" at nexus + "service/local/staging/deploy/maven2")
     },
     credentials := Seq(Seq("SONATYPE_USER", "SONATYPE_PASSWORD").map(key => sys.env.get(key)) match {
       case Seq(Some(user), Some(password)) =>
