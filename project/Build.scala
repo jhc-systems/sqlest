@@ -6,20 +6,20 @@ import xerial.sbt.Sonatype._
 
 object SqlestBuild extends Build {
 
-  lazy val sqlest = Project(
-    id = "sqlest",
+  lazy val root = Project(
+    id = "root",
     base = file("."),
-    aggregate = Seq(sqlestCore, sqlestExamples),
+    aggregate = Seq(core, examples),
     settings = commonSettings ++ Seq(
-      moduleName := "sqlest-root",
+      moduleName := "root",
 
       publish := (),
       publishLocal := ()
     )
   )
 
-  lazy val sqlestCore = Project(
-    id = "sqlest-core",
+  lazy val core = Project(
+    id = "core",
     base = file("core"),
 
     settings = commonSettings ++ publishingSettings ++ Seq(
@@ -35,10 +35,10 @@ object SqlestBuild extends Build {
     )
   )
 
-  lazy val sqlestExamples = Project(
-    id = "sqlest-examples",
+  lazy val examples = Project(
+    id = "examples",
     base = file("examples"),
-    dependencies = Seq(sqlestCore),
+    dependencies = Seq(core),
 
     settings = commonSettings ++ Seq(
       libraryDependencies += "com.h2database" % "h2" % "1.4.180",
