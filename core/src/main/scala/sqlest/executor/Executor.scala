@@ -27,7 +27,7 @@ trait ExecutorSyntax {
     def fetchHeadOption[B](extractor: Extractor[B]): Option[extractor.SingleResult] =
       database.executeSelect(select.what(extractor.columns))(row => extractor.extractHeadOption(row))
 
-    def fetchList[B](extractor: Extractor[B]): List[extractor.SingleResult] =
+    def fetchAll[B](extractor: Extractor[B]): List[extractor.SingleResult] =
       database.executeSelect(select.what(extractor.columns))(row => extractor.extractList(row))
 
     def fetchHead[SingleResult](implicit extractable: Extractable.Aux[A, SingleResult]): SingleResult =
@@ -36,7 +36,7 @@ trait ExecutorSyntax {
     def fetchHeadOption[SingleResult](implicit extractable: Extractable.Aux[A, SingleResult]): Option[SingleResult] =
       database.executeSelect(select)(row => extractable.extractor(select.what).extractHeadOption(row))
 
-    def fetchList[SingleResult](implicit extractable: Extractable.Aux[A, SingleResult]): List[SingleResult] =
+    def fetchAll[SingleResult](implicit extractable: Extractable.Aux[A, SingleResult]): List[SingleResult] =
       database.executeSelect(select)(row => extractable.extractor(select.what).extractList(row))
   }
 
