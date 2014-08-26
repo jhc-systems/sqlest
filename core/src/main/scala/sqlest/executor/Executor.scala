@@ -20,12 +20,24 @@ import sqlest.ast._
 import sqlest.extractor._
 
 trait ExecutorSyntax {
-  implicit class SelectExecutorOps(select: Select)(implicit database: Database) {
-    def fetchOne[A](extractor: Extractor[A]): Option[extractor.SingleResult] =
-      database.executeSelect(select)(row => extractor.extractOne(row))
+  implicit class SelectExecutorOps[A](select: Select[A])(implicit database: Database) {
+    def fetchHead[B](extractor: Extractor[B]): extractor.SingleResult =
+      fetchHeadOption(extractor).getOrElse(throw new NoSuchElementException("fetchHead when no results returned"))
 
-    def fetchAll[A](extractor: Extractor[A]): List[extractor.SingleResult] =
-      database.executeSelect(select)(row => extractor.extractAll(row))
+    def fetchHeadOption[B](extractor: Extractor[B]): Option[extractor.SingleResult] =
+      database.executeSelect(select.what(extractor.columns))(row => extractor.extractHeadOption(row))
+
+    def fetchList[B](extractor: Extractor[B]): List[extractor.SingleResult] =
+      database.executeSelect(select.what(extractor.columns))(row => extractor.extractList(row))
+
+    def fetchHead[SingleResult](implicit extractable: Extractable.Aux[A, SingleResult]): SingleResult =
+      fetchHeadOption.getOrElse(throw new NoSuchElementException("fetchHead when no results returned"))
+
+    def fetchHeadOption[SingleResult](implicit extractable: Extractable.Aux[A, SingleResult]): Option[SingleResult] =
+      database.executeSelect(select)(row => extractable.extractor(select.what).extractHeadOption(row))
+
+    def fetchList[SingleResult](implicit extractable: Extractable.Aux[A, SingleResult]): List[SingleResult] =
+      database.executeSelect(select)(row => extractable.extractor(select.what).extractList(row))
   }
 
   implicit class InsertExecutorOps(insert: Insert) {

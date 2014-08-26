@@ -32,7 +32,7 @@ class InsertBuilder(into: Table) {
   def values(setters: Setter[_, _]*) =
     InsertValues(into, Seq(setters))
 
-  def from(select: Select) =
+  def from[A: AliasedColumns](select: Select[A]) =
     InsertFromSelect(into = into, columns = into.columns, select = select)
 
   def set(setters: Setter[_, _]*) =
@@ -46,6 +46,6 @@ class InsertColumnsBuilder(into: Table, columns: Seq[TableColumn[_]]) {
     InsertValues(into, Seq(setters))
   }
 
-  def from(select: Select) =
+  def from[A: AliasedColumns](select: Select[A]) =
     InsertFromSelect(into = into, columns = columns, select = select)
 }

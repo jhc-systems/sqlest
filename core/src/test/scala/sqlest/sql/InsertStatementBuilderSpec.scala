@@ -107,7 +107,7 @@ trait InsertStatementBuilderSpec extends BaseStatementBuilderSpec {
       insert
         .into(TableOne)
         .from(
-          select.from(TableOne).where(TableOne.col2 === "abc")
+          select(TableOne.col1, TableOne.col2).from(TableOne).where(TableOne.col2 === "abc")
         )
     } should equal(
       s"""
@@ -126,7 +126,7 @@ trait InsertStatementBuilderSpec extends BaseStatementBuilderSpec {
         .into(TableOne)
         .columns(TableOne.col1)
         .from(
-          select.from(TableOne).where(TableOne.col2 === "abc")
+          select(TableOne.col1, TableOne.col2).from(TableOne).where(TableOne.col2 === "abc")
         )
     } should equal(
       s"""

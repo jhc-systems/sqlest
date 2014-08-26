@@ -22,9 +22,7 @@ import scala.collection.mutable
  * A source of columns from the database.
  * Tables, joins, and select statements are all types of relation.
  */
-sealed trait Relation {
-  def columns: Seq[AliasedColumn[_]]
-}
+sealed trait Relation
 
 /**
  * A BaseTable allows columns to be defined on it.
@@ -86,7 +84,6 @@ case class TableFunction(
 sealed trait Join extends Relation {
   def left: Relation
   def right: Relation
-  def columns = left.columns ++ right.columns
 }
 
 /** A left join between two tables. */
@@ -102,8 +99,8 @@ case class InnerJoin(left: Relation, right: Relation, condition: Column[Boolean]
 case class OuterJoin(left: Relation, right: Relation) extends Join
 
 /** A select statement or subselect. */
-case class Select(
-    what: Option[Seq[AliasedColumn[_]]] = None,
+case class Select[A: AliasedColumns](
+    what: A,
     from: Relation,
     where: Option[Column[Boolean]] = None,
     startWith: Option[Column[Boolean]] = None,
@@ -113,33 +110,35 @@ case class Select(
     limit: Option[Long] = None,
     offset: Option[Long] = None) extends Relation with Query {
 
-  def columns =
-    what getOrElse from.columns
+  def columns = AliasedColumns[A].columns(what)
 
-  def from(relation: Relation): Select =
+  def what[A: AliasedColumns](newWhat: A): Select[A] =
+    this.copy(what = newWhat)
+
+  def from(relation: Relation): Select[A] =
     this.copy(from = relation)
 
-  def where(expr: Column[Boolean]): Select =
+  def where(expr: Column[Boolean]): Select[A] =
     this.copy(where = this.where map (_ && expr) orElse Some(expr))
 
-  def startWith(expr: Column[Boolean]): Select =
+  def startWith(expr: Column[Boolean]): Select[A] =
     this.copy(startWith = this.startWith map (_ && expr) orElse Some(expr))
 
-  def connectBy(expr: Column[Boolean]): Select =
+  def connectBy(expr: Column[Boolean]): Select[A] =
     this.copy(connectBy = this.connectBy map (_ && expr) orElse Some(expr))
 
-  def groupBy(groupBys: Group*): Select =
+  def groupBy(groupBys: Group*): Select[A] =
     this.copy(groupBy = this.groupBy ++ groupBys)
 
-  def orderBy(orders: Order*): Select =
+  def orderBy(orders: Order*): Select[A] =
     this.copy(orderBy = this.orderBy ++ orders)
 
-  def limit(limit: Long): Select =
+  def limit(limit: Long): Select[A] =
     this.copy(limit = Some(limit))
 
-  def offset(offset: Long): Select =
+  def offset(offset: Long): Select[A] =
     this.copy(offset = Some(offset))
 
-  def page(number: Long, size: Long): Select =
+  def page(number: Long, size: Long): Select[A] =
     this.copy(limit = Some(size), offset = Some(number * size))
 }

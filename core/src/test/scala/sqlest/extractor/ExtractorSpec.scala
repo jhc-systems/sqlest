@@ -37,11 +37,11 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       "b" -> TableOne.col2
     )
 
-    extractor.extractOne(testResultSet) should equal(Some(
+    extractor.extractHeadOption(testResultSet) should equal(Some(
       One(1, "a")
     ))
 
-    extractor.extractAll(testResultSet) should equal(List(
+    extractor.extractList(testResultSet) should equal(List(
       One(1, "a"),
       One(3, "c"),
       One(-1, "e")
@@ -51,11 +51,11 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
   "tuple extractor" should "extract appropriate data structures" in {
     val extractor = extract(TableOne.col1, TableOne.col2)
 
-    extractor.extractOne(testResultSet) should equal(Some(
+    extractor.extractHeadOption(testResultSet) should equal(Some(
       (1, "a")
     ))
 
-    extractor.extractAll(testResultSet) should equal(List(
+    extractor.extractList(testResultSet) should equal(List(
       (1, "a"),
       (3, "c"),
       (-1, "e")
@@ -74,11 +74,11 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       )
     )
 
-    extractor.extractOne(testResultSet) should equal(Some(
+    extractor.extractHeadOption(testResultSet) should equal(Some(
       AggregateOneTwo(One(1, "a"), Two("b", 2))
     ))
 
-    extractor.extractAll(testResultSet) should equal(List(
+    extractor.extractList(testResultSet) should equal(List(
       AggregateOneTwo(One(1, "a"), Two("b", 2)),
       AggregateOneTwo(One(3, "c"), Two("d", 4)),
       AggregateOneTwo(One(-1, "e"), Two("f", 6))
@@ -97,11 +97,11 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       )
     )
 
-    extractor.extractOne(testResultSet) should equal(Some(
+    extractor.extractHeadOption(testResultSet) should equal(Some(
       AggregateOneTwo(One(1, "a"), Two("b", 2))
     ))
 
-    extractor.extractAll(testResultSet) should equal(List(
+    extractor.extractList(testResultSet) should equal(List(
       AggregateOneTwo(One(1, "a"), Two("b", 2)),
       AggregateOneTwo(One(3, "c"), Two("d", 4)),
       AggregateOneTwo(One(-1, "e"), Two("f", 6))
@@ -124,11 +124,11 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       )
     )
 
-    extractor.extractOne(testResultSet) should equal(Some(
+    extractor.extractHeadOption(testResultSet) should equal(Some(
       AggregateOneTwoThree(One(1, "a"), Two("b", 2), Three(None, Some("x")))
     ))
 
-    extractor.extractAll(testResultSet) should equal(List(
+    extractor.extractList(testResultSet) should equal(List(
       AggregateOneTwoThree(One(1, "a"), Two("b", 2), Three(None, Some("x"))),
       AggregateOneTwoThree(One(3, "c"), Two("d", 4), Three(Some(9), None)),
       AggregateOneTwoThree(One(-1, "e"), Two("f", 6), Three(None, None))
@@ -145,11 +145,11 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
     val extractor =
       TableOne.col1.asOption
 
-    extractor.extractOne(results) should equal(Some(
+    extractor.extractHeadOption(results) should equal(Some(
       Some(1)
     ))
 
-    extractor.extractAll(results) should equal(List(
+    extractor.extractList(results) should equal(List(
       Some(1),
       Some(3),
       None
@@ -159,11 +159,11 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
   "option extractor" should "handle nulls for compound tuples" in {
     val extractor = extract(TableThree.col3, TableThree.col4).asOption
 
-    extractor.extractOne(testResultSet) should equal(Some(
+    extractor.extractHeadOption(testResultSet) should equal(Some(
       Some((None, Some("x")))
     ))
 
-    extractor.extractAll(testResultSet) should equal(List(
+    extractor.extractList(testResultSet) should equal(List(
       Some((None, Some("x"))),
       Some((Some(9), None)),
       Some((None, None))
@@ -176,11 +176,11 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       "b" -> TableThree.col4
     ).asOption
 
-    extractor.extractOne(testResultSet) should equal(Some(
+    extractor.extractHeadOption(testResultSet) should equal(Some(
       Some(Three(None, Some("x")))
     ))
 
-    extractor.extractAll(testResultSet) should equal(List(
+    extractor.extractList(testResultSet) should equal(List(
       Some(Three(None, Some("x"))),
       Some(Three(Some(9), None)),
       Some(Three(None, None))
@@ -203,11 +203,11 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       ).asOption
     )
 
-    extractor.extractOne(testResultSet) should equal(Some(
+    extractor.extractHeadOption(testResultSet) should equal(Some(
       AggregateOneTwoOptionThree(One(1, "a"), Two("b", 2), Some(Three(None, Some("x"))))
     ))
 
-    extractor.extractAll(testResultSet) should equal(List(
+    extractor.extractList(testResultSet) should equal(List(
       AggregateOneTwoOptionThree(One(1, "a"), Two("b", 2), Some(Three(None, Some("x")))),
       AggregateOneTwoOptionThree(One(3, "c"), Two("d", 4), Some(Three(Some(9), None))),
       AggregateOneTwoOptionThree(One(-1, "e"), Two("f", 6), Some(Three(None, None)))
@@ -223,11 +223,11 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       "str" -> TableTwo.col2
     )
 
-    extractor.extractOne(testResultSet) should equal(Some(
+    extractor.extractHeadOption(testResultSet) should equal(Some(
       AggregateOnePointFive(One(1, "a"), "b")
     ))
 
-    extractor.extractAll(testResultSet) should equal(List(
+    extractor.extractList(testResultSet) should equal(List(
       AggregateOnePointFive(One(1, "a"), "b"),
       AggregateOnePointFive(One(3, "c"), "d"),
       AggregateOnePointFive(One(-1, "e"), "f")
@@ -242,9 +242,9 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
 
     val extractor = extract(TableFour.mapped)
 
-    extractor.extractOne(results) should equal(Some(true))
+    extractor.extractHeadOption(results) should equal(Some(true))
 
-    extractor.extractAll(results) should equal(List(true, false))
+    extractor.extractList(results) should equal(List(true, false))
   }
 
   "nested list extractor" should "stop when the left value changes" in {
@@ -268,11 +268,11 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
         TableOne.col2
       ))
 
-    extractor.extractOne(results) should equal(Some(
+    extractor.extractHeadOption(results) should equal(Some(
       (One(1, "a"), List(Two("a", 1), Two("b", 2)))
     ))
 
-    extractor.extractAll(results) should equal(List(
+    extractor.extractList(results) should equal(List(
       (One(1, "a"), List(Two("a", 1), Two("b", 2))),
       (One(2, "b"), List(Two("c", 3)))
     ))
@@ -298,11 +298,11 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       ).asList
     ).groupBy(TableThree.col3)
 
-    extractor.extractOne(results) should equal(Some(
+    extractor.extractHeadOption(results) should equal(Some(
       (Three(Some(1), None), List(Three(Some(4), None), Three(None, None)))
     ))
 
-    extractor.extractAll(results) should equal(List(
+    extractor.extractList(results) should equal(List(
       (Three(Some(1), None), List(Three(Some(4), None), Three(None, None))),
       (Three(None, Some("b")), List(Three(Some(6), None)))
     ))
@@ -328,11 +328,11 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       ).asOption.asList
     ).groupBy(TableThree.col3)
 
-    extractor.extractOne(results) should equal(Some(
+    extractor.extractHeadOption(results) should equal(Some(
       (Three(Some(1), None), List(Some(Three(Some(4), None)), Some(Three(None, None))))
     ))
 
-    extractor.extractAll(results) should equal(List(
+    extractor.extractList(results) should equal(List(
       (Three(Some(1), None), List(Some(Three(Some(4), None)), Some(Three(None, None)))),
       (Three(None, Some("b")), List(Some(Three(Some(6), None))))
     ))
@@ -366,7 +366,7 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       col3.asList
     ).groupBy(col1)
 
-    extractor.extractOne(results) should equal(Some(
+    extractor.extractHeadOption(results) should equal(Some(
       (
         1,
         List(1, 1, 2, 2),
@@ -374,7 +374,7 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       )
     ))
 
-    extractor.extractAll(results) should equal(List(
+    extractor.extractList(results) should equal(List(
       (
         1,
         List(1, 1, 2, 2),
@@ -416,7 +416,7 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       "c" -> col3.asList
     ).groupBy(col1)
 
-    extractor.extractOne(results) should equal(Some(
+    extractor.extractHeadOption(results) should equal(Some(
       Flattened(
         1,
         List(1, 1, 2, 2),
@@ -424,7 +424,7 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       )
     ))
 
-    extractor.extractAll(results) should equal(List(
+    extractor.extractList(results) should equal(List(
       Flattened(
         1,
         List(1, 1, 2, 2),
@@ -468,11 +468,11 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       ).asList
     )
 
-    extractor.extractOne(results) should equal(Some(
+    extractor.extractHeadOption(results) should equal(Some(
       Outer(1, List(Inner(1, List(1))))
     ))
 
-    extractor.extractAll(results) should equal(List(
+    extractor.extractList(results) should equal(List(
       Outer(1, List(Inner(1, List(1)))),
       Outer(1, List(Inner(1, List(2)))),
       Outer(1, List(Inner(2, List(3)))),
@@ -514,13 +514,13 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       ).asList
     ).groupBy(col1)
 
-    extractor.extractOne(results) should equal(Some(Outer(1, List(
+    extractor.extractHeadOption(results) should equal(Some(Outer(1, List(
       Inner(1, List(1)),
       Inner(1, List(2)),
       Inner(2, List(3)),
       Inner(2, List(4))))))
 
-    extractor.extractAll(results) should equal(List(
+    extractor.extractList(results) should equal(List(
       Outer(
         1,
         List(
@@ -561,11 +561,11 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       col3.asList
     ).groupBy(col1)
 
-    extractor.extractOne(results) should equal(Some(
+    extractor.extractHeadOption(results) should equal(Some(
       (1, List(1, 2), List())
     ))
 
-    extractor.extractAll(results) should equal(List(
+    extractor.extractList(results) should equal(List(
       (1, List(1, 2), List()),
       (2, List(3, 4), List())
     ))
@@ -580,9 +580,9 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
 
     val extractor = extractColumnByName[Int]("scalarFunction")
 
-    extractor.extractOne(results) should equal(Some(10))
+    extractor.extractHeadOption(results) should equal(Some(10))
 
-    extractor.extractAll(results) should equal(List(10))
+    extractor.extractList(results) should equal(List(10))
   }
 
   "scalar function extractor" should "compose with other extractors" in {
@@ -598,11 +598,11 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       extractColumnByName[Int]("scalarFunction").asOption
     )
 
-    extractor.extractOne(results) should equal(Some(
+    extractor.extractHeadOption(results) should equal(Some(
       (Some(1), Some("b"), Some(10))
     ))
 
-    extractor.extractAll(results) should equal(List(
+    extractor.extractList(results) should equal(List(
       (Some(1), Some("b"), Some(10))
     ))
   }

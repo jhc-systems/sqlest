@@ -20,17 +20,16 @@ import java.sql.ResultSet
 import org.joda.time.DateTime
 import scala.collection.immutable._
 import sqlest.ast._
-import sqlest.util._
 
-sealed trait Extractor[A] extends Logging {
+sealed trait Extractor[A] {
   type Accumulator
   def columns: List[AliasedColumn[_]]
   def nonOptionalColumns: List[AliasedColumn[_]]
 
   type SingleResult
 
-  def extractOne(row: ResultSet): Option[SingleResult]
-  def extractAll(row: ResultSet): List[SingleResult]
+  def extractHeadOption(row: ResultSet): Option[SingleResult]
+  def extractList(row: ResultSet): List[SingleResult]
 
   def initialize(row: ResultSet): Accumulator
   def accumulate(row: ResultSet, accumulator: Accumulator): Accumulator
@@ -43,11 +42,11 @@ sealed trait Extractor[A] extends Logging {
 trait SingleExtractor[A] extends Extractor[A] {
   final type SingleResult = A
 
-  final def extractOne(row: ResultSet): Option[A] =
-    asList.extractOne(row)
+  final def extractHeadOption(row: ResultSet): Option[A] =
+    asList.extractHeadOption(row)
 
-  final def extractAll(row: ResultSet): List[A] =
-    asList.extractAll(row)
+  final def extractList(row: ResultSet): List[A] =
+    asList.extractList(row)
 
   def asList = ListExtractor(this)
   def groupBy[B](groupBy: Extractor[B]) = GroupedExtractor(this, groupBy)
@@ -58,7 +57,7 @@ trait MultiExtractor[A] extends Extractor[List[A]] {
 
   final type SingleResult = A
 
-  final def extractOne(row: ResultSet): Option[A] = {
+  final def extractHeadOption(row: ResultSet): Option[A] = {
     if (row.isFirst || row.isBeforeFirst && row.next) {
       var accumulator = initialize(row)
 
@@ -69,7 +68,7 @@ trait MultiExtractor[A] extends Extractor[List[A]] {
     } else None
   }
 
-  final def extractAll(row: ResultSet): List[A] = {
+  final def extractList(row: ResultSet): List[A] = {
     if (row.isFirst || row.isBeforeFirst && row.next) {
       var accumulator = initialize(row)
 

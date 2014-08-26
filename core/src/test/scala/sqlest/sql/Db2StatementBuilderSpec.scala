@@ -32,7 +32,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec
 
   "select with limit only" should "produce the right sql" in {
     sql {
-      select
+      select(MyTable.col1, MyTable.col2)
         .from(MyTable)
         .where(MyTable.col1 === 123)
         .limit(10)
@@ -49,7 +49,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec
 
   "select with offset only" should "produce the right sql" in {
     sql {
-      select
+      select(MyTable.col1, MyTable.col2)
         .from(MyTable)
         .where(MyTable.col1 === 123)
         .offset(20)
@@ -69,7 +69,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec
 
   "select with limit and offset" should "produce the right sql" in {
     sql {
-      select
+      select(MyTable.col1, MyTable.col2)
         .from(MyTable)
         .where(MyTable.col1 === 123)
         .page(2, 10)
@@ -89,7 +89,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec
 
   "select with limit and offset and order" should "produce the right sql" in {
     sql {
-      select
+      select(MyTable.col1, MyTable.col2)
         .from(MyTable)
         .where(MyTable.col1 === 123)
         .orderBy(MyTable.col1.asc)
@@ -131,7 +131,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec
 
   "select table function" should "produce the right sql" in {
     sql {
-      select
+      select(TableThree.col3, TableThree.col4, TestTableFunction.col5, TestTableFunction.col6)
         .from(TableThree.outerJoin(TestTableFunction(TableThree.col3, "abc")))
     } should equal(
       s"""

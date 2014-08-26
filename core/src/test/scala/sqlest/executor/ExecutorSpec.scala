@@ -38,13 +38,13 @@ class ExecutorSpec extends FlatSpec with Matchers {
   )
 
   "a select statement" should "be executable with an extractor" in {
-    selectStatement.fetchAll(extractor)
+    selectStatement.fetchList(extractor)
   }
 
   it should "be able to return all results" in {
-    val actual = selectStatement.fetchAll(extractor)
+    val actualExtracted = selectStatement.fetchList(extractor)
 
-    actual should equal(Seq(
+    actualExtracted should equal(Seq(
       One(1, "a"),
       One(3, "c"),
       One(-1, "e")
@@ -52,9 +52,30 @@ class ExecutorSpec extends FlatSpec with Matchers {
   }
 
   it should "be able to return an option of the first result" in {
-    val actual = selectStatement.fetchOne(extractor)
+    val actual = selectStatement.fetchHeadOption(extractor)
 
     actual should equal(Some(One(1, "a")))
+  }
+
+  it should "be able to return the first result" in {
+    val actual = selectStatement.fetchHead(extractor)
+
+    actual should equal(One(1, "a"))
+  }
+
+  it should "be able to return the types of the columns passed in" in {
+    val head: Int = select(TableOne.col1).from(TableOne).fetchHead
+    head should be(1)
+
+    val headOption: Option[(String)] = select(TableOne.col2).from(TableOne).fetchHeadOption
+    headOption should be(Some("a"))
+
+    val all: List[(Int, String)] = select(TableOne.col1, TableOne.col2).from(TableOne).fetchList
+    all should equal(Seq(
+      (1, "a"),
+      (3, "c"),
+      (-1, "e")
+    ))
   }
 
   "an update" should "require a transaction to run" in {

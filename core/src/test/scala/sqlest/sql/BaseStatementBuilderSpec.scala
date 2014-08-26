@@ -71,10 +71,7 @@ trait BaseStatementBuilderSpec extends FlatSpec with Matchers {
   class TestTableFunction(alias: Option[String]) extends TableFunction2[String, String]("testTableFunction", alias) {
     val col5 = column[String]("col5")
     val col6 = column[String]("col6")
-
-    def as(alias: String): TestTableFunction = new TestTableFunction(Some(alias))
   }
-
   object TestTableFunction extends TestTableFunction(None)
 
   val testFunction = ScalarFunction2[String, String, Int]("testFunction")

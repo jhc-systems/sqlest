@@ -19,7 +19,7 @@ package sqlest.sql
 import sqlest.ast._
 
 trait DB2StatementBuilder extends StatementBuilder {
-  override def selectSql(select: Select): String = {
+  override def selectSql(select: Select[_]): String = {
     val offset = select.offset getOrElse 0L
     if (offset > 0L) {
       rowNumberSelectSql(select, offset, select.limit)
@@ -39,7 +39,7 @@ trait DB2StatementBuilder extends StatementBuilder {
     case _ => super.joinSql(relation)
   }
 
-  def rowNumberSelectSql(select: Select, offset: Long, limit: Option[Long]): String = {
+  def rowNumberSelectSql(select: Select[_], offset: Long, limit: Option[Long]): String = {
     val subquery = Seq(
       s"${selectWhatSql(select.columns)}, row_number() over (${selectOrderBySql(select.orderBy) getOrElse ""}) as rownum",
       selectFromSql(select.from)
@@ -58,7 +58,7 @@ trait DB2StatementBuilder extends StatementBuilder {
     s"with subquery as ($subquery) select $what from subquery where $bounds"
   }
 
-  override def selectArgs(select: Select): List[LiteralColumn[_]] = {
+  override def selectArgs(select: Select[_]): List[LiteralColumn[_]] = {
     val offset = select.offset getOrElse 0L
     if (offset > 0L) {
       rowNumberSelectArgs(select, offset, select.limit)
@@ -73,7 +73,7 @@ trait DB2StatementBuilder extends StatementBuilder {
   override def selectOffsetArgs(limit: Option[Long]): List[LiteralColumn[_]] =
     Nil
 
-  def rowNumberSelectArgs(select: Select, offset: Long, limit: Option[Long]): List[LiteralColumn[_]] = {
+  def rowNumberSelectArgs(select: Select[_], offset: Long, limit: Option[Long]): List[LiteralColumn[_]] = {
     val subqueryArgs =
       selectWhatArgs(select.columns) ++
         selectOrderByArgs(select.orderBy) ++

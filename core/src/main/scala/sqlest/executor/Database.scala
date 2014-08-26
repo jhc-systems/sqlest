@@ -39,7 +39,7 @@ trait Database extends Logging {
 
   private val transactionConnection = new DynamicVariable[Option[Connection]](None)
 
-  def executeSelect[A](select: Select)(extractor: ResultSet => A): A =
+  def executeSelect[A](select: Select[_])(extractor: ResultSet => A): A =
     executeWithConnection { connection =>
       val preparedStatement = statementBuilder(connection, select)
       try {
