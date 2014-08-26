@@ -24,7 +24,6 @@ object SqlestBuild extends Build {
 
     settings = commonSettings ++ publishingSettings ++ Seq(
       moduleName := "sqlest",
-      version := "0.2.0-SNAPSHOT",
 
       libraryDependencies ++= Seq(
         "joda-time" % "joda-time" % "2.3",
@@ -50,8 +49,9 @@ object SqlestBuild extends Build {
 
   def commonSettings = SbtScalariform.scalariformSettings ++ Seq(
     organization := "uk.co.jhc",
+    version := "0.2.0",
     scalaVersion := "2.11.2",
-    scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-language:implicitConversions", "-language:existentials")
+    scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-language:implicitConversions", "-language:existentials")
   )
 
   def publishingSettings = sonatypeSettings ++ Seq(
