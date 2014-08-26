@@ -41,7 +41,7 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       One(1, "a")
     ))
 
-    extractor.extractList(testResultSet) should equal(List(
+    extractor.extractAll(testResultSet) should equal(List(
       One(1, "a"),
       One(3, "c"),
       One(-1, "e")
@@ -55,7 +55,7 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       (1, "a")
     ))
 
-    extractor.extractList(testResultSet) should equal(List(
+    extractor.extractAll(testResultSet) should equal(List(
       (1, "a"),
       (3, "c"),
       (-1, "e")
@@ -78,7 +78,7 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       AggregateOneTwo(One(1, "a"), Two("b", 2))
     ))
 
-    extractor.extractList(testResultSet) should equal(List(
+    extractor.extractAll(testResultSet) should equal(List(
       AggregateOneTwo(One(1, "a"), Two("b", 2)),
       AggregateOneTwo(One(3, "c"), Two("d", 4)),
       AggregateOneTwo(One(-1, "e"), Two("f", 6))
@@ -101,7 +101,7 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       AggregateOneTwo(One(1, "a"), Two("b", 2))
     ))
 
-    extractor.extractList(testResultSet) should equal(List(
+    extractor.extractAll(testResultSet) should equal(List(
       AggregateOneTwo(One(1, "a"), Two("b", 2)),
       AggregateOneTwo(One(3, "c"), Two("d", 4)),
       AggregateOneTwo(One(-1, "e"), Two("f", 6))
@@ -128,7 +128,7 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       AggregateOneTwoThree(One(1, "a"), Two("b", 2), Three(None, Some("x")))
     ))
 
-    extractor.extractList(testResultSet) should equal(List(
+    extractor.extractAll(testResultSet) should equal(List(
       AggregateOneTwoThree(One(1, "a"), Two("b", 2), Three(None, Some("x"))),
       AggregateOneTwoThree(One(3, "c"), Two("d", 4), Three(Some(9), None)),
       AggregateOneTwoThree(One(-1, "e"), Two("f", 6), Three(None, None))
@@ -149,7 +149,7 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       Some(1)
     ))
 
-    extractor.extractList(results) should equal(List(
+    extractor.extractAll(results) should equal(List(
       Some(1),
       Some(3),
       None
@@ -163,7 +163,7 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       Some((None, Some("x")))
     ))
 
-    extractor.extractList(testResultSet) should equal(List(
+    extractor.extractAll(testResultSet) should equal(List(
       Some((None, Some("x"))),
       Some((Some(9), None)),
       Some((None, None))
@@ -180,7 +180,7 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       Some(Three(None, Some("x")))
     ))
 
-    extractor.extractList(testResultSet) should equal(List(
+    extractor.extractAll(testResultSet) should equal(List(
       Some(Three(None, Some("x"))),
       Some(Three(Some(9), None)),
       Some(Three(None, None))
@@ -207,7 +207,7 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       AggregateOneTwoOptionThree(One(1, "a"), Two("b", 2), Some(Three(None, Some("x"))))
     ))
 
-    extractor.extractList(testResultSet) should equal(List(
+    extractor.extractAll(testResultSet) should equal(List(
       AggregateOneTwoOptionThree(One(1, "a"), Two("b", 2), Some(Three(None, Some("x")))),
       AggregateOneTwoOptionThree(One(3, "c"), Two("d", 4), Some(Three(Some(9), None))),
       AggregateOneTwoOptionThree(One(-1, "e"), Two("f", 6), Some(Three(None, None)))
@@ -227,7 +227,7 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       AggregateOnePointFive(One(1, "a"), "b")
     ))
 
-    extractor.extractList(testResultSet) should equal(List(
+    extractor.extractAll(testResultSet) should equal(List(
       AggregateOnePointFive(One(1, "a"), "b"),
       AggregateOnePointFive(One(3, "c"), "d"),
       AggregateOnePointFive(One(-1, "e"), "f")
@@ -244,7 +244,7 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
 
     extractor.extractHeadOption(results) should equal(Some(true))
 
-    extractor.extractList(results) should equal(List(true, false))
+    extractor.extractAll(results) should equal(List(true, false))
   }
 
   "nested list extractor" should "stop when the left value changes" in {
@@ -272,7 +272,7 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       (One(1, "a"), List(Two("a", 1), Two("b", 2)))
     ))
 
-    extractor.extractList(results) should equal(List(
+    extractor.extractAll(results) should equal(List(
       (One(1, "a"), List(Two("a", 1), Two("b", 2))),
       (One(2, "b"), List(Two("c", 3)))
     ))
@@ -302,7 +302,7 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       (Three(Some(1), None), List(Three(Some(4), None), Three(None, None)))
     ))
 
-    extractor.extractList(results) should equal(List(
+    extractor.extractAll(results) should equal(List(
       (Three(Some(1), None), List(Three(Some(4), None), Three(None, None))),
       (Three(None, Some("b")), List(Three(Some(6), None)))
     ))
@@ -332,7 +332,7 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       (Three(Some(1), None), List(Some(Three(Some(4), None)), Some(Three(None, None))))
     ))
 
-    extractor.extractList(results) should equal(List(
+    extractor.extractAll(results) should equal(List(
       (Three(Some(1), None), List(Some(Three(Some(4), None)), Some(Three(None, None)))),
       (Three(None, Some("b")), List(Some(Three(Some(6), None))))
     ))
@@ -374,7 +374,7 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       )
     ))
 
-    extractor.extractList(results) should equal(List(
+    extractor.extractAll(results) should equal(List(
       (
         1,
         List(1, 1, 2, 2),
@@ -424,7 +424,7 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       )
     ))
 
-    extractor.extractList(results) should equal(List(
+    extractor.extractAll(results) should equal(List(
       Flattened(
         1,
         List(1, 1, 2, 2),
@@ -472,7 +472,7 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       Outer(1, List(Inner(1, List(1))))
     ))
 
-    extractor.extractList(results) should equal(List(
+    extractor.extractAll(results) should equal(List(
       Outer(1, List(Inner(1, List(1)))),
       Outer(1, List(Inner(1, List(2)))),
       Outer(1, List(Inner(2, List(3)))),
@@ -520,7 +520,7 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       Inner(2, List(3)),
       Inner(2, List(4))))))
 
-    extractor.extractList(results) should equal(List(
+    extractor.extractAll(results) should equal(List(
       Outer(
         1,
         List(
@@ -565,7 +565,7 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       (1, List(1, 2), List())
     ))
 
-    extractor.extractList(results) should equal(List(
+    extractor.extractAll(results) should equal(List(
       (1, List(1, 2), List()),
       (2, List(3, 4), List())
     ))
@@ -582,7 +582,7 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
 
     extractor.extractHeadOption(results) should equal(Some(10))
 
-    extractor.extractList(results) should equal(List(10))
+    extractor.extractAll(results) should equal(List(10))
   }
 
   "scalar function extractor" should "compose with other extractors" in {
@@ -602,7 +602,7 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       (Some(1), Some("b"), Some(10))
     ))
 
-    extractor.extractList(results) should equal(List(
+    extractor.extractAll(results) should equal(List(
       (Some(1), Some("b"), Some(10))
     ))
   }

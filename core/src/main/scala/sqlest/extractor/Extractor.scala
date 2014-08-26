@@ -29,7 +29,7 @@ sealed trait Extractor[A] {
   type SingleResult
 
   def extractHeadOption(row: ResultSet): Option[SingleResult]
-  def extractList(row: ResultSet): List[SingleResult]
+  def extractAll(row: ResultSet): List[SingleResult]
 
   def initialize(row: ResultSet): Accumulator
   def accumulate(row: ResultSet, accumulator: Accumulator): Accumulator
@@ -45,8 +45,8 @@ trait SingleExtractor[A] extends Extractor[A] {
   final def extractHeadOption(row: ResultSet): Option[A] =
     asList.extractHeadOption(row)
 
-  final def extractList(row: ResultSet): List[A] =
-    asList.extractList(row)
+  final def extractAll(row: ResultSet): List[A] =
+    asList.extractAll(row)
 
   def asList = ListExtractor(this)
   def groupBy[B](groupBy: Extractor[B]) = GroupedExtractor(this, groupBy)
@@ -68,7 +68,7 @@ trait MultiExtractor[A] extends Extractor[List[A]] {
     } else None
   }
 
-  final def extractList(row: ResultSet): List[A] = {
+  final def extractAll(row: ResultSet): List[A] = {
     if (row.isFirst || row.isBeforeFirst && row.next) {
       var accumulator = initialize(row)
 
