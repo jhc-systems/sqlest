@@ -21,13 +21,13 @@ import sqlest.extractor._
 
 trait ExecutorSyntax {
   implicit class SelectExecutorOps[A](select: Select[A])(implicit database: Database) {
-    def fetchHead[B](extractor: Extractor[B]): extractor.SingleResult =
-      fetchHeadOption(extractor).getOrElse(throw new NoSuchElementException("fetchHead when no results returned"))
+    def extractHead(extractor: Extractor[_]): extractor.SingleResult =
+      extractHeadOption(extractor).getOrElse(throw new NoSuchElementException("extractHead when no results returned"))
 
-    def fetchHeadOption[B](extractor: Extractor[B]): Option[extractor.SingleResult] =
+    def extractHeadOption(extractor: Extractor[_]): Option[extractor.SingleResult] =
       database.executeSelect(select.what(extractor.columns))(row => extractor.extractHeadOption(row))
 
-    def fetchAll[B](extractor: Extractor[B]): List[extractor.SingleResult] =
+    def extractAll(extractor: Extractor[_]): List[extractor.SingleResult] =
       database.executeSelect(select.what(extractor.columns))(row => extractor.extractAll(row))
 
     def fetchHead[SingleResult](implicit extractable: Extractable.Aux[A, SingleResult]): SingleResult =

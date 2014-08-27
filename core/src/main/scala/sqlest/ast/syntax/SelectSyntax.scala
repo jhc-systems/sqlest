@@ -49,6 +49,10 @@ trait SelectSyntax {
   def apply[C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, C12, C13, C14, C15, C16, C17, C18, C19, C20](column1: AliasedColumn[C1], column2: AliasedColumn[C2], column3: AliasedColumn[C3], column4: AliasedColumn[C4], column5: AliasedColumn[C5], column6: AliasedColumn[C6], column7: AliasedColumn[C7], column8: AliasedColumn[C8], column9: AliasedColumn[C9], column10: AliasedColumn[C10], column11: AliasedColumn[C11], column12: AliasedColumn[C12], column13: AliasedColumn[C13], column14: AliasedColumn[C14], column15: AliasedColumn[C15], column16: AliasedColumn[C16], column17: AliasedColumn[C17], column18: AliasedColumn[C18], column19: AliasedColumn[C19], column20: AliasedColumn[C20]) = SelectBuilder((column1, column2, column3, column4, column5, column6, column7, column8, column9, column10, column11, column12, column13, column14, column15, column16, column17, column18, column19, column20))
   def apply[C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, C12, C13, C14, C15, C16, C17, C18, C19, C20, C21](column1: AliasedColumn[C1], column2: AliasedColumn[C2], column3: AliasedColumn[C3], column4: AliasedColumn[C4], column5: AliasedColumn[C5], column6: AliasedColumn[C6], column7: AliasedColumn[C7], column8: AliasedColumn[C8], column9: AliasedColumn[C9], column10: AliasedColumn[C10], column11: AliasedColumn[C11], column12: AliasedColumn[C12], column13: AliasedColumn[C13], column14: AliasedColumn[C14], column15: AliasedColumn[C15], column16: AliasedColumn[C16], column17: AliasedColumn[C17], column18: AliasedColumn[C18], column19: AliasedColumn[C19], column20: AliasedColumn[C20], column21: AliasedColumn[C21]) = SelectBuilder((column1, column2, column3, column4, column5, column6, column7, column8, column9, column10, column11, column12, column13, column14, column15, column16, column17, column18, column19, column20, column21))
   def apply[C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, C12, C13, C14, C15, C16, C17, C18, C19, C20, C21, C22](column1: AliasedColumn[C1], column2: AliasedColumn[C2], column3: AliasedColumn[C3], column4: AliasedColumn[C4], column5: AliasedColumn[C5], column6: AliasedColumn[C6], column7: AliasedColumn[C7], column8: AliasedColumn[C8], column9: AliasedColumn[C9], column10: AliasedColumn[C10], column11: AliasedColumn[C11], column12: AliasedColumn[C12], column13: AliasedColumn[C13], column14: AliasedColumn[C14], column15: AliasedColumn[C15], column16: AliasedColumn[C16], column17: AliasedColumn[C17], column18: AliasedColumn[C18], column19: AliasedColumn[C19], column20: AliasedColumn[C20], column21: AliasedColumn[C21], column22: AliasedColumn[C22]) = SelectBuilder((column1, column2, column3, column4, column5, column6, column7, column8, column9, column10, column11, column12, column13, column14, column15, column16, column17, column18, column19, column20, column21, column22))
+
+  // Lists
+  def apply(columns: AliasedColumn[_]*) = SelectBuilder(columns.toList)
+  def apply(columns: List[AliasedColumn[_]]) = SelectBuilder(columns)
 }
 
 /** Helper class to enable the `select(...).from(...)` syntax. */
@@ -59,6 +63,7 @@ case class SelectBuilder[A: AliasedColumns](what: A) {
 case class SelectOps[A](select: Select[A]) {
   def what() = select.copy(cols = Nil)
 
+  def what(columns: AliasedColumn[_]*) = select.copy(cols = columns.toList)
   def what(columns: List[AliasedColumn[_]]) = select.copy(cols = columns)
 
   def what[C1](column1: AliasedColumn[C1]) = select.copy(cols = column1)

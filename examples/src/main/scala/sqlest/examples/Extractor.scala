@@ -13,7 +13,7 @@ object ExtractorExamples extends App with DatabaseExample {
       .from(FruitTable)
       .where(FruitTable.juiciness >= 8)
       .orderBy(FruitTable.juiciness.desc)
-      .fetchAll(fruitExtractor)
+      .extractAll(fruitExtractor)
 
   println(fruits)
 
