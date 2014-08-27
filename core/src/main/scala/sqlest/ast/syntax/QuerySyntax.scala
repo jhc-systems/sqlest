@@ -16,9 +16,13 @@
 
 package sqlest.ast.syntax
 
+import sqlest.ast.Select
+
 trait QuerySyntax {
   object select extends SelectSyntax
   object insert extends InsertSyntax
   object update extends UpdateSyntax
   object delete extends DeleteSyntax
+
+  implicit def selectOps[A](select: Select[A]) = SelectOps(select)
 }

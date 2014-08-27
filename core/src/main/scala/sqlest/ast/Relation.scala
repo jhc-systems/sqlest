@@ -99,8 +99,8 @@ case class InnerJoin(left: Relation, right: Relation, condition: Column[Boolean]
 case class OuterJoin(left: Relation, right: Relation) extends Join
 
 /** A select statement or subselect. */
-case class Select[A: AliasedColumns](
-    what: A,
+case class Select[A](
+    cols: A,
     from: Relation,
     where: Option[Column[Boolean]] = None,
     startWith: Option[Column[Boolean]] = None,
@@ -108,12 +108,9 @@ case class Select[A: AliasedColumns](
     groupBy: List[Group] = Nil,
     orderBy: List[Order] = Nil,
     limit: Option[Long] = None,
-    offset: Option[Long] = None) extends Relation with Query {
+    offset: Option[Long] = None)(implicit aliasedColumns: AliasedColumns[A]) extends Relation with Query {
 
-  def columns = AliasedColumns[A].columns(what)
-
-  def what[A: AliasedColumns](newWhat: A): Select[A] =
-    this.copy(what = newWhat)
+  def columns = aliasedColumns.columns(cols)
 
   def from(relation: Relation): Select[A] =
     this.copy(from = relation)

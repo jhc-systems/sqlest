@@ -34,10 +34,10 @@ trait ExecutorSyntax {
       fetchHeadOption.getOrElse(throw new NoSuchElementException("fetchHead when no results returned"))
 
     def fetchHeadOption[SingleResult](implicit extractable: Extractable.Aux[A, SingleResult]): Option[SingleResult] =
-      database.executeSelect(select)(row => extractable.extractor(select.what).extractHeadOption(row))
+      database.executeSelect(select)(row => extractable.extractor(select.cols).extractHeadOption(row))
 
     def fetchAll[SingleResult](implicit extractable: Extractable.Aux[A, SingleResult]): List[SingleResult] =
-      database.executeSelect(select)(row => extractable.extractor(select.what).extractAll(row))
+      database.executeSelect(select)(row => extractable.extractor(select.cols).extractAll(row))
   }
 
   implicit class InsertExecutorOps(insert: Insert) {
