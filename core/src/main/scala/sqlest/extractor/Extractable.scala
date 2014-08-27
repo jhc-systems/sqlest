@@ -24,7 +24,7 @@ import sqlest.ast.AliasedColumn
  */
 trait Extractable[A] {
   type Out
-  def extractor(a: A): SingleExtractor[Out]
+  def extractor(a: A): Extractor[_] { type SingleResult = Out }
 }
 
 object Extractable {
