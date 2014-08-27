@@ -108,7 +108,7 @@ case class Select[A](
     groupBy: List[Group] = Nil,
     orderBy: List[Order] = Nil,
     limit: Option[Long] = None,
-    offset: Option[Long] = None)(implicit aliasedColumns: AliasedColumns[A]) extends Relation with Query {
+    offset: Option[Long] = None)(implicit val aliasedColumns: AliasedColumns[A]) extends Relation with Query {
 
   def columns = aliasedColumns.columns(cols)
 
