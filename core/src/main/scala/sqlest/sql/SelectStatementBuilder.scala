@@ -74,7 +74,7 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
 
   def subselectSql(select: Select[_]) = {
     val alias =
-      if (select.alias.isDefined) " as " + select.alias.get
+      if (select.subselectAlias.isDefined) " as " + select.subselectAlias.get
       else ""
 
     "(" + selectSql(select) + ")" + alias

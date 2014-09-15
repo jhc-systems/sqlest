@@ -21,15 +21,6 @@ import sqlest.extractor._
 
 trait ExecutorSyntax {
   implicit class SelectExecutorOps[A](select: Select[A])(implicit database: Database) {
-    def extractHead(extractor: Extractor[_]): extractor.SingleResult =
-      extractHeadOption(extractor).getOrElse(throw new NoSuchElementException("extractHead when no results returned"))
-
-    def extractHeadOption(extractor: Extractor[_]): Option[extractor.SingleResult] =
-      database.executeSelect(select.what(extractor.columns))(row => extractor.extractHeadOption(row))
-
-    def extractAll(extractor: Extractor[_]): List[extractor.SingleResult] =
-      database.executeSelect(select.what(extractor.columns))(row => extractor.extractAll(row))
-
     def fetchHead[SingleResult](implicit extractable: Extractable.Aux[A, SingleResult]): SingleResult =
       fetchHeadOption.getOrElse(throw new NoSuchElementException("fetchHead when no results returned"))
 
@@ -38,6 +29,15 @@ trait ExecutorSyntax {
 
     def fetchAll[SingleResult](implicit extractable: Extractable.Aux[A, SingleResult]): List[SingleResult] =
       database.executeSelect(select)(row => extractable.extractor(select.cols).extractAll(row))
+
+    def extractHead(extractor: Extractor[_]): extractor.SingleResult =
+      extractHeadOption(extractor).getOrElse(throw new NoSuchElementException("extractHead when no results returned"))
+
+    def extractHeadOption(extractor: Extractor[_]): Option[extractor.SingleResult] =
+      database.executeSelect(select.what(extractor.columns))(row => extractor.extractHeadOption(row))
+
+    def extractAll(extractor: Extractor[_]): List[extractor.SingleResult] =
+      database.executeSelect(select.what(extractor.columns))(row => extractor.extractAll(row))
   }
 
   implicit class InsertExecutorOps(insert: Insert) {
