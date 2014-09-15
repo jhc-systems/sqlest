@@ -239,4 +239,21 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
     )
   }
 
+  "subselect" should "produce the right sql" in {
+    sql {
+      select(MyTable.col1, MyTable.col2)
+        .from(
+          select(MyTable.col1, MyTable.col2)
+            .from(MyTable).as("subselect"))
+    } should equal(
+      s"""
+       |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
+       |from
+       |  (select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
+       |   from mytable) as subselect
+       """.formatSql,
+      Nil
+    )
+  }
+
 }

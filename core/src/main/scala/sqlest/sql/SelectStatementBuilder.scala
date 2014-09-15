@@ -69,7 +69,15 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
     case RightJoin(left, right, condition) => "(" + joinSql(left) + " right join " + joinSql(right) + " on " + columnSql(condition) + ")"
     case InnerJoin(left, right, condition) => "(" + joinSql(left) + " inner join " + joinSql(right) + " on " + columnSql(condition) + ")"
     case OuterJoin(left, right) => "(" + joinSql(left) + " outer join " + joinSql(right) + ")"
-    case select: Select[_] => "(" + selectSql(select) + ")"
+    case select: Select[_] => subselectSql(select)
+  }
+
+  def subselectSql(select: Select[_]) = {
+    val alias =
+      if (select.alias.isDefined) " as " + select.alias.get
+      else ""
+
+    "(" + selectSql(select) + ")" + alias
   }
 
   // -------------------------------------------------

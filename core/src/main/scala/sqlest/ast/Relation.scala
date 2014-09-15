@@ -108,7 +108,8 @@ case class Select[A](
     groupBy: List[Group] = Nil,
     orderBy: List[Order] = Nil,
     limit: Option[Long] = None,
-    offset: Option[Long] = None)(implicit val aliasedColumns: AliasedColumns[A]) extends Relation with Query {
+    offset: Option[Long] = None,
+    alias: Option[String] = None)(implicit val aliasedColumns: AliasedColumns[A]) extends Relation with Query {
 
   def columns = aliasedColumns.columns(cols)
 
@@ -138,4 +139,7 @@ case class Select[A](
 
   def page(number: Long, size: Long): Select[A] =
     this.copy(limit = Some(size), offset = Some(number * size))
+
+  def as(alias: String): Select[A] =
+    this.copy(alias = Some(alias))
 }
