@@ -24,6 +24,7 @@ import sqlest.ast._
 class AggrgateFunctionSyntaxSpec extends FlatSpec with Matchers with CustomMatchers {
   class MyTable(alias: Option[String]) extends Table("mytable", alias) {
     val col1 = column[Int]("col1")
+    val col2 = column[String]("col2")
   }
   object MyTable extends MyTable(None)
 
@@ -31,7 +32,7 @@ class AggrgateFunctionSyntaxSpec extends FlatSpec with Matchers with CustomMatch
     count().columnAlias should be("count")
     sum(MyTable.col1).columnAlias should be("sum")
     min(MyTable.col1).columnAlias should be("min")
-    max(MyTable.col1).columnAlias should be("max")
+    max(MyTable.col2).columnAlias should be("max")
     avg(MyTable.col1).columnAlias should be("avg")
   }
 }

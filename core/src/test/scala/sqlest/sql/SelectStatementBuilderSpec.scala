@@ -33,25 +33,6 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
     )
   }
 
-  "select with aliased column function" should "produce the right sql" in {
-    val func = sum(MyTable.col1) as "sum-function"
-
-    sql {
-      select(MyTable.col1, MyTable.col2, func)
-        .from(MyTable)
-        .where(MyTable.col1 === 123)
-        .orderBy(func.asc)
-    } should equal(
-      s"""
-       |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2, sum(mytable.col1) as sum-function
-       |from mytable
-       |where (mytable.col1 = ?)
-       |order by sum-function
-       """.formatSql,
-      List(123)
-    )
-  }
-
   "query with simple where clause" should "render ok" in {
     sql {
       select(MyTable.col1, MyTable.col2)
@@ -113,6 +94,40 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
        |from ((one inner join two on (one.col2 = two.col2)) inner join three on (two.col3 = three.col3))
        """.formatSql,
       Nil
+    )
+  }
+
+  "select with aggregate function" should "produce the right sql" in {
+    sql {
+      select(count(MyTable.col1), min(TableOne.col2))
+        .from(MyTable.outerJoin(TableOne))
+        .where(MyTable.col1 === 123)
+    } should equal(
+      s"""
+       |select count(mytable.col1) as count, min(one.col2) as min
+       |from (mytable outer join one)
+       |where (mytable.col1 = ?)
+       """.formatSql,
+      List(123)
+    )
+  }
+
+  "select with aliased column function" should "produce the right sql" in {
+    val func = sum(MyTable.col1) as "sum-function"
+
+    sql {
+      select(MyTable.col1, MyTable.col2, func)
+        .from(MyTable)
+        .where(MyTable.col1 === 123)
+        .orderBy(func.asc)
+    } should equal(
+      s"""
+       |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2, sum(mytable.col1) as sum-function
+       |from mytable
+       |where (mytable.col1 = ?)
+       |order by sum-function
+       """.formatSql,
+      List(123)
     )
   }
 
