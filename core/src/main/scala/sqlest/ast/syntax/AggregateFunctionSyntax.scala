@@ -20,6 +20,7 @@ import sqlest.ast._
 
 trait AggregateFunctionSyntax {
   def count[A](column: Column[A] = AliasColumn[String](ConstantColumn("*"), "*")) = ScalarFunctionColumn[Int]("count", Seq(column)).as("count")
+  def distinct[A](column: Column[A]) = AliasColumn((ScalarFunctionColumn[A]("distinct", Seq(column))(column.columnType)), "distinct")(column.columnType)
   def min[A](column: Column[A]) = AliasColumn((ScalarFunctionColumn[A]("min", Seq(column))(column.columnType)), "min")(column.columnType)
   def max[A](column: Column[A]) = AliasColumn((ScalarFunctionColumn[A]("max", Seq(column))(column.columnType)), "max")(column.columnType)
   def sum[A: Numeric](column: Column[A]) = AliasColumn((ScalarFunctionColumn[A]("sum", Seq(column))(column.columnType)), "sum")(column.columnType)
