@@ -24,7 +24,6 @@ import sqlest.ast._
 sealed trait Extractor[A] {
   type Accumulator
   def columns: List[AliasedColumn[_]]
-  def nonOptionalColumns: List[AliasedColumn[_]]
 
   type SingleResult
 
@@ -33,7 +32,12 @@ sealed trait Extractor[A] {
 
   def initialize(row: ResultSet): Accumulator
   def accumulate(row: ResultSet, accumulator: Accumulator): Accumulator
-  def emit(accumulator: Accumulator): A
+  // An Option is emitted to represent null values
+  // If a null value is not handled by an OptionExtractor then an exception will be thrown
+  def emit(accumulator: Accumulator): Option[A]
+
+  protected def checkNullValueAndGet[T](t: Option[T]) =
+    t.getOrElse(throw new NullPointerException("Tried to extract a null value without an OptionExtractor"))
 
   def map[B](func: A => B) = MappedExtractor(this, func)
   def asOption = OptionExtractor(this)
@@ -43,10 +47,19 @@ trait SingleExtractor[A] extends Extractor[A] {
   final type SingleResult = A
 
   final def extractHeadOption(row: ResultSet): Option[A] =
-    asList.extractHeadOption(row)
+    if (row.isFirst || row.isBeforeFirst && row.next) {
+      Some(checkNullValueAndGet(emit(initialize(row))))
+    } else None
 
   final def extractAll(row: ResultSet): List[A] =
-    asList.extractAll(row)
+    if (row.isFirst || row.isBeforeFirst && row.next) {
+      var accumulator = Queue(checkNullValueAndGet(emit(initialize(row))))
+
+      while (row.next)
+        accumulator = accumulator :+ checkNullValueAndGet(emit(initialize(row)))
+
+      accumulator.toList
+    } else Nil
 
   def asList = ListExtractor(this)
   def groupBy[B](groupBy: Extractor[B]) = GroupedExtractor(this, groupBy)
@@ -57,27 +70,25 @@ trait MultiExtractor[A] extends Extractor[List[A]] {
 
   final type SingleResult = A
 
-  final def extractHeadOption(row: ResultSet): Option[A] = {
+  final def extractHeadOption(row: ResultSet): Option[A] =
     if (row.isFirst || row.isBeforeFirst && row.next) {
       var accumulator = initialize(row)
 
       while (row.next && accumulator.size == 1)
         accumulator = accumulate(row, accumulator)
 
-      emit(accumulator).headOption
+      checkNullValueAndGet(emit(accumulator)).headOption
     } else None
-  }
 
-  final def extractAll(row: ResultSet): List[A] = {
+  final def extractAll(row: ResultSet): List[A] =
     if (row.isFirst || row.isBeforeFirst && row.next) {
       var accumulator = initialize(row)
 
       while (row.next)
         accumulator = accumulate(row, accumulator)
 
-      emit(accumulator)
+      checkNullValueAndGet(emit(accumulator))
     } else Nil
-  }
 }
 
 /**
@@ -86,45 +97,45 @@ trait MultiExtractor[A] extends Extractor[List[A]] {
 case class ConstantExtractor[A](value: A) extends SingleExtractor[A] {
   type Accumulator = A
   val columns = Nil
-  val nonOptionalColumns = Nil
 
   def initialize(row: ResultSet) = value
   def accumulate(row: ResultSet, accumulator: A) = value
-  def emit(accumulator: A) = accumulator
+  def emit(accumulator: A) = Some(accumulator)
 }
 
 /**
  * Extractor that emits the values for a single `column`.
  */
 case class ColumnExtractor[A](column: AliasedColumn[A]) extends SingleExtractor[A] {
-  type Accumulator = A
+  type Accumulator = Option[A]
   val columns = List(column)
-  val nonOptionalColumns =
-    column.columnType match {
-      case _: OptionColumnType[_] => Nil
-      case _ => List(column)
-    }
+  column.columnType match {
+    case _: OptionColumnType[_] => Nil
+    case _ => List(column)
+  }
 
   def initialize(row: ResultSet) = read(row, column.columnType)
 
-  def accumulate(row: ResultSet, accumulator: A) = read(row, column.columnType)
+  def accumulate(row: ResultSet, accumulator: Accumulator) = read(row, column.columnType)
 
-  def emit(accumulator: A) = accumulator
+  def emit(accumulator: Accumulator) = accumulator
 
-  private def read[B](row: ResultSet, columnType: ColumnType[B]): B =
+  private def read[B](row: ResultSet, columnType: ColumnType[B]): Option[B] =
     columnType match {
-      case BooleanColumnType => row getBoolean column.columnAlias
-      case IntColumnType => row getInt column.columnAlias
-      case LongColumnType => row getLong column.columnAlias
-      case DoubleColumnType => row getDouble column.columnAlias
-      case BigDecimalColumnType => BigDecimal(row getBigDecimal column.columnAlias)
-      case StringColumnType => row getString column.columnAlias
-      case DateTimeColumnType => new DateTime(row getDate column.columnAlias)
-      case OptionColumnType(base) => Option(read(row, base))
-        .filterNot(_ => row.wasNull)
-        .asInstanceOf[B] // ugly cast but it will always work
-      case mapped: MappedColumnType[B, _] => mapped.read(read(row, mapped.baseType))
+      case BooleanColumnType => wrapNullableValue(row getBoolean column.columnAlias, row)
+      case IntColumnType => wrapNullableValue(row getInt column.columnAlias, row)
+      case LongColumnType => wrapNullableValue(row getLong column.columnAlias, row)
+      case DoubleColumnType => wrapNullableValue(row getDouble column.columnAlias, row)
+      case BigDecimalColumnType => wrapNullableValue(BigDecimal(row getBigDecimal column.columnAlias), row)
+      case StringColumnType => wrapNullableValue(row getString column.columnAlias, row)
+      case DateTimeColumnType => wrapNullableValue(new DateTime(row getDate column.columnAlias), row)
+      case OptionColumnType(base) => Some(read(row, base))
+      case mapped: MappedColumnType[B, _] => read(row, mapped.baseType).map(mapped.read)
     }
+
+  private def wrapNullableValue[B](value: B, row: ResultSet) =
+    if (!row.wasNull) Some(value)
+    else None
 }
 
 trait ProductExtractor[A <: Product] extends SingleExtractor[A] {
@@ -137,13 +148,12 @@ trait ProductExtractor[A <: Product] extends SingleExtractor[A] {
 case class MappedExtractor[A, B](inner: Extractor[A], func: A => B) extends SingleExtractor[B] {
   type Accumulator = inner.Accumulator
   val columns = inner.columns
-  val nonOptionalColumns = inner.nonOptionalColumns
 
   def initialize(row: ResultSet) = inner.initialize(row)
 
   def accumulate(row: ResultSet, accumulator: inner.Accumulator) = inner.accumulate(row, accumulator)
 
-  def emit(accumulator: inner.Accumulator) = func(inner.emit(accumulator))
+  def emit(accumulator: inner.Accumulator) = inner.emit(accumulator).map(func)
 }
 
 /**
@@ -154,55 +164,39 @@ case class MappedExtractor[A, B](inner: Extractor[A], func: A => B) extends Sing
  * of `inner`'s result.
  */
 case class OptionExtractor[A](inner: Extractor[A]) extends SingleExtractor[Option[A]] {
-  type Accumulator = Option[inner.Accumulator]
+  type Accumulator = inner.Accumulator
   val columns = inner.columns
-  val nonOptionalColumns = Nil
 
-  private def containsNotNulls(row: ResultSet) =
-    inner.nonOptionalColumns.isEmpty || !inner.nonOptionalColumns.exists { column =>
-      row getObject column.columnAlias
-      row.wasNull
-    }
+  def initialize(row: ResultSet) = inner.initialize(row)
 
-  def initialize(row: ResultSet) =
-    if (containsNotNulls(row))
-      Some(inner.initialize(row))
-    else
-      None
+  def accumulate(row: ResultSet, accumulator: inner.Accumulator) = inner.accumulate(row, accumulator)
 
-  def accumulate(row: ResultSet, accumulator: Option[inner.Accumulator]) =
-    if (containsNotNulls(row))
-      accumulator.map(accumulator => inner.accumulate(row, accumulator))
-    else
-      None
-
-  def emit(accumulator: Option[inner.Accumulator]) = accumulator map (inner.emit)
+  def emit(accumulator: inner.Accumulator) = Some(inner.emit(accumulator))
 }
 
 /**
  * An extractor that accumulates results into a list.
  */
 case class ListExtractor[A](inner: Extractor[A]) extends MultiExtractor[A] {
-  type Accumulator = Queue[A]
+  type Accumulator = Queue[Option[A]]
   val columns = inner.columns
-  val nonOptionalColumns = inner.nonOptionalColumns
 
-  // Rows where all the columns are null should not be extracted but instead should not add
-  // an item to the left. This allows us to support left joins which return an empty list
-  private val innerOptionExtractor = OptionExtractor(inner)
-  private def readInnerOptionValue(row: ResultSet) = innerOptionExtractor.emit(innerOptionExtractor.initialize(row))
+  def initialize(row: ResultSet) = Queue(inner.emit(inner.initialize(row)))
 
-  def initialize(row: ResultSet) = readInnerOptionValue(row) match {
-    case Some(innerValue) => Queue(innerValue)
-    case None => Queue()
+  def accumulate(row: ResultSet, accumulator: Queue[Option[A]]) = accumulator :+ inner.emit(inner.initialize(row))
+
+  // In a left join either all row are full or all rows are null.
+  // These are the valid accumulators that will return a list
+  def emit(accumulator: Queue[Option[A]]) = {
+    val noRowsEmpty = accumulator.forall(!_.isEmpty)
+    val allRowsEmpty = accumulator.forall(_.isEmpty)
+    if (noRowsEmpty)
+      Some(accumulator.map(_.get).toList)
+    else if (allRowsEmpty)
+      Some(Nil)
+    else
+      None
   }
-
-  def accumulate(row: ResultSet, accumulator: Queue[A]) = readInnerOptionValue(row) match {
-    case Some(innerValue) => accumulator :+ innerValue
-    case None => accumulator
-  }
-
-  def emit(accumulator: Queue[A]) = accumulator.toList
 }
 
 /**
@@ -212,13 +206,12 @@ case class GroupedExtractor[A, B](inner: Extractor[A], groupBy: Extractor[B]) ex
   // Consider using a tuple of a Queue and a HashMap as the Accumulator for efficiency
   type Accumulator = ListMap[B, inner.Accumulator]
   val columns = (inner.columns ++ groupBy.columns).distinct
-  val nonOptionalColumns = inner.nonOptionalColumns
 
   def initialize(row: ResultSet) =
-    ListMap(groupBy.emit(groupBy.initialize(row)) -> inner.initialize(row))
+    ListMap(checkNullValueAndGet(groupBy.emit(groupBy.initialize(row))) -> inner.initialize(row))
 
   def accumulate(row: ResultSet, accumulator: ListMap[B, inner.Accumulator]) = {
-    val groupByKey = groupBy.emit(groupBy.initialize(row))
+    val groupByKey = checkNullValueAndGet(groupBy.emit(groupBy.initialize(row)))
 
     val newInnerAccumulator = accumulator.get(groupByKey) match {
       case Some(innerAccumulator) => inner.accumulate(row, innerAccumulator)
@@ -228,5 +221,5 @@ case class GroupedExtractor[A, B](inner: Extractor[A], groupBy: Extractor[B]) ex
     accumulator + (groupByKey -> newInnerAccumulator)
   }
 
-  def emit(accumulator: ListMap[B, inner.Accumulator]) = accumulator.values.map(inner.emit).toList
+  def emit(accumulator: ListMap[B, inner.Accumulator]) = Some(accumulator.values.map(inner.emit).toList.map(checkNullValueAndGet))
 }

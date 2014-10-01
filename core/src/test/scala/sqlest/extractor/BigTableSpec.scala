@@ -99,45 +99,44 @@ class BigTableSpec extends FlatSpec with Matchers {
 
     type Accumulator = DomainClass
     val columns = List(col1, col2, col3, col4, col5, col6, col7, col8, col9, col10, col11, col12, col13, col14, col15, col16, col17, col18, col19, col20, col21, col22, col23, col24, col25, col26, col27, col28, col29, col30)
-    val nonOptionalColumns = columns
 
     def initialize(row: ResultSet) = read(row)
 
     def accumulate(row: ResultSet, accumulator: DomainClass) = read(row)
 
-    def emit(accumulator: DomainClass) = accumulator
+    def emit(accumulator: DomainClass) = Some(accumulator)
 
     def read(row: ResultSet) = new DomainClass(
-      col1.emit(col1.initialize(row)),
-      col2.emit(col2.initialize(row)),
-      col3.emit(col3.initialize(row)),
-      col4.emit(col4.initialize(row)),
-      col5.emit(col5.initialize(row)),
-      col6.emit(col6.initialize(row)),
-      col7.emit(col7.initialize(row)),
-      col8.emit(col8.initialize(row)),
-      col9.emit(col9.initialize(row)),
-      col10.emit(col10.initialize(row)),
-      col11.emit(col11.initialize(row)),
-      col12.emit(col12.initialize(row)),
-      col13.emit(col13.initialize(row)),
-      col14.emit(col14.initialize(row)),
-      col15.emit(col15.initialize(row)),
-      col16.emit(col16.initialize(row)),
-      col17.emit(col17.initialize(row)),
-      col18.emit(col18.initialize(row)),
-      col19.emit(col19.initialize(row)),
-      col20.emit(col20.initialize(row)),
-      col21.emit(col21.initialize(row)),
-      col22.emit(col22.initialize(row)),
-      col23.emit(col23.initialize(row)),
-      col24.emit(col24.initialize(row)),
-      col25.emit(col25.initialize(row)),
-      col26.emit(col26.initialize(row)),
-      col27.emit(col27.initialize(row)),
-      col28.emit(col28.initialize(row)),
-      col29.emit(col29.initialize(row)),
-      col30.emit(col30.initialize(row))
+      col1.emit(col1.initialize(row)).get,
+      col2.emit(col2.initialize(row)).get,
+      col3.emit(col3.initialize(row)).get,
+      col4.emit(col4.initialize(row)).get,
+      col5.emit(col5.initialize(row)).get,
+      col6.emit(col6.initialize(row)).get,
+      col7.emit(col7.initialize(row)).get,
+      col8.emit(col8.initialize(row)).get,
+      col9.emit(col9.initialize(row)).get,
+      col10.emit(col10.initialize(row)).get,
+      col11.emit(col11.initialize(row)).get,
+      col12.emit(col12.initialize(row)).get,
+      col13.emit(col13.initialize(row)).get,
+      col14.emit(col14.initialize(row)).get,
+      col15.emit(col15.initialize(row)).get,
+      col16.emit(col16.initialize(row)).get,
+      col17.emit(col17.initialize(row)).get,
+      col18.emit(col18.initialize(row)).get,
+      col19.emit(col19.initialize(row)).get,
+      col20.emit(col20.initialize(row)).get,
+      col21.emit(col21.initialize(row)).get,
+      col22.emit(col22.initialize(row)).get,
+      col23.emit(col23.initialize(row)).get,
+      col24.emit(col24.initialize(row)).get,
+      col25.emit(col25.initialize(row)).get,
+      col26.emit(col26.initialize(row)).get,
+      col27.emit(col27.initialize(row)).get,
+      col28.emit(col28.initialize(row)).get,
+      col29.emit(col29.initialize(row)).get,
+      col30.emit(col30.initialize(row)).get
     )
   }
 

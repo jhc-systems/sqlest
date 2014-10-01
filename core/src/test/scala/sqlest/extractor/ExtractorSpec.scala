@@ -108,6 +108,75 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
     ))
   }
 
+  "non option extractors" should "throw exceptions when extracting nulls" in {
+    def results = TestResultSet(TableOne.columns)(
+      Seq(null, null)
+    )
+
+    // TODO Choose better exception
+    intercept[NullPointerException] {
+      TableOne.col1.extractHeadOption(results)
+    }
+
+    intercept[NullPointerException] {
+      extract(
+        TableOne.col1,
+        TableOne.col2
+      ).extractHeadOption(results)
+    }
+
+    intercept[NullPointerException] {
+      extract(
+        TableOne.col1.asOption,
+        TableOne.col2
+      ).extractHeadOption(results)
+    }
+
+    intercept[NullPointerException] {
+      extract(
+        TableOne.col1,
+        TableOne.col2.asOption
+      ).extractHeadOption(results)
+    }
+
+    intercept[NullPointerException] {
+      extractNamed[One](
+        "a" -> TableOne.col1,
+        "b" -> TableOne.col2
+      ).extractHeadOption(results)
+    }
+  }
+
+  "list extractors" should "allow only full or empty lists" in {
+    def emptySubListresults = TestResultSet(TableOne.columns)(
+      Seq(1, null),
+      Seq(1, null)
+    )
+
+    def partlyFullSubListResults = TestResultSet(TableOne.columns)(
+      Seq(1, "b"),
+      Seq(1, null)
+    )
+
+    def fullSubListresults = TestResultSet(TableOne.columns)(
+      Seq(1, "b"),
+      Seq(1, "b")
+    )
+
+    val extractor = extract(
+      TableOne.col1,
+      TableOne.col2.asList
+    ).groupBy(TableOne.col1)
+
+    extractor.extractHeadOption(emptySubListresults)
+
+    intercept[NullPointerException] {
+      extractor.extractHeadOption(partlyFullSubListResults)
+    }
+
+    extractor.extractHeadOption(fullSubListresults)
+  }
+
   "option column types" should "handle nulls" in {
     val extractor = extractNamed[AggregateOneTwoThree](
       "one" -> extractNamed[One](
