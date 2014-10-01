@@ -44,7 +44,7 @@ trait BaseStatementBuilder {
     case column: DoubleInfixFunctionColumn[_] => doubleInfixSql(column.infix1, column.infix2, column.parameter1, column.parameter2, column.parameter3)
     case column: ScalarFunctionColumn[_] => functionSql(column.name, column.parameters: _*)
     case column: TableColumn[_] => identifierSql(column.tableAlias) + "." + identifierSql(column.columnName)
-    case column: AliasColumn[_] => identifierSql(column.columnAlias)
+    case column: AliasColumn[_] => columnSql(column.column)
     case column: CaseWhenColumn[_] => caseSql(column.whens, None)
     case column: CaseWhenElseColumn[_] => caseSql(column.whens, Some(column.`else`))
     case column: CaseColumnColumn[_, _] => caseColumnSql(column.column, column.mappings, None)
