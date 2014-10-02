@@ -111,7 +111,7 @@ case class Select[A](
     offset: Option[Long] = None,
     subselectAlias: Option[String] = None)(implicit val aliasedColumns: AliasedColumns[A]) extends Relation with Query {
 
-  def columns = aliasedColumns.columns(cols)
+  def columns = aliasedColumns.columnList(cols)
 
   def from(relation: Relation): Select[A] =
     this.copy(from = relation)
