@@ -36,7 +36,7 @@ trait BaseStatementBuilder {
   }
 
   def columnSql(column: Column[_]): String = column match {
-    case LiteralColumn(literal) => literalSql(literal)
+    case column: LiteralColumn[_] => literalSql(column)
     case column: ConstantColumn[_] => constantSql(column.columnType, column.value)
     case column: PrefixFunctionColumn[_] => prefixSql(column.name, column.parameter)
     case column: InfixFunctionColumn[_] => infixSql(column.name, column.parameter1, column.parameter2)
@@ -84,8 +84,7 @@ trait BaseStatementBuilder {
     case group: FunctionGroup => s"${group.name}(${group.columns map groupSql mkString ", "})"
   }
 
-  def literalSql[A](literal: A) =
-    "?"
+  def literalSql(column: Column[_]) = "?"
 
   def constantSql[A](columnType: ColumnType[A], value: A): String = columnType match {
     case BooleanColumnType => value.toString

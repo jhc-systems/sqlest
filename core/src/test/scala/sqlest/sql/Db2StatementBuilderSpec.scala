@@ -136,7 +136,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec
     } should equal(
       s"""
        |select three.col3 as three_col3, three.col4 as three_col4, testTableFunction.col5 as testTableFunction_col5, testTableFunction.col6 as testTableFunction_col6
-       |from (three outer join table(testTableFunction(three.col3, ?)) as testTableFunction)
+       |from (three outer join table(testTableFunction(three.col3, cast(? as char))) as testTableFunction)
        """.formatSql,
       List("abc")
     )
