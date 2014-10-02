@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sqlest.sql
+package sqlest.sql.base
 
 import java.sql.{ Connection, PreparedStatement, Timestamp => JdbcTimestamp, Types => JdbcTypes, SQLException }
 import org.joda.time.DateTime

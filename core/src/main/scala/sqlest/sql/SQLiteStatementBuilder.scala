@@ -18,11 +18,6 @@ package sqlest.sql
 
 import sqlest.ast._
 
-trait H2StatementBuilder extends base.StatementBuilder {
-  override def groupSql(group: Group): String = group match {
-    case group: FunctionGroup => throw new UnsupportedOperationException
-    case group => super.groupSql(group)
-  }
-}
+trait SQLiteStatementBuilder extends base.StatementBuilder
 
-object H2StatementBuilder extends H2StatementBuilder
+object SQLiteStatementBuilder extends SQLiteStatementBuilder

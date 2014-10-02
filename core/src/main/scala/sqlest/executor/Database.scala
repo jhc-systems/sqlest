@@ -18,7 +18,7 @@ package sqlest.executor
 
 import sqlest.ast._
 import sqlest.extractor._
-import sqlest.sql._
+import sqlest.sql.base._
 import sqlest.util._
 
 import java.sql.{ Connection, DriverManager, ResultSet, Statement, SQLException }

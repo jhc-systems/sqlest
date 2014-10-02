@@ -18,7 +18,7 @@ package sqlest.sql
 
 import sqlest.ast._
 
-trait DB2StatementBuilder extends StatementBuilder {
+trait DB2StatementBuilder extends base.StatementBuilder {
   override def selectSql(select: Select[_]): String = {
     val offset = select.offset getOrElse 0L
     if (offset > 0L) {

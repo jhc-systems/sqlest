@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sqlest.sql
+package sqlest.sql.base
 
 import sqlest.ast._
 
