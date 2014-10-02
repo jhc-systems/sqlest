@@ -2,6 +2,7 @@ import sbt._
 import sbt.Keys._
 
 import com.typesafe.sbt.SbtScalariform
+import spray.boilerplate.BoilerplatePlugin._
 import xerial.sbt.Sonatype._
 
 object SqlestBuild extends Build {
@@ -22,7 +23,7 @@ object SqlestBuild extends Build {
     id = "core",
     base = file("core"),
 
-    settings = commonSettings ++ publishingSettings ++ Seq(
+    settings = commonSettings ++ publishingSettings ++ Boilerplate.settings ++ Seq(
       moduleName := "sqlest",
 
       libraryDependencies ++= Seq(

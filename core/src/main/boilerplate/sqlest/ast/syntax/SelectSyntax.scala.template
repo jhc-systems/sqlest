@@ -1,0 +1,55 @@
+/*
+ * Copyright 2014 JHC Systems Limited
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package sqlest.ast.syntax
+
+import sqlest.ast._
+
+trait SelectSyntax {
+  /** `select.from(...)` */
+  def from(from: Relation) = Select(Nil, from = from)
+
+  /** Select a subset of columns from a relation: `select(...).from(...)`. */
+  def apply() = SelectBuilder(Nil)
+
+  def apply[C1](column1: AliasedColumn[C1]) = SelectBuilder(column1)
+
+  // Convert arguments into a tuple
+[2..22#  def apply[[#C1#]]([#column1: AliasedColumn[C1]#]) = SelectBuilder(Tuple1([#column1#]))#
+]
+
+  // Lists
+  def apply(columns: AliasedColumn[_]*) = SelectBuilder(columns.toList)
+  def apply(columns: List[AliasedColumn[_]]) = SelectBuilder(columns)
+}
+
+/** Helper class to enable the `select(...).from(...)` syntax. */
+case class SelectBuilder[A: AliasedColumns](what: A) {
+  def from(from: Relation) = Select(what, from = from)
+}
+
+case class SelectOps[A](select: Select[A]) {
+  def what() = select.copy(cols = Nil)
+
+  def what(columns: AliasedColumn[_]*) = select.copy(cols = columns.toList)
+  def what(columns: List[AliasedColumn[_]]) = select.copy(cols = columns)
+
+  def what[C1](column1: AliasedColumn[C1]) = select.copy(cols = column1)
+
+  // Convert arguments into a tuple
+[2..22#  def what[[#C1#]]([#column1: AliasedColumn[C1]#]) = select.copy(cols = Tuple1([#column1#]))#
+]
+}
