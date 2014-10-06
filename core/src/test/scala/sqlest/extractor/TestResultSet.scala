@@ -53,6 +53,9 @@ case class TestResultSet(columns: Seq[AliasedColumn[_]])(rows: Seq[Any]*) extend
   override def getBigDecimal(columnName: String) =
     get[java.math.BigDecimal](columnName, null)
 
+  override def getDate(columnName: String) =
+    get[java.sql.Date](columnName, null)
+
   override def getObject(columnName: String) =
     get[AnyRef](columnName, null)
 

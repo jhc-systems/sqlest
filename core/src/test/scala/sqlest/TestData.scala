@@ -16,6 +16,7 @@
 
 package sqlest
 
+import org.joda.time.DateTime
 import sqlest.extractor.TestResultSet
 
 object TestData {
@@ -26,7 +27,6 @@ object TestData {
 
     def as(alias: String) = new TableOne(Some(alias))
   }
-
   object TableOne extends TableOne(None)
 
   class TableTwo(alias: Option[String]) extends Table("two", alias) {
@@ -36,7 +36,6 @@ object TestData {
 
     def as(alias: String) = new TableTwo(Some(alias))
   }
-
   object TableTwo extends TableTwo(None)
 
   class TableThree(alias: Option[String]) extends Table("three", alias) {
@@ -46,15 +45,22 @@ object TestData {
 
     def as(alias: String) = new TableThree(Some(alias))
   }
-
   object TableThree extends TableThree(None)
 
   class TableFour(alias: Option[String]) extends Table("four", alias) {
     val mapped = column[Boolean]("mapped", BooleanYNColumnType)
     def columns = List(mapped)
   }
-
   object TableFour extends TableFour(None)
+
+  class TableFive(alias: Option[String]) extends Table("five", alias) {
+    val dateTimeCol = column[DateTime]("dateTimeCol")
+    val bigDecimalCol = column[BigDecimal]("bigDecimalCol")
+    def columns = List(dateTimeCol, bigDecimalCol)
+
+    def as(alias: String) = new TableFive(Some(alias))
+  }
+  object TableFive extends TableFive(None)
 
   case class One(a: Int, b: String)
   case class Two(a: String, b: Int)

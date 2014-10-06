@@ -109,13 +109,20 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
   }
 
   "non option extractors" should "throw exceptions when extracting nulls" in {
-    def results = TestResultSet(TableOne.columns)(
-      Seq(null, null)
+    def results = TestResultSet(TableOne.columns ++ TableFive.columns)(
+      Seq(null, null, null, null)
     )
 
-    // TODO Choose better exception
     intercept[NullPointerException] {
       TableOne.col1.extractHeadOption(results)
+    }
+
+    intercept[NullPointerException] {
+      TableFive.dateTimeCol.extractHeadOption(results)
+    }
+
+    intercept[NullPointerException] {
+      TableFive.bigDecimalCol.extractHeadOption(results)
     }
 
     intercept[NullPointerException] {
