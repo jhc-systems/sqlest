@@ -68,6 +68,13 @@ trait ColumnSyntax {
     def isNotNull = PostfixFunctionColumn[Boolean]("is not null", left)
   }
 
+  implicit class AliasedOptionColumnsOps[A](left: AliasedColumn[A])(implicit leftType: BaseColumnType[A]) {
+    def ? = left match {
+      case column: TableColumn[_] => AliasColumn(column, left.columnAlias)(OptionColumnType(leftType))
+      case AliasColumn(column, columnAlias) => AliasColumn(column, columnAlias)(OptionColumnType(leftType))
+    }
+  }
+
   implicit class ComparisonColumnOps[A](left: Column[A]) {
     implicit val leftType: ColumnType[A] = left.columnType
 

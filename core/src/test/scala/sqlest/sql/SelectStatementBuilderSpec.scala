@@ -25,7 +25,7 @@ import sqlest.ast._
 trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
   "empty query" should "render ok" in {
     sql {
-      select(MyTable.col1, MyTable.col2)
+      select(MyTable.col1, MyTable.col2.?)
         .from(MyTable)
     } should equal(
       """select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2 from mytable""",
