@@ -32,27 +32,13 @@ trait BaseTable {
   def tableName: String
   def aliasedAs: Option[String]
   def tableAlias = aliasedAs getOrElse tableName
-  def columns: Seq[TableColumn[_]] = mutableColumns
-
-  /**
-   * A mutable view of `columns`, used by the `column`
-   * method to append new columns to the relation:
-   */
-  private val mutableColumns = new mutable.ArrayBuffer[TableColumn[_]]()
-  protected def addColumn(column: TableColumn[_]) = mutableColumns += column
 
   /** Add a column of type `A` to this relation. */
-  def column[A](name: String)(implicit columnType: ColumnType[A]) = {
-    val ans = TableColumn[A](tableAlias, name)
-    this.mutableColumns += ans
-    ans
-  }
+  def column[A](name: String)(implicit columnType: ColumnType[A]) =
+    TableColumn[A](tableAlias, name)
 
-  def column[A](name: String, columnType: MappedColumnType[A, _]) = {
-    val ans = TableColumn[A](tableAlias, name)(columnType)
-    this.mutableColumns += ans
-    ans
-  }
+  def column[A](name: String, columnType: MappedColumnType[A, _]) =
+    TableColumn[A](tableAlias, name)(columnType)
 
   override def toString = {
     if (tableName == tableAlias) {
@@ -74,8 +60,7 @@ abstract class Table(val tableName: String, val aliasedAs: Option[String] = None
 case class TableFunction(
     tableName: String,
     aliasedAs: Option[String],
-    parameterColumns: Seq[Column[_]],
-    columns: Seq[TableColumn[_]]) extends Relation {
+    parameterColumns: Seq[Column[_]]) extends Relation {
 
   def tableAlias = aliasedAs getOrElse tableName
 }

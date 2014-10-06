@@ -119,7 +119,7 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
 
   def joinArgs(relation: Relation): List[LiteralColumn[_]] = relation match {
     case table: Table => Nil
-    case TableFunction(_, _, parameterColumns, _) => parameterColumns.toList flatMap columnArgs
+    case TableFunction(_, _, parameterColumns) => parameterColumns.toList flatMap columnArgs
     case LeftJoin(left, right, condition) => joinArgs(left) ++ joinArgs(right) ++ columnArgs(condition)
     case RightJoin(left, right, condition) => joinArgs(left) ++ joinArgs(right) ++ columnArgs(condition)
     case InnerJoin(left, right, condition) => joinArgs(left) ++ joinArgs(right) ++ columnArgs(condition)
