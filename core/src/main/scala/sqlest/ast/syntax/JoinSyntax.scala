@@ -49,8 +49,12 @@ trait JoinSyntax {
         RightJoin(left, right, condition)
     }
 
-    def outerJoin(right: Relation) =
-      OuterJoin(left, right)
+    def outerJoin(right: Relation) = new JoinConditionBuilder {
+      def on(condition: Column[Boolean]) =
+        OuterJoin(left, right, condition)
+    }
+
+    def crossJoin(right: Relation) = new CrossJoin(left, right)
   }
 }
 

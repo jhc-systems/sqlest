@@ -68,7 +68,8 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
     case LeftJoin(left, right, condition) => "(" + joinSql(left) + " left join " + joinSql(right) + " on " + columnSql(condition) + ")"
     case RightJoin(left, right, condition) => "(" + joinSql(left) + " right join " + joinSql(right) + " on " + columnSql(condition) + ")"
     case InnerJoin(left, right, condition) => "(" + joinSql(left) + " inner join " + joinSql(right) + " on " + columnSql(condition) + ")"
-    case OuterJoin(left, right) => "(" + joinSql(left) + " outer join " + joinSql(right) + ")"
+    case OuterJoin(left, right, condition) => "(" + joinSql(left) + " full outer join " + joinSql(right) + " on " + columnSql(condition) + ")"
+    case CrossJoin(left, right) => "(" + joinSql(left) + " cross join " + joinSql(right) + ")"
     case select: Select[_] => subselectSql(select)
   }
 
@@ -123,7 +124,8 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
     case LeftJoin(left, right, condition) => joinArgs(left) ++ joinArgs(right) ++ columnArgs(condition)
     case RightJoin(left, right, condition) => joinArgs(left) ++ joinArgs(right) ++ columnArgs(condition)
     case InnerJoin(left, right, condition) => joinArgs(left) ++ joinArgs(right) ++ columnArgs(condition)
-    case OuterJoin(left, right) => joinArgs(left) ++ joinArgs(right)
+    case OuterJoin(left, right, condition) => joinArgs(left) ++ joinArgs(right) ++ columnArgs(condition)
+    case CrossJoin(left, right) => joinArgs(left) ++ joinArgs(right)
     case select: Select[_] => selectArgs(select)
   }
 }

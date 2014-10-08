@@ -81,7 +81,10 @@ case class RightJoin(left: Relation, right: Relation, condition: Column[Boolean]
 case class InnerJoin(left: Relation, right: Relation, condition: Column[Boolean]) extends Join
 
 /** An outer join between two tables. */
-case class OuterJoin(left: Relation, right: Relation) extends Join
+case class OuterJoin(left: Relation, right: Relation, condition: Column[Boolean]) extends Join
+
+/** An outer join between two tables. */
+case class CrossJoin(left: Relation, right: Relation) extends Join
 
 /** A select statement or subselect. */
 case class Select[A](

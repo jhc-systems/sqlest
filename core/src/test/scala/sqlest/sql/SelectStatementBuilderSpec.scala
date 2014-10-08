@@ -100,12 +100,12 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
   "select with aggregate function" should "produce the right sql" in {
     sql {
       select(count(MyTable.col1), min(TableOne.col2), count(distinct(TableOne.col1)))
-        .from(MyTable.outerJoin(TableOne))
+        .from(MyTable.crossJoin(TableOne))
         .where(MyTable.col1 === 123)
     } should equal(
       s"""
        |select count(mytable.col1) as count, min(one.col2) as min, count(distinct(one.col1)) as count
-       |from (mytable outer join one)
+       |from (mytable cross join one)
        |where (mytable.col1 = ?)
        """.formatSql,
       List(123)
