@@ -254,6 +254,21 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
     )
   }
 
+  "scalar subquery" should "produce the right sql" in {
+    sql {
+      select(MyTable.col1, MyTable.col2)
+        .from(MyTable)
+        .where(MyTable.col1 === select(MyTable.col1).from(MyTable))
+    } should equal(
+      s"""
+       |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
+       |from mytable
+       |where (mytable.col1 = (select mytable.col1 as mytable_col1 from mytable))
+       """.formatSql,
+      Nil
+    )
+  }
+
   "subselect" should "produce the right sql" in {
     sql {
       select(MyTable.col1, MyTable.col2)

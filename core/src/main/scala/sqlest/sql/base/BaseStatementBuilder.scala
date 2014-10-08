@@ -42,6 +42,7 @@ trait BaseStatementBuilder {
     case column: InfixFunctionColumn[_] => infixSql(column.name, column.parameter1, column.parameter2)
     case column: PostfixFunctionColumn[_] => postfixSql(column.name, column.parameter)
     case column: DoubleInfixFunctionColumn[_] => doubleInfixSql(column.infix1, column.infix2, column.parameter1, column.parameter2, column.parameter3)
+    case SelectColumn(select) => "(" + selectSql(select) + ")"
     case column: ScalarFunctionColumn[_] => functionSql(column.name, column.parameters: _*)
     case column: TableColumn[_] => identifierSql(column.tableAlias) + "." + identifierSql(column.columnName)
     case column: AliasColumn[_] => columnSql(column.column)
@@ -50,6 +51,8 @@ trait BaseStatementBuilder {
     case column: CaseColumnColumn[_, _] => caseColumnSql(column.column, column.mappings, None)
     case column: CaseColumnElseColumn[_, _] => caseColumnSql(column.column, column.mappings, Some(column.`else`))
   }
+
+  def selectSql(select: Select[_]): String
 
   def prefixSql(op: String, parameter: Column[_]): String =
     s"($op ${columnSql(parameter)})"
@@ -138,6 +141,7 @@ trait BaseStatementBuilder {
     case PostfixFunctionColumn(_, a) => columnArgs(a)
     case DoubleInfixFunctionColumn(_, _, a, b, c) => columnArgs(a) ++ columnArgs(b) ++ columnArgs(c)
     case ScalarFunctionColumn(_, parameters) => parameters.toList flatMap columnArgs
+    case SelectColumn(select) => selectArgs(select)
     case column: TableColumn[_] => Nil
     case column: AliasColumn[_] => Nil
     case column: CaseWhenColumn[_] =>
@@ -149,6 +153,8 @@ trait BaseStatementBuilder {
     case column: CaseColumnElseColumn[_, _] =>
       columnArgs(column.column) ++ column.mappings.flatMap(mapping => columnArgs(mapping._1) ++ columnArgs(mapping._2)) ++ columnArgs(column.`else`)
   }
+
+  def selectArgs(select: Select[_]): List[LiteralColumn[_]]
 
   def orderListArgs(order: Seq[Order]): List[LiteralColumn[_]] =
     order.toList flatMap orderArgs
