@@ -42,6 +42,7 @@ trait BaseStatementBuilder {
     case column: InfixFunctionColumn[_] => infixSql(column.name, column.parameter1, column.parameter2)
     case column: PostfixFunctionColumn[_] => postfixSql(column.name, column.parameter)
     case column: DoubleInfixFunctionColumn[_] => doubleInfixSql(column.infix1, column.infix2, column.parameter1, column.parameter2, column.parameter3)
+    case WindowFunctionColumn(partitionByColumns, orders) => windowFunctionSql(partitionByColumns, orders)
     case SelectColumn(select) => "(" + selectSql(select) + ")"
     case column: ScalarFunctionColumn[_] => functionSql(column.name, column.parameters: _*)
     case column: TableColumn[_] => identifierSql(column.tableAlias) + "." + identifierSql(column.columnName)
@@ -65,6 +66,18 @@ trait BaseStatementBuilder {
 
   def doubleInfixSql(op1: String, op2: String, parameter1: Column[_], parameter2: Column[_], parameter3: Column[_]): String =
     s"(${columnSql(parameter1)} $op1 ${columnSql(parameter2)} $op2 ${columnSql(parameter3)})"
+
+  def windowFunctionSql(partitionByColumns: Seq[Column[_]], orders: Seq[Order]) = {
+    val partitionBy =
+      if (partitionByColumns.isEmpty) ""
+      else s"partition by ${partitionByColumns.map(columnSql).mkString(", ")}"
+
+    val orderBy =
+      if (orders.isEmpty) ""
+      else s"order by ${orderListSql(orders)}"
+
+    (partitionBy + " " + orderBy).trim
+  }
 
   def functionSql(op: String, parameters: Column[_]*): String =
     parameters.map(columnSql).mkString(s"$op(", ", ", ")")
@@ -141,6 +154,7 @@ trait BaseStatementBuilder {
     case PostfixFunctionColumn(_, a) => columnArgs(a)
     case DoubleInfixFunctionColumn(_, _, a, b, c) => columnArgs(a) ++ columnArgs(b) ++ columnArgs(c)
     case ScalarFunctionColumn(_, parameters) => parameters.toList flatMap columnArgs
+    case WindowFunctionColumn(columns, orders) => columns.toList.flatMap(columnArgs) ++ orders.toList.flatMap(order => columnArgs(order.column))
     case SelectColumn(select) => selectArgs(select)
     case column: TableColumn[_] => Nil
     case column: AliasColumn[_] => Nil
