@@ -22,20 +22,20 @@ trait UpdateStatementBuilder extends BaseStatementBuilder {
   def updateSql(update: Update): String = {
     Seq(
       updateTableSql(update.table),
-      updateSetSql(update.set)
+      updateSetSql(update.set, update.table)
     ) ++ Seq(
-        updateWhereSql(update.where)
+        updateWhereSql(update.where, update.table)
       ).flatten mkString ("", " ", "")
   }
 
   def updateTableSql(table: Table): String =
     s"update ${identifierSql(table.tableName)}"
 
-  def updateSetSql(setters: Seq[Setter[_, _]]): String =
-    "set " + setters.map(setter => identifierSql(setter.column.columnName) + " = " + columnSql(setter.value)).mkString(", ")
+  def updateSetSql(setters: Seq[Setter[_, _]], relation: Relation): String =
+    "set " + setters.map(setter => identifierSql(setter.column.columnName) + " = " + columnSql(setter.value, relation)).mkString(", ")
 
-  def updateWhereSql(where: Option[Column[Boolean]]): Option[String] =
-    where map (where => s"where ${columnSql(where)}")
+  def updateWhereSql(where: Option[Column[Boolean]], relation: Relation): Option[String] =
+    where map (where => s"where ${columnSql(where, relation)}")
 
   // -------------------------------------------------
 

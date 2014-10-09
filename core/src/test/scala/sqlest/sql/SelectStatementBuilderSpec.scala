@@ -277,7 +277,7 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
             .from(MyTable).as("subselect"))
     } should equal(
       s"""
-       |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
+       |select mytable_col1 as mytable_col1, mytable_col2 as mytable_col2
        |from
        |  (select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
        |   from mytable) as subselect

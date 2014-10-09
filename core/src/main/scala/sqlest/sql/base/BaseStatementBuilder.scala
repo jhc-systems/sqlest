@@ -19,72 +19,94 @@ package sqlest.sql.base
 import sqlest.ast._
 
 trait BaseStatementBuilder {
-  def columnAliasListSql(columns: Seq[Column[_]]): String =
-    columns map columnAliasSql mkString ", "
+  def columnAliasListSql(columns: Seq[Column[_]], relation: Relation): String =
+    columns.map(column => columnAliasSql(column, relation)).mkString(", ")
 
-  def columnAliasSql(column: Column[_]): String = column match {
+  def columnAliasSql(column: Column[_], relation: Relation): String = column match {
     case column: TableColumn[_] =>
-      columnSql(column.column) + " as " +
+      columnSql(column.column, relation) + " as " +
         identifierSql(column.columnAlias)
 
     case column: AliasColumn[_] =>
-      columnSql(column.column) + " as " +
+      columnSql(column.column, relation) + " as " +
         identifierSql(column.columnAlias)
 
     case column =>
-      columnSql(column)
+      columnSql(column, relation)
   }
 
-  def columnSql(column: Column[_]): String = column match {
-    case LiteralColumn(literal) => literalSql(literal)
-    case column: ConstantColumn[_] => constantSql(column.columnType, column.value)
-    case column: PrefixFunctionColumn[_] => prefixSql(column.name, column.parameter)
-    case column: InfixFunctionColumn[_] => infixSql(column.name, column.parameter1, column.parameter2)
-    case column: PostfixFunctionColumn[_] => postfixSql(column.name, column.parameter)
-    case column: DoubleInfixFunctionColumn[_] => doubleInfixSql(column.infix1, column.infix2, column.parameter1, column.parameter2, column.parameter3)
-    case SelectColumn(select) => "(" + selectSql(select) + ")"
-    case column: ScalarFunctionColumn[_] => functionSql(column.name, column.parameters: _*)
-    case column: TableColumn[_] => identifierSql(column.tableAlias) + "." + identifierSql(column.columnName)
-    case column: AliasColumn[_] => columnSql(column.column)
-    case column: CaseWhenColumn[_] => caseSql(column.whens, None)
-    case column: CaseWhenElseColumn[_] => caseSql(column.whens, Some(column.`else`))
-    case column: CaseColumnColumn[_, _] => caseColumnSql(column.column, column.mappings, None)
-    case column: CaseColumnElseColumn[_, _] => caseColumnSql(column.column, column.mappings, Some(column.`else`))
+  def columnSql(column: Column[_], relation: Relation): String =
+    findColumnInRelation(column, relation).getOrElse(column match {
+      case LiteralColumn(literal) => literalSql(literal)
+      case column: ConstantColumn[_] => constantSql(column.columnType, column.value)
+      case column: PrefixFunctionColumn[_] => prefixSql(column.name, column.parameter, relation)
+      case column: InfixFunctionColumn[_] => infixSql(column.name, column.parameter1, column.parameter2, relation)
+      case column: PostfixFunctionColumn[_] => postfixSql(column.name, column.parameter, relation)
+      case column: DoubleInfixFunctionColumn[_] => doubleInfixSql(column.infix1, column.infix2, column.parameter1, column.parameter2, column.parameter3, relation)
+      case SelectColumn(select) => "(" + selectSql(select) + ")"
+      case column: ScalarFunctionColumn[_] => functionSql(column.name, column.parameters, relation)
+      case column: TableColumn[_] => identifierSql(column.tableAlias) + "." + identifierSql(column.columnName)
+      case column: AliasColumn[_] => columnSql(column.column, relation)
+      case column: CaseWhenColumn[_] => caseSql(column.whens, None, relation)
+      case column: CaseWhenElseColumn[_] => caseSql(column.whens, Some(column.`else`), relation)
+      case column: CaseColumnColumn[_, _] => caseColumnSql(column.column, column.mappings, None, relation)
+      case column: CaseColumnElseColumn[_, _] => caseColumnSql(column.column, column.mappings, Some(column.`else`), relation)
+    })
+
+  def findColumnInRelation(column: Column[_], relation: Relation): Option[String] = relation match {
+    case join: Join => findColumnInRelation(column, join.left) orElse findColumnInRelation(column, join.right)
+    case select: Select[_] => findColumnInSubselect(column, select.from)
+    case _ => None
+  }
+
+  def findColumnInSubselect(column: Column[_], relation: Relation): Option[String] = relation match {
+    case table: Table =>
+      column match {
+        case tableColumn: TableColumn[_] if (tableColumn.tableAlias == table.tableAlias) => Some(tableColumn.columnAlias)
+        case _ => None
+      }
+    case tableFunction: TableFunction =>
+      column match {
+        case tableColumn: TableColumn[_] if (tableColumn.tableAlias == tableFunction.tableAlias) => Some(tableColumn.columnAlias)
+        case _ => None
+      }
+    case join: Join => findColumnInSubselect(column, join.left) orElse findColumnInRelation(column, join.right)
+    case select: Select[_] => findColumnInSubselect(column, select.from)
   }
 
   def selectSql(select: Select[_]): String
 
-  def prefixSql(op: String, parameter: Column[_]): String =
-    s"($op ${columnSql(parameter)})"
+  def prefixSql(op: String, parameter: Column[_], relation: Relation): String =
+    s"($op ${columnSql(parameter, relation)})"
 
-  def infixSql(op: String, parameter1: Column[_], parameter2: Column[_]): String =
-    s"(${columnSql(parameter1)} $op ${columnSql(parameter2)})"
+  def infixSql(op: String, parameter1: Column[_], parameter2: Column[_], relation: Relation): String =
+    s"(${columnSql(parameter1, relation)} $op ${columnSql(parameter2, relation)})"
 
-  def postfixSql(op: String, parameter: Column[_]): String =
-    s"(${columnSql(parameter)} $op)"
+  def postfixSql(op: String, parameter: Column[_], relation: Relation): String =
+    s"(${columnSql(parameter, relation)} $op)"
 
-  def doubleInfixSql(op1: String, op2: String, parameter1: Column[_], parameter2: Column[_], parameter3: Column[_]): String =
-    s"(${columnSql(parameter1)} $op1 ${columnSql(parameter2)} $op2 ${columnSql(parameter3)})"
+  def doubleInfixSql(op1: String, op2: String, parameter1: Column[_], parameter2: Column[_], parameter3: Column[_], relation: Relation): String =
+    s"(${columnSql(parameter1, relation)} $op1 ${columnSql(parameter2, relation)} $op2 ${columnSql(parameter3, relation)})"
 
-  def functionSql(op: String, parameters: Column[_]*): String =
-    parameters.map(columnSql).mkString(s"$op(", ", ", ")")
+  def functionSql(op: String, parameters: Seq[Column[_]], relation: Relation): String =
+    parameters.map(parameter => columnSql(parameter, relation)).mkString(s"$op(", ", ", ")")
 
-  def orderListSql(order: Seq[Order]) =
-    order map orderSql mkString ", "
+  def orderListSql(orders: Seq[Order], relation: Relation) =
+    orders.map(order => orderSql(order, relation)).mkString(", ")
 
-  def groupListSql(group: Seq[Group]) =
-    group map groupSql mkString ", "
+  def groupListSql(groups: Seq[Group], relation: Relation) =
+    groups.map(group => groupSql(group, relation)).mkString(", ")
 
-  def orderSql(order: Order) =
+  def orderSql(order: Order, relation: Relation) =
     if (order.ascending)
-      columnSql(order.column)
+      columnSql(order.column, relation)
     else
-      columnSql(order.column) + " desc"
+      columnSql(order.column, relation) + " desc"
 
-  def groupSql(group: Group): String = group match {
-    case group: ColumnGroup => columnSql(group.column)
-    case group: TupleGroup => group.columns.map(groupSql).mkString("(", ", ", ")")
-    case group: FunctionGroup => s"${group.name}(${group.columns map groupSql mkString ", "})"
+  def groupSql(group: Group, relation: Relation): String = group match {
+    case group: ColumnGroup => columnSql(group.column, relation)
+    case group: TupleGroup => group.columns.map(column => groupSql(column, relation)).mkString("(", ", ", ")")
+    case group: FunctionGroup => group.name + "(" + group.columns.map(column => groupSql(column, relation)).mkString(", ") + ")"
   }
 
   def literalSql[A](literal: A) =
@@ -110,16 +132,16 @@ trait BaseStatementBuilder {
   def escapeSqlString(string: String) =
     string.replace("'", "''")
 
-  def caseSql(whens: List[When[_]], `else`: Option[Column[_]]) = {
-    val whenSql = whens.map(when => s"when ${columnSql(when.condition)} then ${columnSql(when.result)}").mkString(" ")
-    val elseSql = `else`.map(`else` => s"else ${columnSql(`else`)} ").getOrElse("")
+  def caseSql(whens: List[When[_]], `else`: Option[Column[_]], relation: Relation) = {
+    val whenSql = whens.map(when => s"when ${columnSql(when.condition, relation)} then ${columnSql(when.result, relation)}").mkString(" ")
+    val elseSql = `else`.map(`else` => s"else ${columnSql(`else`, relation)} ").getOrElse("")
     s"case $whenSql ${elseSql}end"
   }
 
-  def caseColumnSql(column: Column[_], mappings: List[(Column[_], Column[_])], `else`: Option[Column[_]]) = {
-    val whenSql = mappings.map(mapping => s"when ${columnSql(mapping._1)} then ${columnSql(mapping._2)}").mkString(" ")
-    val elseSql = `else`.map(`else` => s"else ${columnSql(`else`)} ").getOrElse("")
-    s"case ${columnSql(column)} $whenSql ${elseSql}end"
+  def caseColumnSql(column: Column[_], mappings: List[(Column[_], Column[_])], `else`: Option[Column[_]], relation: Relation) = {
+    val whenSql = mappings.map(mapping => s"when ${columnSql(mapping._1, relation)} then ${columnSql(mapping._2, relation)}").mkString(" ")
+    val elseSql = `else`.map(`else` => s"else ${columnSql(`else`, relation)} ").getOrElse("")
+    s"case ${columnSql(column, relation)} $whenSql ${elseSql}end"
   }
 
   // -------------------------------------------------
