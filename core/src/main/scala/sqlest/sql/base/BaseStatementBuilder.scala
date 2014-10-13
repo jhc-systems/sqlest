@@ -44,6 +44,7 @@ trait BaseStatementBuilder {
       case column: PostfixFunctionColumn[_] => postfixSql(column.name, column.parameter, relation)
       case column: DoubleInfixFunctionColumn[_] => doubleInfixSql(column.infix1, column.infix2, column.parameter1, column.parameter2, column.parameter3, relation)
       case SelectColumn(select) => "(" + selectSql(select) + ")"
+      case WindowFunctionColumn(partitionByColumns, orders) => windowFunctionSql(partitionByColumns, orders, relation)
       case column: ScalarFunctionColumn[_] => functionSql(column.name, column.parameters, relation)
       case column: TableColumn[_] => identifierSql(column.tableAlias) + "." + identifierSql(column.columnName)
       case column: AliasColumn[_] => columnSql(column.column, relation)
@@ -55,9 +56,14 @@ trait BaseStatementBuilder {
 
   def findColumnInRelation(column: Column[_], relation: Relation): Option[String] = relation match {
     case join: Join => findColumnInRelation(column, join.left) orElse findColumnInRelation(column, join.right)
-    case select: Select[_] => findColumnInSubselect(column, select.from)
+    case select: Select[_] => findColumnInSubselectColumns(column, select.columns) orElse findColumnInSubselect(column, select.from)
     case _ => None
   }
+
+  def findColumnInSubselectColumns(column: Column[_], subselectColumns: Seq[AliasedColumn[_]]): Option[String] =
+    subselectColumns
+      .find(subselectColumn => subselectColumn == column)
+      .map(_.columnAlias)
 
   def findColumnInSubselect(column: Column[_], relation: Relation): Option[String] = relation match {
     case table: Table =>
@@ -71,7 +77,7 @@ trait BaseStatementBuilder {
         case _ => None
       }
     case join: Join => findColumnInSubselect(column, join.left) orElse findColumnInRelation(column, join.right)
-    case select: Select[_] => findColumnInSubselect(column, select.from)
+    case select: Select[_] => findColumnInSubselectColumns(column, select.columns) orElse findColumnInSubselect(column, select.from)
   }
 
   def selectSql(select: Select[_]): String
@@ -90,6 +96,18 @@ trait BaseStatementBuilder {
 
   def functionSql(op: String, parameters: Seq[Column[_]], relation: Relation): String =
     parameters.map(parameter => columnSql(parameter, relation)).mkString(s"$op(", ", ", ")")
+
+  def windowFunctionSql(partitionByColumns: Seq[Column[_]], orders: Seq[Order], relation: Relation) = {
+    val partitionBy =
+      if (partitionByColumns.isEmpty) ""
+      else s"partition by ${partitionByColumns.map(column => columnSql(column, relation)).mkString(", ")}"
+
+    val orderBy =
+      if (orders.isEmpty) ""
+      else s"order by ${orderListSql(orders, relation)}"
+
+    (partitionBy + " " + orderBy).trim
+  }
 
   def orderListSql(orders: Seq[Order], relation: Relation) =
     orders.map(order => orderSql(order, relation)).mkString(", ")
@@ -163,6 +181,7 @@ trait BaseStatementBuilder {
     case PostfixFunctionColumn(_, a) => columnArgs(a)
     case DoubleInfixFunctionColumn(_, _, a, b, c) => columnArgs(a) ++ columnArgs(b) ++ columnArgs(c)
     case ScalarFunctionColumn(_, parameters) => parameters.toList flatMap columnArgs
+    case WindowFunctionColumn(columns, orders) => columns.toList.flatMap(columnArgs) ++ orders.toList.flatMap(order => columnArgs(order.column))
     case SelectColumn(select) => selectArgs(select)
     case column: TableColumn[_] => Nil
     case column: AliasColumn[_] => Nil

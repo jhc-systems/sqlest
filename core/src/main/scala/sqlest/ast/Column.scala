@@ -51,6 +51,9 @@ case class PostfixFunctionColumn[A](name: String, parameter: Column[_])(implicit
 /** Binary prefix, infix operators, e.g. `a between 1 and 2` */
 case class DoubleInfixFunctionColumn[A](infix1: String, infix2: String, parameter1: Column[_], parameter2: Column[_], parameter3: Column[_])(implicit val columnType: ColumnType[A]) extends Column[A]
 
+/** Defines a window for use within an OLAP function */
+case class WindowFunctionColumn(partitionByColumns: Seq[Column[_]], orderBy: Seq[Order]) extends Column[Int] { val columnType = IntColumnType }
+
 /** A column containing a select statement which selects only a single column */
 case class SelectColumn[A](select: Select[AliasedColumn[A]])(implicit val columnType: ColumnType[A]) extends Column[A]
 

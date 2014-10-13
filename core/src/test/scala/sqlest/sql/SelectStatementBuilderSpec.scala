@@ -286,4 +286,44 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
     )
   }
 
+  "olap functions" should "produce the right sql" in {
+    sql {
+      select(rowNumber().over())
+        .from(MyTable)
+    } should equal(
+      s"""
+       |select (rownumber()  over()) as rownumber
+       |from mytable
+       """.formatSql,
+      Nil
+    )
+
+    sql {
+      select(rowNumber().over(partitionBy(MyTable.col1).orderBy(MyTable.col2)))
+        .from(MyTable)
+    } should equal(
+      s"""
+       |select (rownumber()  over(partition by mytable.col1 order by mytable.col2)) as rownumber
+       |from mytable
+       """.formatSql,
+      Nil
+    )
+
+    sql {
+      val rowNumberColumn = rowNumber().over(partitionBy(MyTable.col1).orderBy(MyTable.col2))
+      select(MyTable.col1)
+        .from(
+          MyTable
+            .innerJoin(select(rowNumberColumn).from(MyTable))
+            .on(rowNumberColumn === 1.constant))
+    } should equal(
+      s"""
+       |select mytable_col1 as mytable_col1
+       |from (mytable
+       | inner join (select (rownumber()  over(partition by mytable.col1 order by mytable.col2)) as rownumber from mytable)
+       |  on (rownumber = 1))
+       """.formatSql,
+      Nil
+    )
+  }
 }
