@@ -32,9 +32,9 @@ class ExecutorSpec extends FlatSpec with Matchers {
   val insertStatement = insert.into(TableOne).set(TableOne.col1 -> 123)
   val deleteStatement = delete.from(TableOne).where(TableOne.col2 === "12")
 
-  val extractor = extractNamed[One](
-    "a" -> TableOne.col1,
-    "b" -> TableOne.col2
+  val extractor = extractNamed[One].using(
+    a = TableOne.col1,
+    b = TableOne.col2
   )
 
   "a select statement" should "be executable with an extractor" in {

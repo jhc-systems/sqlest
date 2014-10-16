@@ -32,9 +32,9 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
   case class AggregateOnePointFive(one: One, str: String)
 
   "single case class extractor" should "extract appropriate data structures" in {
-    val extractor = extractNamed[One](
-      "a" -> TableOne.col1,
-      "b" -> TableOne.col2
+    val extractor = extractNamed[One].using(
+      a = TableOne.col1,
+      b = TableOne.col2
     )
 
     extractor.extractHeadOption(testResultSet) should equal(Some(
@@ -63,14 +63,14 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
   }
 
   "aggregate case class extractor" should "extract appropriate data structures" in {
-    val extractor = extractNamed[AggregateOneTwo](
-      "one" -> extractNamed[One](
-        "a" -> TableOne.col1,
-        "b" -> TableOne.col2
+    val extractor = extractNamed[AggregateOneTwo].using(
+      one = extractNamed[One].using(
+        a = TableOne.col1,
+        b = TableOne.col2
       ),
-      "two" -> extractNamed[Two](
-        "a" -> TableTwo.col2,
-        "b" -> TableTwo.col3
+      two = extractNamed[Two].using(
+        a = TableTwo.col2,
+        b = TableTwo.col3
       )
     )
 
@@ -86,14 +86,14 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
   }
 
   "list extractor" should "extract appropriate data structures" in {
-    val extractor = extractNamed[AggregateOneTwo](
-      "one" -> extractNamed[One](
-        "a" -> TableOne.col1,
-        "b" -> TableOne.col2
+    val extractor = extractNamed[AggregateOneTwo].using(
+      one = extractNamed[One].using(
+        a = TableOne.col1,
+        b = TableOne.col2
       ),
-      "two" -> extractNamed[Two](
-        "a" -> TableTwo.col2,
-        "b" -> TableTwo.col3
+      two = extractNamed[Two].using(
+        a = TableTwo.col2,
+        b = TableTwo.col3
       )
     )
 
@@ -147,9 +147,9 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
     }
 
     intercept[NullPointerException] {
-      extractNamed[One](
-        "a" -> TableOne.col1,
-        "b" -> TableOne.col2
+      extractNamed[One].using(
+        a = TableOne.col1,
+        b = TableOne.col2
       ).extractHeadOption(results)
     }
   }
@@ -185,18 +185,18 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
   }
 
   "option column types" should "handle nulls" in {
-    val extractor = extractNamed[AggregateOneTwoThree](
-      "one" -> extractNamed[One](
-        "a" -> TableOne.col1,
-        "b" -> TableOne.col2
+    val extractor = extractNamed[AggregateOneTwoThree].using(
+      one = extractNamed[One].using(
+        a = TableOne.col1,
+        b = TableOne.col2
       ),
-      "two" -> extractNamed[Two](
-        "a" -> TableTwo.col2,
-        "b" -> TableTwo.col3
+      two = extractNamed[Two].using(
+        a = TableTwo.col2,
+        b = TableTwo.col3
       ),
-      "three" -> extractNamed[Three](
-        "a" -> TableThree.col3,
-        "b" -> TableThree.col4
+      three = extractNamed[Three].using(
+        a = TableThree.col3,
+        b = TableThree.col4
       )
     )
 
@@ -258,9 +258,9 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
   }
 
   "option extractor" should "handle nulls for compound values" in {
-    val extractor = extractNamed[Three](
-      "a" -> TableThree.col3,
-      "b" -> TableThree.col4
+    val extractor = extractNamed[Three].using(
+      a = TableThree.col3,
+      b = TableThree.col4
     ).asOption
 
     extractor.extractHeadOption(testResultSet) should equal(Some(
@@ -275,18 +275,18 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
   }
 
   "option extractor" should "handle nulls for nested compound values" in {
-    val extractor = extractNamed[AggregateOneTwoOptionThree](
-      "one" -> extractNamed[One](
-        "a" -> TableOne.col1,
-        "b" -> TableOne.col2
+    val extractor = extractNamed[AggregateOneTwoOptionThree].using(
+      one = extractNamed[One].using(
+        a = TableOne.col1,
+        b = TableOne.col2
       ),
-      "two" -> extractNamed[Two](
-        "a" -> TableTwo.col2,
-        "b" -> TableTwo.col3
+      two = extractNamed[Two].using(
+        a = TableTwo.col2,
+        b = TableTwo.col3
       ),
-      "three" -> extractNamed[Three](
-        "a" -> TableThree.col3,
-        "b" -> TableThree.col4
+      three = extractNamed[Three].using(
+        a = TableThree.col3,
+        b = TableThree.col4
       ).asOption
     )
 
@@ -302,12 +302,12 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
   }
 
   "column and extractor" should "be usable together as arguments to `extractor`" in {
-    val extractor = extractNamed[AggregateOnePointFive](
-      "one" -> extractNamed[One](
-        "a" -> TableOne.col1,
-        "b" -> TableOne.col2
+    val extractor = extractNamed[AggregateOnePointFive].using(
+      one = extractNamed[One].using(
+        a = TableOne.col1,
+        b = TableOne.col2
       ),
-      "str" -> TableTwo.col2
+      str = TableTwo.col2
     )
 
     extractor.extractHeadOption(testResultSet) should equal(Some(
@@ -342,13 +342,13 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
     )
 
     val extractor = extract(
-      extractNamed[One](
-        "a" -> TableOne.col1,
-        "b" -> TableOne.col2
+      extractNamed[One].using(
+        a = TableOne.col1,
+        b = TableOne.col2
       ),
-      extractNamed[Two](
-        "a" -> TableTwo.col2,
-        "b" -> TableTwo.col3
+      extractNamed[Two].using(
+        a = TableTwo.col2,
+        b = TableTwo.col3
       ).asList
     ).groupBy(extract(
         TableOne.col1,
@@ -375,13 +375,13 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
     )
 
     val extractor = extract(
-      extractNamed[Three](
-        "a" -> TableThree.col3,
-        "b" -> TableThree.col4
+      extractNamed[Three].using(
+        a = TableThree.col3,
+        b = TableThree.col4
       ),
-      extractNamed[Three](
-        "a" -> TableThreeB.col3,
-        "b" -> TableThreeB.col4
+      extractNamed[Three].using(
+        a = TableThreeB.col3,
+        b = TableThreeB.col4
       ).asList
     ).groupBy(TableThree.col3)
 
@@ -405,13 +405,13 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
     )
 
     val extractor = extract(
-      extractNamed[Three](
-        "a" -> TableThree.col3,
-        "b" -> TableThree.col4
+      extractNamed[Three].using(
+        a = TableThree.col3,
+        b = TableThree.col4
       ),
-      extractNamed[Three](
-        "a" -> TableThreeB.col3,
-        "b" -> TableThreeB.col4
+      extractNamed[Three].using(
+        a = TableThreeB.col3,
+        b = TableThreeB.col4
       ).asOption.asList
     ).groupBy(TableThree.col3)
 
@@ -497,10 +497,10 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       Seq(2, 4, 8)
     )
 
-    val extractor = extractNamed[Flattened](
-      "a" -> col1,
-      "b" -> col2.asList,
-      "c" -> col3.asList
+    val extractor = extractNamed[Flattened].using(
+      a = col1,
+      b = col2.asList,
+      c = col3.asList
     ).groupBy(col1)
 
     extractor.extractHeadOption(results) should equal(Some(
@@ -547,11 +547,11 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       Seq(2, 4, 8)
     )
 
-    val extractor = extractNamed[Outer](
-      "a" -> col1,
-      "b" -> extractNamed[Inner](
-        "b" -> col2,
-        "c" -> col3.asList
+    val extractor = extractNamed[Outer].using(
+      a = col1,
+      b = extractNamed[Inner].using(
+        b = col2,
+        c = col3.asList
       ).asList
     )
 
@@ -593,11 +593,11 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       Seq(2, 4, 8)
     )
 
-    val extractor = extractNamed[Outer](
-      "a" -> col1,
-      "b" -> extractNamed[Inner](
-        "b" -> col2,
-        "c" -> col3.asList
+    val extractor = extractNamed[Outer].using(
+      a = col1,
+      b = extractNamed[Inner].using(
+        b = col2,
+        c = col3.asList
       ).asList
     ).groupBy(col1)
 
