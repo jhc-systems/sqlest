@@ -79,6 +79,10 @@ abstract class MappedColumnType[A: ru.TypeTag, B] extends ColumnType[A] {
   def read(database: B): A
   def write(value: A): B
   val typeTag = ru.typeTag[A]
+
+  def compose[C: BaseColumnType](inner: MappedColumnType[B, C]): MappedColumnType[A, C] = {
+    MappedColumnType((db: C) => this.read(inner.read(db)), (v: A) => inner.write(this.write(v)))
+  }
 }
 
 object MappedColumnType {
