@@ -18,6 +18,7 @@ package sqlest.sql
 
 import org.scalatest._
 import org.scalatest.matchers._
+import scala.language.reflectiveCalls
 import sqlest._
 import sqlest.ast._
 
@@ -29,6 +30,19 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec
   val statementBuilder = DB2StatementBuilder
 
   // DB2-specific tests:
+
+  "select scalar function" should "produce the right sql" in {
+    sql {
+      select(TableThree.col3, TableThree.col4, testFunction(TableThree.col3, "abc").as("testFunction"))
+        .from(TableThree)
+    } should equal(
+      s"""
+       |select three.col3 as three_col3, three.col4 as three_col4, testFunction(three.col3, cast(? as char)) as testFunction
+       |from three
+       """.formatSql,
+      List("abc")
+    )
+  }
 
   "select with limit only" should "produce the right sql" in {
     sql {
@@ -118,7 +132,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec
     } should equal(
       s"""
        |with subquery as
-       |(select 1 as a, sum(?) as b, (3 + ?) as c, row_number() over (order by ?, ? desc) as rownum
+       |(select 1 as a, sum(cast(? as integer)) as b, (3 + ?) as c, row_number() over (order by ?, ? desc) as rownum
          |from (one inner join two on ((? = ?) and (? <> ?)))
          |where ((? = ?) and (? <> ?)))
        |select a, b, c
@@ -207,6 +221,19 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec
        |group by grouping sets(mytable.col1, ())
        """.formatSql,
       List(123)
+    )
+  }
+
+  "select with typed parameters" should "produce the right sql" in {
+    sql {
+      select(sum(1).as("sum"), avg(1.5).as("avg"), trim(" abc").as("abc"))
+        .from(MyTable)
+    } should equal(
+      s"""
+       |select sum(cast(? as integer)) as sum, avg(cast(? as double)) as avg, trim(cast(? as char)) as abc
+       |from mytable
+     """.formatSql,
+      List(1, 1.5, " abc")
     )
   }
 }

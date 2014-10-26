@@ -34,8 +34,8 @@ trait DB2StatementBuilder extends base.StatementBuilder {
   override def selectOffsetSql(offset: Option[Long]): Option[String] =
     None
 
-  override def literalSql(column: Column[_]) = {
-    def castType(columnType: ColumnType[_]): String = columnType match {
+  def castLiteralSql(columnType: ColumnType[_]): String = {
+    val `type` = columnType match {
       case StringColumnType => "char"
       case BigDecimalColumnType => "decimal"
       case BooleanColumnType => throw new AssertionError("DB2 does not support Boolean data types")
@@ -43,11 +43,18 @@ trait DB2StatementBuilder extends base.StatementBuilder {
       case DoubleColumnType => "double"
       case IntColumnType => "integer"
       case LongColumnType => "bigint"
-      case OptionColumnType(baseType) => castType(baseType)
-      case mapped: MappedColumnType[_, _] => castType(mapped.baseType)
+      case OptionColumnType(baseType) => castLiteralSql(baseType)
+      case mapped: MappedColumnType[_, _] => castLiteralSql(mapped.baseType)
     }
+    s"cast(? as ${`type`})"
+  }
 
-    s"cast(? as ${castType(column.columnType)})"
+  override def functionSql(op: String, parameters: Column[_]*): String =
+    parameters.map(functionColumnSql).mkString(s"$op(", ", ", ")")
+
+  def functionColumnSql(column: Column[_]): String = column match {
+    case column: LiteralColumn[_] => castLiteralSql(column.columnType)
+    case column => columnSql(column)
   }
 
   override def joinSql(relation: Relation): String = relation match {
