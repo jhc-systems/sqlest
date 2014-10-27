@@ -18,6 +18,7 @@ package sqlest.sql
 
 import org.scalatest._
 import org.scalatest.matchers._
+import scala.language.reflectiveCalls
 import sqlest._
 import sqlest.ast._
 
@@ -27,6 +28,19 @@ class H2StatementBuilderSpec extends BaseStatementBuilderSpec
     with UpdateStatementBuilderSpec
     with DeleteStatementBuilderSpec {
   val statementBuilder = H2StatementBuilder
+
+  "select scalar function" should "produce the right sql" in {
+    sql {
+      select(TableThree.col3, TableThree.col4, testFunction(TableThree.col3, "abc").as("testFunction"))
+        .from(TableThree)
+    } should equal(
+      s"""
+       |select three.col3 as three_col3, three.col4 as three_col4, testFunction(three.col3, ?) as testFunction
+       |from three
+       """.formatSql,
+      List("abc")
+    )
+  }
 
   "where between" should "produce the right sql" in {
     sql {

@@ -52,4 +52,17 @@ case class SelectOps[A](select: Select[A]) {
   // Convert arguments into a tuple
 [2..22#  def what[[#C1#]]([#column1: AliasedColumn[C1]#]) = select.copy(cols = Tuple1([#column1#]))#
 ]
+
+  def mapColumns(f: PartialFunction[Column[_], Column[_]]) = {
+    def applyToInnerColumns(f: PartialFunction[Column[_], Column[_]])(column: AliasedColumn[_]): AliasedColumn[_] = column match {
+      case AliasColumn(innerColumn, alias) => AliasColumn(f(innerColumn), alias)(innerColumn.columnType)
+      case other => other
+    }
+    select.cols match {
+      case l: List[AliasedColumn[_] @unchecked] => select.copy(cols = l.map(applyToInnerColumns(f)))
+      case c: AliasedColumn[_] => select.copy(cols = applyToInnerColumns(f)(c))
+      [2..22#  case t: ([#AliasedColumn[_] @unchecked#]) => select.copy(cols = ([#applyToInnerColumns(f)(t._1)#]))#
+      ]
+    }
+  }
 }

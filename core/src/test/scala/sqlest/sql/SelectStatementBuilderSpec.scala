@@ -224,19 +224,6 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
     )
   }
 
-  "select scalar function" should "produce the right sql" in {
-    sql {
-      select(TableThree.col3, TableThree.col4, testFunction(TableThree.col3, "abc").as("testFunction"))
-        .from(TableThree)
-    } should equal(
-      s"""
-       |select three.col3 as three_col3, three.col4 as three_col4, testFunction(three.col3, ?) as testFunction
-       |from three
-       """.formatSql,
-      List("abc")
-    )
-  }
-
   "select connect by" should "produce the right sql" in {
     sql {
       select(TableOne.col1)
@@ -326,4 +313,22 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
       Nil
     )
   }
+
+  "mapping columns" should "produce the right sql" in {
+    sql {
+      select(1.constant.as("one"), MyTable.col2)
+        .from(MyTable)
+        .mapColumns {
+          case col @ ConstantColumn(innerVal) => LiteralColumn(innerVal)(col.columnType)
+          case col => col
+        }
+    } should equal(
+      s"""
+     |select ? as one, mytable.col2 as mytable_col2
+     |from mytable
+     """.formatSql,
+      List(1)
+    )
+  }
+
 }
