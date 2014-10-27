@@ -24,15 +24,15 @@ trait DeleteStatementBuilder extends BaseStatementBuilder {
       "delete",
       deleteFromSql(delete.from)
     ) ++ Seq(
-        deleteWhereSql(delete.where, delete.from)
+        deleteWhereSql(delete.where)
       ).flatten mkString ("", " ", "")
   }
 
   def deleteFromSql(from: Table): String =
     s"from ${identifierSql(from.tableName)}"
 
-  def deleteWhereSql(where: Option[Column[Boolean]], relation: Relation): Option[String] =
-    where map (where => s"where ${columnSql(where, relation)}")
+  def deleteWhereSql(where: Option[Column[Boolean]]): Option[String] =
+    where map (where => s"where ${columnSql(where)}")
 
   // -------------------------------------------------
 

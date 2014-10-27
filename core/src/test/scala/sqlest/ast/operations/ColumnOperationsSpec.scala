@@ -14,11 +14,22 @@
  * limitations under the License.
  */
 
-package sqlest.ast
+package sqlest.ast.operations
 
-sealed trait Group
+import org.scalatest._
+import org.scalatest.matchers._
+import scala.language.reflectiveCalls
+import sqlest._
 
-case class ColumnGroup(column: Column[_]) extends Group
+class ColumnOperationsSpec extends FlatSpec with Matchers {
 
-case class TupleGroup(groups: List[Group]) extends Group
-case class FunctionGroup(name: String, groups: List[Group]) extends Group
+  class TableOne(alias: Option[String]) extends Table("one", alias) {
+    val col1 = column[Int]("col1")
+  }
+  object TableOne extends TableOne(None)
+
+  "column.map(f)" should "map f over all internal columns" in {
+    TableOne.col1.mapColumns(identity, identity) should be(TableOne.col1)
+  }
+
+}

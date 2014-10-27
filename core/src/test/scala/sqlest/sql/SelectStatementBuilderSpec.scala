@@ -277,10 +277,29 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
             .from(MyTable).as("subselect"))
     } should equal(
       s"""
-       |select mytable_col1 as mytable_col1, mytable_col2 as mytable_col2
+       |select mytable_col1, mytable_col2
        |from
        |  (select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
        |   from mytable) as subselect
+       """.formatSql,
+      Nil
+    )
+
+    sql {
+      select(MyTable.col1, MyTable.col2)
+        .from(
+          select(MyTable.col1, MyTable.col2)
+            .from(
+              select(MyTable.col1, MyTable.col2)
+                .from(MyTable).as("subselect2")).as("subselect1"))
+    } should equal(
+      s"""
+       |select mytable_col1, mytable_col2
+       |from
+       |  (select mytable_col1, mytable_col2
+       |   from
+       |    (select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
+       |     from mytable) as subselect2) as subselect1
        """.formatSql,
       Nil
     )
@@ -318,7 +337,7 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
             .on(rowNumberColumn === 1.constant))
     } should equal(
       s"""
-       |select mytable_col1 as mytable_col1
+       |select mytable.col1 as mytable_col1
        |from (mytable
        | inner join (select (rownumber()  over(partition by mytable.col1 order by mytable.col2)) as rownumber from mytable)
        |  on (rownumber = 1))

@@ -15,6 +15,7 @@
  */
 
 import sqlest.ast._
+import sqlest.ast.operations._
 import sqlest.ast.syntax._
 import sqlest.executor._
 import sqlest.extractor._
@@ -23,6 +24,7 @@ import sqlest.untyped._
 package object sqlest extends SqlestCore
   with QuerySyntax
   with ColumnSyntax
+  with ColumnOperations
   with JoinSyntax
   with OrderSyntax
   with ExtractorSyntax

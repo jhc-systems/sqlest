@@ -35,17 +35,17 @@ trait DB2StatementBuilder extends base.StatementBuilder {
     None
 
   override def joinSql(relation: Relation): String = relation match {
-    case tableFunction: TableFunction => "table(" + functionSql(tableFunction.tableName, tableFunction.parameterColumns, relation) + ") as " + identifierSql(tableFunction.tableAlias)
+    case tableFunction: TableFunction => "table(" + functionSql(tableFunction.tableName, tableFunction.parameterColumns) + ") as " + identifierSql(tableFunction.tableAlias)
     case _ => super.joinSql(relation)
   }
 
   def rowNumberSelectSql(select: Select[_], offset: Long, limit: Option[Long]): String = {
     val subquery = Seq(
-      s"${selectWhatSql(select.columns, select.from)}, row_number() over (${selectOrderBySql(select.orderBy, select.from) getOrElse ""}) as rownum",
+      s"${selectWhatSql(select.columns)}, row_number() over (${selectOrderBySql(select.orderBy) getOrElse ""}) as rownum",
       selectFromSql(select.from)
     ) ++ Seq(
-        selectWhereSql(select.where, select.from),
-        selectGroupBySql(select.groupBy, select.from)
+        selectWhereSql(select.where),
+        selectGroupBySql(select.groupBy)
       ).flatten mkString " "
 
     val what =

@@ -32,13 +32,14 @@ trait StatementBuilder extends BaseStatementBuilder
     prepareStatement(connection, operation)
 
   def prepareStatement(connection: Connection, operation: Operation) = {
-    val querySql = sql(operation)
-    val queryParameters = parameters(operation)
+    val preprocessedOperation = preprocess(operation)
+    val querySql = sql(preprocessedOperation)
+    val queryParameters = parameters(preprocessedOperation)
     try {
       logger.debug(s"Preparing statement: $querySql - $queryParameters")
       val statement = connection.prepareStatement(querySql)
 
-      setParameters(operation, statement, queryParameters)
+      setParameters(preprocessedOperation, statement, queryParameters)
 
       statement
     } catch {
@@ -49,15 +50,16 @@ trait StatementBuilder extends BaseStatementBuilder
   }
 
   def generateRawSql(operation: Operation): String = {
-    val querySql = sql(operation).split("\\?")
-    val queryParameters = parameters(operation).map(parameter => constantSql(parameter.columnType, parameter.value))
+    val preprocessedOperation = preprocess(operation)
+    val querySql = sql(preprocessedOperation).split("\\?")
+    val queryParameters = parameters(preprocessedOperation).map(parameter => constantSql(parameter.columnType, parameter.value))
 
     querySql.zipAll(queryParameters, "", "")
       .map { case (sql, parameter) => sql + parameter }
       .mkString
   }
 
-  def sql(operation: Operation): String = operation match {
+  private[sqlest] def sql(operation: Operation): String = operation match {
     case select: Select[_] => selectSql(select)
     case insert: Insert => insertSql(insert)
     case update: Update => updateSql(update)
@@ -65,7 +67,7 @@ trait StatementBuilder extends BaseStatementBuilder
     case other => sys.error("Unsupported operation type: " + other)
   }
 
-  def parameters(operation: Operation): List[LiteralColumn[_]] = operation match {
+  private[sqlest] def parameters(operation: Operation): List[LiteralColumn[_]] = operation match {
     case select: Select[_] => selectArgs(select)
     case insert: Insert => insertArgs(insert)
     case update: Update => updateArgs(update)

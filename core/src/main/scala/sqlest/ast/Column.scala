@@ -86,6 +86,9 @@ case class TableColumn[A](tableAlias: String, columnName: String)(implicit val c
 /** Alias for a column expression, e.g. `expression as alias` */
 case class AliasColumn[A](column: Column[_], columnAlias: String)(implicit val columnType: ColumnType[A]) extends AliasedColumn[A]
 
+/** Used for refering to another column by alias */
+case class ReferenceColumn[A](columnAlias: String)(implicit val columnType: ColumnType[A]) extends AliasedColumn[A]
+
 /** Case statement **/
 sealed trait CaseColumn[A] extends Column[A]
 

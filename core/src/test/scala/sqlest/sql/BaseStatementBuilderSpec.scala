@@ -27,10 +27,13 @@ trait BaseStatementBuilderSpec extends FlatSpec with Matchers {
   }
   implicit def statementBuilder: StatementBuilder
 
-  def sql(operation: Operation) = (
-    statementBuilder.sql(operation),
-    statementBuilder.parameters(operation).map(_.value)
-  )
+  def sql(operation: Operation) = {
+    val preprocessedOperation = statementBuilder.preprocess(operation)
+    (
+      statementBuilder.sql(preprocessedOperation),
+      statementBuilder.parameters(preprocessedOperation).map(_.value)
+    )
+  }
 
   // Test data ----------------------------------
 

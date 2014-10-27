@@ -80,6 +80,7 @@ trait ColumnSyntax {
     def ? = left match {
       case column: TableColumn[_] => AliasColumn(column, left.columnAlias)(OptionColumnType(leftType))
       case AliasColumn(column, columnAlias) => AliasColumn(column, columnAlias)(OptionColumnType(leftType))
+      case column: ReferenceColumn[A] => ReferenceColumn(left.columnAlias)(OptionColumnType(leftType))
     }
   }
 
