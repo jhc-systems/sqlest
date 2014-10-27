@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package sqlest.sql
+package sqlest.ast
 
-import sqlest.ast._
+trait TableFunctions {
+[#  abstract class TableFunction1[[#A1#]](val tableName: String, val aliasedAs: Option[String] = None) extends BaseTable {
+    def apply[[#B1#]]([#column1: Column[B1]#])(implicit [#column1Equivalence: ColumnTypeEquivalence[A1, B1]#]) =
+      TableFunction(tableName, aliasedAs, Seq([#column1#]))
+  }#
 
-trait H2StatementBuilder extends base.StatementBuilder {
-  override def groupSql(group: Group, relation: Relation): String = group match {
-    case group: FunctionGroup => throw new UnsupportedOperationException
-    case group => super.groupSql(group, relation)
-  }
+]
 }
-
-object H2StatementBuilder extends H2StatementBuilder

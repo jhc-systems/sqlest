@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2014 JHC Systems Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package sqlest.sql
+package sqlest.ast
 
-import sqlest.ast._
+trait TupleGroups {
 
-trait H2StatementBuilder extends base.StatementBuilder {
-  override def groupSql(group: Group, relation: Relation): String = group match {
-    case group: FunctionGroup => throw new UnsupportedOperationException
-    case group => super.groupSql(group, relation)
-  }
+  implicit def TupleGroup0(t: Unit) =
+    TupleGroup(Nil)
+
+[#  implicit def TupleGroup1(t: Tuple1[[#Column[_]#]]) =
+    TupleGroup(List([#ColumnGroup(t._1)#]))#
+
+]
 }
-
-object H2StatementBuilder extends H2StatementBuilder

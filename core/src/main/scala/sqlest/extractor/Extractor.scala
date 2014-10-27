@@ -126,7 +126,7 @@ case class ColumnExtractor[A](column: AliasedColumn[A]) extends SingleExtractor[
       case IntColumnType => wrapNullableValue(row getInt column.columnAlias, row)
       case LongColumnType => wrapNullableValue(row getLong column.columnAlias, row)
       case DoubleColumnType => wrapNullableValue(row getDouble column.columnAlias, row)
-      case BigDecimalColumnType => wrapNullableValue(BigDecimal(row getBigDecimal column.columnAlias), row)
+      case BigDecimalColumnType => wrapNullableValue(row getBigDecimal column.columnAlias, row).map(BigDecimal.apply)
       case StringColumnType => wrapNullableValue(row getString column.columnAlias, row)
       case DateTimeColumnType => wrapNullableValue(new DateTime(row getDate column.columnAlias), row)
       case OptionColumnType(base) => Some(read(row, base))

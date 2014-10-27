@@ -24,6 +24,7 @@ class SelectSpec extends FlatSpec with Matchers {
   class MyTable(alias: Option[String]) extends Table("mytable", alias) {
     val col1 = column[Int]("col1")
     val col2 = column[Int]("col2")
+    def as(alias: String) = new MyTable(Some(alias))
   }
   object MyTable extends MyTable(None)
 
@@ -63,5 +64,17 @@ class SelectSpec extends FlatSpec with Matchers {
     val query = select.from(MyTable).page(1, 10).page(2, 20)
     query.limit should equal(Some(20))
     query.offset should equal(Some(40))
+  }
+
+  "select statements" should "compose" in {
+    val query = select(MyTable.col1).from(MyTable).where(MyTable.col2 === 1)
+    val YourTable = MyTable.as("your")
+
+    query.innerJoin(YourTable).on(MyTable.col1 === YourTable.col1).where(YourTable.col2 === 1)
+
+    select(YourTable.col1).from(query.innerJoin(YourTable).on(MyTable.col1 === YourTable.col1)).where(YourTable.col2 === 1)
+    select(YourTable.col1).from(YourTable.innerJoin(query).on(MyTable.col1 === YourTable.col1)).where(YourTable.col2 === 1)
+
+    select(YourTable.col1).from(YourTable).where(YourTable.col1 in query)
   }
 }

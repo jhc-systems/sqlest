@@ -109,13 +109,20 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
   }
 
   "non option extractors" should "throw exceptions when extracting nulls" in {
-    def results = TestResultSet(TableOne.columns)(
-      Seq(null, null)
+    def results = TestResultSet(TableOne.columns ++ TableFive.columns)(
+      Seq(null, null, null, null)
     )
 
-    // TODO Choose better exception
     intercept[NullPointerException] {
       TableOne.col1.extractHeadOption(results)
+    }
+
+    intercept[NullPointerException] {
+      TableFive.dateTimeCol.extractHeadOption(results)
+    }
+
+    intercept[NullPointerException] {
+      TableFive.bigDecimalCol.extractHeadOption(results)
     }
 
     intercept[NullPointerException] {
@@ -211,14 +218,25 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       Seq(null, "e")
     )
 
-    val extractor =
-      TableOne.col1.asOption
+    val extractor1 = TableOne.col1.asOption
 
-    extractor.extractHeadOption(results) should equal(Some(
+    extractor1.extractHeadOption(results) should equal(Some(
       Some(1)
     ))
 
-    extractor.extractAll(results) should equal(List(
+    extractor1.extractAll(results) should equal(List(
+      Some(1),
+      Some(3),
+      None
+    ))
+
+    val extractor2 = TableOne.col1.?
+
+    extractor2.extractHeadOption(results) should equal(Some(
+      Some(1)
+    ))
+
+    extractor2.extractAll(results) should equal(List(
       Some(1),
       Some(3),
       None

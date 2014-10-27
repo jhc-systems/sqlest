@@ -49,26 +49,26 @@ trait DB2StatementBuilder extends base.StatementBuilder {
     s"cast(? as ${`type`})"
   }
 
-  override def functionSql(op: String, parameters: Column[_]*): String =
-    parameters.map(functionColumnSql).mkString(s"$op(", ", ", ")")
+  override def functionSql(op: String, parameters: Seq[Column[_]], relation: Relation): String =
+    parameters.map(functionColumnSql(_, relation)).mkString(s"$op(", ", ", ")")
 
-  def functionColumnSql(column: Column[_]): String = column match {
+  def functionColumnSql(column: Column[_], relation: Relation): String = column match {
     case column: LiteralColumn[_] => castLiteralSql(column.columnType)
-    case column => columnSql(column)
+    case column => columnSql(column, relation)
   }
 
   override def joinSql(relation: Relation): String = relation match {
-    case tableFunction: TableFunction => "table(" + functionSql(tableFunction.tableName, tableFunction.parameterColumns: _*) + ") as " + identifierSql(tableFunction.tableAlias)
+    case tableFunction: TableFunction => "table(" + functionSql(tableFunction.tableName, tableFunction.parameterColumns, relation) + ") as " + identifierSql(tableFunction.tableAlias)
     case _ => super.joinSql(relation)
   }
 
   def rowNumberSelectSql(select: Select[_], offset: Long, limit: Option[Long]): String = {
     val subquery = Seq(
-      s"${selectWhatSql(select.columns)}, row_number() over (${selectOrderBySql(select.orderBy) getOrElse ""}) as rownum",
+      s"${selectWhatSql(select.columns, select.from)}, row_number() over (${selectOrderBySql(select.orderBy, select.from) getOrElse ""}) as rownum",
       selectFromSql(select.from)
     ) ++ Seq(
-        selectWhereSql(select.where),
-        selectGroupBySql(select.groupBy)
+        selectWhereSql(select.where, select.from),
+        selectGroupBySql(select.groupBy, select.from)
       ).flatten mkString " "
 
     val what =

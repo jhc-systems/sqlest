@@ -26,6 +26,40 @@ trait JoinSyntax {
    * Syntax like `a innerJoin b` produces a `JoinConditionBuilder`
    * containing an `on` method to complete the construction of the join.
    */
+  trait SelectJoinConditionBuilder[C] {
+    def on(condition: Column[Boolean]): Select[C]
+  }
+
+  implicit class SelectCompositionOps[C](left: Select[C]) {
+    def innerJoin(right: Relation) = new SelectJoinConditionBuilder[C] {
+      def on(condition: Column[Boolean]) =
+        left.from(left.from.innerJoin(right).on(condition))
+    }
+
+    def leftJoin(right: Relation) = new SelectJoinConditionBuilder[C] {
+      def on(condition: Column[Boolean]) =
+        left.from(left.from.leftJoin(right).on(condition))
+    }
+
+    def rightJoin(right: Relation) = new SelectJoinConditionBuilder[C] {
+      def on(condition: Column[Boolean]) =
+        left.from(left.from.rightJoin(right).on(condition))
+    }
+
+    def outerJoin(right: Relation) = new SelectJoinConditionBuilder[C] {
+      def on(condition: Column[Boolean]) =
+        left.from(left.from.outerJoin(right).on(condition))
+    }
+
+    def crossJoin(right: Relation) = new CrossJoin(left, right)
+  }
+
+  /**
+   * Temporary object for building join conditions.
+   *
+   * Syntax like `a innerJoin b` produces a `JoinConditionBuilder`
+   * containing an `on` method to complete the construction of the join.
+   */
   trait JoinConditionBuilder {
     def on(condition: Column[Boolean]): Relation
   }
@@ -49,8 +83,12 @@ trait JoinSyntax {
         RightJoin(left, right, condition)
     }
 
-    def outerJoin(right: Relation) =
-      OuterJoin(left, right)
+    def outerJoin(right: Relation) = new JoinConditionBuilder {
+      def on(condition: Column[Boolean]) =
+        OuterJoin(left, right, condition)
+    }
+
+    def crossJoin(right: Relation) = new CrossJoin(left, right)
   }
 }
 

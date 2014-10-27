@@ -14,15 +14,19 @@
  * limitations under the License.
  */
 
-package sqlest.sql
+package sqlest.ast
 
-import sqlest.ast._
+trait ScalarFunctions {
 
-trait H2StatementBuilder extends base.StatementBuilder {
-  override def groupSql(group: Group, relation: Relation): String = group match {
-    case group: FunctionGroup => throw new UnsupportedOperationException
-    case group => super.groupSql(group, relation)
+  def ScalarFunctionN[A, R: ColumnType](name: String) = new {
+    def apply(columns: Column[A]*) =
+      ScalarFunctionColumn[R](name, columns)
   }
-}
 
-object H2StatementBuilder extends H2StatementBuilder
+[#  def ScalarFunction1[[#A1#], R: ColumnType](name: String) = new {
+    def apply[[#B1#]]([#column1: Column[B1]#])(implicit [#column1Equivalence: ColumnTypeEquivalence[A1, B1]#]) =
+      ScalarFunctionColumn[R](name, Seq([#column1#]))
+  }#
+
+]
+}

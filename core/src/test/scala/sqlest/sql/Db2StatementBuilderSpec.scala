@@ -146,11 +146,11 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec
   "select table function" should "produce the right sql" in {
     sql {
       select(TableThree.col3, TableThree.col4, TestTableFunction.col5, TestTableFunction.col6)
-        .from(TableThree.outerJoin(TestTableFunction(TableThree.col3, "abc")))
+        .from(TableThree.crossJoin(TestTableFunction(TableThree.col3, "abc")))
     } should equal(
       s"""
        |select three.col3 as three_col3, three.col4 as three_col4, testTableFunction.col5 as testTableFunction_col5, testTableFunction.col6 as testTableFunction_col6
-       |from (three outer join table(testTableFunction(three.col3, cast(? as char))) as testTableFunction)
+       |from (three cross join table(testTableFunction(three.col3, cast(? as char))) as testTableFunction)
        """.formatSql,
       List("abc")
     )

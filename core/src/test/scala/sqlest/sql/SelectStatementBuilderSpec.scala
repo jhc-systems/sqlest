@@ -25,7 +25,7 @@ import sqlest.ast._
 trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
   "empty query" should "render ok" in {
     sql {
-      select(MyTable.col1, MyTable.col2)
+      select(MyTable.col1, MyTable.col2.?)
         .from(MyTable)
     } should equal(
       """select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2 from mytable""",
@@ -100,12 +100,12 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
   "select with aggregate function" should "produce the right sql" in {
     sql {
       select(count(MyTable.col1), min(TableOne.col2), count(distinct(TableOne.col1)))
-        .from(MyTable.outerJoin(TableOne))
+        .from(MyTable.crossJoin(TableOne))
         .where(MyTable.col1 === 123)
     } should equal(
       s"""
        |select count(mytable.col1) as count, min(one.col2) as min, count(distinct(one.col1)) as count
-       |from (mytable outer join one)
+       |from (mytable cross join one)
        |where (mytable.col1 = ?)
        """.formatSql,
       List(123)
@@ -241,6 +241,21 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
     )
   }
 
+  "scalar subquery" should "produce the right sql" in {
+    sql {
+      select(MyTable.col1, MyTable.col2)
+        .from(MyTable)
+        .where(MyTable.col1 === select(MyTable.col1).from(MyTable))
+    } should equal(
+      s"""
+       |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
+       |from mytable
+       |where (mytable.col1 = (select mytable.col1 as mytable_col1 from mytable))
+       """.formatSql,
+      Nil
+    )
+  }
+
   "subselect" should "produce the right sql" in {
     sql {
       select(MyTable.col1, MyTable.col2)
@@ -249,10 +264,51 @@ trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
             .from(MyTable).as("subselect"))
     } should equal(
       s"""
-       |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
+       |select mytable_col1 as mytable_col1, mytable_col2 as mytable_col2
        |from
        |  (select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
        |   from mytable) as subselect
+       """.formatSql,
+      Nil
+    )
+  }
+
+  "olap functions" should "produce the right sql" in {
+    sql {
+      select(rowNumber().over())
+        .from(MyTable)
+    } should equal(
+      s"""
+       |select (rownumber()  over()) as rownumber
+       |from mytable
+       """.formatSql,
+      Nil
+    )
+
+    sql {
+      select(rowNumber().over(partitionBy(MyTable.col1).orderBy(MyTable.col2)))
+        .from(MyTable)
+    } should equal(
+      s"""
+       |select (rownumber()  over(partition by mytable.col1 order by mytable.col2)) as rownumber
+       |from mytable
+       """.formatSql,
+      Nil
+    )
+
+    sql {
+      val rowNumberColumn = rowNumber().over(partitionBy(MyTable.col1).orderBy(MyTable.col2))
+      select(MyTable.col1)
+        .from(
+          MyTable
+            .innerJoin(select(rowNumberColumn).from(MyTable))
+            .on(rowNumberColumn === 1.constant))
+    } should equal(
+      s"""
+       |select mytable_col1 as mytable_col1
+       |from (mytable
+       | inner join (select (rownumber()  over(partition by mytable.col1 order by mytable.col2)) as rownumber from mytable)
+       |  on (rownumber = 1))
        """.formatSql,
       Nil
     )

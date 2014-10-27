@@ -21,39 +21,39 @@ import sqlest.ast._
 trait SelectStatementBuilder extends BaseStatementBuilder {
   def selectSql(select: Select[_]): String = {
     Seq(
-      selectWhatSql(select.columns),
+      selectWhatSql(select.columns, select.from),
       selectFromSql(select.from)
     ) ++ Seq(
-        selectWhereSql(select.where),
-        selectStartWithSql(select.startWith),
-        selectConnectBySql(select.connectBy),
-        selectGroupBySql(select.groupBy),
-        selectOrderBySql(select.orderBy),
+        selectWhereSql(select.where, select.from),
+        selectStartWithSql(select.startWith, select.from),
+        selectConnectBySql(select.connectBy, select.from),
+        selectGroupBySql(select.groupBy, select.from),
+        selectOrderBySql(select.orderBy, select.from),
         selectLimitSql(select.limit),
         selectOffsetSql(select.offset)
       ).flatten mkString ("", " ", "")
   }
 
-  def selectWhatSql(columns: Seq[Column[_]]): String =
-    s"select ${columnAliasListSql(columns)}"
+  def selectWhatSql(columns: Seq[Column[_]], relation: Relation): String =
+    s"select ${columnAliasListSql(columns, relation)}"
 
   def selectFromSql(from: Relation): String =
     s"from ${joinSql(from)}"
 
-  def selectWhereSql(where: Option[Column[Boolean]]): Option[String] =
-    where map (where => s"where ${columnSql(where)}")
+  def selectWhereSql(where: Option[Column[Boolean]], relation: Relation): Option[String] =
+    where map (where => s"where ${columnSql(where, relation)}")
 
-  def selectStartWithSql(startWith: Option[Column[Boolean]]): Option[String] =
-    startWith map (startWith => s"start with ${columnSql(startWith)}")
+  def selectStartWithSql(startWith: Option[Column[Boolean]], relation: Relation): Option[String] =
+    startWith map (startWith => s"start with ${columnSql(startWith, relation)}")
 
-  def selectConnectBySql(connectBy: Option[Column[Boolean]]): Option[String] =
-    connectBy map (connectBy => s"connect by ${columnSql(connectBy)}")
+  def selectConnectBySql(connectBy: Option[Column[Boolean]], relation: Relation): Option[String] =
+    connectBy map (connectBy => s"connect by ${columnSql(connectBy, relation)}")
 
-  def selectGroupBySql(group: Seq[Group]): Option[String] =
-    if (group.isEmpty) None else Some(s"group by ${groupListSql(group)}")
+  def selectGroupBySql(group: Seq[Group], relation: Relation): Option[String] =
+    if (group.isEmpty) None else Some(s"group by ${groupListSql(group, relation)}")
 
-  def selectOrderBySql(order: Seq[Order]): Option[String] =
-    if (order.isEmpty) None else Some(s"order by ${orderListSql(order)}")
+  def selectOrderBySql(order: Seq[Order], relation: Relation): Option[String] =
+    if (order.isEmpty) None else Some(s"order by ${orderListSql(order, relation)}")
 
   def selectLimitSql(limit: Option[Long]): Option[String] =
     limit map (limit => s"limit ${literalSql(limit)}")
@@ -64,11 +64,12 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
   def joinSql(relation: Relation): String = relation match {
     case table: Table if table.tableName == table.tableAlias => identifierSql(table.tableName)
     case table: Table if table.tableName != table.tableAlias => identifierSql(table.tableName) + " as " + identifierSql(table.tableAlias)
-    case tableFunction: TableFunction => functionSql(tableFunction.tableName, tableFunction.parameterColumns: _*) + " as " + identifierSql(tableFunction.tableAlias)
-    case LeftJoin(left, right, condition) => "(" + joinSql(left) + " left join " + joinSql(right) + " on " + columnSql(condition) + ")"
-    case RightJoin(left, right, condition) => "(" + joinSql(left) + " right join " + joinSql(right) + " on " + columnSql(condition) + ")"
-    case InnerJoin(left, right, condition) => "(" + joinSql(left) + " inner join " + joinSql(right) + " on " + columnSql(condition) + ")"
-    case OuterJoin(left, right) => "(" + joinSql(left) + " outer join " + joinSql(right) + ")"
+    case tableFunction: TableFunction => functionSql(tableFunction.tableName, tableFunction.parameterColumns, relation) + " as " + identifierSql(tableFunction.tableAlias)
+    case LeftJoin(left, right, condition) => "(" + joinSql(left) + " left join " + joinSql(right) + " on " + columnSql(condition, relation) + ")"
+    case RightJoin(left, right, condition) => "(" + joinSql(left) + " right join " + joinSql(right) + " on " + columnSql(condition, relation) + ")"
+    case InnerJoin(left, right, condition) => "(" + joinSql(left) + " inner join " + joinSql(right) + " on " + columnSql(condition, relation) + ")"
+    case OuterJoin(left, right, condition) => "(" + joinSql(left) + " full outer join " + joinSql(right) + " on " + columnSql(condition, relation) + ")"
+    case CrossJoin(left, right) => "(" + joinSql(left) + " cross join " + joinSql(right) + ")"
     case select: Select[_] => subselectSql(select)
   }
 
@@ -119,11 +120,12 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
 
   def joinArgs(relation: Relation): List[LiteralColumn[_]] = relation match {
     case table: Table => Nil
-    case TableFunction(_, _, parameterColumns, _) => parameterColumns.toList flatMap columnArgs
+    case TableFunction(_, _, parameterColumns) => parameterColumns.toList flatMap columnArgs
     case LeftJoin(left, right, condition) => joinArgs(left) ++ joinArgs(right) ++ columnArgs(condition)
     case RightJoin(left, right, condition) => joinArgs(left) ++ joinArgs(right) ++ columnArgs(condition)
     case InnerJoin(left, right, condition) => joinArgs(left) ++ joinArgs(right) ++ columnArgs(condition)
-    case OuterJoin(left, right) => joinArgs(left) ++ joinArgs(right)
+    case OuterJoin(left, right, condition) => joinArgs(left) ++ joinArgs(right) ++ columnArgs(condition)
+    case CrossJoin(left, right) => joinArgs(left) ++ joinArgs(right)
     case select: Select[_] => selectArgs(select)
   }
 }

@@ -102,24 +102,6 @@ trait InsertStatementBuilderSpec extends BaseStatementBuilderSpec {
     )
   }
 
-  "insert from select" should "produce the right sql" in {
-    sql {
-      insert
-        .into(TableOne)
-        .from(
-          select(TableOne.col1, TableOne.col2).from(TableOne).where(TableOne.col2 === "abc")
-        )
-    } should equal(
-      s"""
-       |insert
-       |into one
-       |(col1, col2)
-       |select one.col1 as one_col1, one.col2 as one_col2 from one where (one.col2 = ?)
-       """.formatSql,
-      List("abc")
-    )
-  }
-
   "insert columns from select" should "produce the right sql" in {
     sql {
       insert
