@@ -24,7 +24,6 @@ import sqlest.untyped._
 package object sqlest extends SqlestCore
   with QuerySyntax
   with ColumnSyntax
-  with ColumnOperations
   with JoinSyntax
   with OrderSyntax
   with ExtractorSyntax

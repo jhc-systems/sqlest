@@ -18,7 +18,7 @@ package sqlest.ast.operations
 
 import sqlest.ast._
 
-trait ColumnOperations {
+object ColumnOperations {
   implicit class SelectColumnsOps[A](select: Select[A]) {
     def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_] => Select[_]): Select[A] =
       Select(

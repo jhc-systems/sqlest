@@ -17,6 +17,7 @@
 package sqlest.sql.base
 
 import sqlest.ast._
+import sqlest.ast.operations.ColumnOperations._
 
 trait BaseStatementBuilder {
   def preprocess(operation: Operation): Operation =
