@@ -44,6 +44,9 @@ trait BaseStatementBuilder {
               .map { subselectColumn => ReferenceColumn(subselectColumn.columnAlias)(column.columnType) }
               .getOrElse(column)
         }, operation => aliasColumnsFromSubselects(operation).asInstanceOf[Select[_]])
+      case update: Update => update.mapColumns(identity, operation => aliasColumnsFromSubselects(operation).asInstanceOf[Select[_]])
+      case insert: Insert => insert.mapColumns(identity, operation => aliasColumnsFromSubselects(operation).asInstanceOf[Select[_]])
+      case delete: Delete => delete.mapColumns(identity, operation => aliasColumnsFromSubselects(operation).asInstanceOf[Select[_]])
       case _ => operation
     }
   }
@@ -101,7 +104,7 @@ trait BaseStatementBuilder {
     s"(${columnSql(parameter1)} $op ${columnSql(parameter2)})"
 
   def postfixSql(op: String, parameter: Column[_]): String =
-    s"(${columnSql(parameter)} $op)"
+    s"${columnSql(parameter)} $op"
 
   def doubleInfixSql(op1: String, op2: String, parameter1: Column[_], parameter2: Column[_], parameter3: Column[_]): String =
     s"(${columnSql(parameter1)} $op1 ${columnSql(parameter2)} $op2 ${columnSql(parameter3)})"

@@ -20,7 +20,7 @@ import sqlest.ast._
 
 trait ColumnOperations {
   implicit class SelectColumnsOps[A](select: Select[A]) {
-    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_] => Select[_] = identity): Select[A] =
+    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_] => Select[_]): Select[A] =
       Select(
         select.aliasedColumns.mapColumns(f, selectFunction, select.cols),
         select.from.mapColumns(f, selectFunction),
@@ -33,6 +33,27 @@ trait ColumnOperations {
         select.offset,
         select.subselectAlias
       )(select.aliasedColumns)
+  }
+
+  implicit class InsertColumnsOps(insert: Insert) {
+    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_] => Select[_]): Insert =
+      insert match {
+        case insertFromSelect: InsertFromSelect[a] =>
+          val newSelect = selectFunction(insertFromSelect.select).asInstanceOf[Select[a]]
+          InsertFromSelect[a](insertFromSelect.into, insertFromSelect.columns.map(_.mapColumns(f, selectFunction).asInstanceOf[TableColumn[_]]), newSelect)(newSelect.aliasedColumns)
+        case insertValues: InsertValues =>
+          InsertValues(insertValues.into, insertValues.setterLists.map(_.map(_.mapColumns(f, selectFunction))))
+      }
+  }
+
+  implicit class UpdateColumnsOps(update: Update) {
+    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_] => Select[_]): Update =
+      Update(update.table, update.set, update.where.map(_.mapColumns(f, selectFunction)))
+  }
+
+  implicit class DeleteColumnsOps(delete: Delete) {
+    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_] => Select[_]): Delete =
+      Delete(delete.from, delete.where.map(_.mapColumns(f, selectFunction)))
   }
 
   implicit class ColumnOps[A](column: Column[A]) {
@@ -69,11 +90,6 @@ trait ColumnOperations {
     }
   }
 
-  implicit class WhenOps[A](when: When[A]) {
-    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_] => Select[_]): When[A] =
-      when.copy(condition = when.condition.mapColumns(f, selectFunction), result = when.result.mapColumns(f, selectFunction))
-  }
-
   implicit class OrderOps(order: Order) {
     def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_] => Select[_]): Order =
       order.copy(column = order.column.mapColumns(f, selectFunction))
@@ -85,5 +101,15 @@ trait ColumnOperations {
       case TupleGroup(groups) => TupleGroup(groups.map(_.mapColumns(f, selectFunction)))
       case FunctionGroup(name, groups) => FunctionGroup(name, groups.map(_.mapColumns(f, selectFunction)))
     }
+  }
+
+  implicit class WhenOps[A](when: When[A]) {
+    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_] => Select[_]): When[A] =
+      when.copy(condition = when.condition.mapColumns(f, selectFunction), result = when.result.mapColumns(f, selectFunction))
+  }
+
+  implicit class SetterOps[A, B](setter: Setter[A, B]) {
+    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_] => Select[_]): Setter[A, B] =
+      setter.copy(setter.column.mapColumns(f, selectFunction).asInstanceOf[TableColumn[A]], setter.value.mapColumns(f, selectFunction))(setter.columnEquivalence)
   }
 }

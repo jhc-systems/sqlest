@@ -16,4 +16,4 @@
 
 package sqlest.ast
 
-case class Setter[A, B](column: TableColumn[A], value: Column[B])(implicit columnEquivalence: ColumnTypeEquivalence[A, B])
+case class Setter[A, B](column: TableColumn[A], value: Column[B])(implicit val columnEquivalence: ColumnTypeEquivalence[A, B])
