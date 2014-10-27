@@ -21,7 +21,9 @@ import org.scalatest.matchers._
 import sqlest._
 import sqlest.ast._
 
-trait UpdateStatementBuilderSpec extends BaseStatementBuilderSpec {
+class UpdateStatementBuilderSpec extends BaseStatementBuilderSpec {
+  implicit def statementBuilder = new base.StatementBuilder {}
+
   "update" should "produce the right sql" in {
     sql {
       update(TableOne)

@@ -18,7 +18,6 @@ package sqlest.ast.operations
 
 import org.scalatest._
 import org.scalatest.matchers._
-import scala.language.reflectiveCalls
 import sqlest._
 import sqlest.ast.operations.ColumnOperations._
 

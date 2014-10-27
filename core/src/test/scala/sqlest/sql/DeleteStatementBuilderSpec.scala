@@ -21,7 +21,9 @@ import org.scalatest.matchers._
 import sqlest._
 import sqlest.ast._
 
-trait DeleteStatementBuilderSpec extends BaseStatementBuilderSpec {
+class DeleteStatementBuilderSpec extends BaseStatementBuilderSpec {
+  implicit def statementBuilder = new base.StatementBuilder {}
+
   "delete" should "produce the right sql" in {
     sql {
       delete

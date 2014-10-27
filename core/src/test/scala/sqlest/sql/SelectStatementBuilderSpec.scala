@@ -18,11 +18,12 @@ package sqlest.sql
 
 import org.scalatest._
 import org.scalatest.matchers._
-import scala.language.reflectiveCalls
 import sqlest._
 import sqlest.ast._
 
-trait SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
+class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
+  implicit def statementBuilder = new base.StatementBuilder {}
+
   "empty query" should "render ok" in {
     sql {
       select(MyTable.col1, MyTable.col2.?)

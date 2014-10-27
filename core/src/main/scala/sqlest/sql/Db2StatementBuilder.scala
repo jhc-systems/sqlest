@@ -17,8 +17,47 @@
 package sqlest.sql
 
 import sqlest.ast._
+import sqlest.ast.operations.ColumnOperations._
 
 trait DB2StatementBuilder extends base.StatementBuilder {
+  override def preprocess(operation: Operation): Operation =
+    addTypingToSqlParams(super.preprocess(operation))
+
+  def addTypingToSqlParams(operation: Operation): Operation = operation match {
+    case select: Select[_] => select.mapColumns(addTypingToSqlFunctions, select => addTypingToSqlParams(select).asInstanceOf[Select[_]])
+    case update: Update => update.mapColumns(addTypingToSqlFunctions, select => addTypingToSqlParams(select).asInstanceOf[Select[_]])
+    case insert: Insert => insert.mapColumns(addTypingToSqlFunctions, select => addTypingToSqlParams(select).asInstanceOf[Select[_]])
+    case delete: Delete => delete.mapColumns(addTypingToSqlFunctions, select => addTypingToSqlParams(select).asInstanceOf[Select[_]])
+    case _ => operation
+  }
+
+  def addTypingToSqlFunctions(column: Column[_]): Column[_] = column match {
+    case scalarFunctionColumn: ScalarFunctionColumn[_] =>
+      ScalarFunctionColumn(
+        scalarFunctionColumn.name,
+        scalarFunctionColumn.parameters.map { parameterColumn =>
+          parameterColumn match {
+            case literalColumn: LiteralColumn[_] => ScalarFunctionColumn("cast", Seq(PostfixFunctionColumn("as " + castLiteralSql(parameterColumn.columnType), literalColumn)(literalColumn.columnType)))(literalColumn.columnType)
+            case _ => parameterColumn
+          }
+        }
+      )(scalarFunctionColumn.columnType)
+    case _ => column
+  }
+
+  def castLiteralSql(columnType: ColumnType[_]): String =
+    columnType match {
+      case StringColumnType => "varchar"
+      case BigDecimalColumnType => "decimal"
+      case BooleanColumnType => throw new AssertionError("DB2 does not support Boolean data types")
+      case DateTimeColumnType => "timestamp"
+      case DoubleColumnType => "double"
+      case IntColumnType => "integer"
+      case LongColumnType => "bigint"
+      case OptionColumnType(baseType) => castLiteralSql(baseType)
+      case mapped: MappedColumnType[_, _] => castLiteralSql(mapped.baseType)
+    }
+
   override def selectSql(select: Select[_]): String = {
     val offset = select.offset getOrElse 0L
     if (offset > 0L) {

@@ -18,12 +18,20 @@ package sqlest.ast
 
 trait ScalarFunctions {
 
-  def ScalarFunctionN[A, R: ColumnType](name: String) = new {
+  abstract class ScalarFunctionColumnN[A, R: ColumnType] {
+    def apply(columns: Column[A]*): ScalarFunctionColumn[R]
+  }
+
+  def ScalarFunctionN[A, R: ColumnType](name: String) = new ScalarFunctionColumnN[A, R] {
     def apply(columns: Column[A]*) =
       ScalarFunctionColumn[R](name, columns)
   }
 
-[#  def ScalarFunction1[[#A1#], R: ColumnType](name: String) = new {
+[#  abstract class ScalarFunctionColumn1[[#A1#], R: ColumnType] {
+    def apply[[#B1#]]([#column1: Column[B1]#])(implicit [#column1Equivalence: ColumnTypeEquivalence[A1, B1]#]): ScalarFunctionColumn[R]
+  }
+
+  def ScalarFunction1[[#A1#], R: ColumnType](name: String) = new ScalarFunctionColumn1[[#A1#], R] {
     def apply[[#B1#]]([#column1: Column[B1]#])(implicit [#column1Equivalence: ColumnTypeEquivalence[A1, B1]#]) =
       ScalarFunctionColumn[R](name, Seq([#column1#]))
   }#

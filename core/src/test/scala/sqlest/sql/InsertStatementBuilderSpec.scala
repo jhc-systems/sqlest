@@ -21,7 +21,9 @@ import org.scalatest.matchers._
 import sqlest._
 import sqlest.ast._
 
-trait InsertStatementBuilderSpec extends BaseStatementBuilderSpec {
+class InsertStatementBuilderSpec extends BaseStatementBuilderSpec {
+  implicit def statementBuilder = new base.StatementBuilder {}
+
   "insert" should "produce the right sql" in {
     sql {
       insert

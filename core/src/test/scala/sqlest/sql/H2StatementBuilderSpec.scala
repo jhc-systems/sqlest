@@ -21,11 +21,7 @@ import org.scalatest.matchers._
 import sqlest._
 import sqlest.ast._
 
-class H2StatementBuilderSpec extends BaseStatementBuilderSpec
-    with SelectStatementBuilderSpec
-    with InsertStatementBuilderSpec
-    with UpdateStatementBuilderSpec
-    with DeleteStatementBuilderSpec {
+class H2StatementBuilderSpec extends BaseStatementBuilderSpec {
   val statementBuilder = H2StatementBuilder
 
   "where between" should "produce the right sql" in {

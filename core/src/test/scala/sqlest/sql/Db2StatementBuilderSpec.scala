@@ -21,11 +21,7 @@ import org.scalatest.matchers._
 import sqlest._
 import sqlest.ast._
 
-class DB2StatementBuilderSpec extends BaseStatementBuilderSpec
-    with SelectStatementBuilderSpec
-    with InsertStatementBuilderSpec
-    with UpdateStatementBuilderSpec
-    with DeleteStatementBuilderSpec {
+class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
   val statementBuilder = DB2StatementBuilder
 
   // DB2-specific tests:
@@ -118,7 +114,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec
     } should equal(
       s"""
        |with subquery as
-       |(select 1 as a, sum(?) as b, (3 + ?) as c, row_number() over (order by ?, ? desc) as rownum
+       |(select 1 as a, sum(cast(? as integer)) as b, (3 + ?) as c, row_number() over (order by ?, ? desc) as rownum
          |from (one inner join two on ((? = ?) and (? <> ?)))
          |where ((? = ?) and (? <> ?)))
        |select a, b, c
@@ -207,6 +203,19 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec
        |group by grouping sets(mytable.col1, ())
        """.formatSql,
       List(123)
+    )
+  }
+
+  "select scalar function" should "produce the right sql" in {
+    sql {
+      select(TableThree.col3, TableThree.col4, testFunction(TableThree.col3, "abc").as("testFunction"))
+        .from(TableThree)
+    } should equal(
+      s"""
+       |select three.col3 as three_col3, three.col4 as three_col4, testFunction(three.col3, cast(? as varchar)) as testFunction
+       |from three
+       """.formatSql,
+      List("abc")
     )
   }
 }

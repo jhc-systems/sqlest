@@ -18,7 +18,6 @@ package sqlest.ast
 
 import org.scalatest._
 import org.scalatest.matchers._
-import scala.language.reflectiveCalls
 import sqlest._
 
 class ColumnSpec extends FlatSpec with Matchers {
