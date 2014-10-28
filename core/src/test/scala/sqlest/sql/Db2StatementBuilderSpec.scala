@@ -212,7 +212,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
         .from(TableThree)
     } should equal(
       s"""
-       |select three.col3 as three_col3, three.col4 as three_col4, testFunction(three.col3, cast(? as varchar)) as testFunction
+       |select three.col3 as three_col3, three.col4 as three_col4, testFunction(three.col3, cast(? as char)) as testFunction
        |from three
        """.formatSql,
       List("abc")
