@@ -47,7 +47,7 @@ trait DB2StatementBuilder extends base.StatementBuilder {
 
   def castLiteralSql(columnType: ColumnType[_]): String =
     columnType match {
-      case StringColumnType => "varchar"
+      case StringColumnType => "char"
       case BigDecimalColumnType => "decimal"
       case BooleanColumnType => throw new AssertionError("DB2 does not support Boolean data types")
       case DateTimeColumnType => "timestamp"
