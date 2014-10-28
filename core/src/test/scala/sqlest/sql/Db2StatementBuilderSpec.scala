@@ -132,7 +132,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
     } should equal(
       s"""
        |select three.col3 as three_col3, three.col4 as three_col4, testTableFunction.col5 as testTableFunction_col5, testTableFunction.col6 as testTableFunction_col6
-       |from (three cross join table(testTableFunction(three.col3, cast(? as char))) as testTableFunction)
+       |from (three cross join table(testTableFunction(three.col3, cast(? as varchar(256)))) as testTableFunction)
        """.formatSql,
       List("abc")
     )
@@ -212,7 +212,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
         .from(TableThree)
     } should equal(
       s"""
-       |select three.col3 as three_col3, three.col4 as three_col4, testFunction(three.col3, cast(? as char)) as testFunction
+       |select three.col3 as three_col3, three.col4 as three_col4, testFunction(three.col3, cast(? as varchar(256))) as testFunction
        |from three
        """.formatSql,
       List("abc")
