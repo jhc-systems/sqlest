@@ -32,16 +32,12 @@ trait DB2StatementBuilder extends base.StatementBuilder {
   }
 
   def addTypingToSqlFunctions(column: Column[_]): Column[_] = column match {
-    case scalarFunctionColumn: ScalarFunctionColumn[_] =>
-      ScalarFunctionColumn(
-        scalarFunctionColumn.name,
-        scalarFunctionColumn.parameters.map { parameterColumn =>
-          parameterColumn match {
-            case literalColumn: LiteralColumn[_] => ScalarFunctionColumn("cast", Seq(PostfixFunctionColumn("as " + castLiteralSql(parameterColumn.columnType), literalColumn)(literalColumn.columnType)))(literalColumn.columnType)
-            case _ => parameterColumn
-          }
-        }
-      )(scalarFunctionColumn.columnType)
+    case scalarFunctionColumn: ScalarFunctionColumn[_] => ScalarFunctionColumn(scalarFunctionColumn.name, scalarFunctionColumn.parameters.map(addTypingToSqlColumn))(scalarFunctionColumn.columnType)
+    case _ => column
+  }
+
+  def addTypingToSqlColumn(column: Column[_]): Column[_] = column match {
+    case literalColumn: LiteralColumn[_] => ScalarFunctionColumn("cast", Seq(PostfixFunctionColumn("as " + castLiteralSql(column.columnType), literalColumn)(literalColumn.columnType)))(literalColumn.columnType)
     case _ => column
   }
 
@@ -74,7 +70,7 @@ trait DB2StatementBuilder extends base.StatementBuilder {
     None
 
   override def joinSql(relation: Relation): String = relation match {
-    case tableFunction: TableFunction => "table(" + functionSql(tableFunction.tableName, tableFunction.parameterColumns) + ") as " + identifierSql(tableFunction.tableAlias)
+    case tableFunction: TableFunction => "table(" + functionSql(tableFunction.tableName, tableFunction.parameterColumns.map(addTypingToSqlColumn)) + ") as " + identifierSql(tableFunction.tableAlias)
     case _ => super.joinSql(relation)
   }
 
