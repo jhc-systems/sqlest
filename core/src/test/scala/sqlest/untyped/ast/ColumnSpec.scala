@@ -20,7 +20,6 @@ import org.joda.time._
 import org.scalatest._
 import org.scalatest.matchers._
 import sqlest._
-import sqlest.ast._
 
 class ColumnSpec extends FlatSpec with Matchers {
 
