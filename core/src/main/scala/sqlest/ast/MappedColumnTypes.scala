@@ -29,6 +29,7 @@ trait MappedColumnTypes
 
   // Reprovide the MappedColumnType type to custom Sqlest builds that use this trait:
   type MappedColumnType[ValueType, DatabaseType] = sqlest.ast.MappedColumnType[ValueType, DatabaseType]
+  val MappedColumnType = sqlest.ast.MappedColumnType
 }
 
 trait StringMappedColumnTypes {
