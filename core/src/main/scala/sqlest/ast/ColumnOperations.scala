@@ -28,6 +28,7 @@ object ColumnOperations {
         select.startWith.map(_.mapColumns(f, selectFunction)),
         select.connectBy.map(_.mapColumns(f, selectFunction)),
         select.groupBy.map(_.mapColumns(f, selectFunction)),
+        select.having.map(_.mapColumns(f, selectFunction)),
         select.orderBy.map(_.mapColumns(f, selectFunction)),
         select.limit,
         select.offset,

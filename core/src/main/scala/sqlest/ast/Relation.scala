@@ -94,6 +94,7 @@ case class Select[A](
     startWith: Option[Column[Boolean]] = None,
     connectBy: Option[Column[Boolean]] = None,
     groupBy: List[Group] = Nil,
+    having: Option[Column[Boolean]] = None,
     orderBy: List[Order] = Nil,
     limit: Option[Long] = None,
     offset: Option[Long] = None,
@@ -115,6 +116,9 @@ case class Select[A](
 
   def groupBy(groupBys: Group*): Select[A] =
     this.copy(groupBy = this.groupBy ++ groupBys)
+
+  def having(expr: Column[Boolean]): Select[A] =
+    this.copy(having = this.having map (_ && expr) orElse Some(expr))
 
   def orderBy(orders: Order*): Select[A] =
     this.copy(orderBy = this.orderBy ++ orders)

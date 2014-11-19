@@ -28,6 +28,7 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
         selectStartWithSql(select.startWith),
         selectConnectBySql(select.connectBy),
         selectGroupBySql(select.groupBy),
+        selectHavingSql(select.having),
         selectOrderBySql(select.orderBy),
         selectLimitSql(select.limit),
         selectOffsetSql(select.offset)
@@ -51,6 +52,9 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
 
   def selectGroupBySql(group: Seq[Group]): Option[String] =
     if (group.isEmpty) None else Some(s"group by ${groupListSql(group)}")
+
+  def selectHavingSql(having: Option[Column[Boolean]]): Option[String] =
+    having map (having => s"having ${columnSql(having)}")
 
   def selectOrderBySql(order: Seq[Order]): Option[String] =
     if (order.isEmpty) None else Some(s"order by ${orderListSql(order)}")

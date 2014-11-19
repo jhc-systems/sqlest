@@ -225,6 +225,23 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
     )
   }
 
+  "select having" should "produce the right sql" in {
+    sql {
+      select(count())
+        .from(MyTable)
+        .groupBy(MyTable.col2)
+        .having(sum(MyTable.col1) >= 5.constant)
+    } should equal(
+      s"""
+       |select count('*') as count
+       |from mytable
+       |group by mytable.col2
+       |having (sum(mytable.col1) >= 5)
+       """.formatSql,
+      List()
+    )
+  }
+
   "select scalar function" should "produce the right sql" in {
     sql {
       select(TableThree.col3, TableThree.col4, testFunction(TableThree.col3, "abc").as("testFunction"))
