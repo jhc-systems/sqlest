@@ -30,7 +30,7 @@ trait JoinSyntax {
     def on(condition: Column[Boolean]): Select[C]
   }
 
-  implicit class SelectCompositionOps[C](left: Select[C]) {
+  implicit class SelectJoinOps[C](left: Select[C]) {
     def innerJoin(right: Relation) = new SelectJoinConditionBuilder[C] {
       def on(condition: Column[Boolean]) =
         left.from(left.from.innerJoin(right).on(condition))
@@ -51,7 +51,7 @@ trait JoinSyntax {
         left.from(left.from.outerJoin(right).on(condition))
     }
 
-    def crossJoin(right: Relation) = new CrossJoin(left, right)
+    def crossJoin(right: Relation) = left.from(left.from.crossJoin(right))
   }
 
   /**
