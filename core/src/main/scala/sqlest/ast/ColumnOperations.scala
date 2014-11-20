@@ -32,6 +32,7 @@ object ColumnOperations {
         select.orderBy.map(_.mapColumns(f, selectFunction)),
         select.limit,
         select.offset,
+        select.union.map(_.mapColumns(f, selectFunction)),
         select.subselectAlias
       )(select.aliasedColumns)
   }
@@ -102,6 +103,11 @@ object ColumnOperations {
       case TupleGroup(groups) => TupleGroup(groups.map(_.mapColumns(f, selectFunction)))
       case FunctionGroup(name, groups) => FunctionGroup(name, groups.map(_.mapColumns(f, selectFunction)))
     }
+  }
+
+  implicit class UnionOps[A](union: Union[A]) {
+    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_] => Select[_]): Union[A] =
+      union.copy(select = union.select.mapColumns(f, selectFunction))
   }
 
   implicit class WhenOps[A](when: When[A]) {

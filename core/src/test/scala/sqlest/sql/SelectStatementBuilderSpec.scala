@@ -287,6 +287,44 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
     )
   }
 
+  "union" should "produce the right sql" in {
+    sql {
+      select(TableOne.col1, TableOne.col2)
+        .from(TableOne)
+        .union(
+          select(TableTwo.col2, TableTwo.col3)
+            .from(TableTwo))
+    } should equal(
+      s"""
+       |select one.col1 as one_col1, one.col2 as one_col2
+       |from one
+       |union
+       |select two.col2 as two_col2, two.col3 as two_col3
+       |from two
+       """.formatSql,
+      Nil
+    )
+  }
+
+  "unionAll" should "produce the right sql" in {
+    sql {
+      select(TableOne.col1, TableOne.col2)
+        .from(TableOne)
+        .unionAll(
+          select(TableTwo.col2, TableTwo.col3)
+            .from(TableTwo))
+    } should equal(
+      s"""
+       |select one.col1 as one_col1, one.col2 as one_col2
+       |from one
+       |union all
+       |select two.col2 as two_col2, two.col3 as two_col3
+       |from two
+       """.formatSql,
+      Nil
+    )
+  }
+
   "subselect" should "produce the right sql" in {
     sql {
       select(MyTable.col1, MyTable.col2)

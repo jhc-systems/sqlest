@@ -16,8 +16,6 @@
 
 package sqlest.ast
 
-import scala.collection.mutable
-
 /**
  * A source of columns from the database.
  * Tables, joins, and select statements are all types of relation.
@@ -98,7 +96,11 @@ case class Select[A](
     orderBy: List[Order] = Nil,
     limit: Option[Long] = None,
     offset: Option[Long] = None,
+    union: List[Union[_]] = Nil,
     subselectAlias: Option[String] = None)(implicit val aliasedColumns: AliasedColumns[A]) extends Relation with Query {
+
+  if (union.headOption.map(union => union.select.columns.size != columns.size).getOrElse(false))
+    throw new AssertionError("Number of columns in unioned selects does not match. Maybe your extractor has different columns from your query")
 
   def columns = aliasedColumns.columnList(cols)
 
@@ -131,6 +133,12 @@ case class Select[A](
 
   def page(number: Long, size: Long): Select[A] =
     this.copy(limit = Some(size), offset = Some(number * size))
+
+  def union(select: Select[A]): Select[A] =
+    this.copy(union = this.union ++ List(Union(select, false)))
+
+  def unionAll(select: Select[A]): Select[A] =
+    this.copy(union = this.union ++ List(Union(select, true)))
 
   def as(subselectAlias: String): Select[A] =
     this.copy(subselectAlias = Some(subselectAlias))

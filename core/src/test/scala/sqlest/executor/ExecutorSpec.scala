@@ -78,6 +78,26 @@ class ExecutorSpec extends FlatSpec with Matchers {
     ))
   }
 
+  "a unioned select statement" should "be executable with an extractor with same number of columns to the select" in {
+    val actualExtracted = select(TableOne.col1, TableOne.col2).from(TableOne)
+      .union(select(TableOne.col1, TableOne.col2).from(TableOne))
+      .extractAll(extractor)
+
+    actualExtracted should equal(Seq(
+      One(1, "a"),
+      One(3, "c"),
+      One(-1, "e")
+    ))
+  }
+
+  it should "not be executable with an extractor with a different number of columns to the select" in {
+    intercept[AssertionError] {
+      select(TableOne.col1).from(TableOne)
+        .union(select(TableOne.col1).from(TableOne))
+        .extractAll(extractor)
+    }
+  }
+
   "an update" should "require a transaction to run" in {
     // Ensure the same database is used throughout this test
     implicit val testDatabase = TestDatabase(testResultSet)

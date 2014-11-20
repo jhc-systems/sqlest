@@ -213,10 +213,4 @@ trait BaseStatementBuilder {
   }
 
   def selectArgs(select: Select[_]): List[LiteralColumn[_]]
-
-  def orderListArgs(order: Seq[Order]): List[LiteralColumn[_]] =
-    order.toList flatMap orderArgs
-
-  def orderArgs(order: Order): List[LiteralColumn[_]] =
-    columnArgs(order.column)
 }

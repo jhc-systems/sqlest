@@ -31,8 +31,9 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
         selectHavingSql(select.having),
         selectOrderBySql(select.orderBy),
         selectLimitSql(select.limit),
-        selectOffsetSql(select.offset)
-      ).flatten mkString ("", " ", "")
+        selectOffsetSql(select.offset),
+        selectUnionSql(select.union)
+      ).flatten mkString (" ")
   }
 
   def selectWhatSql(columns: Seq[Column[_]]): String =
@@ -65,6 +66,15 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
   def selectOffsetSql(offset: Option[Long]): Option[String] =
     offset map (offset => s"offset ${literalSql(offset)}")
 
+  def selectUnionSql(union: Seq[Union[_]]): Option[String] =
+    if (union.isEmpty) None else
+      Some(union.map {
+        _ match {
+          case Union(select, false) => s"union ${selectSql(select)}"
+          case Union(select, true) => s"union all ${selectSql(select)}"
+        }
+      }.mkString(" "))
+
   def joinSql(relation: Relation): String = relation match {
     case table: Table if table.tableName == table.tableAlias => identifierSql(table.tableName)
     case table: Table if table.tableName != table.tableAlias => identifierSql(table.tableName) + " as " + identifierSql(table.tableAlias)
@@ -93,9 +103,12 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
       selectWhereArgs(select.where) ++
       selectStartWithArgs(select.startWith) ++
       selectConnectByArgs(select.connectBy) ++
+      selectGroupByArgs(select.groupBy) ++
+      selectHavingArgs(select.having) ++
       selectOrderByArgs(select.orderBy) ++
       selectLimitArgs(select.limit) ++
-      selectOffsetArgs(select.offset)
+      selectOffsetArgs(select.offset) ++
+      selectUnionArgs(select.union)
   }
 
   def selectWhatArgs(columns: Seq[Column[_]]): List[LiteralColumn[_]] =
@@ -113,14 +126,29 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
   def selectConnectByArgs(connectBy: Option[Column[Boolean]]): List[LiteralColumn[_]] =
     connectBy map columnArgs getOrElse Nil
 
+  def selectGroupByArgs(group: Seq[Group]): List[LiteralColumn[_]] =
+    group.toList flatMap {
+      _ match {
+        case ColumnGroup(column) => columnArgs(column)
+        case TupleGroup(groups) => selectGroupByArgs(groups)
+        case FunctionGroup(_, groups) => selectGroupByArgs(groups)
+      }
+    }
+
+  def selectHavingArgs(having: Option[Column[Boolean]]): List[LiteralColumn[_]] =
+    having map columnArgs getOrElse Nil
+
   def selectOrderByArgs(order: Seq[Order]): List[LiteralColumn[_]] =
-    order.toList flatMap orderArgs
+    order.toList.map(_.column) flatMap columnArgs
 
   def selectLimitArgs(limit: Option[Long]): List[LiteralColumn[_]] =
     limit.map(LiteralColumn[Long](_)).toList
 
   def selectOffsetArgs(offset: Option[Long]): List[LiteralColumn[_]] =
     offset.map(LiteralColumn[Long](_)).toList
+
+  def selectUnionArgs(union: Seq[Union[_]]): List[LiteralColumn[_]] =
+    union.toList.map(_.select) flatMap selectArgs
 
   def joinArgs(relation: Relation): List[LiteralColumn[_]] = relation match {
     case table: Table => Nil
