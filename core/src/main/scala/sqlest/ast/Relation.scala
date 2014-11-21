@@ -55,39 +55,42 @@ abstract class Table(val tableName: String, val aliasedAs: Option[String] = None
  * Instead it will be returned as a result of applying a TableFunctionN (where N is a number)
  * to a set of columns. See TableFunctions for the implementations of TableFunctionN
  */
-case class TableFunction(
-    tableName: String,
-    aliasedAs: Option[String],
-    parameterColumns: Seq[Column[_]]) extends Relation {
+// case class TableFunction(
+//     tableName: String,
+//     aliasedAs: Option[String],
+//     parameterColumns: Seq[Column[_]]) extends Relation {
 
-  def tableAlias = aliasedAs getOrElse tableName
+//   def tableAlias = aliasedAs getOrElse tableName
+// }
+trait BaseTableFunction extends Relation with BaseTable {
+  def parameterColumns: Seq[Column[_]]
 }
 
 /** A join over two relations. */
-sealed trait Join extends Relation {
-  def left: Relation
-  def right: Relation
+sealed trait Join[R1 <: Relation, R2 <: Relation] extends Relation {
+  def left: R1
+  def right: R2
 }
 
 /** A left join between two tables. */
-case class LeftJoin(left: Relation, right: Relation, condition: Column[Boolean]) extends Join
+case class LeftJoin[R1 <: Relation, R2 <: Relation](left: R1, right: R2, condition: Column[Boolean]) extends Join[R1, R2]
 
 /** A right join between two tables. */
-case class RightJoin(left: Relation, right: Relation, condition: Column[Boolean]) extends Join
+case class RightJoin[R1 <: Relation, R2 <: Relation](left: R1, right: R2, condition: Column[Boolean]) extends Join[R1, R2]
 
 /** An inner join between two tables. */
-case class InnerJoin(left: Relation, right: Relation, condition: Column[Boolean]) extends Join
+case class InnerJoin[R1 <: Relation, R2 <: Relation](left: R1, right: R2, condition: Column[Boolean]) extends Join[R1, R2]
 
 /** An outer join between two tables. */
-case class OuterJoin(left: Relation, right: Relation, condition: Column[Boolean]) extends Join
+case class OuterJoin[R1 <: Relation, R2 <: Relation](left: R1, right: R2, condition: Column[Boolean]) extends Join[R1, R2]
 
 /** An outer join between two tables. */
-case class CrossJoin(left: Relation, right: Relation) extends Join
+case class CrossJoin[R1 <: Relation, R2 <: Relation](left: R1, right: R2) extends Join[R1, R2]
 
 /** A select statement or subselect. */
-case class Select[A](
+case class Select[A, R <: Relation](
     cols: A,
-    from: Relation,
+    from: R,
     where: Option[Column[Boolean]] = None,
     startWith: Option[Column[Boolean]] = None,
     connectBy: Option[Column[Boolean]] = None,
@@ -104,42 +107,42 @@ case class Select[A](
 
   def columns = aliasedColumns.columnList(cols)
 
-  def from(relation: Relation): Select[A] =
+  def from[R2 <: Relation](relation: R2): Select[A, R2] =
     this.copy(from = relation)
 
-  def where(expr: Column[Boolean]): Select[A] =
+  def where(expr: Column[Boolean]): Select[A, R] =
     this.copy(where = this.where map (_ && expr) orElse Some(expr))
 
-  def startWith(expr: Column[Boolean]): Select[A] =
+  def startWith(expr: Column[Boolean]): Select[A, R] =
     this.copy(startWith = this.startWith map (_ && expr) orElse Some(expr))
 
-  def connectBy(expr: Column[Boolean]): Select[A] =
+  def connectBy(expr: Column[Boolean]): Select[A, R] =
     this.copy(connectBy = this.connectBy map (_ && expr) orElse Some(expr))
 
-  def groupBy(groupBys: Group*): Select[A] =
+  def groupBy(groupBys: Group*): Select[A, R] =
     this.copy(groupBy = this.groupBy ++ groupBys)
 
-  def having(expr: Column[Boolean]): Select[A] =
+  def having(expr: Column[Boolean]): Select[A, R] =
     this.copy(having = this.having map (_ && expr) orElse Some(expr))
 
-  def orderBy(orders: Order*): Select[A] =
+  def orderBy(orders: Order*): Select[A, R] =
     this.copy(orderBy = this.orderBy ++ orders)
 
-  def limit(limit: Long): Select[A] =
+  def limit(limit: Long): Select[A, R] =
     this.copy(limit = Some(limit))
 
-  def offset(offset: Long): Select[A] =
+  def offset(offset: Long): Select[A, R] =
     this.copy(offset = Some(offset))
 
-  def page(number: Long, size: Long): Select[A] =
+  def page(number: Long, size: Long): Select[A, R] =
     this.copy(limit = Some(size), offset = Some(number * size))
 
-  def union(select: Select[A]): Select[A] =
+  def union(select: Select[A, _ <: Relation]): Select[A, R] =
     this.copy(union = this.union ++ List(Union(select, false)))
 
-  def unionAll(select: Select[A]): Select[A] =
+  def unionAll(select: Select[A, _ <: Relation]): Select[A, R] =
     this.copy(union = this.union ++ List(Union(select, true)))
 
-  def as(subselectAlias: String): Select[A] =
+  def as(subselectAlias: String): Select[A, R] =
     this.copy(subselectAlias = Some(subselectAlias))
 }

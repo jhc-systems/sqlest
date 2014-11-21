@@ -37,4 +37,4 @@ case class InsertValues(into: Table, setterLists: Seq[Seq[Setter[_, _]]]) extend
 }
 
 // TODO - Constrain columns to be related type to select
-case class InsertFromSelect[A: AliasedColumns](into: Table, columns: Seq[TableColumn[_]], select: Select[A]) extends Insert
+case class InsertFromSelect[A: AliasedColumns](into: Table, columns: Seq[TableColumn[_]], select: Select[A, _ <: Relation]) extends Insert

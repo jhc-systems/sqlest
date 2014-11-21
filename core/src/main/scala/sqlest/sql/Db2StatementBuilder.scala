@@ -24,10 +24,10 @@ trait DB2StatementBuilder extends base.StatementBuilder {
     addTypingToSqlParams(super.preprocess(operation))
 
   def addTypingToSqlParams(operation: Operation): Operation = operation match {
-    case select: Select[_] => select.mapColumns(addTypingToSqlFunctions, select => addTypingToSqlParams(select).asInstanceOf[Select[_]])
-    case update: Update => update.mapColumns(addTypingToSqlFunctions, select => addTypingToSqlParams(select).asInstanceOf[Select[_]])
-    case insert: Insert => insert.mapColumns(addTypingToSqlFunctions, select => addTypingToSqlParams(select).asInstanceOf[Select[_]])
-    case delete: Delete => delete.mapColumns(addTypingToSqlFunctions, select => addTypingToSqlParams(select).asInstanceOf[Select[_]])
+    case select: Select[_, _] => select.mapColumns(addTypingToSqlFunctions, select => addTypingToSqlParams(select).asInstanceOf[Select[_, _]])
+    case update: Update => update.mapColumns(addTypingToSqlFunctions, select => addTypingToSqlParams(select).asInstanceOf[Select[_, _]])
+    case insert: Insert => insert.mapColumns(addTypingToSqlFunctions, select => addTypingToSqlParams(select).asInstanceOf[Select[_, _]])
+    case delete: Delete => delete.mapColumns(addTypingToSqlFunctions, select => addTypingToSqlParams(select).asInstanceOf[Select[_, _]])
     case _ => operation
   }
 
@@ -54,7 +54,7 @@ trait DB2StatementBuilder extends base.StatementBuilder {
       case mapped: MappedColumnType[_, _] => castLiteralSql(mapped.baseType)
     }
 
-  override def selectSql(select: Select[_]): String = {
+  override def selectSql(select: Select[_, _ <: Relation]): String = {
     val offset = select.offset getOrElse 0L
     if (offset > 0L) {
       rowNumberSelectSql(select, offset, select.limit)
@@ -70,11 +70,11 @@ trait DB2StatementBuilder extends base.StatementBuilder {
     None
 
   override def joinSql(relation: Relation): String = relation match {
-    case tableFunction: TableFunction => "table(" + functionSql(tableFunction.tableName, tableFunction.parameterColumns.map(addTypingToSqlColumn)) + ") as " + identifierSql(tableFunction.tableAlias)
+    case tableFunction: BaseTableFunction => "table(" + functionSql(tableFunction.tableName, tableFunction.parameterColumns.map(addTypingToSqlColumn)) + ") as " + identifierSql(tableFunction.tableAlias)
     case _ => super.joinSql(relation)
   }
 
-  def rowNumberSelectSql(select: Select[_], offset: Long, limit: Option[Long]): String = {
+  def rowNumberSelectSql(select: Select[_, _ <: Relation], offset: Long, limit: Option[Long]): String = {
     val subquery = Seq(
       s"${selectWhatSql(select.columns)}, row_number() over (${selectOrderBySql(select.orderBy) getOrElse ""}) as rownum",
       selectFromSql(select.from)
@@ -93,7 +93,7 @@ trait DB2StatementBuilder extends base.StatementBuilder {
     s"with subquery as ($subquery) select $what from subquery where $bounds"
   }
 
-  override def selectArgs(select: Select[_]): List[LiteralColumn[_]] = {
+  override def selectArgs(select: Select[_, _ <: Relation]): List[LiteralColumn[_]] = {
     val offset = select.offset getOrElse 0L
     if (offset > 0L) {
       rowNumberSelectArgs(select, offset, select.limit)
@@ -108,7 +108,7 @@ trait DB2StatementBuilder extends base.StatementBuilder {
   override def selectOffsetArgs(limit: Option[Long]): List[LiteralColumn[_]] =
     Nil
 
-  def rowNumberSelectArgs(select: Select[_], offset: Long, limit: Option[Long]): List[LiteralColumn[_]] = {
+  def rowNumberSelectArgs(select: Select[_, _ <: Relation], offset: Long, limit: Option[Long]): List[LiteralColumn[_]] = {
     val subqueryArgs =
       selectWhatArgs(select.columns) ++
         selectOrderByArgs(select.orderBy) ++

@@ -17,9 +17,15 @@
 package sqlest.ast
 
 trait TableFunctions {
-[#  abstract class TableFunction1[[#A1#]](val tableName: String, val aliasedAs: Option[String] = None) extends BaseTable {
-    def apply[[#B1#]]([#column1: Column[B1]#])(implicit [#column1Equivalence: ColumnTypeEquivalence[A1, B1]#]) =
-      TableFunction(tableName, aliasedAs, Seq([#column1#]))
+[#  abstract class TableFunction1[[#A1#]](val tableName: String, val aliasedAs: Option[String] = None) extends BaseTableFunction {
+      this: TableFunction1[[#A1#]] =>
+      private var internalParameterColumns: Seq[Column[_]] = Nil
+      def parameterColumns = internalParameterColumns
+
+      def apply[[#B1#]]([#column1: Column[B1]#])(implicit [#column1Equivalence: ColumnTypeEquivalence[A1, B1]#]) = {
+        internalParameterColumns = Seq([#column1#])
+        this
+      }
   }#
 
 ]

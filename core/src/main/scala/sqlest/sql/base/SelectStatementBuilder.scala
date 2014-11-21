@@ -19,7 +19,7 @@ package sqlest.sql.base
 import sqlest.ast._
 
 trait SelectStatementBuilder extends BaseStatementBuilder {
-  def selectSql(select: Select[_]): String = {
+  def selectSql(select: Select[_, _ <: Relation]): String = {
     Seq(
       selectWhatSql(select.columns),
       selectFromSql(select.from)
@@ -78,16 +78,16 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
   def joinSql(relation: Relation): String = relation match {
     case table: Table if table.tableName == table.tableAlias => identifierSql(table.tableName)
     case table: Table if table.tableName != table.tableAlias => identifierSql(table.tableName) + " as " + identifierSql(table.tableAlias)
-    case tableFunction: TableFunction => functionSql(tableFunction.tableName, tableFunction.parameterColumns) + " as " + identifierSql(tableFunction.tableAlias)
+    case tableFunction: BaseTableFunction => functionSql(tableFunction.tableName, tableFunction.parameterColumns) + " as " + identifierSql(tableFunction.tableAlias)
     case LeftJoin(left, right, condition) => "(" + joinSql(left) + " left join " + joinSql(right) + " on " + columnSql(condition) + ")"
     case RightJoin(left, right, condition) => "(" + joinSql(left) + " right join " + joinSql(right) + " on " + columnSql(condition) + ")"
     case InnerJoin(left, right, condition) => "(" + joinSql(left) + " inner join " + joinSql(right) + " on " + columnSql(condition) + ")"
     case OuterJoin(left, right, condition) => "(" + joinSql(left) + " full outer join " + joinSql(right) + " on " + columnSql(condition) + ")"
     case CrossJoin(left, right) => "(" + joinSql(left) + " cross join " + joinSql(right) + ")"
-    case select: Select[_] => subselectSql(select)
+    case select: Select[_, _] => subselectSql(select)
   }
 
-  def subselectSql(select: Select[_]) = {
+  def subselectSql(select: Select[_, _ <: Relation]) = {
     val alias =
       if (select.subselectAlias.isDefined) " as " + select.subselectAlias.get
       else ""
@@ -97,7 +97,7 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
 
   // -------------------------------------------------
 
-  def selectArgs(select: Select[_]): List[LiteralColumn[_]] = {
+  def selectArgs(select: Select[_, _ <: Relation]): List[LiteralColumn[_]] = {
     selectWhatArgs(select.columns) ++
       selectFromArgs(select.from) ++
       selectWhereArgs(select.where) ++
@@ -152,12 +152,12 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
 
   def joinArgs(relation: Relation): List[LiteralColumn[_]] = relation match {
     case table: Table => Nil
-    case TableFunction(_, _, parameterColumns) => parameterColumns.toList flatMap columnArgs
+    case tableFunction: BaseTableFunction => tableFunction.parameterColumns.toList flatMap columnArgs
     case LeftJoin(left, right, condition) => joinArgs(left) ++ joinArgs(right) ++ columnArgs(condition)
     case RightJoin(left, right, condition) => joinArgs(left) ++ joinArgs(right) ++ columnArgs(condition)
     case InnerJoin(left, right, condition) => joinArgs(left) ++ joinArgs(right) ++ columnArgs(condition)
     case OuterJoin(left, right, condition) => joinArgs(left) ++ joinArgs(right) ++ columnArgs(condition)
     case CrossJoin(left, right) => joinArgs(left) ++ joinArgs(right)
-    case select: Select[_] => selectArgs(select)
+    case select: Select[_, _] => selectArgs(select)
   }
 }

@@ -85,14 +85,73 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
   "select from a three table join" should "produce the right sql" in {
     sql {
       select(TableOne.col1, TableOne.col2, TableTwo.col2, TableTwo.col3, TableThree.col3, TableThree.col4)
-        .from(
-          TableOne
-            .innerJoin(TableTwo).on(TableOne.col2 === TableTwo.col2)
-            .innerJoin(TableThree).on(TableTwo.col3 === TableThree.col3))
+        .from(TableOne)
+        .innerJoin(TableTwo).on(TableOne.col2 === TableTwo.col2)
+        .innerJoin(TableThree).on(TableTwo.col3 === TableThree.col3)
     } should equal(
       s"""
        |select one.col1 as one_col1, one.col2 as one_col2, two.col2 as two_col2, two.col3 as two_col3, three.col3 as three_col3, three.col4 as three_col4
        |from ((one inner join two on (one.col2 = two.col2)) inner join three on (two.col3 = three.col3))
+       """.formatSql,
+      Nil
+    )
+  }
+
+  "select from a natural join" should "produce the right sql" in {
+    sql {
+      select(TableOne.col1, TableOne.col2, TableTwo.col2, TableTwo.col3)
+        .from(TableOne)
+        .naturalJoin(TableTwo)
+        .naturalJoin(TestTableFunction(TableOne.col1, "abc".constant))
+    } should equal(
+      s"""
+       |select one.col1 as one_col1, one.col2 as one_col2, two.col2 as two_col2, two.col3 as two_col3
+       |from ((one inner join two on (one.col2 = two.col2)) inner join testTableFunction(one.col1, 'abc') as testTableFunction on (one.col1 = testTableFunction.col6))
+       """.formatSql,
+      Nil
+    )
+  }
+
+  it should "allow natural joins to a joined table" in {
+    val TableTwoo = TableTwo.as("twoo")
+    sql {
+      select(TableOne.col1, TableOne.col2, TableTwo.col2, TableTwo.col3, TableTwoo.col2, TableTwoo.col3)
+        .from(TableOne)
+        .innerJoin(TableTwo).on(TableOne.col2 === TableTwo.col2)
+        .naturalJoin(TableTwoo)
+    } should equal(
+      s"""
+       |select one.col1 as one_col1, one.col2 as one_col2, two.col2 as two_col2, two.col3 as two_col3, twoo.col2 as twoo_col2, twoo.col3 as twoo_col3
+       |from ((one inner join two on (one.col2 = two.col2)) inner join two as twoo on (one.col2 = twoo.col2))
+       """.formatSql,
+      Nil
+    )
+
+    sql {
+      select(TableOne.col1, TableOne.col2, TableTwo.col2, TableTwo.col3, TableTwoo.col2, TableTwoo.col3)
+        .from(TableTwo)
+        .innerJoin(TableOne).on(TableOne.col2 === TableTwo.col2)
+        .naturalJoin(TableTwoo)
+    } should equal(
+      s"""
+       |select one.col1 as one_col1, one.col2 as one_col2, two.col2 as two_col2, two.col3 as two_col3, twoo.col2 as twoo_col2, twoo.col3 as twoo_col3
+       |from ((two inner join one on (one.col2 = two.col2)) inner join two as twoo on (one.col2 = twoo.col2))
+       """.formatSql,
+      Nil
+    )
+  }
+
+  it should "allow many natural joins to the same table" in {
+    val TableTwoo = TableTwo.as("twoo")
+    sql {
+      select(TableOne.col1, TableOne.col2, TableTwo.col2, TableTwo.col3, TableTwoo.col2, TableTwoo.col3)
+        .from(TableOne)
+        .naturalJoin(TableTwo)
+        .naturalJoin(TableTwoo)
+    } should equal(
+      s"""
+       |select one.col1 as one_col1, one.col2 as one_col2, two.col2 as two_col2, two.col3 as two_col3, twoo.col2 as twoo_col2, twoo.col3 as twoo_col3
+       |from ((one inner join two on (one.col2 = two.col2)) inner join two as twoo on (one.col2 = twoo.col2))
        """.formatSql,
       Nil
     )
@@ -255,6 +314,19 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
     )
   }
 
+  "select table function" should "produce the right sql" in {
+    sql {
+      select(TableThree.col3, TableThree.col4, TestTableFunction.col5, TestTableFunction.col6)
+        .from(TableThree.crossJoin(TestTableFunction(TableThree.col3, "abc")))
+    } should equal(
+      s"""
+       |select three.col3 as three_col3, three.col4 as three_col4, testTableFunction.col5 as testTableFunction_col5, testTableFunction.col6 as testTableFunction_col6
+       |from (three cross join testTableFunction(three.col3, ?) as testTableFunction)
+       """.formatSql,
+      List("abc")
+    )
+  }
+
   "select connect by" should "produce the right sql" in {
     sql {
       select(TableOne.col1)
@@ -387,10 +459,11 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
     sql {
       val rowNumberColumn = rowNumber().over(partitionBy(MyTable.col1).orderBy(MyTable.col2))
       select(MyTable.col1)
-        .from(
-          MyTable
-            .innerJoin(select(rowNumberColumn).from(MyTable))
-            .on(rowNumberColumn === 1.constant))
+        .from(MyTable)
+        .innerJoin(
+          select(rowNumberColumn)
+            .from(MyTable))
+        .on(rowNumberColumn === 1.constant)
     } should equal(
       s"""
        |select mytable.col1 as mytable_col1

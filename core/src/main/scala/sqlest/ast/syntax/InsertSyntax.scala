@@ -43,6 +43,6 @@ class InsertColumnsBuilder(into: Table, columns: Seq[TableColumn[_]]) {
     InsertValues(into, Seq(setters))
   }
 
-  def from[A: AliasedColumns](select: Select[A]) =
+  def from[A: AliasedColumns](select: Select[A, _ <: Relation]) =
     InsertFromSelect(into = into, columns = columns, select = select)
 }
