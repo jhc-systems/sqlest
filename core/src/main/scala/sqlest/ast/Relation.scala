@@ -89,7 +89,7 @@ object AliasTableImpl {
 }
 
 /** A database table. */
-abstract class Table(val tableName: String, val aliasedAs: Option[String] = None) extends Relation with BaseTable
+abstract class Table(val tableName: String, val aliasedAs: Option[String]) extends Relation with BaseTable
 
 /**
  * This TableFunction case class should not be created by the user directly.
