@@ -32,8 +32,6 @@ class ColumnSpec extends FlatSpec with Matchers {
     val stringCol = column[String]("Col")
     val dateTimeCol = column[DateTime]("Col")
     val mappedCol = column[Int]("Col", MappedColumnType[Int, String](_.toInt, _.toString))
-
-    def as(alias: String) = new TableOne(Some(alias))
   }
 
   object TableOne extends TableOne(None)

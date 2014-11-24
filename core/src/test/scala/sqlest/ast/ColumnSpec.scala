@@ -37,8 +37,6 @@ class ColumnSpec extends FlatSpec with Matchers {
     val col6 = column[Size]("col5", sizeColumnType)
 
     def * = (col1, col2)
-
-    def as(alias: String) = new TableOne(Some(alias))
   }
 
   object TableOne extends TableOne(None)

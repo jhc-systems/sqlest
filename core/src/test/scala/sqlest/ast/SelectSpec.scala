@@ -24,7 +24,6 @@ class SelectSpec extends FlatSpec with Matchers {
   class MyTable(alias: Option[String]) extends Table("mytable", alias) {
     val col1 = column[Int]("col1")
     val col2 = column[Int]("col2")
-    def as(alias: String) = new MyTable(Some(alias))
   }
   object MyTable extends MyTable(None)
 

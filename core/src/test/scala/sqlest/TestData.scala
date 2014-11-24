@@ -24,8 +24,6 @@ object TestData {
     val col1 = column[Int]("col1")
     val col2 = column[String]("col2")
     def columns = List(col1, col2)
-
-    def as(alias: String) = new TableOne(Some(alias))
   }
   object TableOne extends TableOne(None)
 
@@ -33,8 +31,6 @@ object TestData {
     val col2 = column[String]("col2")
     val col3 = column[Int]("col3")
     def columns = List(col2, col3)
-
-    def as(alias: String) = new TableTwo(Some(alias))
   }
   object TableTwo extends TableTwo(None)
 
@@ -42,8 +38,6 @@ object TestData {
     val col3 = column[Option[Int]]("col3")
     val col4 = column[Option[String]]("col4")
     def columns = List(col3, col4)
-
-    def as(alias: String) = new TableThree(Some(alias))
   }
   object TableThree extends TableThree(None)
 
@@ -57,8 +51,6 @@ object TestData {
     val dateTimeCol = column[DateTime]("dateTimeCol")
     val bigDecimalCol = column[BigDecimal]("bigDecimalCol")
     def columns = List(dateTimeCol, bigDecimalCol)
-
-    def as(alias: String) = new TableFive(Some(alias))
   }
   object TableFive extends TableFive(None)
 

@@ -57,7 +57,6 @@ class BigTableSpec extends FlatSpec with Matchers {
     val col28 = column[Int]("col28")
     val col29 = column[Int]("col29")
     val col30 = column[Int]("col30")
-    def as(alias: String) = new TableOne(Some(alias))
   }
 
   object TableOne extends TableOne(None)

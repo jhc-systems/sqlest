@@ -16,6 +16,8 @@
 
 package sqlest.ast
 
+import scala.language.experimental.macros
+
 /**
  * A source of columns from the database.
  * Tables, joins, and select statements are all types of relation.
@@ -38,12 +40,24 @@ trait BaseTable {
   def column[A](name: String, columnType: MappedColumnType[A, _]) =
     TableColumn[A](tableAlias, name)(columnType)
 
+  def as(alias: String): BaseTable = macro AliasTableImpl.apply
+
   override def toString = {
     if (tableName == tableAlias) {
       s"${getClass.getName}($tableName)"
     } else {
       s"${getClass.getName}($tableName as $tableAlias)"
     }
+  }
+}
+
+object AliasTableImpl {
+  import scala.reflect.macros.whitebox.Context
+
+  def apply(c: Context { type PrefixType = BaseTable })(alias: c.Expr[String]): c.Tree = {
+    import c.universe._
+    val tableClass = c.prefix.actualType.baseClasses.takeWhile(_ != typeOf[BaseTable].typeSymbol).dropRight(1).last
+    q"new ${tableClass}(Some($alias))"
   }
 }
 
