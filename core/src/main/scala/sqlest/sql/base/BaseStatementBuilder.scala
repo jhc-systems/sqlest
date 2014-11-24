@@ -54,7 +54,7 @@ trait BaseStatementBuilder {
 
   def findSubselects(relation: Relation): List[Select[_, _]] = relation match {
     case _: Table => Nil
-    case _: BaseTableFunction => Nil
+    case _: TableFunctionApplication[_] => Nil
     case join: Join[_, _] => findSubselects(join.left) ++ findSubselects(join.right)
     case select: Select[_, _] => List(select) ++ findSubselects(select.from)
   }

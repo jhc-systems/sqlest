@@ -55,15 +55,13 @@ abstract class Table(val tableName: String, val aliasedAs: Option[String] = None
  * Instead it will be returned as a result of applying a TableFunctionN (where N is a number)
  * to a set of columns. See TableFunctions for the implementations of TableFunctionN
  */
-// case class TableFunction(
-//     tableName: String,
-//     aliasedAs: Option[String],
-//     parameterColumns: Seq[Column[_]]) extends Relation {
+case class TableFunctionApplication[+T](
+    tableName: String,
+    aliasedAs: Option[String],
+    parameterColumns: Seq[Column[_]],
+    tableFunction: T) extends Relation {
 
-//   def tableAlias = aliasedAs getOrElse tableName
-// }
-trait BaseTableFunction extends Relation with BaseTable {
-  def parameterColumns: Seq[Column[_]]
+  def tableAlias = aliasedAs getOrElse tableName
 }
 
 /** A join over two relations. */

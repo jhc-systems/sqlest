@@ -16,16 +16,23 @@
 
 package sqlest.ast
 
-trait TableFunctions {
-[#  abstract class TableFunction1[[#A1#]](val tableName: String, val aliasedAs: Option[String] = None) extends BaseTableFunction {
-      this: TableFunction1[[#A1#]] =>
-      private var internalParameterColumns: Seq[Column[_]] = Nil
-      def parameterColumns = internalParameterColumns
+import scala.language.experimental.macros
 
-      def apply[[#B1#]]([#column1: Column[B1]#])(implicit [#column1Equivalence: ColumnTypeEquivalence[A1, B1]#]) = {
-        internalParameterColumns = Seq([#column1#])
-        this
-      }
+trait TableFunctions {
+[#  abstract class TableFunction1[[#A1#]](val tableName: String, val aliasedAs: Option[String] = None) extends BaseTable {
+      def apply[[#B1#]]([#column1: Column[B1]#])(implicit [#column1Equivalence: ColumnTypeEquivalence[A1, B1]#]): TableFunctionApplication[TableFunction1[[#A1#]]] = macro TableFunctionApplyImpl.apply1[[#A1, B1#]]
+  }#
+
+]
+}
+
+object TableFunctionApplyImpl {
+  import scala.reflect.macros.whitebox.Context
+
+[#  def apply1[[#A1, B1#]](c: Context)([#column1: c.Expr[Column[B1]]#])([#column1Equivalence: c.Expr[ColumnTypeEquivalence[A1, B1]]#]): c.Tree = {
+    import c.universe._
+    val tableFunction1 = c.prefix
+    q"TableFunctionApplication[${tableFunction1.actualType}](${tableFunction1}.tableName, ${tableFunction1}.aliasedAs, Seq([#$column1#]), ${tableFunction1})"
   }#
 
 ]

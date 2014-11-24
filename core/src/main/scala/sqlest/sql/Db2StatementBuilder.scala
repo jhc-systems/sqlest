@@ -70,7 +70,7 @@ trait DB2StatementBuilder extends base.StatementBuilder {
     None
 
   override def joinSql(relation: Relation): String = relation match {
-    case tableFunction: BaseTableFunction => "table(" + functionSql(tableFunction.tableName, tableFunction.parameterColumns.map(addTypingToSqlColumn)) + ") as " + identifierSql(tableFunction.tableAlias)
+    case tableFunctionApplication: TableFunctionApplication[_] => "table(" + functionSql(tableFunctionApplication.tableName, tableFunctionApplication.parameterColumns.map(addTypingToSqlColumn)) + ") as " + identifierSql(tableFunctionApplication.tableAlias)
     case _ => super.joinSql(relation)
   }
 

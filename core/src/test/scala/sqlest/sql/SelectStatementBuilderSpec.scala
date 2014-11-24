@@ -98,6 +98,7 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
   }
 
   "select from a natural join" should "produce the right sql" in {
+    TableOne.naturalJoin(TestTableFunction(TableOne.col1, "abc".constant))
     sql {
       select(TableOne.col1, TableOne.col2, TableTwo.col2, TableTwo.col3)
         .from(TableOne)

@@ -78,7 +78,7 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
   def joinSql(relation: Relation): String = relation match {
     case table: Table if table.tableName == table.tableAlias => identifierSql(table.tableName)
     case table: Table if table.tableName != table.tableAlias => identifierSql(table.tableName) + " as " + identifierSql(table.tableAlias)
-    case tableFunction: BaseTableFunction => functionSql(tableFunction.tableName, tableFunction.parameterColumns) + " as " + identifierSql(tableFunction.tableAlias)
+    case tableFunctionApplication: TableFunctionApplication[_] => functionSql(tableFunctionApplication.tableName, tableFunctionApplication.parameterColumns) + " as " + identifierSql(tableFunctionApplication.tableAlias)
     case LeftJoin(left, right, condition) => "(" + joinSql(left) + " left join " + joinSql(right) + " on " + columnSql(condition) + ")"
     case RightJoin(left, right, condition) => "(" + joinSql(left) + " right join " + joinSql(right) + " on " + columnSql(condition) + ")"
     case InnerJoin(left, right, condition) => "(" + joinSql(left) + " inner join " + joinSql(right) + " on " + columnSql(condition) + ")"
@@ -152,7 +152,7 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
 
   def joinArgs(relation: Relation): List[LiteralColumn[_]] = relation match {
     case table: Table => Nil
-    case tableFunction: BaseTableFunction => tableFunction.parameterColumns.toList flatMap columnArgs
+    case tableFunctionApplication: TableFunctionApplication[_] => tableFunctionApplication.parameterColumns.toList.flatMap(columnArgs)
     case LeftJoin(left, right, condition) => joinArgs(left) ++ joinArgs(right) ++ columnArgs(condition)
     case RightJoin(left, right, condition) => joinArgs(left) ++ joinArgs(right) ++ columnArgs(condition)
     case InnerJoin(left, right, condition) => joinArgs(left) ++ joinArgs(right) ++ columnArgs(condition)
