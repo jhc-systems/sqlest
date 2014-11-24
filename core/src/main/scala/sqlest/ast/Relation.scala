@@ -56,8 +56,32 @@ object AliasTableImpl {
 
   def apply(c: Context { type PrefixType = BaseTable })(alias: c.Expr[String]): c.Tree = {
     import c.universe._
-    val tableClass = c.prefix.actualType.baseClasses.takeWhile(_ != typeOf[BaseTable].typeSymbol).dropRight(1).last
-    q"new ${tableClass}(Some($alias))"
+
+    object MatchingAliasConstructor {
+      def unapply(sym: Symbol) = sym match {
+        case method: MethodSymbol if method.isConstructor =>
+          method.paramLists match {
+            case (firstParam :: Nil) :: Nil =>
+              val paramMatches =
+                firstParam.name.toString == "alias" &&
+                  firstParam.typeSignature =:= typeOf[Option[String]]
+
+              if (paramMatches) Some(method) else None
+            case _ => None
+          }
+        case _ => None
+      }
+    }
+
+    val subTypeTableClass = c.prefix.actualType
+
+    val constructor = subTypeTableClass.baseClasses.flatMap(_.asType.typeSignature.members).collectFirst {
+      case MatchingAliasConstructor(constructor) => constructor
+    }.getOrElse {
+      c.abort(c.enclosingPosition, s"No matching constructor found: (alias: Option[String]): $subTypeTableClass")
+    }
+
+    q"new ${constructor.returnType}(Some($alias))"
   }
 }
 

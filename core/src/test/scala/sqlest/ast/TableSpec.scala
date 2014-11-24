@@ -20,18 +20,25 @@ import org.scalatest._
 import org.scalatest.matchers._
 import sqlest._
 
-class MyTable(alias: Option[String]) extends Table("mytable", alias) {
-  val col1 = column[Int]("col1")
-  val col2 = column[Int]("col2")
-}
-object MyTable extends MyTable(None)
-
 class TableSpec extends FlatSpec with Matchers {
+  class SimpleTable(alias: Option[String]) extends Table("mytable", alias)
+  object SimpleTable extends SimpleTable(None)
+
+  trait TableTrait
+  class TraitedTable(alias: Option[String]) extends Table("traitedtable", alias) with TableTrait
+  object TraitedTable extends TraitedTable(None)
+
   "as macro" should "alias table" in {
-    val TheirTable = MyTable.as("their")
+    val TheirTable = SimpleTable.as("their")
     TheirTable.tableAlias should be("their")
     TheirTable.as("your").tableAlias should be("your")
-    new MyTable(Some("its")).as("mine").tableAlias should be("mine")
+    new SimpleTable(Some("its")).as("mine").tableAlias should be("mine")
   }
 
+  it should "also alias tables the implement other traits" in {
+    val TheirTable = TraitedTable.as("their")
+    TheirTable.tableAlias should be("their")
+    TheirTable.as("your").tableAlias should be("your")
+    new TraitedTable(Some("its")).as("mine").tableAlias should be("mine")
+  }
 }
