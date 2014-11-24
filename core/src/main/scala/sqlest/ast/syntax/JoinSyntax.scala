@@ -58,6 +58,14 @@ trait JoinSyntax {
     def naturalJoin[R2 <: Relation](right: R2)(implicit naturalJoinConditionBuilder: NaturalJoinConditionBuilder[Select[A, R1], R2]) =
       (left.innerJoin(right).on(naturalJoinConditionBuilder.joinCondition(left, right)))
 
+    def naturalLeftJoin[R2 <: Relation](right: R2)(implicit naturalJoinConditionBuilder: NaturalJoinConditionBuilder[Select[A, R1], R2]) =
+      (left.leftJoin(right).on(naturalJoinConditionBuilder.joinCondition(left, right)))
+
+    def naturalRightJoin[R2 <: Relation](right: R2)(implicit naturalJoinConditionBuilder: NaturalJoinConditionBuilder[Select[A, R1], R2]) =
+      (left.rightJoin(right).on(naturalJoinConditionBuilder.joinCondition(left, right)))
+
+    def naturalOuterJoin[R2 <: Relation](right: R2)(implicit naturalJoinConditionBuilder: NaturalJoinConditionBuilder[Select[A, R1], R2]) =
+      (left.outerJoin(right).on(naturalJoinConditionBuilder.joinCondition(left, right)))
   }
 
   /**

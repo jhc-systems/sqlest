@@ -98,16 +98,15 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
   }
 
   "select from a natural join" should "produce the right sql" in {
-    TableOne.naturalJoin(TestTableFunction(TableOne.col1, "abc".constant))
     sql {
       select(TableOne.col1, TableOne.col2, TableTwo.col2, TableTwo.col3)
         .from(TableOne)
-        .naturalJoin(TableTwo)
-        .naturalJoin(TestTableFunction(TableOne.col1, "abc".constant))
+        .naturalLeftJoin(TableTwo)
+        .naturalRightJoin(TestTableFunction(TableOne.col1, "abc".constant))
     } should equal(
       s"""
        |select one.col1 as one_col1, one.col2 as one_col2, two.col2 as two_col2, two.col3 as two_col3
-       |from ((one inner join two on (one.col2 = two.col2)) inner join testTableFunction(one.col1, 'abc') as testTableFunction on (one.col1 = testTableFunction.col6))
+       |from ((one left join two on (one.col2 = two.col2)) right join testTableFunction(one.col1, 'abc') as testTableFunction on (one.col1 = testTableFunction.col6))
        """.formatSql,
       Nil
     )
