@@ -81,7 +81,10 @@ object AliasTableImpl {
       c.abort(c.enclosingPosition, s"No matching constructor found: (alias: Option[String]): $subTypeTableClass")
     }
 
-    q"new ${constructor.returnType}(Some($alias))"
+    // Use asSeenFrom to ensure the type is seen correctly in the enclosing scope
+    val tableType = constructor.returnType.asSeenFrom(subTypeTableClass, subTypeTableClass.typeSymbol.asClass)
+
+    q"new $tableType(Some($alias))"
   }
 }
 

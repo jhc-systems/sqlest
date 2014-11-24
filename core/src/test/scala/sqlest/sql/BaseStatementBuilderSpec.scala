@@ -60,8 +60,6 @@ trait BaseStatementBuilderSpec extends FlatSpec with Matchers {
   class TableTwo(alias: Option[String]) extends Table("two", alias) {
     val col2 = column[String]("col2")
     val col3 = column[String]("col3")
-
-    def as(alias: String) = new TableTwo(Some(alias))
   }
   object TableTwo extends TableTwo(None)
 

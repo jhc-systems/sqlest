@@ -101,12 +101,11 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
     sql {
       select(TableOne.col1, TableOne.col2, TableTwo.col2, TableTwo.col3)
         .from(TableOne)
-        .naturalLeftJoin(TableTwo)
-        .naturalRightJoin(TestTableFunction(TableOne.col1, "abc".constant))
+        .naturalJoin(TableTwo)
     } should equal(
       s"""
        |select one.col1 as one_col1, one.col2 as one_col2, two.col2 as two_col2, two.col3 as two_col3
-       |from ((one left join two on (one.col2 = two.col2)) right join testTableFunction(one.col1, 'abc') as testTableFunction on (one.col1 = testTableFunction.col6))
+       |from (one inner join two on (one.col2 = two.col2))
        """.formatSql,
       Nil
     )
@@ -152,6 +151,22 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
       s"""
        |select one.col1 as one_col1, one.col2 as one_col2, two.col2 as two_col2, two.col3 as two_col3, twoo.col2 as twoo_col2, twoo.col3 as twoo_col3
        |from ((one inner join two on (one.col2 = two.col2)) inner join two as twoo on (one.col2 = twoo.col2))
+       """.formatSql,
+      Nil
+    )
+  }
+
+  it should "work with table functions" in {
+    val NewTestTableFunction = TestTableFunction.as("newtesttablefunction")
+    sql {
+      select(TableOne.col1, TableOne.col2, TableTwo.col2, TableTwo.col3)
+        .from(TableOne)
+        .naturalLeftJoin(TableTwo)
+        .naturalRightJoin(NewTestTableFunction(TableOne.col1, "abc".constant))
+    } should equal(
+      s"""
+       |select one.col1 as one_col1, one.col2 as one_col2, two.col2 as two_col2, two.col3 as two_col3
+       |from ((one left join two on (one.col2 = two.col2)) right join testTableFunction(one.col1, 'abc') as newtesttablefunction on (one.col1 = newtesttablefunction.col6))
        """.formatSql,
       Nil
     )
