@@ -55,7 +55,7 @@ case class DoubleInfixFunctionColumn[A](infix1: String, infix2: String, paramete
 case class WindowFunctionColumn(partitionByColumns: Seq[Column[_]], orderBy: Seq[Order]) extends Column[Int] { val columnType = IntColumnType }
 
 /** A column containing a select statement which selects only a single column */
-case class SelectColumn[A](select: Select[AliasedColumn[A]])(implicit val columnType: ColumnType[A]) extends Column[A]
+case class SelectColumn[A](select: Select[AliasedColumn[A], _ <: Relation])(implicit val columnType: ColumnType[A]) extends Column[A]
 
 /**
  * A ScalarFunctionColumn should not be created by the user directly.

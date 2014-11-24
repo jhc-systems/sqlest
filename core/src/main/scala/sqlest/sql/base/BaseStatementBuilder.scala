@@ -31,7 +31,7 @@ trait BaseStatementBuilder {
       })
 
     operation match {
-      case select: Select[_] =>
+      case select: Select[_, _] =>
         val subselects = findSubselects(select.from)
         select.mapColumns({
           column =>
@@ -44,19 +44,19 @@ trait BaseStatementBuilder {
               .headOption
               .map { subselectColumn => ReferenceColumn(subselectColumn.columnAlias)(column.columnType) }
               .getOrElse(column)
-        }, operation => aliasColumnsFromSubselects(operation).asInstanceOf[Select[_]])
-      case update: Update => update.mapColumns(identity, operation => aliasColumnsFromSubselects(operation).asInstanceOf[Select[_]])
-      case insert: Insert => insert.mapColumns(identity, operation => aliasColumnsFromSubselects(operation).asInstanceOf[Select[_]])
-      case delete: Delete => delete.mapColumns(identity, operation => aliasColumnsFromSubselects(operation).asInstanceOf[Select[_]])
+        }, operation => aliasColumnsFromSubselects(operation).asInstanceOf[Select[_, _]])
+      case update: Update => update.mapColumns(identity, operation => aliasColumnsFromSubselects(operation).asInstanceOf[Select[_, _]])
+      case insert: Insert => insert.mapColumns(identity, operation => aliasColumnsFromSubselects(operation).asInstanceOf[Select[_, _]])
+      case delete: Delete => delete.mapColumns(identity, operation => aliasColumnsFromSubselects(operation).asInstanceOf[Select[_, _]])
       case _ => operation
     }
   }
 
-  def findSubselects(relation: Relation): List[Select[_]] = relation match {
+  def findSubselects(relation: Relation): List[Select[_, _]] = relation match {
     case _: Table => Nil
-    case _: TableFunction => Nil
-    case join: Join => findSubselects(join.left) ++ findSubselects(join.right)
-    case select: Select[_] => List(select) ++ findSubselects(select.from)
+    case _: TableFunctionApplication[_] => Nil
+    case join: Join[_, _] => findSubselects(join.left) ++ findSubselects(join.right)
+    case select: Select[_, _] => List(select) ++ findSubselects(select.from)
   }
 
   def columnAliasListSql(columns: Seq[Column[_]]): String =
@@ -96,7 +96,7 @@ trait BaseStatementBuilder {
       case column: CaseColumnElseColumn[_, _] => caseColumnSql(column.column, column.mappings, Some(column.`else`))
     }
 
-  def selectSql(select: Select[_]): String
+  def selectSql(select: Select[_, _ <: Relation]): String
 
   def prefixSql(op: String, parameter: Column[_]): String =
     s"($op ${columnSql(parameter)})"
@@ -212,5 +212,5 @@ trait BaseStatementBuilder {
       columnArgs(column.column) ++ column.mappings.flatMap(mapping => columnArgs(mapping._1) ++ columnArgs(mapping._2)) ++ columnArgs(column.`else`)
   }
 
-  def selectArgs(select: Select[_]): List[LiteralColumn[_]]
+  def selectArgs(select: Select[_, _ <: Relation]): List[LiteralColumn[_]]
 }

@@ -16,4 +16,4 @@
 
 package sqlest.ast
 
-case class Union[A](select: Select[A], unionAll: Boolean)
+case class Union[A](select: Select[A, _ <: Relation], unionAll: Boolean)
