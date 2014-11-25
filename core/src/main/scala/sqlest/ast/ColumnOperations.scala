@@ -20,7 +20,7 @@ import sqlest.ast._
 
 object ColumnOperations {
   implicit class SelectColumnsOps[A, R <: Relation](select: Select[A, R]) {
-    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_, _ <: Relation] => Select[_, _ <: Relation]): Select[A, _] =
+    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_, _ <: Relation] => Select[_, _ <: Relation]): Select[A, _ <: Relation] =
       Select(
         select.aliasedColumns.mapColumns(f, selectFunction, select.cols),
         select.from.mapColumns(f, selectFunction),
