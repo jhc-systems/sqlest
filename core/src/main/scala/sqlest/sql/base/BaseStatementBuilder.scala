@@ -44,10 +44,10 @@ trait BaseStatementBuilder {
               .headOption
               .map { subselectColumn => ReferenceColumn(subselectColumn.columnAlias)(column.columnType) }
               .getOrElse(column)
-        }, operation => aliasColumnsFromSubselects(operation).asInstanceOf[Select[_, _]])
-      case update: Update => update.mapColumns(identity, operation => aliasColumnsFromSubselects(operation).asInstanceOf[Select[_, _]])
-      case insert: Insert => insert.mapColumns(identity, operation => aliasColumnsFromSubselects(operation).asInstanceOf[Select[_, _]])
-      case delete: Delete => delete.mapColumns(identity, operation => aliasColumnsFromSubselects(operation).asInstanceOf[Select[_, _]])
+        }, operation => aliasColumnsFromSubselects(operation).asInstanceOf[Select[_, _ <: Relation]])
+      case update: Update => update.mapColumns(identity, operation => aliasColumnsFromSubselects(operation).asInstanceOf[Select[_, _ <: Relation]])
+      case insert: Insert => insert.mapColumns(identity, operation => aliasColumnsFromSubselects(operation).asInstanceOf[Select[_, _ <: Relation]])
+      case delete: Delete => delete.mapColumns(identity, operation => aliasColumnsFromSubselects(operation).asInstanceOf[Select[_, _ <: Relation]])
       case _ => operation
     }
   }

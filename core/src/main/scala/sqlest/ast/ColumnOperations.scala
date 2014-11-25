@@ -20,7 +20,7 @@ import sqlest.ast._
 
 object ColumnOperations {
   implicit class SelectColumnsOps[A, R <: Relation](select: Select[A, R]) {
-    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_, _] => Select[_, _]): Select[A, _] =
+    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_, _ <: Relation] => Select[_, _ <: Relation]): Select[A, _] =
       Select(
         select.aliasedColumns.mapColumns(f, selectFunction, select.cols),
         select.from.mapColumns(f, selectFunction),
@@ -38,7 +38,7 @@ object ColumnOperations {
   }
 
   implicit class InsertColumnsOps(insert: Insert) {
-    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_, _] => Select[_, _]): Insert =
+    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_, _ <: Relation] => Select[_, _ <: Relation]): Insert =
       insert match {
         case insertFromSelect: InsertFromSelect[a] =>
           val newSelect = selectFunction(insertFromSelect.select).asInstanceOf[Select[a, _ <: Relation]]
@@ -49,17 +49,17 @@ object ColumnOperations {
   }
 
   implicit class UpdateColumnsOps(update: Update) {
-    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_, _] => Select[_, _]): Update =
+    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_, _ <: Relation] => Select[_, _ <: Relation]): Update =
       Update(update.table, update.set, update.where.map(_.mapColumns(f, selectFunction)))
   }
 
   implicit class DeleteColumnsOps(delete: Delete) {
-    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_, _] => Select[_, _]): Delete =
+    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_, _ <: Relation] => Select[_, _ <: Relation]): Delete =
       Delete(delete.from, delete.where.map(_.mapColumns(f, selectFunction)))
   }
 
   implicit class ColumnOps[A](column: Column[A]) {
-    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_, _] => Select[_, _]): Column[A] = column match {
+    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_, _ <: Relation] => Select[_, _ <: Relation]): Column[A] = column match {
       case literalColumn: LiteralColumn[A] => f(literalColumn).asInstanceOf[Column[A]]
       case constantColumn: ConstantColumn[A] => f(constantColumn).asInstanceOf[Column[A]]
       case prefixFunctionColumn: PrefixFunctionColumn[A] => f(PrefixFunctionColumn(prefixFunctionColumn.name, prefixFunctionColumn.parameter.mapColumns(f, selectFunction))(prefixFunctionColumn.columnType)).asInstanceOf[Column[A]]
@@ -80,7 +80,7 @@ object ColumnOperations {
   }
 
   implicit class RelationOps(relation: Relation) {
-    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_, _] => Select[_, _]): Relation = relation match {
+    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_, _ <: Relation] => Select[_, _ <: Relation]): Relation = relation match {
       case table: Table => table
       case TableFunctionApplication(tableName, aliasedAs, parameterColumns, tableFunction) => TableFunctionApplication(tableName, aliasedAs, parameterColumns.map(_.mapColumns(f, selectFunction)), tableFunction)
       case LeftJoin(left, right, condition) => LeftJoin(left.mapColumns(f, selectFunction), right.mapColumns(f, selectFunction), condition.mapColumns(f, selectFunction))
@@ -93,12 +93,12 @@ object ColumnOperations {
   }
 
   implicit class OrderOps(order: Order) {
-    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_, _] => Select[_, _]): Order =
+    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_, _ <: Relation] => Select[_, _ <: Relation]): Order =
       order.copy(column = order.column.mapColumns(f, selectFunction))
   }
 
   implicit class GroupOps(group: Group) {
-    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_, _] => Select[_, _]): Group = group match {
+    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_, _ <: Relation] => Select[_, _ <: Relation]): Group = group match {
       case ColumnGroup(column) => ColumnGroup(column.mapColumns(f, selectFunction))
       case TupleGroup(groups) => TupleGroup(groups.map(_.mapColumns(f, selectFunction)))
       case FunctionGroup(name, groups) => FunctionGroup(name, groups.map(_.mapColumns(f, selectFunction)))
@@ -106,17 +106,17 @@ object ColumnOperations {
   }
 
   implicit class UnionOps[A](union: Union[A]) {
-    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_, _] => Select[_, _]): Union[A] =
+    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_, _ <: Relation] => Select[_, _ <: Relation]): Union[A] =
       union.copy(select = union.select.mapColumns(f, selectFunction).asInstanceOf[Select[A, _ <: Relation]])
   }
 
   implicit class WhenOps[A](when: When[A]) {
-    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_, _] => Select[_, _]): When[A] =
+    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_, _ <: Relation] => Select[_, _ <: Relation]): When[A] =
       when.copy(condition = when.condition.mapColumns(f, selectFunction), result = when.result.mapColumns(f, selectFunction))
   }
 
   implicit class SetterOps[A, B](setter: Setter[A, B]) {
-    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_, _] => Select[_, _]): Setter[A, B] =
+    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_, _ <: Relation] => Select[_, _ <: Relation]): Setter[A, B] =
       setter.copy(setter.column.mapColumns(f, selectFunction).asInstanceOf[TableColumn[A]], setter.value.mapColumns(f, selectFunction))(setter.columnEquivalence)
   }
 }
