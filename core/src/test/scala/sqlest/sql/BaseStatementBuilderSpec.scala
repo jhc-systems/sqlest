@@ -48,11 +48,11 @@ trait BaseStatementBuilderSpec extends FlatSpec with Matchers {
     val col2 = column[String]("col2")
   }
   object TableOne extends TableOne(None) {
-    implicit val tableTwoNaturalJoinCondition = NaturalJoinConditionBuilder {
+    implicit val tableTwoNaturalJoinCondition = NaturalJoinCondition {
       (tableOne: TableOne, tableTwo: TableTwo) => tableOne.col2 === tableTwo.col2
     }
 
-    implicit val testTableFunctionJoinCondition = NaturalJoinConditionBuilder {
+    implicit val testTableFunctionJoinCondition = NaturalJoinCondition {
       (tableOne: TableOne, testTableFunction: TestTableFunction) => tableOne.col1 === testTableFunction.col6
     }
   }

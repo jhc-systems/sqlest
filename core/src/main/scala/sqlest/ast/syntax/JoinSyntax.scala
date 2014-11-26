@@ -55,17 +55,17 @@ trait JoinSyntax {
 
     def crossJoin(right: Relation) = left.from(left.from.crossJoin(right))
 
-    def naturalJoin[R2 <: Relation](right: R2)(implicit naturalJoinConditionBuilder: NaturalJoinConditionBuilder[Select[A, R1], R2]) =
-      (left.innerJoin(right).on(naturalJoinConditionBuilder.joinCondition(left, right)))
+    def naturalJoin[R2 <: Relation](right: R2)(implicit naturalJoinCondition: NaturalJoinCondition[R1, R2]) =
+      left.innerJoin(right).on(naturalJoinCondition.joinCondition(left.from, right))
 
-    def naturalLeftJoin[R2 <: Relation](right: R2)(implicit naturalJoinConditionBuilder: NaturalJoinConditionBuilder[Select[A, R1], R2]) =
-      (left.leftJoin(right).on(naturalJoinConditionBuilder.joinCondition(left, right)))
+    def naturalLeftJoin[R2 <: Relation](right: R2)(implicit naturalJoinCondition: NaturalJoinCondition[R1, R2]) =
+      left.leftJoin(right).on(naturalJoinCondition.joinCondition(left.from, right))
 
-    def naturalRightJoin[R2 <: Relation](right: R2)(implicit naturalJoinConditionBuilder: NaturalJoinConditionBuilder[Select[A, R1], R2]) =
-      (left.rightJoin(right).on(naturalJoinConditionBuilder.joinCondition(left, right)))
+    def naturalRightJoin[R2 <: Relation](right: R2)(implicit naturalJoinCondition: NaturalJoinCondition[R1, R2]) =
+      left.rightJoin(right).on(naturalJoinCondition.joinCondition(left.from, right))
 
-    def naturalOuterJoin[R2 <: Relation](right: R2)(implicit naturalJoinConditionBuilder: NaturalJoinConditionBuilder[Select[A, R1], R2]) =
-      (left.outerJoin(right).on(naturalJoinConditionBuilder.joinCondition(left, right)))
+    def naturalOuterJoin[R2 <: Relation](right: R2)(implicit naturalJoinCondition: NaturalJoinCondition[R1, R2]) =
+      left.outerJoin(right).on(naturalJoinCondition.joinCondition(left.from, right))
   }
 
   /**
@@ -82,9 +82,6 @@ trait JoinSyntax {
    * Typeclass that adds methods such as `leftJoin` and `innerJoin` to a relation.
    */
   implicit class JoinOps[R1 <: Relation](left: R1) {
-    def naturalJoin[R2 <: Relation](right: R2)(implicit naturalJoinConditionBuilder: NaturalJoinConditionBuilder[R1, R2]) =
-      left.innerJoin(right).on(naturalJoinConditionBuilder.joinCondition(left, right))
-
     def innerJoin[R2 <: Relation](right: R2) = new JoinBuilder[R1, R2] {
       def on(condition: Column[Boolean]) =
         InnerJoin(left, right, condition)
@@ -106,49 +103,55 @@ trait JoinSyntax {
     }
 
     def crossJoin(right: Relation) = new CrossJoin(left, right)
+
+    def naturalJoin[R2 <: Relation](right: R2)(implicit naturalJoinCondition: NaturalJoinCondition[R1, R2]) =
+      left.innerJoin(right).on(naturalJoinCondition.joinCondition(left, right))
+
+    def naturalLeftJoin[R2 <: Relation](right: R2)(implicit naturalJoinCondition: NaturalJoinCondition[R1, R2]) =
+      left.leftJoin(right).on(naturalJoinCondition.joinCondition(left, right))
+
+    def naturalRightJoin[R2 <: Relation](right: R2)(implicit naturalJoinCondition: NaturalJoinCondition[R1, R2]) =
+      left.rightJoin(right).on(naturalJoinCondition.joinCondition(left, right))
+
+    def naturalOuterJoin[R2 <: Relation](right: R2)(implicit naturalJoinCondition: NaturalJoinCondition[R1, R2]) =
+      left.outerJoin(right).on(naturalJoinCondition.joinCondition(left, right))
   }
 
   /**
    * Typeclass witnessing that relation R1 and R2 can be joined naturally
    */
-  // @implicitNotFound("Either no NaturalJoinConditionBuilder could be found or ${R2} could be naturally joined to more than 1 table in ${R1}")
-  trait NaturalJoinConditionBuilder[-R1, -R2] {
+  // @implicitNotFound("Either no NaturalJoinCondition could be found or ${R2} could be naturally joined to more than 1 table in ${R1}")
+  trait NaturalJoinCondition[-R1, -R2] {
     def joinCondition(relation1: R1, relation2: R2): Column[Boolean]
   }
 
-  object NaturalJoinConditionBuilder {
-    def apply[R1, R2](f: (R1, R2) => Column[Boolean]) = new NaturalJoinConditionBuilder[R1, R2] {
+  object NaturalJoinCondition {
+    def apply[R1, R2](f: (R1, R2) => Column[Boolean]) = new NaturalJoinCondition[R1, R2] {
       def joinCondition(relation1: R1, relation2: R2) = f(relation1, relation2)
     }
 
-    implicit def selectNaturalJoinConditionBuilder[A, R1 <: Relation, R2 <: Relation](implicit relationJoinConditionBuilder: NaturalJoinConditionBuilder[R1, R2]): NaturalJoinConditionBuilder[Select[A, R1], R2] =
-      new NaturalJoinConditionBuilder[Select[A, R1], R2] {
-        def joinCondition(select: Select[A, R1], relation2: R2) =
-          relationJoinConditionBuilder.joinCondition(select.from, relation2)
-      }
-
-    implicit def joinLeftNaturalJoinConditionBuilder[R1 <: Relation, R2 <: Relation](implicit naturalJoinConditionBuilder: NaturalJoinConditionBuilder[R1, R2]): NaturalJoinConditionBuilder[Join[R1, _], R2] =
-      new NaturalJoinConditionBuilder[Join[R1, _], R2] {
+    implicit def joinLeftNaturalJoinCondition[R1 <: Relation, R2 <: Relation](implicit naturalJoinCondition: NaturalJoinCondition[R1, R2]): NaturalJoinCondition[Join[R1, _], R2] =
+      new NaturalJoinCondition[Join[R1, _], R2] {
         def joinCondition(join: Join[R1, _], relation2: R2) =
-          naturalJoinConditionBuilder.joinCondition(join.left, relation2)
+          naturalJoinCondition.joinCondition(join.left, relation2)
       }
 
-    implicit def joinRightNaturalJoinConditionBuilder[R1 <: Relation, R2 <: Relation](implicit naturalJoinConditionBuilder: NaturalJoinConditionBuilder[R1, R2]): NaturalJoinConditionBuilder[Join[_, R1], R2] =
-      new NaturalJoinConditionBuilder[Join[_, R1], R2] {
+    implicit def joinRightNaturalJoinCondition[R1 <: Relation, R2 <: Relation](implicit naturalJoinCondition: NaturalJoinCondition[R1, R2]): NaturalJoinCondition[Join[_, R1], R2] =
+      new NaturalJoinCondition[Join[_, R1], R2] {
         def joinCondition(join: Join[_, R1], relation2: R2) =
-          naturalJoinConditionBuilder.joinCondition(join.right, relation2)
+          naturalJoinCondition.joinCondition(join.right, relation2)
       }
 
-    implicit def tableFunctionLeftNaturalJoinConditionBuilder[R1, R2 <: Relation](implicit naturalJoinConditionBuilder: NaturalJoinConditionBuilder[R1, R2]): NaturalJoinConditionBuilder[TableFunctionApplication[R1], R2] =
-      new NaturalJoinConditionBuilder[TableFunctionApplication[R1], R2] {
+    implicit def tableFunctionLeftNaturalJoinCondition[R1, R2 <: Relation](implicit naturalJoinCondition: NaturalJoinCondition[R1, R2]): NaturalJoinCondition[TableFunctionApplication[R1], R2] =
+      new NaturalJoinCondition[TableFunctionApplication[R1], R2] {
         def joinCondition(tableFunctionApplication: TableFunctionApplication[R1], relation2: R2) =
-          naturalJoinConditionBuilder.joinCondition(tableFunctionApplication.tableFunction, relation2)
+          naturalJoinCondition.joinCondition(tableFunctionApplication.tableFunction, relation2)
       }
 
-    implicit def tableFunctionRightNaturalJoinConditionBuilder[R1 <: Relation, R2](implicit naturalJoinConditionBuilder: NaturalJoinConditionBuilder[R1, R2]): NaturalJoinConditionBuilder[R1, TableFunctionApplication[R2]] =
-      new NaturalJoinConditionBuilder[R1, TableFunctionApplication[R2]] {
+    implicit def tableFunctionRightNaturalJoinCondition[R1 <: Relation, R2](implicit naturalJoinCondition: NaturalJoinCondition[R1, R2]): NaturalJoinCondition[R1, TableFunctionApplication[R2]] =
+      new NaturalJoinCondition[R1, TableFunctionApplication[R2]] {
         def joinCondition(relation1: R1, tableFunctionApplication: TableFunctionApplication[R2]) =
-          naturalJoinConditionBuilder.joinCondition(relation1, tableFunctionApplication.tableFunction)
+          naturalJoinCondition.joinCondition(relation1, tableFunctionApplication.tableFunction)
       }
   }
 }
