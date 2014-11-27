@@ -97,11 +97,11 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
     )
   }
 
-  "select from a natural join" should "produce the right sql" in {
+  "select from a auto join" should "produce the right sql" in {
     sql {
       select(TableOne.col1, TableOne.col2, TableTwo.col2, TableTwo.col3)
         .from(TableOne)
-        .naturalJoin(TableTwo)
+        .autoJoin(TableTwo)
     } should equal(
       s"""
        |select one.col1 as one_col1, one.col2 as one_col2, two.col2 as two_col2, two.col3 as two_col3
@@ -111,13 +111,13 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
     )
   }
 
-  it should "allow natural joins to a joined table" in {
+  it should "allow auto joins to a joined table" in {
     val TableTwoo = TableTwo.as("twoo")
     sql {
       select(TableOne.col1, TableOne.col2, TableTwo.col2, TableTwo.col3, TableTwoo.col2, TableTwoo.col3)
         .from(TableOne)
         .innerJoin(TableTwo).on(TableOne.col2 === TableTwo.col2)
-        .naturalJoin(TableTwoo)
+        .autoJoin(TableTwoo)
     } should equal(
       s"""
        |select one.col1 as one_col1, one.col2 as one_col2, two.col2 as two_col2, two.col3 as two_col3, twoo.col2 as twoo_col2, twoo.col3 as twoo_col3
@@ -130,7 +130,7 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
       select(TableOne.col1, TableOne.col2, TableTwo.col2, TableTwo.col3, TableTwoo.col2, TableTwoo.col3)
         .from(TableTwo)
         .innerJoin(TableOne).on(TableOne.col2 === TableTwo.col2)
-        .naturalJoin(TableTwoo)
+        .autoJoin(TableTwoo)
     } should equal(
       s"""
        |select one.col1 as one_col1, one.col2 as one_col2, two.col2 as two_col2, two.col3 as two_col3, twoo.col2 as twoo_col2, twoo.col3 as twoo_col3
@@ -140,13 +140,13 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
     )
   }
 
-  it should "allow many natural joins to the same table" in {
+  it should "allow many auto joins to the same table" in {
     val TableTwoo = TableTwo.as("twoo")
     sql {
       select(TableOne.col1, TableOne.col2, TableTwo.col2, TableTwo.col3, TableTwoo.col2, TableTwoo.col3)
         .from(TableOne)
-        .naturalJoin(TableTwo)
-        .naturalJoin(TableTwoo)
+        .autoJoin(TableTwo)
+        .autoJoin(TableTwoo)
     } should equal(
       s"""
        |select one.col1 as one_col1, one.col2 as one_col2, two.col2 as two_col2, two.col3 as two_col3, twoo.col2 as twoo_col2, twoo.col3 as twoo_col3
@@ -161,8 +161,8 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
     sql {
       select(TableOne.col1, TableOne.col2, TableTwo.col2, TableTwo.col3)
         .from(TableOne)
-        .naturalLeftJoin(TableTwo)
-        .naturalRightJoin(NewTestTableFunction(TableOne.col1, "abc".constant))
+        .autoLeftJoin(TableTwo)
+        .autoRightJoin(NewTestTableFunction(TableOne.col1, "abc".constant))
     } should equal(
       s"""
        |select one.col1 as one_col1, one.col2 as one_col2, two.col2 as two_col2, two.col3 as two_col3
