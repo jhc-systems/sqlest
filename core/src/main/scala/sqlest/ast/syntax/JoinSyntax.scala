@@ -130,25 +130,25 @@ trait JoinSyntax {
       def onClause(relation1: R1, relation2: R2) = f(relation1, relation2)
     }
 
-    implicit def joinLeftNaturalJoinCondition[R1 <: Relation, R2 <: Relation](implicit joinCondition: JoinCondition[R1, R2]): JoinCondition[Join[R1, _], R2] =
+    implicit def joinLeftAutoJoinCondition[R1 <: Relation, R2 <: Relation](implicit joinCondition: JoinCondition[R1, R2]): JoinCondition[Join[R1, _], R2] =
       new JoinCondition[Join[R1, _], R2] {
         def onClause(join: Join[R1, _], relation2: R2) =
           joinCondition.onClause(join.left, relation2)
       }
 
-    implicit def joinRightNaturalJoinCondition[R1 <: Relation, R2 <: Relation](implicit joinCondition: JoinCondition[R1, R2]): JoinCondition[Join[_, R1], R2] =
+    implicit def joinRightAutoJoinCondition[R1 <: Relation, R2 <: Relation](implicit joinCondition: JoinCondition[R1, R2]): JoinCondition[Join[_, R1], R2] =
       new JoinCondition[Join[_, R1], R2] {
         def onClause(join: Join[_, R1], relation2: R2) =
           joinCondition.onClause(join.right, relation2)
       }
 
-    implicit def tableFunctionLeftNaturalJoinCondition[R1, R2 <: Relation](implicit joinCondition: JoinCondition[R1, R2]): JoinCondition[TableFunctionApplication[R1], R2] =
+    implicit def tableFunctionLeftAutoJoinCondition[R1, R2 <: Relation](implicit joinCondition: JoinCondition[R1, R2]): JoinCondition[TableFunctionApplication[R1], R2] =
       new JoinCondition[TableFunctionApplication[R1], R2] {
         def onClause(tableFunctionApplication: TableFunctionApplication[R1], relation2: R2) =
           joinCondition.onClause(tableFunctionApplication.tableFunction, relation2)
       }
 
-    implicit def tableFunctionRightNaturalJoinCondition[R1 <: Relation, R2](implicit joinCondition: JoinCondition[R1, R2]): JoinCondition[R1, TableFunctionApplication[R2]] =
+    implicit def tableFunctionRightAutoJoinCondition[R1 <: Relation, R2](implicit joinCondition: JoinCondition[R1, R2]): JoinCondition[R1, TableFunctionApplication[R2]] =
       new JoinCondition[R1, TableFunctionApplication[R2]] {
         def onClause(relation1: R1, tableFunctionApplication: TableFunctionApplication[R2]) =
           joinCondition.onClause(relation1, tableFunctionApplication.tableFunction)
