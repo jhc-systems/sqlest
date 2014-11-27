@@ -155,7 +155,7 @@ class H2StatementBuilderSpec extends BaseStatementBuilderSpec {
     } should equal(
       s"""
        |select ? as a, sum(?) as b, (? + ?) as c
-       |from (one inner join two on ((? = ?) and (? <> ?)))
+       |from one inner join two on ((? = ?) and (? <> ?))
        |where ((? = ?) and (? <> ?))
        |order by ?, ? desc
        |limit ?

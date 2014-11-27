@@ -79,11 +79,11 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
     case table: Table if table.tableName == table.tableAlias => identifierSql(table.tableName)
     case table: Table if table.tableName != table.tableAlias => identifierSql(table.tableName) + " as " + identifierSql(table.tableAlias)
     case tableFunctionApplication: TableFunctionApplication[_] => functionSql(tableFunctionApplication.tableName, tableFunctionApplication.parameterColumns) + " as " + identifierSql(tableFunctionApplication.tableAlias)
-    case LeftJoin(left, right, condition) => "(" + joinSql(left) + " left join " + joinSql(right) + " on " + columnSql(condition) + ")"
-    case RightJoin(left, right, condition) => "(" + joinSql(left) + " right join " + joinSql(right) + " on " + columnSql(condition) + ")"
-    case InnerJoin(left, right, condition) => "(" + joinSql(left) + " inner join " + joinSql(right) + " on " + columnSql(condition) + ")"
-    case OuterJoin(left, right, condition) => "(" + joinSql(left) + " full outer join " + joinSql(right) + " on " + columnSql(condition) + ")"
-    case CrossJoin(left, right) => "(" + joinSql(left) + " cross join " + joinSql(right) + ")"
+    case LeftJoin(left, right, condition) => joinSql(left) + " left join " + joinSql(right) + " on " + columnSql(condition)
+    case RightJoin(left, right, condition) => joinSql(left) + " right join " + joinSql(right) + " on " + columnSql(condition)
+    case InnerJoin(left, right, condition) => joinSql(left) + " inner join " + joinSql(right) + " on " + columnSql(condition)
+    case OuterJoin(left, right, condition) => joinSql(left) + " full outer join " + joinSql(right) + " on " + columnSql(condition)
+    case CrossJoin(left, right) => joinSql(left) + " cross join " + joinSql(right)
     case select: Select[_, _] => subselectSql(select)
   }
 

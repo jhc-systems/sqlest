@@ -91,7 +91,7 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
     } should equal(
       s"""
        |select one.col1 as one_col1, one.col2 as one_col2, two.col2 as two_col2, two.col3 as two_col3, three.col3 as three_col3, three.col4 as three_col4
-       |from ((one inner join two on (one.col2 = two.col2)) inner join three on (two.col3 = three.col3))
+       |from one inner join two on (one.col2 = two.col2) inner join three on (two.col3 = three.col3)
        """.formatSql,
       Nil
     )
@@ -105,7 +105,7 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
     } should equal(
       s"""
        |select one.col1 as one_col1, one.col2 as one_col2, two.col2 as two_col2, two.col3 as two_col3
-       |from (one inner join two on (one.col2 = two.col2))
+       |from one inner join two on (one.col2 = two.col2)
        """.formatSql,
       Nil
     )
@@ -121,7 +121,7 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
     } should equal(
       s"""
        |select one.col1 as one_col1, one.col2 as one_col2, two.col2 as two_col2, two.col3 as two_col3, twoo.col2 as twoo_col2, twoo.col3 as twoo_col3
-       |from ((one inner join two on (one.col2 = two.col2)) inner join two as twoo on (one.col2 = twoo.col2))
+       |from one inner join two on (one.col2 = two.col2) inner join two as twoo on (one.col2 = twoo.col2)
        """.formatSql,
       Nil
     )
@@ -134,7 +134,7 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
     } should equal(
       s"""
        |select one.col1 as one_col1, one.col2 as one_col2, two.col2 as two_col2, two.col3 as two_col3, twoo.col2 as twoo_col2, twoo.col3 as twoo_col3
-       |from ((two inner join one on (one.col2 = two.col2)) inner join two as twoo on (one.col2 = twoo.col2))
+       |from two inner join one on (one.col2 = two.col2) inner join two as twoo on (one.col2 = twoo.col2)
        """.formatSql,
       Nil
     )
@@ -150,7 +150,7 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
     } should equal(
       s"""
        |select one.col1 as one_col1, one.col2 as one_col2, two.col2 as two_col2, two.col3 as two_col3, twoo.col2 as twoo_col2, twoo.col3 as twoo_col3
-       |from ((one inner join two on (one.col2 = two.col2)) inner join two as twoo on (one.col2 = twoo.col2))
+       |from one inner join two on (one.col2 = two.col2) inner join two as twoo on (one.col2 = twoo.col2)
        """.formatSql,
       Nil
     )
@@ -166,7 +166,7 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
     } should equal(
       s"""
        |select one.col1 as one_col1, one.col2 as one_col2, two.col2 as two_col2, two.col3 as two_col3
-       |from ((one left join two on (one.col2 = two.col2)) right join testTableFunction(one.col1, 'abc') as newtesttablefunction on (one.col1 = newtesttablefunction.col6))
+       |from one left join two on (one.col2 = two.col2) right join testTableFunction(one.col1, 'abc') as newtesttablefunction on (one.col1 = newtesttablefunction.col6)
        """.formatSql,
       Nil
     )
@@ -180,7 +180,7 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
     } should equal(
       s"""
        |select count(mytable.col1) as count, min(one.col2) as min, count(distinct(one.col1)) as count
-       |from (mytable cross join one)
+       |from mytable cross join one
        |where (mytable.col1 = ?)
        """.formatSql,
       List(123)
@@ -336,7 +336,7 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
     } should equal(
       s"""
        |select three.col3 as three_col3, three.col4 as three_col4, testTableFunction.col5 as testTableFunction_col5, testTableFunction.col6 as testTableFunction_col6
-       |from (three cross join testTableFunction(three.col3, ?) as testTableFunction)
+       |from three cross join testTableFunction(three.col3, ?) as testTableFunction
        """.formatSql,
       List("abc")
     )
@@ -482,9 +482,9 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
     } should equal(
       s"""
        |select mytable.col1 as mytable_col1
-       |from (mytable
-       | inner join (select (rownumber()  over(partition by mytable.col1 order by mytable.col2)) as rownumber from mytable)
-       |  on (rownumber = 1))
+       |from mytable
+       |inner join (select (rownumber()  over(partition by mytable.col1 order by mytable.col2)) as rownumber from mytable)
+       |  on (rownumber = 1)
        """.formatSql,
       Nil
     )
