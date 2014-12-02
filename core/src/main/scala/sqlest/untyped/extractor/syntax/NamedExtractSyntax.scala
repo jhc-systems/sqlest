@@ -38,8 +38,8 @@ case class NamedExtractSyntax(c: Context) extends ExtractorSyntax {
     val validApplyMethods = applyMethods.filter(_.paramLists.length == 1)
     if (validApplyMethods.isEmpty) c.abort(c.enclosingPosition, s"No apply method found for ${companion.name.toString}")
 
-    // Step 3. Extract the parameter list for the `apply` method
     val liftedApplyMethods = validApplyMethods.map { applyMethod =>
+      // Step 3. Extract the parameter list for the `apply` method
       val caseClassParamTerms = applyMethod.paramLists.flatten.map(_.asTerm)
       val caseClassParamTypes = caseClassParamTerms.map(_.typeSignature)
       val caseClassParamNames = caseClassParamTerms.map(_.name)
@@ -70,6 +70,7 @@ case class NamedExtractSyntax(c: Context) extends ExtractorSyntax {
       """
     }
 
+    // import scala.language.dynamics to avoid having to do so at the call site
     c.Expr(q"import scala.language.dynamics; new Dynamic { ..$liftedApplyMethods }")
   }
 
