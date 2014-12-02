@@ -52,7 +52,7 @@ object SqlestBuild extends Build {
     organization := "uk.co.jhc",
     version := "0.3.0-SNAPSHOT",
     scalaVersion := "2.11.2",
-    scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-language:implicitConversions", "-language:existentials", "-language:dynamics")
+    scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-language:implicitConversions", "-language:existentials")
   )
 
   def publishingSettings = sonatypeSettings ++ Seq(

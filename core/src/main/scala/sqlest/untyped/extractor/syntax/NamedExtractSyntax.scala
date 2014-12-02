@@ -70,7 +70,7 @@ case class NamedExtractSyntax(c: Context) extends ExtractorSyntax {
       """
     }
 
-    c.Expr(q"new Dynamic { ..$liftedApplyMethods }")
+    c.Expr(q"import scala.language.dynamics; new Dynamic { ..$liftedApplyMethods }")
   }
 
   def productExtractorType(size: Int) = {
