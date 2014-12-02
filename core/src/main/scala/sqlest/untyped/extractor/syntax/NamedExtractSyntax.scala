@@ -65,8 +65,8 @@ object NamedExtractSyntax extends ExtractorSyntax {
 
     val finalTree =
       q"""
-        new {
-          def using(..$funcParams) = {
+        new Dynamic {
+          def apply(..$funcParams) = {
             new $namedExtractor(
             new $productExtractor(..$caseClassParamNames),
             ($tupleArg: $tupleType) => $companion.$applyMethod(..$tupleAccessors),

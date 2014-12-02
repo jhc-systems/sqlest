@@ -40,17 +40,17 @@ class NamedExtractSyntaxSpec extends FlatSpec with Matchers with PathDependenceT
 
   case class Tiny(a: Int)
 
-  val simpleExtractor = extractNamed[One].using(
+  val simpleExtractor = extractNamed[One](
     a = TableOne.col1,
     b = TableOne.col2
   )
 
-  val nestedExtractor = extractNamed[AggregateOneTwo].using(
-    one = extractNamed[One].using(
+  val nestedExtractor = extractNamed[AggregateOneTwo](
+    one = extractNamed[One](
       a = TableOne.col1,
       b = TableOne.col2
     ),
-    two = extractNamed[Two].using(
+    two = extractNamed[Two](
       a = TableTwo.col2,
       b = TableTwo.col3
     )
@@ -97,18 +97,18 @@ class NamedExtractSyntaxSpec extends FlatSpec with Matchers with PathDependenceT
   }
 
   "general namedExtract" should "work for case classes with one field" in {
-    extractNamed[Tiny].using(a = TableOne.col1)
+    extractNamed[Tiny](a = TableOne.col1)
   }
 
   it should "handle path-dependent types correctly" in {
     pending
     // TODO: This should compile, but doesn't due to a bug related to path dependent types:
-    // extractNamed[PathDependentOneTwo].using(
-    //   one = extractNamed[PathDependentOne].using(
+    // extractNamed[PathDependentOneTwo](
+    //   one = extractNamed[PathDependentOne](
     //     a = TableOne.col1,
     //     b = TableOne.col2
     //   ),
-    //   two = extractNamed[PathDependentTwo].using(
+    //   two = extractNamed[PathDependentTwo](
     //     a = TableTwo.col2,
     //     b = TableTwo.col3
     //   )
@@ -120,7 +120,7 @@ class NamedExtractSyntaxSpec extends FlatSpec with Matchers with PathDependenceT
   // TODO: Implement this test with illTyped:
   it should "fail if there are too few arguments" in {
     pending
-    // extractNamed[One].using(
+    // extractNamed[One](
     //   a = TableOne.col1
     // )
   }
@@ -128,7 +128,7 @@ class NamedExtractSyntaxSpec extends FlatSpec with Matchers with PathDependenceT
   // TODO: Implement this test with illTyped:
   it should "fail if there are too many arguments" in {
     pending
-    // extractNamed[One].using(
+    // extractNamed[One](
     //   a = TableOne.col1,
     //   b = TableOne.col1,
     //   c = TableOne.col1
@@ -138,7 +138,7 @@ class NamedExtractSyntaxSpec extends FlatSpec with Matchers with PathDependenceT
   // TODO: Implement this test with illTyped:
   it should "fail on the wrong types of arguments" in {
     pending
-    // extractNamed[One].using(
+    // extractNamed[One](
     //   a = TableOne.col2,
     //   b = TableOne.col1
     // )
@@ -147,7 +147,7 @@ class NamedExtractSyntaxSpec extends FlatSpec with Matchers with PathDependenceT
   // TODO: Implement this test with illTyped:
   it should "fail on the wrong argument names" in {
     pending
-    // extractNamed[One].using(
+    // extractNamed[One](
     //   b = TableOne.col1,
     //   a = TableOne.col2
     // )

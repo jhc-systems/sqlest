@@ -75,7 +75,7 @@ class FindColumnSpec extends FlatSpec with Matchers {
   }
 
   it should "find a column in named/product extractor" in {
-    val extractor = extractNamed[One].using(
+    val extractor = extractNamed[One](
       a = TableOne.col1,
       b = TableOne.col2
     )
@@ -88,18 +88,18 @@ class FindColumnSpec extends FlatSpec with Matchers {
   }
 
   it should "find a column in nested named extractors" in {
-    val extractor = extractNamed[AggregateOneTwoThenThree].using(
-      oneTwo = extractNamed[AggregateOneTwo].using(
-        one = extractNamed[One].using(
+    val extractor = extractNamed[AggregateOneTwoThenThree](
+      oneTwo = extractNamed[AggregateOneTwo](
+        one = extractNamed[One](
           a = TableOne.col1,
           b = TableOne.col2
         ),
-        two = extractNamed[Two].using(
+        two = extractNamed[Two](
           a = TableTwo.col2,
           b = TableTwo.col3
         )
       ),
-      three = extractNamed[Three].using(
+      three = extractNamed[Three](
         a = TableThree.col3,
         b = TableThree.col4
       )
@@ -122,18 +122,18 @@ class FindColumnSpec extends FlatSpec with Matchers {
   // it should "find a column in a nested named and product extractor" in {
   //   case class Outer(oneTwo: (One, Two), three: Three)
 
-  //   val extractor = extractNamed[Outer].using(
+  //   val extractor = extractNamed[Outer](
   //     oneTwo = extractNamed[Tuple2[One, Two]](
-  //       one = extractNamed[One].using(
+  //       one = extractNamed[One](
   //         a = TableOne.col1,
   //         b = TableOne.col2
   //       ),
-  //       two = extractNamed[Two].using(
+  //       two = extractNamed[Two](
   //         a = TableTwo.col2,
   //         b = TableTwo.col3
   //       )
   //     ),
-  //     three = extractNamed[Three].using(
+  //     three = extractNamed[Three](
   //       a = TableThree.col3,
   //       b = TableThree.col4
   //     )

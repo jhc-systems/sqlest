@@ -23,7 +23,7 @@ import sqlest.untyped.extractor.syntax.NamedExtractSyntax
 import sqlest.untyped.syntax.ColumnFinderSyntax
 
 trait SqlestUntyped extends ColumnSyntax with ColumnFinderSyntax {
-  def extractNamed[A]: Any = macro NamedExtractSyntax.extractNamedImpl[A]
+  def extractNamed[A]: Dynamic = macro NamedExtractSyntax.extractNamedImpl[A]
 
   val ColumnFinder = sqlest.untyped.ColumnFinder
 
