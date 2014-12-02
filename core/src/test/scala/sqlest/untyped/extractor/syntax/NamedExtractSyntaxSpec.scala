@@ -100,6 +100,18 @@ class NamedExtractSyntaxSpec extends FlatSpec with Matchers with PathDependenceT
     extractNamed[Tiny](a = TableOne.col1)
   }
 
+  class Multiple(a: Int, b: Int)
+  object Multiple {
+    def apply(a: Int) = new Multiple(a, 37)
+    def apply(a: Int, b: Int) = new Multiple(a, b)
+    def apply(a: Int, b: Int, c: Int) = new Multiple(a, b + c)
+  }
+  it should "work for classes with multiple apply methods" in {
+    extractNamed[Multiple](a = TableOne.col1)
+    extractNamed[Multiple](a = TableOne.col1, b = TableOne.col1)
+    extractNamed[Multiple](a = TableOne.col1, b = TableOne.col1, c = TableOne.col1)
+  }
+
   it should "handle path-dependent types correctly" in {
     pending
     // TODO: This should compile, but doesn't due to a bug related to path dependent types:

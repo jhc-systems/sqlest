@@ -20,8 +20,8 @@ import scala.language.experimental.macros
 import scala.reflect.macros.whitebox.Context
 import sqlest.extractor._
 
-object NamedExtractSyntax extends ExtractorSyntax {
-  def extractNamedImpl[A: c.WeakTypeTag](c: Context) = {
+case class NamedExtractSyntax(c: Context) extends ExtractorSyntax {
+  def extractNamedImpl[A: c.WeakTypeTag] = {
     import c.universe._
 
     // Step 1. Extract useful information from the type A:
@@ -29,57 +29,51 @@ object NamedExtractSyntax extends ExtractorSyntax {
     val companion = typeOfA.typeSymbol.companion
     val companionType = companion.typeSignature
 
-    // Step 2. Locate the `apply` method of the case class we're constructing:
-    val applyMethod = companionType.decl(TermName("apply")) match {
-      case method: MethodSymbol => method
-      case NoSymbol =>
-        c.abort(c.enclosingPosition, s"No apply method found for ${companion.name.toString}")
+    // Step 2. Locate the `apply` methods of the case class we're constructing:
+    val applyMethods: List[MethodSymbol] = companionType.decl(TermName("apply")) match {
+      case method: MethodSymbol => List(method)
+      case termSymbol: TermSymbol => termSymbol.alternatives.collect { case method: MethodSymbol => method }
+      case _ => Nil
     }
+    val validApplyMethods = applyMethods.filter(_.paramLists.length == 1)
+    if (validApplyMethods.isEmpty) c.abort(c.enclosingPosition, s"No apply method found for ${companion.name.toString}")
 
     // Step 3. Extract the parameter list for the `apply` method
-    val caseClassParamTerms = applyMethod.paramLists match {
-      case paramList :: Nil => paramList.map(_.asTerm)
-      case _ => c.abort(c.enclosingPosition, s"No valid parameter list found for ${companion.name.toString}")
-    }
+    val liftedApplyMethods = validApplyMethods.map { applyMethod =>
+      val caseClassParamTerms = applyMethod.paramLists.flatten.map(_.asTerm)
+      val caseClassParamTypes = caseClassParamTerms.map(_.typeSignature)
+      val caseClassParamNames = caseClassParamTerms.map(_.name)
+      val caseClassParamStrings = caseClassParamTerms.map(_.name.toString.trim)
 
-    val caseClassParamTypes = caseClassParamTerms.map(_.typeSignature)
-    val caseClassParamNames = caseClassParamTerms.map(_.name)
-    val caseClassParamStrings = caseClassParamTerms.map(_.name.toString.trim)
+      // Step 4. Build the target code fragment:
+      val funcParams = caseClassParamNames.zip(caseClassParamTypes).map {
+        case (param, typ) => q"$param: sqlest.extractor.Extractor[$typ]"
+      }
 
-    val paramListLength = caseClassParamTerms.length
+      val paramListLength = caseClassParamTerms.length
+      val tupleType =
+        if (paramListLength == 1) tq"scala.Tuple1[..$caseClassParamTypes]"
+        else tq"(..$caseClassParamTypes)"
+      val tupleArg = TermName("arg")
+      val tupleAccessors = (1 to paramListLength).toList.map(num => Select(Ident(tupleArg), TermName("_" + num)))
 
-    // Step 4. Build the target code fragment:
-    val extractor = tq"sqlest.extractor.Extractor"
+      val namedExtractor = tq"sqlest.untyped.extractor.NamedExtractor[$tupleType, $typeOfA]"
+      val productExtractor = productExtractorType(caseClassParamTerms.length)
 
-    val funcParamTypes = caseClassParamTypes.map(typ => tq"$extractor[$typ]")
-    val funcParams = caseClassParamNames.zip(funcParamTypes).map(x => q"val ${x._1}: ${x._2}")
-
-    val tupleType =
-      if (paramListLength == 1) tq"scala.Tuple1[..$caseClassParamTypes]"
-      else tq"(..$caseClassParamTypes)"
-    val tupleArg = TermName("arg")
-    val tupleAccessors = (1 to paramListLength).toList.map(num => Select(Ident(tupleArg), TermName("_" + num)))
-
-    val namedExtractor = tq"sqlest.untyped.extractor.NamedExtractor[$tupleType, $typeOfA]"
-    val productExtractor = productExtractorType(c)(caseClassParamTerms.length)
-
-    val finalTree =
       q"""
-        new Dynamic {
-          def apply(..$funcParams) = {
-            new $namedExtractor(
+        def apply(..$funcParams) =
+          new $namedExtractor(
             new $productExtractor(..$caseClassParamNames),
             ($tupleArg: $tupleType) => $companion.$applyMethod(..$tupleAccessors),
             List(..$caseClassParamStrings)
-            )
-          }
-        }
+          )
       """
+    }
 
-    c.Expr(finalTree)
+    c.Expr(q"new Dynamic { ..$liftedApplyMethods }")
   }
 
-  def productExtractorType(c: Context)(size: Int) = {
+  def productExtractorType(size: Int) = {
     import c.universe._
     size match {
       case 1 => tq"sqlest.extractor.Tuple1Extractor"
