@@ -45,6 +45,4 @@ trait ExtractorSyntax extends Extractors {
 
   def extractColumnByName[A: ColumnType](name: String)(implicit builder: ExtractorBuilder[AliasedColumn[A]]): ColumnExtractor[A] =
     builder(AliasColumn[A](null, name)).asInstanceOf[ColumnExtractor[A]]
-
-  def extractConstant[A](value: A) = ConstantExtractor(value)
 }

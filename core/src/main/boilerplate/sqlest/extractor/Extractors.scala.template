@@ -20,7 +20,11 @@ import sqlest.ast._
 import scala.language.experimental.macros
 import sqlest.untyped.extractor.syntax.NamedExtractSyntax
 
-trait Extractors {
+trait LowPriorityExtractors {
+  implicit def extractConstant[A](value: A) = ConstantExtractor(value)
+}
+
+trait Extractors extends LowPriorityExtractors {
   def extract[A]: Dynamic = macro NamedExtractSyntax.extractImpl[A]
 
   implicit def extractColumn[A](column: AliasedColumn[A]): ColumnExtractor[A] =

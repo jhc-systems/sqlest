@@ -300,23 +300,23 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
     ))
   }
 
-  "column and extractor" should "be usable together as arguments to `extractor`" in {
+  "columns, constants and extractors" should "be usable together as arguments to `extractor`" in {
     val extractor = extract[AggregateOnePointFive](
       one = extract[One](
         a = TableOne.col1,
-        b = TableOne.col2
+        b = "const"
       ),
       str = TableTwo.col2
     )
 
     extractor.extractHeadOption(testResultSet) should equal(Some(
-      AggregateOnePointFive(One(1, "a"), "b")
+      AggregateOnePointFive(One(1, "const"), "b")
     ))
 
     extractor.extractAll(testResultSet) should equal(List(
-      AggregateOnePointFive(One(1, "a"), "b"),
-      AggregateOnePointFive(One(3, "c"), "d"),
-      AggregateOnePointFive(One(-1, "e"), "f")
+      AggregateOnePointFive(One(1, "const"), "b"),
+      AggregateOnePointFive(One(3, "const"), "d"),
+      AggregateOnePointFive(One(-1, "const"), "f")
     ))
   }
 
