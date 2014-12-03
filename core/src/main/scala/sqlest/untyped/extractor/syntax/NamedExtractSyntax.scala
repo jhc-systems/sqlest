@@ -55,10 +55,19 @@ case class NamedExtractSyntax(c: Context) extends ExtractorSyntax {
     val caseClassParamTypes = caseClassParamTerms.map(_.typeSignature)
     val caseClassParamNames = caseClassParamTerms.map(_.name)
     val caseClassParamStrings = caseClassParamTerms.map(_.name.toString.trim)
+    val caseClassParamDefaultValues = caseClassParamTerms.zipWithIndex.map {
+      case (param, index) =>
+        if (param.isParamWithDefault) {
+          val getterName = TermName("apply$default$" + (index + 1))
+          Some(q"$companion.$getterName")
+        } else None
+    }
 
     // Build the target code fragment:
-    val funcParams = caseClassParamNames.zip(caseClassParamTypes).map {
-      case (param, typ) => q"$param: sqlest.extractor.Extractor[$typ]"
+    val funcParams = (caseClassParamNames, caseClassParamTypes, caseClassParamDefaultValues).zipped.map {
+      case (paramName, typ, defaultValue) =>
+        val funcParam = q"val $paramName: sqlest.extractor.Extractor[$typ]"
+        defaultValue.map(default => q"$funcParam = default").getOrElse(funcParam)
     }
 
     val paramListLength = caseClassParamTerms.length
@@ -69,7 +78,7 @@ case class NamedExtractSyntax(c: Context) extends ExtractorSyntax {
     val tupleAccessors = (1 to paramListLength).toList.map(num => Select(Ident(tupleArg), TermName("_" + num)))
 
     val namedExtractor = tq"sqlest.untyped.extractor.NamedExtractor[$tupleType, $typeOfA]"
-    val productExtractor = productExtractorType(caseClassParamTerms.length)
+    val productExtractor = productExtractorType(paramListLength)
 
     q"""
         def apply(..$funcParams) =

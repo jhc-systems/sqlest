@@ -29,6 +29,7 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
   case class Outer(a: Int, b: List[Inner])
   case class Flattened(a: Int, b: List[Int], c: List[Int])
   case class AggregateOnePointFive(one: One, str: String)
+  case class DefaultParams(a: Int, b: String = "sweet")
 
   "single case class extractor" should "extract appropriate data structures" in {
     val extractor = extract[One](
@@ -44,6 +45,22 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       One(1, "a"),
       One(3, "c"),
       One(-1, "e")
+    ))
+  }
+
+  it should "work for default parameters" in {
+    val extractor = extract[DefaultParams](
+      a = TableOne.col1
+    )
+
+    extractor.extractHeadOption(testResultSet) should equal(Some(
+      DefaultParams(1, "sweet")
+    ))
+
+    extractor.extractAll(testResultSet) should equal(List(
+      DefaultParams(1, "sweet"),
+      DefaultParams(3, "sweet"),
+      DefaultParams(-1, "sweet")
     ))
   }
 

@@ -112,6 +112,12 @@ class NamedExtractSyntaxSpec extends FlatSpec with Matchers with PathDependenceT
     extract[Multiple](a = TableOne.col1, b = TableOne.col1, c = TableOne.col1)
   }
 
+  case class DefaultParams(a: Int, b: String = "sweet")
+  it should "work for apply methods with default parameters" in {
+    extract[DefaultParams](a = TableOne.col1, b = TableOne.col2)
+    extract[DefaultParams](a = TableOne.col1)
+  }
+
   it should "handle path-dependent types correctly" in {
     pending
     // TODO: This should compile, but doesn't due to a bug related to path dependent types:
