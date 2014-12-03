@@ -40,23 +40,23 @@ class NamedExtractSyntaxSpec extends FlatSpec with Matchers with PathDependenceT
 
   case class Tiny(a: Int)
 
-  val simpleExtractor = extractNamed[One](
+  val simpleExtractor = extract[One](
     a = TableOne.col1,
     b = TableOne.col2
   )
 
-  val nestedExtractor = extractNamed[AggregateOneTwo](
-    one = extractNamed[One](
+  val nestedExtractor = extract[AggregateOneTwo](
+    one = extract[One](
       a = TableOne.col1,
       b = TableOne.col2
     ),
-    two = extractNamed[Two](
+    two = extract[Two](
       a = TableTwo.col2,
       b = TableTwo.col3
     )
   )
 
-  "simple extractNamed" should "have the correct extractHeadOption behaviour" in {
+  "simple extract" should "have the correct extractHeadOption behaviour" in {
     simpleExtractor.extractHeadOption(testResultSet) should equal(Some(
       One(1, "a")
     ))
@@ -76,7 +76,7 @@ class NamedExtractSyntaxSpec extends FlatSpec with Matchers with PathDependenceT
     simpleExtractor.findColumn("c") should equal(None)
   }
 
-  "nested extractNamed" should "have the correct extractHeadOption behaviour" in {
+  "nested extract" should "have the correct extractHeadOption behaviour" in {
     nestedExtractor.extractHeadOption(testResultSet) should equal(Some(
       AggregateOneTwo(One(1, "a"), Two("b", 2))
     ))
@@ -97,7 +97,7 @@ class NamedExtractSyntaxSpec extends FlatSpec with Matchers with PathDependenceT
   }
 
   "general namedExtract" should "work for case classes with one field" in {
-    extractNamed[Tiny](a = TableOne.col1)
+    extract[Tiny](a = TableOne.col1)
   }
 
   class Multiple(a: Int, b: Int)
@@ -107,20 +107,20 @@ class NamedExtractSyntaxSpec extends FlatSpec with Matchers with PathDependenceT
     def apply(a: Int, b: Int, c: Int) = new Multiple(a, b + c)
   }
   it should "work for classes with multiple apply methods" in {
-    extractNamed[Multiple](a = TableOne.col1)
-    extractNamed[Multiple](a = TableOne.col1, b = TableOne.col1)
-    extractNamed[Multiple](a = TableOne.col1, b = TableOne.col1, c = TableOne.col1)
+    extract[Multiple](a = TableOne.col1)
+    extract[Multiple](a = TableOne.col1, b = TableOne.col1)
+    extract[Multiple](a = TableOne.col1, b = TableOne.col1, c = TableOne.col1)
   }
 
   it should "handle path-dependent types correctly" in {
     pending
     // TODO: This should compile, but doesn't due to a bug related to path dependent types:
-    // extractNamed[PathDependentOneTwo](
-    //   one = extractNamed[PathDependentOne](
+    // extract[PathDependentOneTwo](
+    //   one = extract[PathDependentOne](
     //     a = TableOne.col1,
     //     b = TableOne.col2
     //   ),
-    //   two = extractNamed[PathDependentTwo](
+    //   two = extract[PathDependentTwo](
     //     a = TableTwo.col2,
     //     b = TableTwo.col3
     //   )
@@ -132,7 +132,7 @@ class NamedExtractSyntaxSpec extends FlatSpec with Matchers with PathDependenceT
   // TODO: Implement this test with illTyped:
   it should "fail if there are too few arguments" in {
     pending
-    // extractNamed[One](
+    // extract[One](
     //   a = TableOne.col1
     // )
   }
@@ -140,7 +140,7 @@ class NamedExtractSyntaxSpec extends FlatSpec with Matchers with PathDependenceT
   // TODO: Implement this test with illTyped:
   it should "fail if there are too many arguments" in {
     pending
-    // extractNamed[One](
+    // extract[One](
     //   a = TableOne.col1,
     //   b = TableOne.col1,
     //   c = TableOne.col1
@@ -150,7 +150,7 @@ class NamedExtractSyntaxSpec extends FlatSpec with Matchers with PathDependenceT
   // TODO: Implement this test with illTyped:
   it should "fail on the wrong types of arguments" in {
     pending
-    // extractNamed[One](
+    // extract[One](
     //   a = TableOne.col2,
     //   b = TableOne.col1
     // )
@@ -159,7 +159,7 @@ class NamedExtractSyntaxSpec extends FlatSpec with Matchers with PathDependenceT
   // TODO: Implement this test with illTyped:
   it should "fail on the wrong argument names" in {
     pending
-    // extractNamed[One](
+    // extract[One](
     //   b = TableOne.col1,
     //   a = TableOne.col2
     // )

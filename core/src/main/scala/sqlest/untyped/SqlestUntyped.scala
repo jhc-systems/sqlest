@@ -16,15 +16,12 @@
 
 package sqlest.untyped
 
-import scala.language.experimental.macros
 import sqlest.extractor._
 import sqlest.untyped.ast.syntax.ColumnSyntax
 import sqlest.untyped.extractor.syntax.NamedExtractSyntax
 import sqlest.untyped.syntax.ColumnFinderSyntax
 
 trait SqlestUntyped extends ColumnSyntax with ColumnFinderSyntax {
-  def extractNamed[A]: Dynamic = macro NamedExtractSyntax.extractNamedImpl[A]
-
   val ColumnFinder = sqlest.untyped.ColumnFinder
 
   type ProductNames[A] = sqlest.untyped.ProductNames[A]

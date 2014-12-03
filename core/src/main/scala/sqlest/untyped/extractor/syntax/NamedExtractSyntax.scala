@@ -23,7 +23,7 @@ import sqlest.extractor._
 case class NamedExtractSyntax(c: Context) extends ExtractorSyntax {
   import c.universe._
 
-  def extractNamedImpl[A: c.WeakTypeTag] = {
+  def extractImpl[A: c.WeakTypeTag] = {
 
     // Extract useful information from the type A:
     val typeOfA = weakTypeOf[A]

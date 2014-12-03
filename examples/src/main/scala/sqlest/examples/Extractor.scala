@@ -17,7 +17,7 @@ object ExtractorExamples extends App with DatabaseExample {
 
   println(fruits)
 
-  lazy val fruitExtractor = extractNamed[Fruit](
+  lazy val fruitExtractor = extract[Fruit](
     name = FruitTable.name,
     juiciness = FruitTable.juiciness
   )

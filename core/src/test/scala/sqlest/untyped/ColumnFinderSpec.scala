@@ -25,25 +25,25 @@ class FindColumnSpec extends FlatSpec with Matchers {
   import TestData._
 
   "column finder" should "find a column in a single extractor" in {
-    val extractor = extract(TableOne.col1)
+    val extractor = extractColumn(TableOne.col1)
     extractor.findColumn("") should equal(Some(TableOne.col1))
     extractor.findColumn("foo") should equal(None)
   }
 
   it should "find a column in a bare mapped extractor" in {
-    val extractor = extract(TableOne.col1).map(_ * 2)
+    val extractor = TableOne.col1.map(_ * 2)
     extractor.findColumn("") should equal(Some(TableOne.col1))
     extractor.findColumn("foo") should equal(None)
   }
 
   it should "find a column in a bare list extractor" in {
-    val extractor = extract(TableOne.col1).asList
+    val extractor = TableOne.col1.asList
     extractor.findColumn("") should equal(Some(TableOne.col1))
     extractor.findColumn("foo") should equal(None)
   }
 
   it should "find a column in a bare grouped extractor" in {
-    val extractor = extract(TableOne.col1).groupBy(TableOne.col1)
+    val extractor = TableOne.col1.groupBy(TableOne.col1)
     extractor.findColumn("") should equal(Some(TableOne.col1))
     extractor.findColumn("foo") should equal(None)
   }
@@ -75,7 +75,7 @@ class FindColumnSpec extends FlatSpec with Matchers {
   }
 
   it should "find a column in named/product extractor" in {
-    val extractor = extractNamed[One](
+    val extractor = extract[One](
       a = TableOne.col1,
       b = TableOne.col2
     )
@@ -88,18 +88,18 @@ class FindColumnSpec extends FlatSpec with Matchers {
   }
 
   it should "find a column in nested named extractors" in {
-    val extractor = extractNamed[AggregateOneTwoThenThree](
-      oneTwo = extractNamed[AggregateOneTwo](
-        one = extractNamed[One](
+    val extractor = extract[AggregateOneTwoThenThree](
+      oneTwo = extract[AggregateOneTwo](
+        one = extract[One](
           a = TableOne.col1,
           b = TableOne.col2
         ),
-        two = extractNamed[Two](
+        two = extract[Two](
           a = TableTwo.col2,
           b = TableTwo.col3
         )
       ),
-      three = extractNamed[Three](
+      three = extract[Three](
         a = TableThree.col3,
         b = TableThree.col4
       )
@@ -122,18 +122,18 @@ class FindColumnSpec extends FlatSpec with Matchers {
   // it should "find a column in a nested named and product extractor" in {
   //   case class Outer(oneTwo: (One, Two), three: Three)
 
-  //   val extractor = extractNamed[Outer](
-  //     oneTwo = extractNamed[Tuple2[One, Two]](
-  //       one = extractNamed[One](
+  //   val extractor = extract[Outer](
+  //     oneTwo = extract[Tuple2[One, Two]](
+  //       one = extract[One](
   //         a = TableOne.col1,
   //         b = TableOne.col2
   //       ),
-  //       two = extractNamed[Two](
+  //       two = extract[Two](
   //         a = TableTwo.col2,
   //         b = TableTwo.col3
   //       )
   //     ),
-  //     three = extractNamed[Three](
+  //     three = extract[Three](
   //       a = TableThree.col3,
   //       b = TableThree.col4
   //     )
