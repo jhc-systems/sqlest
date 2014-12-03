@@ -94,18 +94,17 @@ select(FruitTable.name, FruitTable.juiciness)
 ### Extractors
 Extractors are used to populate domain classes from ResultSets returned by running queries. They declaratively specify which parameter in a case class is populated by which column in a table
 ```scala
-lazy val fruitExtractor = extractNamed[Fruit](
-  "name" -> FruitTable.name,
-  "juiciness" -> FruitTable.juiciness
+lazy val fruitExtractor = extract[Fruit](
+  name = FruitTable.name,
+  juiciness = FruitTable.juiciness
 )
 ```
-Don't be put off by the strings - extractNamed is a macro that fails at compile time if there is not an apply method for the class you are creating with the same named and typed parameters
 
 Extractors are designed for composition to allow nested case classes to be extracted, and multiple rows of the ResultSet to be combined into a single result
 ```scala
-lazy val smoothyExtractor = extractNamed[Smoothy](
-  "description" -> SmoothyTable.description,
-  "fruits" -> fruitExtractor.asList
+lazy val smoothyExtractor = extract[Smoothy](
+  description = SmoothyTable.description,
+  fruits = fruitExtractor.asList
 ).groupBy(SmoothyTable.id)
 ```
 
