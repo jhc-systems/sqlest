@@ -66,8 +66,10 @@ case class NamedExtractSyntax(c: Context) extends ExtractorSyntax {
     // Build the target code fragment:
     val funcParams = (caseClassParamNames, caseClassParamTypes, caseClassParamDefaultValues).zipped.map {
       case (paramName, typ, defaultValue) =>
-        val funcParam = q"val $paramName: sqlest.extractor.Extractor[$typ]"
-        defaultValue.map(default => q"$funcParam = default").getOrElse(funcParam)
+        if (defaultValue.isDefined)
+          q"val $paramName: sqlest.extractor.Extractor[$typ] = ${defaultValue.get}"
+        else
+          q"val $paramName: sqlest.extractor.Extractor[$typ]"
     }
 
     val paramListLength = caseClassParamTerms.length
