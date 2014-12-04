@@ -69,10 +69,8 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
   def selectUnionSql(union: Seq[Union[_]]): Option[String] =
     if (union.isEmpty) None else
       Some(union.map {
-        _ match {
-          case Union(select, false) => s"union ${selectSql(select)}"
-          case Union(select, true) => s"union all ${selectSql(select)}"
-        }
+        case Union(select, false) => s"union ${selectSql(select)}"
+        case Union(select, true) => s"union all ${selectSql(select)}"
       }.mkString(" "))
 
   def joinSql(relation: Relation): String = relation match {
@@ -128,11 +126,9 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
 
   def selectGroupByArgs(group: Seq[Group]): List[LiteralColumn[_]] =
     group.toList flatMap {
-      _ match {
-        case ColumnGroup(column) => columnArgs(column)
-        case TupleGroup(groups) => selectGroupByArgs(groups)
-        case FunctionGroup(_, groups) => selectGroupByArgs(groups)
-      }
+      case ColumnGroup(column) => columnArgs(column)
+      case TupleGroup(groups) => selectGroupByArgs(groups)
+      case FunctionGroup(_, groups) => selectGroupByArgs(groups)
     }
 
   def selectHavingArgs(having: Option[Column[Boolean]]): List[LiteralColumn[_]] =
