@@ -229,9 +229,9 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
 
   "option extractor" should "handle nulls" in {
     def results = TestResultSet(TableOne.columns)(
-      Seq(1, "a"),
-      Seq(3, "c"),
-      Seq(null, "e")
+      Seq(1, "q   "),
+      Seq(3, null),
+      Seq(null, "e   ")
     )
 
     val extractor1 = TableOne.col1.asOption
@@ -246,16 +246,16 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       None
     ))
 
-    val extractor2 = TableOne.col1.?
+    val extractor2 = TableOne.col2.?
 
     extractor2.extractHeadOption(results) should equal(Some(
-      Some(1)
+      Some("q")
     ))
 
     extractor2.extractAll(results) should equal(List(
-      Some(1),
-      Some(3),
-      None
+      Some("q"),
+      None,
+      Some("e")
     ))
   }
 

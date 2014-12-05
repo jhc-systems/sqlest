@@ -22,7 +22,7 @@ import sqlest.extractor.TestResultSet
 object TestData {
   class TableOne(alias: Option[String]) extends Table("one", alias) {
     val col1 = column[Int]("col1")
-    val col2 = column[String]("col2")
+    val col2 = column[String]("col2", TrimmedStringColumnType)
     def columns = List(col1, col2)
   }
   object TableOne extends TableOne(None)

@@ -51,15 +51,15 @@ trait ColumnSyntax {
   implicit def literalSetterPair[A, B](pair: (TableColumn[A], B))(implicit valueType: ColumnType[B], equivalence: ColumnTypeEquivalence[A, B]) =
     Setter[A, B](pair._1, pair._2.column)
 
-  implicit class AliasColumnOps[A](left: Column[A])(implicit leftType: ColumnType[A]) {
+  implicit class AliasColumnOps[A](left: Column[A]) {
     def as(alias: String) = left match {
-      case AliasColumn(column, _) => AliasColumn[A](column, alias)
-      case _ => AliasColumn[A](left, alias)
+      case AliasColumn(column, _) => AliasColumn[A](column, alias)(left.columnType)
+      case _ => AliasColumn[A](left, alias)(left.columnType)
     }
 
     def as(tableAlias: String, alias: String) = left match {
-      case AliasColumn(column, _) => AliasColumn[A](column, tableAlias + "_" + alias)
-      case _ => AliasColumn[A](left, tableAlias + "_" + alias)
+      case AliasColumn(column, _) => AliasColumn[A](column, tableAlias + "_" + alias)(left.columnType)
+      case _ => AliasColumn[A](left, tableAlias + "_" + alias)(left.columnType)
     }
   }
 
@@ -71,16 +71,16 @@ trait ColumnSyntax {
     AliasColumn(SelectColumn(select)(column.columnType), column.columnAlias)(column.columnType)
   }
 
-  implicit class NullableColumnsOps[A](left: Column[A])(implicit leftType: ColumnType[A]) {
+  implicit class NullableColumnsOps[A](left: Column[A]) {
     def isNull = PostfixFunctionColumn[Boolean]("is null", left)
     def isNotNull = PostfixFunctionColumn[Boolean]("is not null", left)
   }
 
-  implicit class AliasedOptionColumnsOps[A](left: AliasedColumn[A])(implicit leftType: BaseColumnType[A]) {
+  implicit class AliasedOptionColumnsOps[A](left: AliasedColumn[A]) {
     def ? = left match {
-      case column: TableColumn[_] => AliasColumn(column, left.columnAlias)(OptionColumnType(leftType))
-      case AliasColumn(column, columnAlias) => AliasColumn(column, columnAlias)(OptionColumnType(leftType))
-      case column: ReferenceColumn[A] => ReferenceColumn(left.columnAlias)(OptionColumnType(leftType))
+      case column: TableColumn[_] => AliasColumn(column, left.columnAlias)(OptionColumnType(left.columnType))
+      case AliasColumn(column, columnAlias) => AliasColumn(column, columnAlias)(OptionColumnType(left.columnType))
+      case column: ReferenceColumn[A] => ReferenceColumn(left.columnAlias)(OptionColumnType(left.columnType))
     }
   }
 
