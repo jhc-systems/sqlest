@@ -65,8 +65,16 @@ case object DateTimeColumnType extends NonNumericBaseColumnType[DateTime] {
  *
  * For every `OptionColumnType` there is an underlying `BaseColumnType`.
  */
-case class OptionColumnType[+A](baseType: BaseColumnType[A]) extends ColumnType[Option[A]] {
+case class OptionColumnType[+A](baseType: ColumnType[A]) extends ColumnType[Option[A]] {
   val typeTag = ru.typeTag[Option[_]]
+}
+object ColumnType {
+  implicit class OptionColumnTypeOps[A](left: ColumnType[A]) {
+    def toOptionColumnType: OptionColumnType[A] = left match {
+      case option: OptionColumnType[A] => option
+      case base => OptionColumnType(base)
+    }
+  }
 }
 
 /**
