@@ -36,6 +36,7 @@ case class NamedExtractSyntax(c: Context) extends ExtractorSyntax {
 
     val liftedApplyMethods = applyMethods.map(liftApplyMethod(_, typeOfA, companion))
 
+    println(show(liftedApplyMethods))
     // import scala.language.dynamics to avoid having to do so at the call site
     c.Expr(q"import scala.language.dynamics; new Dynamic { ..$liftedApplyMethods }")
   }
@@ -47,6 +48,42 @@ case class NamedExtractSyntax(c: Context) extends ExtractorSyntax {
       case _ => Nil
     }
     applyMethods.filter(_.paramLists.length == 1)
+  }
+
+  def buildTupleAccessors(applyMethod: MethodSymbol, tupleArg: TermName, length: Int): List[Tree] = {
+    val accessors = (1 until length).toList.map(num => Select(Ident(tupleArg), TermName("_" + num)))
+    if (applyMethod.isVarargs)
+      accessors :+ Typed(Select(Ident(tupleArg), TermName("_" + length)), Ident(typeNames.WILDCARD_STAR))
+    else
+      accessors :+ Select(Ident(tupleArg), TermName("_" + length))
+  }
+
+  def repeatableToTCParam(param: Type, symbol: ClassSymbol): Type = {
+    import definitions._
+    import internal._
+
+    val repeatedParamClass = RepeatedParamClass
+
+    param match {
+      case TypeRef(_, `repeatedParamClass`, typ :: Nil) =>
+        typeRef(symbol.owner.asType.toType, symbol, typ :: Nil)
+      case inner: TypeRef =>
+        typeRef(symbol.owner.asType.toType, symbol, inner :: Nil)
+    }
+  }
+
+  def liftParam(param: Type, symbol: ClassSymbol): Type = {
+    import definitions._
+    import internal._
+
+    val repeatedParamClass = RepeatedParamClass
+
+    param match {
+      case TypeRef(_, `repeatedParamClass`, typ) =>
+        typeRef(NoPrefix, `repeatedParamClass`, typeRef(symbol.owner.asType.toType, symbol, typ) :: Nil)
+      case inner: TypeRef =>
+        typeRef(symbol.owner.asType.toType, symbol, inner :: Nil)
+    }
   }
 
   def liftApplyMethod(applyMethod: MethodSymbol, typeOfA: Type, companion: Symbol) = {
@@ -63,29 +100,48 @@ case class NamedExtractSyntax(c: Context) extends ExtractorSyntax {
         } else None
     }
 
+    val extractorSymbol = c.mirror.staticClass("sqlest.extractor.Extractor")
+    val liftedParamTypes = caseClassParamTypes.map(liftParam(_, extractorSymbol))
+
     // Build the target code fragment:
-    val funcParams = (caseClassParamNames, caseClassParamTypes, caseClassParamDefaultValues).zipped.map {
+    val funcParams = (caseClassParamNames, liftedParamTypes, caseClassParamDefaultValues).zipped.map {
       case (paramName, typ, defaultValue) =>
         if (defaultValue.isDefined)
-          q"val $paramName: sqlest.extractor.Extractor[$typ] = ${defaultValue.get}"
+          q"val $paramName: $typ = ${defaultValue.get}"
         else
-          q"val $paramName: sqlest.extractor.Extractor[$typ]"
+          q"val $paramName: $typ"
+    }
+
+    val seqSymbol = c.mirror.staticClass("scala.collection.Seq")
+    val repeatableToSeqTypes = {
+      if (applyMethod.isVarargs)
+        caseClassParamTypes.init :+
+          repeatableToTCParam(caseClassParamTypes.last, seqSymbol)
+      else caseClassParamTypes
     }
 
     val paramListLength = caseClassParamTerms.length
     val tupleType =
-      if (paramListLength == 1) tq"scala.Tuple1[..$caseClassParamTypes]"
-      else tq"(..$caseClassParamTypes)"
+      if (paramListLength == 1) tq"scala.Tuple1[..$repeatableToSeqTypes]"
+      else tq"(..$repeatableToSeqTypes)"
     val tupleArg = TermName("arg")
-    val tupleAccessors = (1 to paramListLength).toList.map(num => Select(Ident(tupleArg), TermName("_" + num)))
+    val tupleAccessors = buildTupleAccessors(applyMethod, tupleArg, paramListLength)
 
     val namedExtractor = tq"sqlest.untyped.extractor.NamedExtractor[$tupleType, $typeOfA]"
     val productExtractor = productExtractorType(paramListLength)
+    val extractorParams =
+      if (applyMethod.isVarargs) {
+        val varargsBaseType = caseClassParamTypes.last match {
+          case TypeRef(_, _, typ :: Nil) => typ
+        }
+        caseClassParamNames.init.map(Ident(_)) :+
+          q"sqlest.extractor.SeqExtractor[$varargsBaseType](${caseClassParamNames.last}.toSeq)"
+      } else caseClassParamNames.map(Ident(_))
 
     q"""
         def apply(..$funcParams) =
           new $namedExtractor(
-            new $productExtractor(..$caseClassParamNames),
+            new $productExtractor(..$extractorParams),
             ($tupleArg: $tupleType) => $companion.$applyMethod(..$tupleAccessors),
             List(..$caseClassParamStrings)
           )

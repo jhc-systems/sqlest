@@ -19,6 +19,7 @@ package sqlest.extractor
 import org.scalatest._
 import org.scalatest.matchers._
 import sqlest._
+import sqlest.untyped.extractor.NamedExtractor
 
 class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
   import TestData._
@@ -30,6 +31,7 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
   case class Flattened(a: Int, b: List[Int], c: List[Int])
   case class AggregateOnePointFive(one: One, str: String)
   case class DefaultParams(a: Int, b: String = "sweet")
+  case class VarargsParams(a: Int, b: String*)
 
   "single case class extractor" should "extract appropriate data structures" in {
     val extractor = extract[One](
@@ -62,6 +64,21 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       DefaultParams(3, "sweet"),
       DefaultParams(-1, "sweet")
     ))
+  }
+
+  it should "work for apply methods with varargs" in {
+    /* Doesn't typecheck because Extractor[A] is invariant in A
+       regardless that SeqExtractor[String] <: SingleExtractor[Seq[String]] */
+    extract[VarargsParams](TableOne.col1, TableOne.col2)
+    extract[VarargsParams](TableOne.col1)
+    extract[List[String]](TableOne.col2, TableOne.col2)
+
+    def apply(a: Extractor[Int], b: Extractor[String]*) =
+      new NamedExtractor[(Int, Seq[String]), VarargsParams](
+        new Tuple2Extractor(a, SeqExtractor[String](b)),
+        (arg: (Int, Seq[String])) => VarargsParams(arg._1, arg._2: _*),
+        List("a", "b")
+      )
   }
 
   "tuple extractor" should "extract appropriate data structures" in {

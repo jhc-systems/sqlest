@@ -61,7 +61,7 @@ trait SingleExtractor[A] extends Extractor[A] {
       accumulator.toList
     } else Nil
 
-  def asList = ListExtractor(this)
+  def asList = QueueExtractor(this)
   def groupBy[B](groupBy: Extractor[B]) = GroupedExtractor(this, groupBy)
 }
 
@@ -177,7 +177,7 @@ case class OptionExtractor[A](inner: Extractor[A]) extends SingleExtractor[Optio
 /**
  * An extractor that accumulates results into a list.
  */
-case class ListExtractor[A](inner: Extractor[A]) extends MultiExtractor[A] {
+case class QueueExtractor[A](inner: Extractor[A]) extends MultiExtractor[A] {
   type Accumulator = Queue[Option[A]]
   val columns = inner.columns
 
@@ -197,6 +197,21 @@ case class ListExtractor[A](inner: Extractor[A]) extends MultiExtractor[A] {
     else
       None
   }
+}
+
+/**
+ * An extractor that aggregates results from a seq of extractors into a seq.
+ */
+case class SeqExtractor[A](extractors: Seq[Extractor[A]]) extends SingleExtractor[Seq[A]] {
+  type Accumulator = Seq[Option[A]]
+  val columns = extractors.flatMap(_.columns).toList
+
+  def initialize(row: ResultSet): Accumulator = extractors.map(inner => inner.emit(inner.initialize(row)))
+
+  def accumulate(row: ResultSet, accumulator: Accumulator) =
+    accumulator ++ extractors.map(inner => inner.emit(inner.initialize(row)))
+
+  def emit(accumulator: Accumulator) = Some(accumulator.map(checkNullValueAndGet))
 }
 
 /**

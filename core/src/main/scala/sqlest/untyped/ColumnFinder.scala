@@ -55,7 +55,7 @@ object ColumnFinder {
       case OptionExtractor(inner) =>
         apply(inner, path)
 
-      case ListExtractor(inner) =>
+      case QueueExtractor(inner) =>
         apply(inner, path)
 
       case GroupedExtractor(inner, _) =>
