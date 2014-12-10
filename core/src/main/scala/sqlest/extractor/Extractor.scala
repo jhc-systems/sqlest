@@ -18,7 +18,7 @@ package sqlest.extractor
 
 import java.sql.ResultSet
 import org.joda.time.DateTime
-import scala.collection.immutable._
+import scala.collection.immutable.{ Queue, ListMap }
 import sqlest.ast._
 
 sealed trait Extractor[A] {

@@ -71,14 +71,11 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
        regardless that SeqExtractor[String] <: SingleExtractor[Seq[String]] */
     extract[VarargsParams](TableOne.col1, TableOne.col2)
     extract[VarargsParams](TableOne.col1)
-    extract[List[String]](TableOne.col2, TableOne.col2)
 
-    def apply(a: Extractor[Int], b: Extractor[String]*) =
-      new NamedExtractor[(Int, Seq[String]), VarargsParams](
-        new Tuple2Extractor(a, SeqExtractor[String](b)),
-        (arg: (Int, Seq[String])) => VarargsParams(arg._1, arg._2: _*),
-        List("a", "b")
-      )
+    /* These cases should also be considered:
+    extract[List[String]](TableOne.col2, TableOne.col2)
+    extract[List[String]](TableOne.col2, Seq(TableOne.col2, TableOne.col2))
+    */
   }
 
   "tuple extractor" should "extract appropriate data structures" in {
