@@ -67,12 +67,10 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
   }
 
   it should "work for apply methods with varargs" in {
-    /* Doesn't typecheck because Extractor[A] is invariant in A
-       regardless that SeqExtractor[String] <: SingleExtractor[Seq[String]] */
     extract[VarargsParams](TableOne.col1, TableOne.col2)
     extract[VarargsParams](TableOne.col1)
 
-    /* These cases should also be considered:
+    /* These cases should also be considered later:
     extract[List[String]](TableOne.col2, TableOne.col2)
     extract[List[String]](TableOne.col2, Seq(TableOne.col2, TableOne.col2))
     */
