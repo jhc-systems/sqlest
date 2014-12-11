@@ -107,7 +107,7 @@ case class NamedExtractSyntax(c: Context) extends ExtractorSyntax {
     val funcParams = (caseClassParamNames, liftedParamTypes, caseClassParamDefaultValues).zipped.map {
       case (paramName, typ, defaultValue) =>
         if (defaultValue.isDefined)
-          q"val $paramName: $typ = ${defaultValue.get}"
+          q"val $paramName: $typ = sqlest.extractor.ConstantExtractor(${defaultValue.get})"
         else
           q"val $paramName: $typ"
     }
