@@ -26,18 +26,17 @@ case class NamedExtractSyntax(c: Context) extends ExtractorSyntax {
   import internal._
 
   def extractImpl[A: c.WeakTypeTag] = {
-
     // Extract useful information from the type A:
     val typeOfA = weakTypeOf[A]
+    val typeArgs = typeOfA.dealias.typeArgs
     val companion = typeOfA.typeSymbol.companion
-    val companionType = companion.typeSignature
 
     // Locate the `apply` methods of the case class we're constructing:
-    val applyMethods = findApplyMethods(companionType)
+    val applyMethods = findApplyMethods(companion.typeSignature)
     if (applyMethods.isEmpty) c.abort(c.enclosingPosition, s"No apply method found for ${companion.name.toString}")
 
     // Construct extractor methods for this case class corresponding to each apply method
-    val liftedApplyMethods = applyMethods.map(liftApplyMethod(_, typeOfA, companion))
+    val liftedApplyMethods = applyMethods.map(liftApplyMethod(_, typeOfA, typeArgs, companion))
 
     // import scala.language.dynamics to avoid having to do so at the call site
     c.Expr(q"import scala.language.dynamics; new Dynamic { ..$liftedApplyMethods }")
@@ -52,25 +51,32 @@ case class NamedExtractSyntax(c: Context) extends ExtractorSyntax {
     applyMethods.filter(_.paramLists.length == 1)
   }
 
-  def liftApplyMethod(applyMethod: MethodSymbol, typeOfA: Type, companion: Symbol) = {
+  def liftApplyMethod(applyMethod: MethodSymbol, typeOfA: Type, typeArgs: List[Type], companion: Symbol) = {
     // Extract useful information about the parameter list for the `apply` method
     val caseClassParamNames = extractMappedParams(applyMethod, _.name)
     val caseClassParamTypes = extractMappedParams(applyMethod, _.typeSignature)
     val caseClassParamStrings = extractMappedParams(applyMethod, _.name.toString.trim)
     val caseClassParamDefaultValues = extractDefaultValues(extractMappedParams(applyMethod), companion)
 
-    // Build the apply method
-    val applyParams = buildApplyParams(caseClassParamNames, caseClassParamTypes, caseClassParamDefaultValues)
+    // Substitute provided type parameters into the apply method
+    val parameterisedTypes =
+      if (typeArgs.nonEmpty)
+        for (typ <- caseClassParamTypes)
+          yield typ.substituteTypes(applyMethod.typeParams, typeArgs)
+      else caseClassParamTypes
+
+    // Build a matching apply method for the extractor
+    val applyParams = buildApplyParams(caseClassParamNames, parameterisedTypes, caseClassParamDefaultValues)
 
     // Build the tuple definition
     val tupleArg = TermName("arg")
-    val tupleType = buildTupleType(applyMethod, caseClassParamTypes)
+    val tupleType = buildTupleType(applyMethod, parameterisedTypes)
     val tupleAccessors = buildTupleAccessors(applyMethod, tupleArg)
 
     // Build the extractor definitions
     val namedExtractor = tq"sqlest.untyped.extractor.NamedExtractor[$tupleType, $typeOfA]"
     val tupleExtractor = productExtractorType(extractMappedParams(applyMethod).length)
-    val tupleExtractorParams = buildExtractorParams(applyMethod, caseClassParamNames, caseClassParamTypes)
+    val tupleExtractorParams = buildExtractorParams(applyMethod, caseClassParamNames, parameterisedTypes)
 
     q"""
         def apply(..$applyParams) =
@@ -86,12 +92,12 @@ case class NamedExtractSyntax(c: Context) extends ExtractorSyntax {
     applyMethod.paramLists.flatten.map(_.asTerm).map(f)
   }
 
-  def extractDefaultValues(paramTerms: List[TermSymbol], companionType: Symbol): List[Option[Tree]] = {
+  def extractDefaultValues(paramTerms: List[TermSymbol], companion: Symbol): List[Option[Tree]] = {
     paramTerms.zipWithIndex.map {
       case (param, index) =>
         if (param.isParamWithDefault) {
           val getterName = TermName("apply$default$" + (index + 1))
-          Some(q"$companionType.$getterName")
+          Some(q"$companion.$getterName")
         } else None
     }
   }

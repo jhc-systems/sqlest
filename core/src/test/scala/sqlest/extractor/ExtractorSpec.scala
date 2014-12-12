@@ -31,6 +31,7 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
   case class AggregateOnePointFive(one: One, str: String)
   case class DefaultParams(a: Int, b: String = "sweet")
   case class VarargsParams(a: Int, b: String*)
+  case class TypeParamClass[A, B](a: A, b: B)
 
   "single case class extractor" should "extract appropriate data structures" in {
     val extractor = extract[One](
@@ -68,11 +69,11 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
   it should "work for apply methods with varargs" in {
     extract[VarargsParams](TableOne.col1, TableOne.col2)
     extract[VarargsParams](TableOne.col1)
+  }
 
-    /* These cases should also be considered later:
+  it should "work for apply methods with type parameters" in {
+    extract[TypeParamClass[String, Int]](TableOne.col2, TableOne.col1)
     extract[List[String]](TableOne.col2, TableOne.col2)
-    extract[List[String]](TableOne.col2, Seq(TableOne.col2, TableOne.col2))
-    */
   }
 
   "tuple extractor" should "extract appropriate data structures" in {
