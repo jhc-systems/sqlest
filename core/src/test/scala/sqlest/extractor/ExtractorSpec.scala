@@ -19,7 +19,6 @@ package sqlest.extractor
 import org.scalatest._
 import org.scalatest.matchers._
 import sqlest._
-import sqlest.untyped.extractor.NamedExtractor
 
 class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
   import TestData._
