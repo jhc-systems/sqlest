@@ -66,13 +66,27 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
   }
 
   it should "work for apply methods with varargs" in {
-    extract[VarargsParams](TableOne.col1, TableOne.col2)
-    extract[VarargsParams](TableOne.col1)
+    val extractor1 = extract[VarargsParams](TableOne.col1)
+    extractor1.extractHeadOption(testResultSet) should equal(Some(
+      VarargsParams(1)
+    ))
 
-    /* These cases should also be considered later:
-    extract[List[String]](TableOne.col2, TableOne.col2)
-    extract[List[String]](TableOne.col2, Seq(TableOne.col2, TableOne.col2))
-    */
+    extractor1.extractAll(testResultSet) should equal(List(
+      VarargsParams(1),
+      VarargsParams(3),
+      VarargsParams(-1)
+    ))
+
+    val extractor4 = extract[VarargsParams](TableOne.col1, TableOne.col2, TableTwo.col2, TableOne.col2)
+    extractor4.extractHeadOption(testResultSet) should equal(Some(
+      VarargsParams(1, "a", "b", "a")
+    ))
+
+    extractor4.extractAll(testResultSet) should equal(List(
+      VarargsParams(1, "a", "b", "a"),
+      VarargsParams(3, "c", "d", "c"),
+      VarargsParams(-1, "e", "f", "e")
+    ))
   }
 
   "tuple extractor" should "extract appropriate data structures" in {

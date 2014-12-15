@@ -55,10 +55,10 @@ object ColumnFinder {
       case OptionExtractor(inner) =>
         apply(inner, path)
 
-      case QueueExtractor(inner) =>
+      case ListMultiExtractor(inner) =>
         apply(inner, path)
 
-      case GroupedExtractor(inner, _) =>
+      case GroupedMultiExtractor(inner, _) =>
         apply(inner, path)
 
       case other => sys.error(s"Unsupported extractor type: $other")
