@@ -123,6 +123,7 @@ class NamedExtractSyntaxSpec extends FlatSpec with Matchers with PathDependenceT
     extract[VarargsParams](TableOne.col1, TableOne.col2, TableOne.col2)
     extract[VarargsParams](TableOne.col1, TableOne.col2)
     extract[VarargsParams](TableOne.col1)
+    extract[VarargsParams](TableOne.col1, Seq(TableOne.col2, TableOne.col2): _*)
   }
 
   it should "handle path-dependent types correctly" in {
