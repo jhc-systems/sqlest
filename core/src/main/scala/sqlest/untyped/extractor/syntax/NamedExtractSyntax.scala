@@ -23,7 +23,12 @@ import sqlest.extractor._
 case class NamedExtractSyntax(c: Context) extends ExtractorSyntax {
   import c.universe._
   import definitions._
-  import internal._
+
+  /**
+   * RepeatedParamClass cannot be used in a match unless we bind it
+   *  to a val ([[https://issues.scala-lang.org/browse/SI-8483 SI-8483]]).
+   */
+  val repeatedParamClass = RepeatedParamClass
 
   def extractImpl[A: c.WeakTypeTag] = {
 
@@ -97,19 +102,14 @@ case class NamedExtractSyntax(c: Context) extends ExtractorSyntax {
   }
 
   def buildApplyParams(paramNames: List[TermName], paramTypes: List[Type], defaultValues: List[Option[Tree]]): List[Tree] = {
-    val repeatedParamClass = RepeatedParamClass
-    val extractorSymbol = c.mirror.staticClass("sqlest.extractor.Extractor")
-
-    val liftRepeatable: PartialFunction[Type, Type] = {
-      case TypeRef(_, `repeatedParamClass`, typ) =>
-        typeRef(NoPrefix, `repeatedParamClass`, typeRef(extractorSymbol.owner.asType.toType, extractorSymbol, typ) :: Nil)
-    }
-    val liftParam: PartialFunction[Type, Type] = {
+    val liftParam: PartialFunction[Type, Tree] = {
+      case TypeRef(_, `repeatedParamClass`, typ :: Nil) =>
+        tq"$repeatedParamClass[sqlest.extractor.Extractor[$typ]]"
       case inner: TypeRef =>
-        typeRef(extractorSymbol.owner.asType.toType, extractorSymbol, inner :: Nil)
+        tq"sqlest.extractor.Extractor[$inner]"
     }
 
-    val liftedParamTypes = paramTypes.map(liftRepeatable orElse liftParam)
+    val liftedParamTypes = paramTypes.map(liftParam)
 
     (paramNames, liftedParamTypes, defaultValues).zipped.map {
       case (paramName, typ, defaultValue) =>
@@ -121,17 +121,15 @@ case class NamedExtractSyntax(c: Context) extends ExtractorSyntax {
   }
 
   def buildTupleType(applyMethod: MethodSymbol, paramTypes: List[Type]): Tree = {
-    val repeatedParamClass = RepeatedParamClass
-    val seqSymbol = c.mirror.staticClass("scala.collection.Seq")
+    val treeTypes = paramTypes.map(typ => tq"$typ")
 
-    val tupleType =
+    val tupleType: List[Tree] =
       if (applyMethod.isVarargs)
-        paramTypes.init :+
+        treeTypes.init :+
           (paramTypes.last match {
-            case TypeRef(_, `repeatedParamClass`, typ) =>
-              typeRef(seqSymbol.owner.asType.toType, seqSymbol, typ)
+            case TypeRef(_, `repeatedParamClass`, typ :: Nil) => tq"scala.collection.Seq[$typ]"
           })
-      else paramTypes
+      else treeTypes
 
     if (extractMappedParams(applyMethod).length == 1) tq"scala.Tuple1[..$tupleType]"
     else tq"(..$tupleType)"
@@ -147,13 +145,11 @@ case class NamedExtractSyntax(c: Context) extends ExtractorSyntax {
   }
 
   def buildExtractorParams(applyMethod: MethodSymbol, paramNames: List[TermName], paramTypes: List[Type]): List[Tree] = {
+    val treeNames = paramNames.map(name => q"$name")
     if (applyMethod.isVarargs) {
-      val varargsBaseType = paramTypes.last match {
-        case TypeRef(_, _, typ :: Nil) => typ
-      }
-      paramNames.init.map(Ident(_)) :+
-        q"sqlest.extractor.SeqExtractor[$varargsBaseType](${paramNames.last}.toSeq)"
-    } else paramNames.map(Ident(_))
+      val varargsBaseType = paramTypes.last match { case TypeRef(_, _, typ :: Nil) => typ }
+      treeNames.init :+ q"sqlest.extractor.SeqExtractor[$varargsBaseType](${paramNames.last}.toSeq)"
+    } else treeNames
   }
 
   def productExtractorType(size: Int) = {
