@@ -115,8 +115,27 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
   }
 
   it should "work for apply methods with type parameters" in {
-    extract[TypeParamClass[String, Int]](TableOne.col2, TableOne.col1)
-    extract[List[String]](TableOne.col2, TableOne.col2)
+    val extractor1 = extract[TypeParamClass[String, Int]](TableOne.col2, TableOne.col1)
+    extractor1.extractHeadOption(testResultSet) should equal(Some(
+      TypeParamClass("a", 1)
+    ))
+
+    extractor1.extractAll(testResultSet) should equal(List(
+      TypeParamClass("a", 1),
+      TypeParamClass("c", 3),
+      TypeParamClass("e", -1)
+    ))
+
+    val extractor2 = extract[List[String]](TableOne.col2, TableTwo.col2)
+    extractor2.extractHeadOption(testResultSet) should equal(Some(
+      List("a", "b")
+    ))
+
+    extractor2.extractAll(testResultSet) should equal(List(
+      List("a", "b"),
+      List("c", "d"),
+      List("e", "f")
+    ))
   }
 
   "tuple extractor" should "extract appropriate data structures" in {

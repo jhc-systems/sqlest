@@ -64,24 +64,20 @@ case class NamedExtractSyntax(c: Context) extends ExtractorSyntax {
     val caseClassParamDefaultValues = extractDefaultValues(extractMappedParams(applyMethod), companion)
 
     // Substitute provided type parameters into the apply method
-    val parameterisedTypes =
-      if (typeArgs.nonEmpty)
-        for (typ <- caseClassParamTypes)
-          yield typ.substituteTypes(applyMethod.typeParams, typeArgs)
-      else caseClassParamTypes
+    val appliedTypeArgTypes = substituteTypeParams(applyMethod, typeArgs, caseClassParamTypes)
 
     // Build a matching apply method for the extractor
-    val applyParams = buildApplyParams(caseClassParamNames, parameterisedTypes, caseClassParamDefaultValues)
+    val applyParams = buildApplyParams(caseClassParamNames, appliedTypeArgTypes, caseClassParamDefaultValues)
 
     // Build the tuple definition
     val tupleArg = TermName("arg")
-    val tupleType = buildTupleType(applyMethod, parameterisedTypes)
+    val tupleType = buildTupleType(applyMethod, appliedTypeArgTypes)
     val tupleAccessors = buildTupleAccessors(applyMethod, tupleArg)
 
     // Build the extractor definitions
     val namedExtractor = tq"sqlest.untyped.extractor.NamedExtractor[$tupleType, $typeOfA]"
     val tupleExtractor = productExtractorType(extractMappedParams(applyMethod).length)
-    val tupleExtractorParams = buildExtractorParams(applyMethod, caseClassParamNames, parameterisedTypes)
+    val tupleExtractorParams = buildExtractorParams(applyMethod, caseClassParamNames, appliedTypeArgTypes)
 
     q"""
         def apply(..$applyParams) =
@@ -105,6 +101,13 @@ case class NamedExtractSyntax(c: Context) extends ExtractorSyntax {
           Some(q"$companion.$getterName")
         } else None
     }
+  }
+
+  def substituteTypeParams(applyMethod: MethodSymbol, typeArgs: List[Type], paramTypes: List[Type]) = {
+    if (typeArgs.nonEmpty)
+      for (typ <- paramTypes)
+        yield typ.substituteTypes(applyMethod.typeParams, typeArgs)
+    else paramTypes
   }
 
   def buildApplyParams(paramNames: List[TermName], paramTypes: List[Type], defaultValues: List[Option[Tree]]): List[Tree] = {
