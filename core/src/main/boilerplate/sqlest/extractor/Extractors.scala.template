@@ -22,6 +22,7 @@ import sqlest.untyped.extractor.syntax.NamedExtractSyntax
 
 trait LowPriorityExtractors {
   implicit def extractConstant[A](value: A) = ConstantExtractor(value)
+  implicit def extractConstantSeq[A](valueSeq: Seq[A]) = valueSeq.map(ConstantExtractor(_))
 }
 
 trait Extractors extends LowPriorityExtractors {
@@ -29,6 +30,9 @@ trait Extractors extends LowPriorityExtractors {
 
   implicit def extractColumn[A](column: AliasedColumn[A]): ColumnExtractor[A] =
     ColumnExtractor(column)
+
+  implicit def extractSeq[A](columnSeq: Seq[AliasedColumn[A]]): Seq[Extractor[A]] =
+    columnSeq.map(ColumnExtractor(_))
 
 [2..22#  def extract[[#A1#]]([#a1: A1#])(implicit [#b1: ExtractorBuilder[A1]#]) =
     new Tuple1Extractor[[#b1.Result#]]([#b1(a1)#])#

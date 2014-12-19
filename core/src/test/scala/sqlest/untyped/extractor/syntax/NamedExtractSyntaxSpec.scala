@@ -118,6 +118,14 @@ class NamedExtractSyntaxSpec extends FlatSpec with Matchers with PathDependenceT
     extract[DefaultParams](a = TableOne.col1)
   }
 
+  case class VarargsParams(a: Int, b: String*)
+  it should "work for apply methods with varargs" in {
+    extract[VarargsParams](TableOne.col1, TableOne.col2, TableOne.col2)
+    extract[VarargsParams](TableOne.col1, TableOne.col2)
+    extract[VarargsParams](TableOne.col1)
+    extract[VarargsParams](TableOne.col1, Seq(TableOne.col2, TableOne.col2): _*)
+  }
+
   it should "handle path-dependent types correctly" in {
     pending
     // TODO: This should compile, but doesn't due to a bug related to path dependent types:

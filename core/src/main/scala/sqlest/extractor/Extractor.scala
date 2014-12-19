@@ -61,8 +61,8 @@ trait SingleExtractor[A] extends Extractor[A] {
       accumulator.toList
     } else Nil
 
-  def asList = QueueExtractor(this)
-  def groupBy[B](groupBy: Extractor[B]) = GroupedExtractor(this, groupBy)
+  def asList = ListMultiExtractor(this)
+  def groupBy[B](groupBy: Extractor[B]) = GroupedMultiExtractor(this, groupBy)
 }
 
 trait MultiExtractor[A] extends Extractor[List[A]] {
@@ -175,9 +175,24 @@ case class OptionExtractor[A](inner: Extractor[A]) extends SingleExtractor[Optio
 }
 
 /**
+ * An extractor that aggregates results from a seq of extractors into a seq.
+ */
+case class SeqExtractor[A](extractors: Seq[Extractor[A]]) extends SingleExtractor[Seq[A]] {
+  type Accumulator = Seq[Option[A]]
+  val columns = extractors.flatMap(_.columns).toList
+
+  def initialize(row: ResultSet): Accumulator = extractors.map(inner => inner.emit(inner.initialize(row)))
+
+  def accumulate(row: ResultSet, accumulator: Accumulator) =
+    accumulator ++ extractors.map(inner => inner.emit(inner.initialize(row)))
+
+  def emit(accumulator: Accumulator) = Some(accumulator.map(checkNullValueAndGet))
+}
+
+/**
  * An extractor that accumulates results into a list.
  */
-case class QueueExtractor[A](inner: Extractor[A]) extends MultiExtractor[A] {
+case class ListMultiExtractor[A](inner: Extractor[A]) extends MultiExtractor[A] {
   type Accumulator = Queue[Option[A]]
   val columns = inner.columns
 
@@ -200,24 +215,9 @@ case class QueueExtractor[A](inner: Extractor[A]) extends MultiExtractor[A] {
 }
 
 /**
- * An extractor that aggregates results from a seq of extractors into a seq.
- */
-case class SeqExtractor[A](extractors: Seq[Extractor[A]]) extends SingleExtractor[Seq[A]] {
-  type Accumulator = Seq[Option[A]]
-  val columns = extractors.flatMap(_.columns).toList
-
-  def initialize(row: ResultSet): Accumulator = extractors.map(inner => inner.emit(inner.initialize(row)))
-
-  def accumulate(row: ResultSet, accumulator: Accumulator) =
-    accumulator ++ extractors.map(inner => inner.emit(inner.initialize(row)))
-
-  def emit(accumulator: Accumulator) = Some(accumulator.map(checkNullValueAndGet))
-}
-
-/**
  * An extractor that accumulates results with the same groupBy value into the same value
  */
-case class GroupedExtractor[A, B](inner: Extractor[A], groupBy: Extractor[B]) extends MultiExtractor[A] {
+case class GroupedMultiExtractor[A, B](inner: Extractor[A], groupBy: Extractor[B]) extends MultiExtractor[A] {
   // Consider using a tuple of a Queue and a HashMap as the Accumulator for efficiency
   type Accumulator = ListMap[B, inner.Accumulator]
   val columns = (inner.columns ++ groupBy.columns).distinct

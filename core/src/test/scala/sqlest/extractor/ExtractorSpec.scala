@@ -67,8 +67,51 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
   }
 
   it should "work for apply methods with varargs" in {
-    extract[VarargsParams](TableOne.col1, TableOne.col2)
-    extract[VarargsParams](TableOne.col1)
+    val extractor1 = extract[VarargsParams](TableOne.col1)
+    extractor1.extractHeadOption(testResultSet) should equal(Some(
+      VarargsParams(1)
+    ))
+
+    extractor1.extractAll(testResultSet) should equal(List(
+      VarargsParams(1),
+      VarargsParams(3),
+      VarargsParams(-1)
+    ))
+
+    val extractor2 = extract[VarargsParams](TableOne.col1, Seq(TableTwo.col2, TableOne.col2, TableTwo.col2): _*)
+    extractor2.extractHeadOption(testResultSet) should equal(Some(
+      VarargsParams(1, "b", "a", "b")
+    ))
+
+    extractor2.extractAll(testResultSet) should equal(List(
+      VarargsParams(1, "b", "a", "b"),
+      VarargsParams(3, "d", "c", "d"),
+      VarargsParams(-1, "f", "e", "f")
+    ))
+
+    val extractor4 = extract[VarargsParams](TableOne.col1, TableOne.col2, TableTwo.col2, TableOne.col2)
+    extractor4.extractHeadOption(testResultSet) should equal(Some(
+      VarargsParams(1, "a", "b", "a")
+    ))
+
+    extractor4.extractAll(testResultSet) should equal(List(
+      VarargsParams(1, "a", "b", "a"),
+      VarargsParams(3, "c", "d", "c"),
+      VarargsParams(-1, "e", "f", "e")
+    ))
+  }
+
+  it should "work for vararg default values" in {
+    val extractor3 = extract[VarargsParams](TableOne.col1, b = Seq("default", "value", "test"): _*)
+    extractor3.extractHeadOption(testResultSet) should equal(Some(
+      VarargsParams(1, "default", "value", "test")
+    ))
+
+    extractor3.extractAll(testResultSet) should equal(List(
+      VarargsParams(1, "default", "value", "test"),
+      VarargsParams(3, "default", "value", "test"),
+      VarargsParams(-1, "default", "value", "test")
+    ))
   }
 
   it should "work for apply methods with type parameters" in {
