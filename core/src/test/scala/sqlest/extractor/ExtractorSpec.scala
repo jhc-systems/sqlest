@@ -32,6 +32,9 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
   case class DefaultParams(a: Int, b: String = "sweet")
   case class VarargsParams(a: Int, b: String*)
   case class TypeParamClass[A, B](a: A, b: B)
+  case class ReversedTypeParamClass[A, B](b: B, a: A)
+  case class DuplicateTypeParamClass[A](a1: A, a2: A)
+  case class MixedTypeParamClass[A](s: String, a: A)
 
   "single case class extractor" should "extract appropriate data structures" in {
     val extractor = extract[One](
@@ -135,6 +138,39 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       List("a", "b"),
       List("c", "d"),
       List("e", "f")
+    ))
+
+    val extractor3 = extract[ReversedTypeParamClass[String, Int]](TableOne.col1, TableOne.col2)
+    extractor3.extractHeadOption(testResultSet) should equal(Some(
+      ReversedTypeParamClass(1, "a")
+    ))
+
+    extractor3.extractAll(testResultSet) should equal(List(
+      ReversedTypeParamClass(1, "a"),
+      ReversedTypeParamClass(3, "c"),
+      ReversedTypeParamClass(-1, "e")
+    ))
+
+    val extractor4 = extract[DuplicateTypeParamClass[Int]](TableOne.col1, TableTwo.col3)
+    extractor4.extractHeadOption(testResultSet) should equal(Some(
+      DuplicateTypeParamClass(1, 2)
+    ))
+
+    extractor4.extractAll(testResultSet) should equal(List(
+      DuplicateTypeParamClass(1, 2),
+      DuplicateTypeParamClass(3, 4),
+      DuplicateTypeParamClass(-1, 6)
+    ))
+
+    val extractor5 = extract[MixedTypeParamClass[Int]](TableTwo.col2, TableOne.col1)
+    extractor5.extractHeadOption(testResultSet) should equal(Some(
+      MixedTypeParamClass("b", 1)
+    ))
+
+    extractor5.extractAll(testResultSet) should equal(List(
+      MixedTypeParamClass("b", 1),
+      MixedTypeParamClass("d", 3),
+      MixedTypeParamClass("f", -1)
     ))
   }
 
