@@ -22,6 +22,13 @@ import sqlest.extractor._
 
 case class NamedExtractSyntax(c: Context) extends ExtractorSyntax {
   import c.universe._
+  import definitions._
+
+  /**
+   * RepeatedParamClass cannot be used in a match unless we bind it
+   *  to a val ([[https://issues.scala-lang.org/browse/SI-8483 SI-8483]]).
+   */
+  val repeatedParamClass = RepeatedParamClass
 
   def extractImpl[A: c.WeakTypeTag] = {
 
@@ -34,6 +41,7 @@ case class NamedExtractSyntax(c: Context) extends ExtractorSyntax {
     val applyMethods = findApplyMethods(companionType)
     if (applyMethods.isEmpty) c.abort(c.enclosingPosition, s"No apply method found for ${companion.name.toString}")
 
+    // Construct extractor methods for this case class corresponding to each apply method
     val liftedApplyMethods = applyMethods.map(liftApplyMethod(_, typeOfA, companion))
 
     // import scala.language.dynamics to avoid having to do so at the call site
@@ -50,46 +58,98 @@ case class NamedExtractSyntax(c: Context) extends ExtractorSyntax {
   }
 
   def liftApplyMethod(applyMethod: MethodSymbol, typeOfA: Type, companion: Symbol) = {
-    // Extract the parameter list for the `apply` method
-    val caseClassParamTerms = applyMethod.paramLists.flatten.map(_.asTerm)
-    val caseClassParamTypes = caseClassParamTerms.map(_.typeSignature)
-    val caseClassParamNames = caseClassParamTerms.map(_.name)
-    val caseClassParamStrings = caseClassParamTerms.map(_.name.toString.trim)
-    val caseClassParamDefaultValues = caseClassParamTerms.zipWithIndex.map {
-      case (param, index) =>
-        if (param.isParamWithDefault) {
-          val getterName = TermName("apply$default$" + (index + 1))
-          Some(q"$companion.$getterName")
-        } else None
-    }
+    // Extract useful information about the parameter list for the `apply` method
+    val caseClassParamNames = extractMappedParams(applyMethod, _.name)
+    val caseClassParamTypes = extractMappedParams(applyMethod, _.typeSignature)
+    val caseClassParamStrings = extractMappedParams(applyMethod, _.name.toString.trim)
+    val caseClassParamDefaultValues = extractDefaultValues(extractMappedParams(applyMethod), companion)
 
-    // Build the target code fragment:
-    val funcParams = (caseClassParamNames, caseClassParamTypes, caseClassParamDefaultValues).zipped.map {
-      case (paramName, typ, defaultValue) =>
-        if (defaultValue.isDefined)
-          q"val $paramName: sqlest.extractor.Extractor[$typ] = sqlest.extractor.ConstantExtractor(${defaultValue.get})"
-        else
-          q"val $paramName: sqlest.extractor.Extractor[$typ]"
-    }
+    // Build the apply method
+    val applyParams = buildApplyParams(caseClassParamNames, caseClassParamTypes, caseClassParamDefaultValues)
 
-    val paramListLength = caseClassParamTerms.length
-    val tupleType =
-      if (paramListLength == 1) tq"scala.Tuple1[..$caseClassParamTypes]"
-      else tq"(..$caseClassParamTypes)"
+    // Build the tuple definition
     val tupleArg = TermName("arg")
-    val tupleAccessors = (1 to paramListLength).toList.map(num => Select(Ident(tupleArg), TermName("_" + num)))
+    val tupleType = buildTupleType(applyMethod, caseClassParamTypes)
+    val tupleAccessors = buildTupleAccessors(applyMethod, tupleArg)
 
+    // Build the extractor definitions
     val namedExtractor = tq"sqlest.untyped.extractor.NamedExtractor[$tupleType, $typeOfA]"
-    val productExtractor = productExtractorType(paramListLength)
+    val tupleExtractor = productExtractorType(extractMappedParams(applyMethod).length)
+    val tupleExtractorParams = buildExtractorParams(applyMethod, caseClassParamNames, caseClassParamTypes)
 
     q"""
-        def apply(..$funcParams) =
+        def apply(..$applyParams) =
           new $namedExtractor(
-            new $productExtractor(..$caseClassParamNames),
+            new $tupleExtractor(..$tupleExtractorParams),
             ($tupleArg: $tupleType) => $companion.$applyMethod(..$tupleAccessors),
             List(..$caseClassParamStrings)
           )
       """
+  }
+
+  def extractMappedParams[B](applyMethod: MethodSymbol, f: TermSymbol => B = identity[TermSymbol](_)): List[B] = {
+    applyMethod.paramLists.flatten.map(_.asTerm).map(f)
+  }
+
+  def extractDefaultValues(paramTerms: List[TermSymbol], companionType: Symbol): List[Option[Tree]] = {
+    paramTerms.zipWithIndex.map {
+      case (param, index) =>
+        if (param.isParamWithDefault) {
+          val getterName = TermName("apply$default$" + (index + 1))
+          Some(q"$companionType.$getterName")
+        } else None
+    }
+  }
+
+  def buildApplyParams(paramNames: List[TermName], paramTypes: List[Type], defaultValues: List[Option[Tree]]): List[Tree] = {
+    val liftParam: PartialFunction[Type, Tree] = {
+      case TypeRef(_, `repeatedParamClass`, typ :: Nil) =>
+        tq"$repeatedParamClass[sqlest.extractor.Extractor[$typ]]"
+      case inner: TypeRef =>
+        tq"sqlest.extractor.Extractor[$inner]"
+    }
+
+    val liftedParamTypes = paramTypes.map(liftParam)
+
+    (paramNames, liftedParamTypes, defaultValues).zipped.map {
+      case (paramName, typ, defaultValue) =>
+        if (defaultValue.isDefined)
+          q"val $paramName: $typ = sqlest.extractor.ConstantExtractor(${defaultValue.get})"
+        else
+          q"val $paramName: $typ"
+    }
+  }
+
+  def buildTupleType(applyMethod: MethodSymbol, paramTypes: List[Type]): Tree = {
+    val treeTypes = paramTypes.map(typ => tq"$typ")
+
+    val tupleType: List[Tree] =
+      if (applyMethod.isVarargs)
+        treeTypes.init :+
+          (paramTypes.last match {
+            case TypeRef(_, `repeatedParamClass`, typ :: Nil) => tq"scala.collection.Seq[$typ]"
+          })
+      else treeTypes
+
+    if (extractMappedParams(applyMethod).length == 1) tq"scala.Tuple1[..$tupleType]"
+    else tq"(..$tupleType)"
+  }
+
+  def buildTupleAccessors(applyMethod: MethodSymbol, tupleArg: TermName): List[Tree] = {
+    val length = extractMappedParams(applyMethod).length
+    val accessors = (1 until length).toList.map(num => Select(Ident(tupleArg), TermName("_" + num)))
+    if (applyMethod.isVarargs)
+      accessors :+ Typed(Select(Ident(tupleArg), TermName("_" + length)), Ident(typeNames.WILDCARD_STAR))
+    else
+      accessors :+ Select(Ident(tupleArg), TermName("_" + length))
+  }
+
+  def buildExtractorParams(applyMethod: MethodSymbol, paramNames: List[TermName], paramTypes: List[Type]): List[Tree] = {
+    val treeNames = paramNames.map(name => q"$name")
+    if (applyMethod.isVarargs) {
+      val varargsBaseType = paramTypes.last match { case TypeRef(_, _, typ :: Nil) => typ }
+      treeNames.init :+ q"sqlest.extractor.SeqExtractor[$varargsBaseType](${paramNames.last}.toSeq)"
+    } else treeNames
   }
 
   def productExtractorType(size: Int) = {
