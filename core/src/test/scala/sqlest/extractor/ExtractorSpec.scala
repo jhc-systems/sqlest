@@ -188,6 +188,19 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
     ))
   }
 
+  it should "work with inherited apply methods" in {
+    val extractor = extract[Map[Int, String]](TableOne.col1 -> TableOne.col2, TableTwo.col3 -> TableTwo.col2)
+    extractor.extractHeadOption(testResultSet) should equal(Some(
+      Map(1 -> "a", 2 -> "b")
+    ))
+
+    extractor.extractAll(testResultSet) should equal(List(
+      Map(1 -> "a", 2 -> "b"),
+      Map(3 -> "c", 4 -> "d"),
+      Map(-1 -> "e", 6 -> "f")
+    ))
+  }
+
   "aggregate case class extractor" should "extract appropriate data structures" in {
     val extractor = extract[AggregateOneTwo](
       one = extract[One](

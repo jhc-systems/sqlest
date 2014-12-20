@@ -48,7 +48,7 @@ case class NamedExtractSyntax(c: Context) extends ExtractorSyntax {
   }
 
   def findApplyMethods(companionType: Type): List[MethodSymbol] = {
-    val applyMethods = companionType.decl(TermName("apply")) match {
+    val applyMethods = companionType.member(TermName("apply")) match {
       case method: MethodSymbol => List(method)
       case termSymbol: TermSymbol => termSymbol.alternatives.collect { case method: MethodSymbol => method }
       case _ => Nil

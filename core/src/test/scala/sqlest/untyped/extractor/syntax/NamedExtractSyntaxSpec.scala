@@ -138,6 +138,7 @@ class NamedExtractSyntaxSpec extends FlatSpec with Matchers with PathDependenceT
     extract[DuplicateTypeParamClass[Int]](TableOne.col1, TableTwo.col3)
     extract[MixedTypeParamClass[Int]](TableTwo.col2, TableOne.col1)
     extract[List[String]](TableOne.col2, TableTwo.col2)
+    extract[Map[Int, String]](TableOne.col1 -> TableOne.col2, TableTwo.col3 -> TableTwo.col2)
   }
 
   it should "handle path-dependent types correctly" in {
