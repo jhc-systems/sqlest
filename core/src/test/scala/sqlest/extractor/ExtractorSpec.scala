@@ -31,6 +31,10 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
   case class AggregateOnePointFive(one: One, str: String)
   case class DefaultParams(a: Int, b: String = "sweet")
   case class VarargsParams(a: Int, b: String*)
+  case class TypeParamClass[A, B](a: A, b: B)
+  case class ReversedTypeParamClass[A, B](b: B, a: A)
+  case class DuplicateTypeParamClass[A](a1: A, a2: A)
+  case class MixedTypeParamClass[A](s: String, a: A)
 
   "single case class extractor" should "extract appropriate data structures" in {
     val extractor = extract[One](
@@ -113,6 +117,63 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
     ))
   }
 
+  it should "work for apply methods with type parameters" in {
+    val extractor1 = extract[TypeParamClass[String, Int]](TableOne.col2, TableOne.col1)
+    extractor1.extractHeadOption(testResultSet) should equal(Some(
+      TypeParamClass("a", 1)
+    ))
+
+    extractor1.extractAll(testResultSet) should equal(List(
+      TypeParamClass("a", 1),
+      TypeParamClass("c", 3),
+      TypeParamClass("e", -1)
+    ))
+
+    val extractor2 = extract[List[String]](TableOne.col2, TableTwo.col2)
+    extractor2.extractHeadOption(testResultSet) should equal(Some(
+      List("a", "b")
+    ))
+
+    extractor2.extractAll(testResultSet) should equal(List(
+      List("a", "b"),
+      List("c", "d"),
+      List("e", "f")
+    ))
+
+    val extractor3 = extract[ReversedTypeParamClass[String, Int]](TableOne.col1, TableOne.col2)
+    extractor3.extractHeadOption(testResultSet) should equal(Some(
+      ReversedTypeParamClass(1, "a")
+    ))
+
+    extractor3.extractAll(testResultSet) should equal(List(
+      ReversedTypeParamClass(1, "a"),
+      ReversedTypeParamClass(3, "c"),
+      ReversedTypeParamClass(-1, "e")
+    ))
+
+    val extractor4 = extract[DuplicateTypeParamClass[Int]](TableOne.col1, TableTwo.col3)
+    extractor4.extractHeadOption(testResultSet) should equal(Some(
+      DuplicateTypeParamClass(1, 2)
+    ))
+
+    extractor4.extractAll(testResultSet) should equal(List(
+      DuplicateTypeParamClass(1, 2),
+      DuplicateTypeParamClass(3, 4),
+      DuplicateTypeParamClass(-1, 6)
+    ))
+
+    val extractor5 = extract[MixedTypeParamClass[Int]](TableTwo.col2, TableOne.col1)
+    extractor5.extractHeadOption(testResultSet) should equal(Some(
+      MixedTypeParamClass("b", 1)
+    ))
+
+    extractor5.extractAll(testResultSet) should equal(List(
+      MixedTypeParamClass("b", 1),
+      MixedTypeParamClass("d", 3),
+      MixedTypeParamClass("f", -1)
+    ))
+  }
+
   "tuple extractor" should "extract appropriate data structures" in {
     val extractor = extract(TableOne.col1, TableOne.col2)
 
@@ -124,6 +185,19 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
       (1, "a"),
       (3, "c"),
       (-1, "e")
+    ))
+  }
+
+  it should "work with inherited apply methods" in {
+    val extractor = extract[Map[Int, String]](TableOne.col1 -> TableOne.col2, TableTwo.col3 -> TableTwo.col2)
+    extractor.extractHeadOption(testResultSet) should equal(Some(
+      Map(1 -> "a", 2 -> "b")
+    ))
+
+    extractor.extractAll(testResultSet) should equal(List(
+      Map(1 -> "a", 2 -> "b"),
+      Map(3 -> "c", 4 -> "d"),
+      Map(-1 -> "e", 6 -> "f")
     ))
   }
 
