@@ -31,6 +31,10 @@ class ColumnSpec extends FlatSpec with Matchers {
   }
 
   case class WrappedInt(int: Int)
+  object WrappedInt {
+    // Test that ColumnType[WrappedInt] can be materialized when 2 apply methods exist
+    def apply(int1: Int, int2: Int) = new WrappedInt(int1 + int2)
+  }
 
   class TableOne(alias: Option[String]) extends Table("one", alias) {
     val col1 = column[Int]("col1")
@@ -85,8 +89,17 @@ class ColumnSpec extends FlatSpec with Matchers {
     (TableOne.col6 <= Small.constant[Size]) should equal(InfixFunctionColumn[Boolean]("<=", TableOne.col6, Small.constant[Size]))
     (TableOne.col6 > Small.constant[Size]) should equal(InfixFunctionColumn[Boolean](">", TableOne.col6, Small.constant[Size]))
     (TableOne.col6 >= Small.constant[Size]) should equal(InfixFunctionColumn[Boolean](">=", TableOne.col6, Small.constant[Size]))
-    (TableOne.col6 in (Small.constant[Size], Medium.constant[Size])) should equal(InfixFunctionColumn[Boolean]("in", TableOne.col6, ScalarFunctionColumn[Size]("", Seq(Small.constant[Size], Medium.constant[Size]))))
+    (TableOne.col6.in(Small.constant[Size], Medium.constant[Size])) should equal(InfixFunctionColumn[Boolean]("in", TableOne.col6, ScalarFunctionColumn[Size]("", Seq(Small.constant[Size], Medium.constant[Size]))))
     (TableOne.col6 in List[Size](Small, Medium)) should equal(InfixFunctionColumn[Boolean]("in", TableOne.col6, ScalarFunctionColumn[Size]("", Seq(Small.constant[Size], Medium.constant[Size]))))
+
+    (TableOne.col7 === WrappedInt(3).constant) should equal(InfixFunctionColumn[Boolean]("=", TableOne.col7, WrappedInt(3).constant))
+    (TableOne.col7 =!= WrappedInt(3).constant) should equal(InfixFunctionColumn[Boolean]("<>", TableOne.col7, WrappedInt(3).constant))
+    (TableOne.col7 < WrappedInt(3).constant) should equal(InfixFunctionColumn[Boolean]("<", TableOne.col7, WrappedInt(3).constant))
+    (TableOne.col7 <= WrappedInt(3).constant) should equal(InfixFunctionColumn[Boolean]("<=", TableOne.col7, WrappedInt(3).constant))
+    (TableOne.col7 > WrappedInt(3).constant) should equal(InfixFunctionColumn[Boolean](">", TableOne.col7, WrappedInt(3).constant))
+    (TableOne.col7 >= WrappedInt(3).constant) should equal(InfixFunctionColumn[Boolean](">=", TableOne.col7, WrappedInt(3).constant))
+    (TableOne.col7.in(WrappedInt(0).constant, WrappedInt(1).constant)) should equal(InfixFunctionColumn[Boolean]("in", TableOne.col7, ScalarFunctionColumn[WrappedInt]("", Seq(WrappedInt(0).constant, WrappedInt(1).constant))))
+    (TableOne.col7 in List(WrappedInt(0), WrappedInt(1))) should equal(InfixFunctionColumn[Boolean]("in", TableOne.col7, ScalarFunctionColumn[WrappedInt]("", Seq(WrappedInt(0).constant, WrappedInt(1).constant))))
   }
 
   "column comparisons" should "fail for a mapped and an unmapped column" in {

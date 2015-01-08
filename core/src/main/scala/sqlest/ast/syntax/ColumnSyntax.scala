@@ -153,7 +153,8 @@ trait ColumnSyntax {
 
       (left.columnType, right.columnType) match {
         case (leftColumnType, rightColumnType) if leftColumnType == rightColumnType => (left, right)
-        case (leftColumnType: MappedColumnType[_, _], rightColumnType: MappedColumnType[_, _]) => throw new AssertionError("Cannot compare 2 different MappedColumns")
+        case (leftColumnType: MappedColumnType[_, _], rightColumnType: MappedColumnType[_, _]) if leftColumnType.baseType == rightColumnType.baseType => (left, right)
+        case (leftColumnType: MappedColumnType[_, _], rightColumnType: MappedColumnType[_, _]) => throw new AssertionError(s"Cannot compare 2 different MappedColumns: $leftColumnType and $rightColumnType")
         case (leftColumnType: MappedColumnType[_, _], _) => (left, mapLiteralColumn(leftColumnType, equivalence.left, right))
         case (_, rightColumnType: MappedColumnType[_, _]) => (mapLiteralColumn(rightColumnType, equivalence.right, left), right)
         case (_, _) => (left, right)

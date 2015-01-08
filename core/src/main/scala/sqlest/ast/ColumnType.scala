@@ -18,7 +18,7 @@ package sqlest.ast
 
 import org.joda.time.DateTime
 import scala.language.experimental.macros
-import scala.reflect.macros.blackbox.Context
+import scala.reflect.macros.whitebox.Context
 
 /**
  * Object representing a mapping between a Scala data type and an underlying SQL data type.
@@ -56,7 +56,7 @@ case class OptionColumnType[A](baseType: ColumnType[A]) extends ColumnType[Optio
  *
  * For every `MappedColumnType` there is an underlying `BaseColumnType`.
  */
-abstract class MappedColumnType[A, B] extends ColumnType[A] {
+trait MappedColumnType[A, B] extends ColumnType[A] {
   def baseType: ColumnType[B]
   def read(database: B): A
   def write(value: A): B
@@ -86,7 +86,7 @@ object ColumnType {
   implicit val bigDecimalColumnType = BigDecimalColumnType
   implicit val stringColumnType = StringColumnType
   implicit val dateTimeColumnType = DateTimeColumnType
-  implicit def materialize[A]: ColumnType[A] = macro MaterializeColumnTypeMacro.materializeImpl[A]
+  implicit def materialize[A, B]: MappedColumnType[A, B] = macro MaterializeColumnTypeMacro.materializeImpl[A, B]
 
   implicit def optionType[A](implicit base: ColumnType[A]): OptionColumnType[A] =
     OptionColumnType[A](base)
@@ -102,7 +102,7 @@ object ColumnType {
 case class MaterializeColumnTypeMacro(c: Context) {
   import c.universe._
 
-  def materializeImpl[A: c.WeakTypeTag] = {
+  def materializeImpl[A: c.WeakTypeTag, B: c.WeakTypeTag] = {
     val typeOfA = c.weakTypeOf[A]
     val companion = typeOfA.typeSymbol.companion
     val applyMethod = findMethod(companion.typeSignature, "apply", typeOfA)
@@ -112,9 +112,15 @@ case class MaterializeColumnTypeMacro(c: Context) {
   }
 
   def findMethod(companionType: Type, name: String, typeOfA: Type) = {
-    companionType.member(TermName(name)) match {
-      case method: MethodSymbol if method.paramLists.flatten.length == 1 => method
-      case _ => c.abort(c.enclosingPosition, s"No matching $name method found on $typeOfA")
+    val applyMethods = companionType.member(TermName(name)) match {
+      case method: MethodSymbol => List(method)
+      case termSymbol: TermSymbol => termSymbol.alternatives.collect { case method: MethodSymbol => method }
+      case _ => Nil
     }
+
+    val singleParamApplyMethods = applyMethods.filter(_.paramLists.flatten.length == 1)
+
+    if (singleParamApplyMethods.length == 1) singleParamApplyMethods.head
+    else c.abort(c.enclosingPosition, s"No matching $name method found on $typeOfA")
   }
 }
