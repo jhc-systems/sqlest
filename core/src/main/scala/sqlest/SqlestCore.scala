@@ -21,7 +21,7 @@ import sqlest.ast.syntax._
 import sqlest.executor._
 import sqlest.extractor._
 
-trait SqlestCore extends BaseColumnTypes with ColumnTypeEquivalences {
+trait SqlestCore {
   type Table = sqlest.ast.Table
 
   type StatementBuilder = sqlest.sql.base.StatementBuilder

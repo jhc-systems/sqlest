@@ -26,7 +26,11 @@ class ColumnSpec extends FlatSpec with Matchers {
   case object Small extends Size
   case object Medium extends Size
   case object Large extends Size
-  implicit val sizeColumnType = EnumerationColumnType[Size, String](Small -> "S", Medium -> "M", Large -> "L")
+  object Size {
+    implicit val sizeColumnType = EnumerationColumnType[Size, String](Small -> "S", Medium -> "M", Large -> "L")
+  }
+
+  case class WrappedInt(int: Int)
 
   class TableOne(alias: Option[String]) extends Table("one", alias) {
     val col1 = column[Int]("col1")
@@ -34,7 +38,8 @@ class ColumnSpec extends FlatSpec with Matchers {
     val col3 = column[Int]("col3", MappedColumnType[Int, String](_.toInt, _.toString))
     val col4 = column[Double]("col1")
     val col5 = column[Option[String]]("col5", BlankIsNoneStringColumnType)
-    val col6 = column[Size]("col5", sizeColumnType)
+    val col6 = column[Size]("col6")
+    val col7 = column[WrappedInt]("col7")
 
     def * = (col1, col2)
   }

@@ -29,7 +29,7 @@ package sqlest.ast
  * all of the following would be represented as instances of `Column`:
  * `a`, `b`, `c`, `1`, and `a == 1`.
  */
-sealed trait Column[+A] {
+sealed trait Column[A] {
   def columnType: ColumnType[A]
 }
 

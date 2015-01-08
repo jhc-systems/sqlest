@@ -17,7 +17,6 @@
 package sqlest.ast
 
 import org.joda.time.DateTime
-import scala.reflect.runtime.{ universe => ru }
 
 /** Standard set of MappedColumnTypes for various column types: */
 trait MappedColumnTypes
@@ -54,7 +53,7 @@ trait StringMappedColumnTypes {
 }
 
 trait BooleanMappedColumnTypes {
-  case class MappedBooleanColumnType[DatabaseType](trueValue: DatabaseType, falseValue: DatabaseType)(implicit base: BaseColumnType[DatabaseType]) extends MappedColumnType[Boolean, DatabaseType] {
+  case class MappedBooleanColumnType[DatabaseType](trueValue: DatabaseType, falseValue: DatabaseType)(implicit base: ColumnType[DatabaseType]) extends MappedColumnType[Boolean, DatabaseType] {
     val baseType = base
 
     def read(database: DatabaseType) = database == trueValue
@@ -65,7 +64,7 @@ trait BooleanMappedColumnTypes {
 }
 
 trait EnumerationMappedColumnTypes {
-  case class EnumerationColumnType[ValueType: ru.TypeTag, DatabaseType](mappings: (ValueType, DatabaseType)*)(implicit base: BaseColumnType[DatabaseType]) extends MappedColumnType[ValueType, DatabaseType] {
+  case class EnumerationColumnType[ValueType, DatabaseType](mappings: (ValueType, DatabaseType)*)(implicit base: ColumnType[DatabaseType]) extends MappedColumnType[ValueType, DatabaseType] {
     val baseType = base
 
     lazy val toDatabaseMappings = mappings.toMap
@@ -75,7 +74,7 @@ trait EnumerationMappedColumnTypes {
     def write(value: ValueType) = toDatabaseMappings(value)
   }
 
-  case class OrderedEnumerationColumnType[ValueType: ru.TypeTag, DatabaseType](mappings: (ValueType, DatabaseType)*)(implicit base: BaseColumnType[DatabaseType]) extends MappedColumnType[ValueType, DatabaseType] with OrderedColumnType[ValueType] {
+  case class OrderedEnumerationColumnType[ValueType, DatabaseType](mappings: (ValueType, DatabaseType)*)(implicit base: ColumnType[DatabaseType]) extends MappedColumnType[ValueType, DatabaseType] with OrderedColumnType[ValueType] {
     val baseType = base
 
     lazy val toDatabaseMappings = mappings.toMap
@@ -97,7 +96,7 @@ trait EnumerationMappedColumnTypes {
 }
 
 trait NumericMappedColumnTypes {
-  case class ZeroIsNoneColumnType[A: ru.TypeTag]()(implicit numeric: Numeric[A], base: BaseColumnType[A]) extends MappedColumnType[Option[A], A] {
+  case class ZeroIsNoneColumnType[A]()(implicit numeric: Numeric[A], base: ColumnType[A]) extends MappedColumnType[Option[A], A] {
     val baseType = base
 
     def read(database: A) =

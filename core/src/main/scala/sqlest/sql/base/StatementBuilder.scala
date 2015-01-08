@@ -52,7 +52,7 @@ trait StatementBuilder extends BaseStatementBuilder
   def generateRawSql(operation: Operation): String = {
     val preprocessedOperation = preprocess(operation)
     val querySql = sql(preprocessedOperation).split("\\?")
-    val queryParameters = parameters(preprocessedOperation).map(parameter => constantSql(parameter.columnType, parameter.value))
+    val queryParameters = parameters(preprocessedOperation).map(parameter => constantSql(parameter.columnType.asInstanceOf[ColumnType[Any]], parameter.value))
 
     querySql.zipAll(queryParameters, "", "")
       .map { case (sql, parameter) => sql + parameter }

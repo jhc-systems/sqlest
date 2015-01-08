@@ -22,10 +22,10 @@ import sqlest._
 
 class ColumnTypeSpec extends FlatSpec with Matchers with CustomMatchers {
   "basic data types" should "have implicit ColumnTypes" in {
-    implicitly[ColumnType[Boolean]] should be(anInstanceOf[BaseColumnType[Boolean]])
-    implicitly[ColumnType[Int]] should be(anInstanceOf[BaseColumnType[Int]])
-    implicitly[ColumnType[Double]] should be(anInstanceOf[BaseColumnType[Double]])
-    implicitly[ColumnType[String]] should be(anInstanceOf[BaseColumnType[String]])
+    implicitly[ColumnType[Boolean]] should be(anInstanceOf[ColumnType[Boolean]])
+    implicitly[ColumnType[Int]] should be(anInstanceOf[ColumnType[Int]])
+    implicitly[ColumnType[Double]] should be(anInstanceOf[ColumnType[Double]])
+    implicitly[ColumnType[String]] should be(anInstanceOf[ColumnType[String]])
   }
 
   "optional data types" should "have implicit ColumnTypes" in {

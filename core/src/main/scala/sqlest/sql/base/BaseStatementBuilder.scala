@@ -156,7 +156,7 @@ trait BaseStatementBuilder {
     case DateTimeColumnType => value.toString
     case optionType: OptionColumnType[_] =>
       val option = value.asInstanceOf[Option[_]]
-      if (option.isEmpty) "null" else constantSql(optionType.baseType, option.get)
+      if (option.isEmpty) "null" else constantSql(optionType.baseType.asInstanceOf[ColumnType[Any]], option.get)
     case mappedType: MappedColumnType[A, _] => constantSql(mappedType.baseType, mappedType.write(value.asInstanceOf[A]))
   }
 

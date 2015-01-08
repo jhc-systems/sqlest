@@ -16,7 +16,6 @@
 
 package sqlest.executor
 
-import scala.reflect.runtime.universe.WeakTypeTag
 import org.scalatest._
 import org.scalatest.matchers._
 import sqlest._

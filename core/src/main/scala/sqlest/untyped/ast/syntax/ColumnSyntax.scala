@@ -34,18 +34,18 @@ class UntypedColumnHelpers {
   }
   def bigDecimalArgument(arg: String) = Try(BigDecimal(arg)).toOption
   def dateTimeArgument(arg: String) = Iso8601.unapply(arg)
-  def mappedArgument[A](arg: String, columnType: ColumnType[A]): Option[A] = (columnType.typeTag match {
-    case typeTag if typeTag == ru.typeTag[Int] => intArgument(arg)
-    case typeTag if typeTag == ru.typeTag[Long] => longArgument(arg)
-    case typeTag if typeTag == ru.typeTag[Double] => doubleArgument(arg)
-    case typeTag if typeTag == ru.typeTag[BigDecimal] => bigDecimalArgument(arg)
-    case typeTag if typeTag == ru.typeTag[Boolean] => booleanArgument(arg)
-    case typeTag if typeTag == ru.typeTag[String] => stringArgument(arg)
-    case typeTag if typeTag == ru.typeTag[DateTime] => dateTimeArgument(arg)
+  def mappedArgument[A](arg: String, columnType: ColumnType[A]): Option[A] = (columnType match {
+    case IntColumnType => intArgument(arg)
+    case LongColumnType => longArgument(arg)
+    case DoubleColumnType => doubleArgument(arg)
+    case BigDecimalColumnType => bigDecimalArgument(arg)
+    case BooleanColumnType => booleanArgument(arg)
+    case StringColumnType => stringArgument(arg)
+    case DateTimeColumnType => dateTimeArgument(arg)
     case _ => sys.error(s"Untyped operators are not implemented for non-standard mapped types: $columnType")
   }).asInstanceOf[Option[A]]
 
-  def infixExpression[A](op: String, left: Column[A], right: String, columnType: ColumnType[A]): Option[InfixFunctionColumn[Boolean]] = columnType match {
+  def infixExpression[A](op: String, left: Column[A], right: String, columnType: ColumnType[_]): Option[InfixFunctionColumn[Boolean]] = columnType match {
     case IntColumnType => intArgument(right).map(right => InfixFunctionColumn[Boolean](op, left, right))
     case LongColumnType => longArgument(right).map(right => InfixFunctionColumn[Boolean](op, left, right))
     case DoubleColumnType => doubleArgument(right).map(right => InfixFunctionColumn[Boolean](op, left, right))
@@ -55,7 +55,7 @@ class UntypedColumnHelpers {
     case DateTimeColumnType => dateTimeArgument(right).map(right => InfixFunctionColumn[Boolean](op, left, right))
     case OptionColumnType(baseType) => infixExpression(op, left, right, baseType)
     case mappedColumnType: MappedColumnType[A, _] =>
-      mappedArgument(right, columnType).map { right =>
+      mappedArgument(right, mappedColumnType).map { right =>
         val mappedRight = mappedColumnType.write(right)
         InfixFunctionColumn[Boolean](op, left, LiteralColumn(mappedRight)(mappedColumnType.baseType))
       }
@@ -86,7 +86,7 @@ trait ColumnSyntax {
     def untypedIn(right: List[String]) = {
       val mappedValues = right.map(value => helpers.mappedArgument(value, left.columnType))
       if (mappedValues.forall(_.isDefined)) {
-        val inColumns = mappedValues.flatten.map(value => LiteralColumn(value)(left.columnType))
+        val inColumns = mappedValues.flatten.map(value => LiteralColumn(value)(left.columnType.asInstanceOf[ColumnType[Any]]))
         Some(InfixFunctionColumn[Boolean]("in", left, ScalarFunctionColumn("", inColumns)(left.columnType)))
       } else
         None

@@ -23,8 +23,6 @@ import sqlest._
 class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
   import TestData._
 
-  // HACK: These declarations have been hoisted out of the tests below due to a Scala bug
-  // that prevented MappedExtractor being able to locate a TypeTag for them:
   case class Inner(b: Int, c: List[Int])
   case class Outer(a: Int, b: List[Inner])
   case class Flattened(a: Int, b: List[Int], c: List[Int])

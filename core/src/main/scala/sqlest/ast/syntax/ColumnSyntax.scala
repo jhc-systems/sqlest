@@ -22,7 +22,7 @@ trait ColumnSyntax {
   implicit def literalColumn[A](value: A)(implicit columnType: ColumnType[A]): Column[A] =
     LiteralColumn[A](value)
 
-  implicit def literalColumn[A](value: Some[A])(implicit columnType: BaseColumnType[A]): Column[Option[A]] =
+  implicit def literalColumn[A](value: Some[A])(implicit columnType: ColumnType[A]): Column[Option[A]] =
     LiteralColumn[Option[A]](value)
 
   implicit class LiteralColumnOps[A](left: A) {
@@ -139,15 +139,15 @@ trait ColumnSyntax {
 
       def mapLiteralColumn(mappedColumn: MappedColumnType[_, _], mappedColumnType: ColumnType[_], column: Column[_]): Column[_] =
         column match {
-          case LiteralColumn(value) => LiteralColumn(mappedValue(mappedColumn, mappedColumnType, column, value))(mappedColumn.baseType)
-          case ConstantColumn(value) => ConstantColumn(mappedValue(mappedColumn, mappedColumnType, column, value))(mappedColumn.baseType)
+          case LiteralColumn(value) => LiteralColumn(mappedValue(mappedColumn, mappedColumnType, column, value))(mappedColumn.baseType.asInstanceOf[ColumnType[Any]])
+          case ConstantColumn(value) => ConstantColumn(mappedValue(mappedColumn, mappedColumnType, column, value))(mappedColumn.baseType.asInstanceOf[ColumnType[Any]])
           case _ => throw new AssertionError(s"Cannot compare MappedColumn $mappedColumn and non mapped column $column")
         }
 
       def mappedValue[A](mappedColumn: MappedColumnType[A, _], mappedColumnType: ColumnType[_], column: Column[_], value: Any): Any =
         (mappedColumnType, column.columnType) match {
-          case (_: OptionColumnType[_], _: BaseColumnType[_]) => mappedColumn.write(Some(value).asInstanceOf[A])
-          case (_: BaseColumnType[_], _: OptionColumnType[_]) => mappedColumn.write(value.asInstanceOf[Option[_]].get.asInstanceOf[A])
+          case (_: OptionColumnType[_], _: ColumnType[_] with BaseColumnType) => mappedColumn.write(Some(value).asInstanceOf[A])
+          case (_: ColumnType[_] with BaseColumnType, _: OptionColumnType[_]) => mappedColumn.write(value.asInstanceOf[Option[_]].get.asInstanceOf[A])
           case _ => mappedColumn.write(value.asInstanceOf[A])
         }
 
