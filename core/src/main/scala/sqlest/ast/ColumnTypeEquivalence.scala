@@ -18,30 +18,32 @@ package sqlest.ast
 
 /**
  * Typeclass representing the equivalence of two column types.
- * For example: `1 === 2` is a valid SQLest expression but `1 === "2"` is not.
+ * For example: `1 === 2` is a valid sqlest expression but `1 === "2"` is not.
  *
- * The main requirement for this class comes from `OptionColumnTypes`. SQLest is relaxed
+ * The main requirement for this class comes from `OptionColumnTypes`. sqlest is relaxed
  * about allowing direct comparisons between optional and non-optional columns.
  * For example, `1 === Some(2)` is considered valid.
+ *
+ * The second requirement is that different numeric column types should be comparable
  */
-case class ColumnTypeEquivalence[A, B](left: ColumnType[A], right: ColumnType[B])
+case class ColumnTypeEquivalence[A, B](leftOption: Boolean, rightOption: Boolean)
 
 object ColumnTypeEquivalence {
   implicit def nonNumericEquivalence[A](implicit left: ColumnType[A] with NonNumericColumnType, right: ColumnType[A] with NonNumericColumnType) =
-    ColumnTypeEquivalence(left, right)
+    ColumnTypeEquivalence[A, A](false, false)
 
   implicit def numericEquivalence[A, B](implicit left: ColumnType[A] with NumericColumnType, right: ColumnType[B] with NumericColumnType) =
-    ColumnTypeEquivalence(left, right)
+    ColumnTypeEquivalence[A, B](false, false)
 
   implicit def mappedColumnTypeEquivalence[A, B](implicit left: MappedColumnType[A, B], right: MappedColumnType[A, B]) =
-    ColumnTypeEquivalence(left, right)
+    ColumnTypeEquivalence[A, A](false, false)
 
   implicit def leftOptionColumnTypeEquivalence[A, B](implicit left: ColumnType[Option[A]], right: ColumnType[B], columnTypeEquivalence: ColumnTypeEquivalence[A, B]) =
-    ColumnTypeEquivalence(left, right)
+    ColumnTypeEquivalence[Option[A], B](true, false)
 
   implicit def rightOptionColumnTypeEquivalence[A, B](implicit left: ColumnType[A], right: ColumnType[Option[B]], columnTypeEquivalence: ColumnTypeEquivalence[A, B]) =
-    ColumnTypeEquivalence(left, right)
+    ColumnTypeEquivalence[A, Option[B]](false, true)
 
   implicit def bothOptionColumnTypeEquivalence[A, B](implicit left: ColumnType[Option[A]], right: ColumnType[Option[B]], columnTypeEquivalence: ColumnTypeEquivalence[A, B]) =
-    ColumnTypeEquivalence(left, right)
+    ColumnTypeEquivalence[Option[A], Option[B]](true, true)
 }
