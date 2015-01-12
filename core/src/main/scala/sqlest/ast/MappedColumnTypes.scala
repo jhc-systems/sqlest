@@ -118,6 +118,9 @@ trait OptionColumnTypes {
   def BlankIsNoneColumnType[A](implicit columnType: ColumnType.Aux[A, String]) =
     OptionColumnType[A, String]("", (_: String).trim == "")(columnType)
 
+  def ZeroIsNoneColumnType[A, B: Numeric](columnType: ColumnType.Aux[A, B]) =
+    OptionColumnType[A, B](implicitly[Numeric[B]].zero)(columnType)
+
   def ZeroIsNoneColumnType[A, B: Numeric](implicit columnType: ColumnType.Aux[A, B]) =
     OptionColumnType[A, B](implicitly[Numeric[B]].zero)(columnType)
 }

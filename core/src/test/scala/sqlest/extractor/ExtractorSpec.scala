@@ -16,6 +16,7 @@
 
 package sqlest.extractor
 
+import org.joda.time.DateTime
 import org.scalatest._
 import org.scalatest.matchers._
 import sqlest._
@@ -35,22 +36,22 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
   case class MixedTypeParamClass[A](s: String, a: A)
 
   "mapped column extractor" should "extract mapped value" in {
-    val extractor = TableSix.trimmedString
+    val extractor = extract(TableSix.trimmedString, TableSix.zeroIsNoneWrappedInt, TableSix.zeroIsNoneDateTime)
 
     val testResultSet = TestResultSet(TableSix.columns)(
-      Seq("test"),
-      Seq(" test "),
-      Seq("   ")
+      Seq("test", 5, 20150101),
+      Seq(" test ", 0, 21000101),
+      Seq("   ", 0, 0)
     )
 
     extractor.extractHeadOption(testResultSet) should equal(Some(
-      Some(WrappedString("test"))
+      (Some(WrappedString("test")), Some(WrappedInt(5)), Some(new DateTime(2015, 1, 1, 0, 0)))
     ))
 
     extractor.extractAll(testResultSet) should equal(List(
-      Some(WrappedString("test")),
-      Some(WrappedString("test")),
-      None
+      (Some(WrappedString("test")), Some(WrappedInt(5)), Some(new DateTime(2015, 1, 1, 0, 0))),
+      (Some(WrappedString("test")), None, Some(new DateTime(2100, 1, 1, 0, 0))),
+      (None, None, None)
     ))
   }
 

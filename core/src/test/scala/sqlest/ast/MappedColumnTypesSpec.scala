@@ -60,7 +60,7 @@ class MappedColumnTypeSpec extends FlatSpec with Matchers with MappedColumnTypes
     zeroIsNoneIntColumnType.read(Some(10)) should be(Some(Some(10)))
     zeroIsNoneIntColumnType.read(Some(0)) should be(Some(None))
 
-    val zeroIsNoneBigDecimalColumnType = OptionColumnType[BigDecimal, BigDecimal](BigDecimal(0))
+    val zeroIsNoneBigDecimalColumnType = ZeroIsNoneColumnType[BigDecimal, BigDecimal]
     zeroIsNoneBigDecimalColumnType.write(Some(BigDecimal("3.1415"))) should be(BigDecimal("3.1415"))
     zeroIsNoneBigDecimalColumnType.write(None) should be(BigDecimal(0))
     zeroIsNoneBigDecimalColumnType.read(Some(BigDecimal("3.1415"))) should be(Some(Some(BigDecimal("3.1415"))))

@@ -55,9 +55,12 @@ object TestData {
   object TableFive extends TableFive(None)
 
   case class WrappedString(inner: String)
+  case class WrappedInt(inner: Int)
   class TableSix(alias: Option[String]) extends Table("six", alias) {
     val trimmedString = column[Option[WrappedString]]("trimmedString")(BlankIsNoneColumnType(ColumnType[WrappedString, String].compose(TrimmedStringColumnType)))
-    def columns = List(trimmedString)
+    val zeroIsNoneWrappedInt = column[Option[WrappedInt]]("zeroIsNoneWrappedInt")(ZeroIsNoneColumnType[WrappedInt, Int])
+    val zeroIsNoneDateTime = column[Option[DateTime]]("zeroIsNoneDateTime")(ZeroIsNoneColumnType(YyyyMmDdColumnType))
+    def columns = List(trimmedString, zeroIsNoneWrappedInt, zeroIsNoneDateTime)
   }
   object TableSix extends TableSix(None)
 
