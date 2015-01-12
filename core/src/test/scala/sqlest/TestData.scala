@@ -56,7 +56,7 @@ object TestData {
 
   case class WrappedString(inner: String)
   class TableSix(alias: Option[String]) extends Table("six", alias) {
-    val trimmedString = column[Option[WrappedString]]("trimmedString")(OptionColumnType("", (_: String).trim == "")(ColumnType[WrappedString, String].compose(TrimmedStringColumnType)))
+    val trimmedString = column[Option[WrappedString]]("trimmedString")(BlankIsNoneColumnType(ColumnType[WrappedString, String].compose(TrimmedStringColumnType)))
     def columns = List(trimmedString)
   }
   object TableSix extends TableSix(None)

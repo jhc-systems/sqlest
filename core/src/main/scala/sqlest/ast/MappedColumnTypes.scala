@@ -24,7 +24,8 @@ trait MappedColumnTypes
     with BooleanMappedColumnTypes
     with EnumerationMappedColumnTypes
     with NumericMappedColumnTypes
-    with DateTimeMappedColumnTypes {
+    with DateTimeMappedColumnTypes
+    with OptionColumnTypes {
 
   // Expose the ColumnType types to custom Sqlest builds that use this trait:
   val ColumnType = sqlest.ast.ColumnType
@@ -111,4 +112,12 @@ trait DateTimeMappedColumnTypes {
     def write(value: DateTime) =
       value.getYear * 10000 + value.getMonthOfYear * 100 + value.getDayOfMonth
   }
+}
+
+trait OptionColumnTypes {
+  def BlankIsNoneColumnType[A](implicit columnType: ColumnType.Aux[A, String]) =
+    OptionColumnType[A, String]("", (_: String).trim == "")(columnType)
+
+  def ZeroIsNoneColumnType[A, B: Numeric](implicit columnType: ColumnType.Aux[A, B]) =
+    OptionColumnType[A, B](implicitly[Numeric[B]].zero)(columnType)
 }
