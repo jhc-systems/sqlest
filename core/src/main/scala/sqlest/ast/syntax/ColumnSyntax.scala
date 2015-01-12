@@ -22,7 +22,7 @@ trait ColumnSyntax {
   implicit def literalColumn[A](value: A)(implicit columnType: ColumnType[A]): Column[A] =
     LiteralColumn[A](value)
 
-  implicit def literalColumn[A](value: Some[A])(implicit columnType: ColumnType[A]): Column[Option[A]] =
+  implicit def literalColumn[A](value: Some[A])(implicit columnType: ColumnType.Aux[A, A]): Column[Option[A]] =
     LiteralColumn[Option[A]](value)
 
   implicit class LiteralColumnOps[A](left: A) {
@@ -139,21 +139,21 @@ trait ColumnSyntax {
 
       def mapLiteralColumn(mappedColumnType: MappedColumnType[_, _], isOption: Boolean, column: Column[_]): Column[_] =
         column match {
-          case LiteralColumn(value) => LiteralColumn(mappedValue(mappedColumnType, isOption, column, value))(mappedColumnType.baseType.asInstanceOf[ColumnType[Any]])
-          case ConstantColumn(value) => ConstantColumn(mappedValue(mappedColumnType, isOption, column, value))(mappedColumnType.baseType.asInstanceOf[ColumnType[Any]])
+          case LiteralColumn(value) => LiteralColumn(mappedValue(mappedColumnType, isOption, column, value))(mappedColumnType.baseColumnType.asInstanceOf[ColumnType[Any]])
+          case ConstantColumn(value) => ConstantColumn(mappedValue(mappedColumnType, isOption, column, value))(mappedColumnType.baseColumnType.asInstanceOf[ColumnType[Any]])
           case _ => throw new AssertionError(s"Cannot compare MappedColumn $mappedColumnType and non mapped column $column")
         }
 
       def mappedValue[A](mappedColumnType: MappedColumnType[A, _], isOption: Boolean, column: Column[_], value: Any): Any =
         (isOption, column.columnType) match {
-          case (true, _: ColumnType[_] with BaseColumnType) => mappedColumnType.write(Some(value).asInstanceOf[A])
-          case (false, _: OptionColumnType[_]) => mappedColumnType.write(value.asInstanceOf[Option[_]].get.asInstanceOf[A])
+          case (true, _: BaseColumnType[_]) => mappedColumnType.write(Some(value).asInstanceOf[A])
+          case (false, _: OptionColumnType[_, _]) => mappedColumnType.write(value.asInstanceOf[Option[_]].get.asInstanceOf[A])
           case _ => mappedColumnType.write(value.asInstanceOf[A])
         }
 
       (left.columnType, right.columnType) match {
         case (leftColumnType, rightColumnType) if leftColumnType == rightColumnType => (left, right)
-        case (leftColumnType: MappedColumnType[_, _], rightColumnType: MappedColumnType[_, _]) if leftColumnType.baseType == rightColumnType.baseType => (left, right)
+        case (leftColumnType: MappedColumnType[_, _], rightColumnType: MappedColumnType[_, _]) if leftColumnType.baseColumnType == rightColumnType.baseColumnType => (left, right)
         case (leftColumnType: MappedColumnType[_, _], rightColumnType: MappedColumnType[_, _]) => throw new AssertionError(s"Cannot compare 2 different MappedColumns: $leftColumnType and $rightColumnType")
         case (leftColumnType: MappedColumnType[_, _], _) => (left, mapLiteralColumn(leftColumnType, equivalence.leftOption, right))
         case (_, rightColumnType: MappedColumnType[_, _]) => (mapLiteralColumn(rightColumnType, equivalence.rightOption, left), right)

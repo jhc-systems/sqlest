@@ -26,37 +26,24 @@ trait MappedColumnTypes
     with NumericMappedColumnTypes
     with DateTimeMappedColumnTypes {
 
-  // Reprovide the MappedColumnType type to custom Sqlest builds that use this trait:
+  // Expose the ColumnType types to custom Sqlest builds that use this trait:
+  val ColumnType = sqlest.ast.ColumnType
+  val OptionColumnType = sqlest.ast.OptionColumnType
   type MappedColumnType[ValueType, DatabaseType] = sqlest.ast.MappedColumnType[ValueType, DatabaseType]
   val MappedColumnType = sqlest.ast.MappedColumnType
 }
 
 trait StringMappedColumnTypes {
   case object TrimmedStringColumnType extends MappedColumnType[String, String] {
-    val baseType = StringColumnType
-
-    def read(database: String) = database.trim
-
+    val baseColumnType = StringColumnType
+    def read(database: Option[String]) = database.map(_.trim)
     def write(value: String) = value
   }
-
-  case object BlankIsNoneStringColumnType extends MappedColumnType[Option[String], String] {
-    val baseType = StringColumnType
-
-    def read(database: String) =
-      if (database.trim != "") Some(database) else None
-
-    def write(value: Option[String]) =
-      value getOrElse ""
-  }
-
 }
 
 trait BooleanMappedColumnTypes {
-  case class MappedBooleanColumnType[DatabaseType](trueValue: DatabaseType, falseValue: DatabaseType)(implicit base: ColumnType[DatabaseType]) extends MappedColumnType[Boolean, DatabaseType] {
-    val baseType = base
-
-    def read(database: DatabaseType) = database == trueValue
+  case class MappedBooleanColumnType[DatabaseType](trueValue: DatabaseType, falseValue: DatabaseType)(implicit val baseColumnType: BaseColumnType[DatabaseType]) extends MappedColumnType[Boolean, DatabaseType] {
+    def read(database: Option[DatabaseType]) = database.map(_ == trueValue)
     def write(value: Boolean) = if (value) trueValue else falseValue
   }
 
@@ -64,25 +51,18 @@ trait BooleanMappedColumnTypes {
 }
 
 trait EnumerationMappedColumnTypes {
-  case class EnumerationColumnType[ValueType, DatabaseType](mappings: (ValueType, DatabaseType)*)(implicit base: ColumnType[DatabaseType]) extends MappedColumnType[ValueType, DatabaseType] {
-    val baseType = base
+  trait BaseEnumerationColumnType[ValueType, DatabaseType] extends MappedColumnType[ValueType, DatabaseType] {
+    val mappings: Seq[(ValueType, DatabaseType)]
+    val toDatabaseMappings = mappings.toMap
+    val toValueMappings = mappings.map { case (value, database) => (database, value) }.toMap
 
-    lazy val toDatabaseMappings = mappings.toMap
-    lazy val toValueMappings = mappings.map { case (value, database) => (database, value) }.toMap
-
-    def read(database: DatabaseType) = toValueMappings(database)
+    def read(database: Option[DatabaseType]) = database.map(toValueMappings)
     def write(value: ValueType) = toDatabaseMappings(value)
   }
 
-  case class OrderedEnumerationColumnType[ValueType, DatabaseType](mappings: (ValueType, DatabaseType)*)(implicit base: ColumnType[DatabaseType]) extends MappedColumnType[ValueType, DatabaseType] with OrderedColumnType[ValueType] {
-    val baseType = base
+  case class EnumerationColumnType[ValueType, DatabaseType](mappings: (ValueType, DatabaseType)*)(implicit val baseColumnType: BaseColumnType[DatabaseType]) extends BaseEnumerationColumnType[ValueType, DatabaseType]
 
-    lazy val toDatabaseMappings = mappings.toMap
-    lazy val toValueMappings = mappings.map { case (value, database) => (database, value) }.toMap
-
-    def read(database: DatabaseType) = toValueMappings(database)
-    def write(value: ValueType) = toDatabaseMappings(value)
-
+  case class OrderedEnumerationColumnType[ValueType, DatabaseType](mappings: (ValueType, DatabaseType)*)(implicit val baseColumnType: BaseColumnType[DatabaseType]) extends BaseEnumerationColumnType[ValueType, DatabaseType] with OrderedColumnType[ValueType] {
     def orderColumn(column: Column[ValueType]) = {
       val caseMappings =
         mappings
@@ -96,42 +76,31 @@ trait EnumerationMappedColumnTypes {
 }
 
 trait NumericMappedColumnTypes {
-  case class ZeroIsNoneColumnType[A]()(implicit numeric: Numeric[A], base: ColumnType[A]) extends MappedColumnType[Option[A], A] {
-    val baseType = base
-
-    def read(database: A) =
-      if (database != numeric.zero) Some(database) else None
-
-    def write(value: Option[A]) =
-      value getOrElse numeric.zero
-  }
-
   case object BigDecimalStringColumnType extends MappedColumnType[BigDecimal, String] {
-    val baseType = StringColumnType
+    val baseColumnType = StringColumnType
 
-    def read(database: String) = {
-      val trimmed = database.trim
-      if (trimmed != "") {
-        if (trimmed.indexOf("/") == -1) {
-          BigDecimal(trimmed)
-        } else {
-          BigDecimal(0)
-        }
-
-      } else BigDecimal(0)
+    def read(database: Option[String]) = {
+      database.map { database: String =>
+        val trimmed = database.trim
+        if (trimmed != "") {
+          if (trimmed.indexOf("/") == -1) {
+            BigDecimal(trimmed)
+          } else {
+            BigDecimal(0)
+          }
+        } else BigDecimal(0)
+      }
     }
 
     def write(value: BigDecimal) = value.toString
-
   }
-
 }
 
 trait DateTimeMappedColumnTypes {
   case object YyyyMmDdColumnType extends MappedColumnType[DateTime, Int] {
-    val baseType = IntColumnType
+    val baseColumnType = IntColumnType
 
-    def read(database: Int) = {
+    def read(database: Option[Int]) = database.map { database =>
       val year = database / 10000
       val month = (database % 10000) / 100
       val day = database % 100
@@ -141,18 +110,5 @@ trait DateTimeMappedColumnTypes {
 
     def write(value: DateTime) =
       value.getYear * 10000 + value.getMonthOfYear * 100 + value.getDayOfMonth
-  }
-
-  case object ZeroIsNoneYyyyMmDdColumnType extends MappedColumnType[Option[DateTime], Int] {
-    val baseType = IntColumnType
-
-    def read(database: Int) =
-      if (database == 0) None
-      else Some(YyyyMmDdColumnType.read(database))
-
-    def write(value: Option[DateTime]) = value match {
-      case Some(value) => value.getYear * 10000 + value.getMonthOfYear * 100 + value.getDayOfMonth
-      case None => 0
-    }
   }
 }

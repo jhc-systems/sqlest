@@ -26,7 +26,7 @@ case class TestResultSet(columns: Seq[AliasedColumn[_]])(rows: Seq[Any]*) extend
     val columnIndex = columns.zipWithIndex
       .find(pair => pair._1.columnAlias == columnName)
       .map(_._2)
-      .getOrElse(-1)
+      .getOrElse(throw new Exception(s"Could not find $columnName in $columns"))
 
     try {
       lastCallWasNull = false

@@ -154,10 +154,10 @@ trait BaseStatementBuilder {
     case BigDecimalColumnType => value.toString
     case StringColumnType => "'" + escapeSqlString(value.toString) + "'"
     case DateTimeColumnType => value.toString
-    case optionType: OptionColumnType[_] =>
+    case optionType: OptionColumnType[_, _] =>
       val option = value.asInstanceOf[Option[_]]
-      if (option.isEmpty) "null" else constantSql(optionType.baseType.asInstanceOf[ColumnType[Any]], option.get)
-    case mappedType: MappedColumnType[A, _] => constantSql(mappedType.baseType, mappedType.write(value.asInstanceOf[A]))
+      if (option.isEmpty) "null" else constantSql(optionType.baseColumnType.asInstanceOf[ColumnType[Any]], option.get)
+    case mappedType: MappedColumnType[A, _] => constantSql(mappedType.baseColumnType, mappedType.write(value.asInstanceOf[A]))
   }
 
   def identifierSql(identifier: String) =

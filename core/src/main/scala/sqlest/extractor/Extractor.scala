@@ -109,10 +109,6 @@ case class ConstantExtractor[A](value: A) extends SingleExtractor[A] {
 case class ColumnExtractor[A](column: AliasedColumn[A]) extends SingleExtractor[A] {
   type Accumulator = Option[A]
   val columns = List(column)
-  column.columnType match {
-    case _: OptionColumnType[_] => Nil
-    case _ => List(column)
-  }
 
   def initialize(row: ResultSet) = read(row, column.columnType)
 
@@ -122,20 +118,27 @@ case class ColumnExtractor[A](column: AliasedColumn[A]) extends SingleExtractor[
 
   private def read[B](row: ResultSet, columnType: ColumnType[B]): Option[B] =
     columnType match {
-      case BooleanColumnType => wrapNullableValue(row getBoolean column.columnAlias, row)
-      case IntColumnType => wrapNullableValue(row getInt column.columnAlias, row)
-      case LongColumnType => wrapNullableValue(row getLong column.columnAlias, row)
-      case DoubleColumnType => wrapNullableValue(row getDouble column.columnAlias, row)
-      case BigDecimalColumnType => wrapNullableValue(row getBigDecimal column.columnAlias, row).map(BigDecimal.apply)
-      case StringColumnType => wrapNullableValue(row getString column.columnAlias, row)
-      case DateTimeColumnType => wrapNullableValue(new DateTime(row getDate column.columnAlias), row)
-      case OptionColumnType(base) => Some(read(row, base))
-      case mapped: MappedColumnType[B, _] => read(row, mapped.baseType).map(mapped.read)
+      case baseColumnType: BaseColumnType[B] => readBaseType(row, baseColumnType)
+      case optionColumnType: OptionColumnType[B, _] => optionColumnType.read(readBaseType(row, optionColumnType.baseColumnType))
+      case mappedColumnType: MappedColumnType[B, _] => mappedColumnType.read(readBaseType(row, mappedColumnType.baseColumnType))
     }
 
-  private def wrapNullableValue[B](value: B, row: ResultSet) =
-    if (!row.wasNull) Some(value)
-    else None
+  private def readBaseType[B](row: ResultSet, columnType: BaseColumnType[B]): Option[B] = {
+    def checkNull(value: B): Option[B] =
+      if (!row.wasNull) Some(value)
+      else None
+
+    columnType match {
+      case BooleanColumnType => checkNull(row.getBoolean(column.columnAlias))
+      case IntColumnType => checkNull(row.getInt(column.columnAlias))
+      case LongColumnType => checkNull(row.getLong(column.columnAlias))
+      case DoubleColumnType => checkNull(row.getDouble(column.columnAlias))
+      case BigDecimalColumnType => Option(row.getBigDecimal(column.columnAlias)).map(BigDecimal.apply)
+      case StringColumnType => checkNull(row.getString(column.columnAlias))
+      case DateTimeColumnType => checkNull(new DateTime(row.getDate(column.columnAlias)))
+    }
+  }
+
 }
 
 trait ProductExtractor[A <: Product] extends SingleExtractor[A] {

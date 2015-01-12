@@ -29,10 +29,10 @@ package sqlest.ast
 case class ColumnTypeEquivalence[A, B](leftOption: Boolean, rightOption: Boolean)
 
 object ColumnTypeEquivalence {
-  implicit def nonNumericEquivalence[A](implicit left: ColumnType[A] with NonNumericColumnType, right: ColumnType[A] with NonNumericColumnType) =
+  implicit def nonNumericEquivalence[A](implicit left: NonNumericColumnType[A], right: NonNumericColumnType[A]) =
     ColumnTypeEquivalence[A, A](false, false)
 
-  implicit def numericEquivalence[A, B](implicit left: ColumnType[A] with NumericColumnType, right: ColumnType[B] with NumericColumnType) =
+  implicit def numericEquivalence[A, B](implicit left: NumericColumnType[A], right: NumericColumnType[B]) =
     ColumnTypeEquivalence[A, B](false, false)
 
   implicit def mappedColumnTypeEquivalence[A, B](implicit left: MappedColumnType[A, B], right: MappedColumnType[A, B]) =

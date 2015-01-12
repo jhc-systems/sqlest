@@ -34,6 +34,26 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
   case class DuplicateTypeParamClass[A](a1: A, a2: A)
   case class MixedTypeParamClass[A](s: String, a: A)
 
+  "mapped column extractor" should "extract mapped value" in {
+    val extractor = TableSix.trimmedString
+
+    val testResultSet = TestResultSet(TableSix.columns)(
+      Seq("test"),
+      Seq(" test "),
+      Seq("   ")
+    )
+
+    extractor.extractHeadOption(testResultSet) should equal(Some(
+      Some(WrappedString("test"))
+    ))
+
+    extractor.extractAll(testResultSet) should equal(List(
+      Some(WrappedString("test")),
+      Some(WrappedString("test")),
+      None
+    ))
+  }
+
   "single case class extractor" should "extract appropriate data structures" in {
     val extractor = extract[One](
       a = TableOne.col1,

@@ -29,9 +29,9 @@ class ColumnTypeSpec extends FlatSpec with Matchers with CustomMatchers {
   }
 
   "optional data types" should "have implicit ColumnTypes" in {
-    implicitly[ColumnType[Option[Boolean]]] should be(anInstanceOf[OptionColumnType[Boolean]])
-    implicitly[ColumnType[Option[Int]]] should be(anInstanceOf[OptionColumnType[Int]])
-    implicitly[ColumnType[Option[Double]]] should be(anInstanceOf[OptionColumnType[Double]])
-    implicitly[ColumnType[Option[String]]] should be(anInstanceOf[OptionColumnType[String]])
+    implicitly[ColumnType[Option[Boolean]]] should be(anInstanceOf[OptionColumnType[Boolean, Boolean]])
+    implicitly[ColumnType[Option[Int]]] should be(anInstanceOf[OptionColumnType[Int, Int]])
+    implicitly[ColumnType[Option[Double]]] should be(anInstanceOf[OptionColumnType[Double, Double]])
+    implicitly[ColumnType[Option[String]]] should be(anInstanceOf[OptionColumnType[String, String]])
   }
 }

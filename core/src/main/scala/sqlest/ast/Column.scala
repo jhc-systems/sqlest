@@ -30,7 +30,7 @@ package sqlest.ast
  * `a`, `b`, `c`, `1`, and `a == 1`.
  */
 sealed trait Column[A] {
-  def columnType: ColumnType[A]
+  val columnType: ColumnType[A]
 }
 
 /** Literal column values, e.g. `1`, `'foo'`, and so on. */

@@ -22,7 +22,7 @@ import sqlest.extractor.TestResultSet
 object TestData {
   class TableOne(alias: Option[String]) extends Table("one", alias) {
     val col1 = column[Int]("col1")
-    val col2 = column[String]("col2", TrimmedStringColumnType)
+    val col2 = column[String]("col2")(TrimmedStringColumnType)
     def columns = List(col1, col2)
   }
   object TableOne extends TableOne(None)
@@ -42,7 +42,7 @@ object TestData {
   object TableThree extends TableThree(None)
 
   class TableFour(alias: Option[String]) extends Table("four", alias) {
-    val mapped = column[Boolean]("mapped", BooleanYNColumnType)
+    val mapped = column[Boolean]("mapped")(BooleanYNColumnType)
     def columns = List(mapped)
   }
   object TableFour extends TableFour(None)
@@ -53,6 +53,13 @@ object TestData {
     def columns = List(dateTimeCol, bigDecimalCol)
   }
   object TableFive extends TableFive(None)
+
+  case class WrappedString(inner: String)
+  class TableSix(alias: Option[String]) extends Table("six", alias) {
+    val trimmedString = column[Option[WrappedString]]("trimmedString")(OptionColumnType(ColumnType[WrappedString, String].compose(TrimmedStringColumnType), "", (_: String).trim == ""))
+    def columns = List(trimmedString)
+  }
+  object TableSix extends TableSix(None)
 
   case class One(a: Int, b: String)
   case class Two(a: String, b: Int)

@@ -39,9 +39,9 @@ class ColumnSpec extends FlatSpec with Matchers {
   class TableOne(alias: Option[String]) extends Table("one", alias) {
     val col1 = column[Int]("col1")
     val col2 = column[String]("col2")
-    val col3 = column[Int]("col3", MappedColumnType[Int, String](_.toInt, _.toString))
+    val col3 = column[Int]("col3")(MappedColumnType[Int, String](_.map(_.toInt), _.toString))
     val col4 = column[Double]("col1")
-    val col5 = column[Option[String]]("col5", BlankIsNoneStringColumnType)
+    val col5 = column[Option[String]]("col5")(OptionColumnType(StringColumnType, ""))
     val col6 = column[Size]("col6")
     val col7 = column[WrappedInt]("col7")
 

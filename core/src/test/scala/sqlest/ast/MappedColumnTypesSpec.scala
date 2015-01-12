@@ -26,15 +26,15 @@ class MappedColumnTypeSpec extends FlatSpec with Matchers with MappedColumnTypes
 
     BooleanIntColumnType.write(true) should be(1)
     BooleanIntColumnType.write(false) should be(0)
-    BooleanIntColumnType.read(1) should be(true)
-    BooleanIntColumnType.read(0) should be(false)
+    BooleanIntColumnType.read(Some(1)) should be(Some(true))
+    BooleanIntColumnType.read(Some(0)) should be(Some(false))
 
     val BooleanStringColumnType = MappedBooleanColumnType("Y", "Z")
 
     BooleanStringColumnType.write(true) should be("Y")
     BooleanStringColumnType.write(false) should be("Z")
-    BooleanStringColumnType.read("Y") should be(true)
-    BooleanStringColumnType.read("Z") should be(false)
+    BooleanStringColumnType.read(Some("Y")) should be(Some(true))
+    BooleanStringColumnType.read(Some("Z")) should be(Some(false))
   }
 
   sealed trait Animal
@@ -49,45 +49,47 @@ class MappedColumnTypeSpec extends FlatSpec with Matchers with MappedColumnTypes
 
     AnimalColumnType.write(Snake) should be("S")
     AnimalColumnType.write(Gigantosaurus) should be("G")
-    AnimalColumnType.read("S") should be(Snake)
-    AnimalColumnType.read("G") should be(Gigantosaurus)
+    AnimalColumnType.read(Some("S")) should be(Some(Snake))
+    AnimalColumnType.read(Some("G")) should be(Some(Gigantosaurus))
   }
 
-  "ZeroIsNoneColumnType" should "convert zeroes in database to None" in {
-    ZeroIsNoneColumnType[Int].write(Some(10)) should be(10)
-    ZeroIsNoneColumnType[Int].write(None) should be(0)
-    ZeroIsNoneColumnType[Int].read(10) should be(Some(10))
-    ZeroIsNoneColumnType[Int].read(0) should be(None)
+  "OptionColumnType" should "convert zeroes in database to None" in {
+    val zeroIsNoneIntColumnType = OptionColumnType(IntColumnType, 0)
+    zeroIsNoneIntColumnType.write(Some(10)) should be(10)
+    zeroIsNoneIntColumnType.write(None) should be(0)
+    zeroIsNoneIntColumnType.read(Some(10)) should be(Some(Some(10)))
+    zeroIsNoneIntColumnType.read(Some(0)) should be(Some(None))
 
-    ZeroIsNoneColumnType[BigDecimal].write(Some(BigDecimal("3.1415"))) should be(BigDecimal("3.1415"))
-    ZeroIsNoneColumnType[BigDecimal].write(None) should be(BigDecimal(0))
-    ZeroIsNoneColumnType[BigDecimal].read(BigDecimal("3.1415")) should be(Some(BigDecimal("3.1415")))
-    ZeroIsNoneColumnType[BigDecimal].read(BigDecimal(0)) should be(None)
+    val zeroIsNoneBigDecimalColumnType = OptionColumnType(BigDecimalColumnType, BigDecimal(0))
+    zeroIsNoneBigDecimalColumnType.write(Some(BigDecimal("3.1415"))) should be(BigDecimal("3.1415"))
+    zeroIsNoneBigDecimalColumnType.write(None) should be(BigDecimal(0))
+    zeroIsNoneBigDecimalColumnType.read(Some(BigDecimal("3.1415"))) should be(Some(Some(BigDecimal("3.1415"))))
+    zeroIsNoneBigDecimalColumnType.read(Some(BigDecimal(0))) should be(Some(None))
   }
 
   "YyyyMmDdColumnType" should "convert integers to date times" in {
     YyyyMmDdColumnType.write(new DateTime(1999, 12, 31, 0, 0)) should be(19991231)
     YyyyMmDdColumnType.write(new DateTime(2000, 1, 1, 0, 0)) should be(20000101)
-    YyyyMmDdColumnType.read(19991231) should be(new DateTime(1999, 12, 31, 0, 0))
-    YyyyMmDdColumnType.read(20000101) should be(new DateTime(2000, 1, 1, 0, 0))
+    YyyyMmDdColumnType.read(Some(19991231)) should be(Some(new DateTime(1999, 12, 31, 0, 0)))
+    YyyyMmDdColumnType.read(Some(20000101)) should be(Some(new DateTime(2000, 1, 1, 0, 0)))
   }
 
   "MappedColumnType.compose" should "compose read and write operations" in {
-    val zeroIsNoneStringColumn = ZeroIsNoneColumnType[Int].compose(MappedColumnType[Int, String](_.toInt, _.toString))
+    val zeroIsNoneStringColumn = OptionColumnType(MappedColumnType[Int, String](_.map(_.toInt), _.toString), "0")
     zeroIsNoneStringColumn.write(Some(1)) should be("1")
-    zeroIsNoneStringColumn.read("0") should be(None)
     zeroIsNoneStringColumn.write(None) should be("0")
-    zeroIsNoneStringColumn.read("1") should be(Some(1))
+    zeroIsNoneStringColumn.read(Some("0")) should be(Some(None))
+    zeroIsNoneStringColumn.read(Some("1")) should be(Some(Some(1)))
 
-    val blankIsNoneTrimmedColumn = BlankIsNoneStringColumnType.compose(TrimmedStringColumnType)
-    blankIsNoneTrimmedColumn.read("") should be(None)
-    blankIsNoneTrimmedColumn.read("  Test   ") should be(Some("Test"))
+    val blankIsNoneTrimmedColumn = OptionColumnType(TrimmedStringColumnType, "")
+    blankIsNoneTrimmedColumn.read(Some("")) should be(Some(None))
+    blankIsNoneTrimmedColumn.read(Some("  Test   ")) should be(Some(Some("Test")))
     blankIsNoneTrimmedColumn.write(Some("Test")) should be("Test")
     blankIsNoneTrimmedColumn.write(None) should be("")
 
     val chainedComposedMappedColumn =
       MappedColumnType[Option[Int], Boolean](
-        db => if (db) Some(1) else None,
+        db => db.map { db => if (db) Some(1) else None },
         v => if (v.getOrElse(0) == 0) false else true
       ).compose(
           MappedBooleanColumnType(
@@ -96,8 +98,8 @@ class MappedColumnTypeSpec extends FlatSpec with Matchers with MappedColumnTypes
           )
         ).compose(YyyyMmDdColumnType)
 
-    chainedComposedMappedColumn.read(19991231) should be(Some(1))
-    chainedComposedMappedColumn.read(19900408) should be(None)
+    chainedComposedMappedColumn.read(Some(19991231)) should be(Some(Some(1)))
+    chainedComposedMappedColumn.read(Some(19900408)) should be(Some(None))
     chainedComposedMappedColumn.write(Some(5)) should be(19991231)
     chainedComposedMappedColumn.write(None) should be(20000101)
   }
