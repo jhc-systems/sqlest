@@ -37,9 +37,6 @@ trait BaseTable {
   def column[A](name: String)(implicit columnType: ColumnType[A]) =
     TableColumn[A](tableAlias, name)
 
-  def column[A](name: String, columnType: MappedColumnType[A, _]) =
-    TableColumn[A](tableAlias, name)(columnType)
-
   def as(alias: String): BaseTable = macro AliasTableImpl.apply
 
   override def toString = {

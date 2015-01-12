@@ -70,7 +70,7 @@ trait BaseStatementBuilderSpec extends FlatSpec with Matchers {
   case object Bronze extends Medal
 
   class TableFour(alias: Option[String]) extends Table("four", alias) {
-    val orderedColumn = column[Medal]("orderedColumn", OrderedEnumerationColumnType[Medal, String](Gold -> "G", Silver -> "S", Bronze -> "B"))
+    val orderedColumn = column[Medal]("orderedColumn")(OrderedEnumerationColumnType[Medal, String](Gold -> "G", Silver -> "S", Bronze -> "B"))
   }
   object TableFour extends TableFour(None)
 

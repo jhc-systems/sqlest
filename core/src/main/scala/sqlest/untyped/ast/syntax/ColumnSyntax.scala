@@ -53,7 +53,7 @@ class UntypedColumnHelpers {
     case BooleanColumnType => booleanArgument(right).map(right => InfixFunctionColumn[Boolean](op, left, right))
     case StringColumnType => stringArgument(right).map(right => InfixFunctionColumn[Boolean](op, left, right))
     case DateTimeColumnType => dateTimeArgument(right).map(right => InfixFunctionColumn[Boolean](op, left, right))
-    case OptionColumnType(baseColumnType, _, _) => infixExpression(op, left, right, baseColumnType)
+    case optionColumnType: OptionColumnType[A, _] => infixExpression(op, left, right, optionColumnType.baseColumnType)
     case mappedColumnType: MappedColumnType[A, _] =>
       mappedArgument(right, mappedColumnType).map { right =>
         val mappedRight = mappedColumnType.write(right)
@@ -63,7 +63,7 @@ class UntypedColumnHelpers {
 
   def likeExpression(left: Column[_], right: String, columnType: ColumnType[_], formatArgument: String => String): Option[InfixFunctionColumn[Boolean]] = columnType match {
     case StringColumnType => stringArgument(right).map(right => InfixFunctionColumn[Boolean]("like", left, formatArgument(right)))
-    case OptionColumnType(baseColumnType, _, _) => likeExpression(left, right, baseColumnType, formatArgument)
+    case optionColumnType: OptionColumnType[_, _] => likeExpression(left, right, optionColumnType.baseColumnType, formatArgument)
     case _ => None
   }
 

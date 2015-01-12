@@ -57,7 +57,7 @@ case object DateTimeColumnType extends NonNumericColumnType[DateTime]
  *
  * For every `OptionColumnType` there is an underlying `BaseColumnType`.
  */
-case class OptionColumnType[A, B](innerColumnType: ColumnType.Aux[A, B], nullValue: B, isNull: B => Boolean) extends ColumnType[Option[A]] {
+case class OptionColumnType[A, B](nullValue: B, isNull: B => Boolean)(implicit innerColumnType: ColumnType.Aux[A, B]) extends ColumnType[Option[A]] {
   type Database = B
   val baseColumnType: BaseColumnType[B] = innerColumnType match {
     case baseColumnType: ColumnType[A] with BaseColumnType[B] => baseColumnType
@@ -76,8 +76,8 @@ case class OptionColumnType[A, B](innerColumnType: ColumnType.Aux[A, B], nullVal
 }
 
 object OptionColumnType {
-  def apply[A, B](innerColumnType: ColumnType.Aux[A, B], nullValue: B): OptionColumnType[A, B] = apply(innerColumnType, nullValue, _ == nullValue)
-  def apply[A, B](innerColumnType: ColumnType.Aux[A, B]): OptionColumnType[A, B] = apply(innerColumnType, null.asInstanceOf[B])
+  def apply[A, B](nullValue: B)(implicit innerColumnType: ColumnType.Aux[A, B]): OptionColumnType[A, B] = apply(nullValue, (_: B) == nullValue)
+  def apply[A, B](innerColumnType: ColumnType.Aux[A, B]): OptionColumnType[A, B] = apply(null.asInstanceOf[B])(innerColumnType)
 }
 
 /**
@@ -102,7 +102,7 @@ object MappedColumnType {
   }
 
   implicit class MappedColumnTypeOps[A, B](mappedColumnType: MappedColumnType[A, B]) {
-    def compose[C: BaseColumnType](inner: MappedColumnType[B, C]): MappedColumnType[A, C] = {
+    def compose[C: BaseColumnType](inner: ColumnType.Aux[B, C]): MappedColumnType[A, C] = {
       MappedColumnType((database: Option[C]) => mappedColumnType.read(inner.read(database)), (value: A) => inner.write(mappedColumnType.write(value)))
     }
   }

@@ -54,13 +54,13 @@ class MappedColumnTypeSpec extends FlatSpec with Matchers with MappedColumnTypes
   }
 
   "OptionColumnType" should "convert zeroes in database to None" in {
-    val zeroIsNoneIntColumnType = OptionColumnType(IntColumnType, 0)
+    val zeroIsNoneIntColumnType = OptionColumnType[Int, Int](0)
     zeroIsNoneIntColumnType.write(Some(10)) should be(10)
     zeroIsNoneIntColumnType.write(None) should be(0)
     zeroIsNoneIntColumnType.read(Some(10)) should be(Some(Some(10)))
     zeroIsNoneIntColumnType.read(Some(0)) should be(Some(None))
 
-    val zeroIsNoneBigDecimalColumnType = OptionColumnType(BigDecimalColumnType, BigDecimal(0))
+    val zeroIsNoneBigDecimalColumnType = OptionColumnType[BigDecimal, BigDecimal](BigDecimal(0))
     zeroIsNoneBigDecimalColumnType.write(Some(BigDecimal("3.1415"))) should be(BigDecimal("3.1415"))
     zeroIsNoneBigDecimalColumnType.write(None) should be(BigDecimal(0))
     zeroIsNoneBigDecimalColumnType.read(Some(BigDecimal("3.1415"))) should be(Some(Some(BigDecimal("3.1415"))))
@@ -75,13 +75,13 @@ class MappedColumnTypeSpec extends FlatSpec with Matchers with MappedColumnTypes
   }
 
   "MappedColumnType.compose" should "compose read and write operations" in {
-    val zeroIsNoneStringColumn = OptionColumnType(MappedColumnType[Int, String](_.map(_.toInt), _.toString), "0")
+    val zeroIsNoneStringColumn = OptionColumnType("0")(MappedColumnType[Int, String](_.map(_.toInt), _.toString))
     zeroIsNoneStringColumn.write(Some(1)) should be("1")
     zeroIsNoneStringColumn.write(None) should be("0")
     zeroIsNoneStringColumn.read(Some("0")) should be(Some(None))
     zeroIsNoneStringColumn.read(Some("1")) should be(Some(Some(1)))
 
-    val blankIsNoneTrimmedColumn = OptionColumnType(TrimmedStringColumnType, "")
+    val blankIsNoneTrimmedColumn = OptionColumnType("")(TrimmedStringColumnType)
     blankIsNoneTrimmedColumn.read(Some("")) should be(Some(None))
     blankIsNoneTrimmedColumn.read(Some("  Test   ")) should be(Some(Some("Test")))
     blankIsNoneTrimmedColumn.write(Some("Test")) should be("Test")

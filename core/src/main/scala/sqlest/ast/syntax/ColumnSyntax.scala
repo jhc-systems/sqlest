@@ -78,9 +78,9 @@ trait ColumnSyntax {
 
   implicit class AliasedOptionColumnsOps[A](left: AliasedColumn[A]) {
     def ? = left match {
-      case column: TableColumn[_] => AliasColumn(column, left.columnAlias)(OptionColumnType(left.columnType))
-      case AliasColumn(column, columnAlias) => AliasColumn(column, columnAlias)(OptionColumnType(left.columnType))
-      case column: ReferenceColumn[A] => ReferenceColumn(left.columnAlias)(OptionColumnType(left.columnType))
+      case column: TableColumn[_] => AliasColumn(column, left.columnAlias)(left.columnType.toOptionColumnType)
+      case AliasColumn(column, columnAlias) => AliasColumn(column, columnAlias)(left.columnType.toOptionColumnType)
+      case column: ReferenceColumn[A] => ReferenceColumn(left.columnAlias)(left.columnType.toOptionColumnType)
     }
   }
 
