@@ -1,7 +1,10 @@
 import sbt._
 import sbt.Keys._
 
+import com.typesafe.sbt.SbtGit.GitKeys.gitRemoteRepo
+import com.typesafe.sbt.SbtGhPages
 import com.typesafe.sbt.SbtScalariform
+import com.typesafe.sbt.SbtSite
 import spray.boilerplate.BoilerplatePlugin._
 import xerial.sbt.Sonatype._
 
@@ -23,14 +26,14 @@ object SqlestBuild extends Build {
     id = "core",
     base = file("core"),
 
-    settings = commonSettings ++ publishingSettings ++ Boilerplate.settings ++ Seq(
+    settings = commonSettings ++ publishingSettings ++ scaladocSettings ++ Boilerplate.settings ++ Seq(
       moduleName := "sqlest",
 
       libraryDependencies ++= Seq(
         "joda-time" % "joda-time" % "2.3",
         "org.joda" % "joda-convert" % "1.6",
         "com.typesafe.scala-logging" %% "scala-logging-slf4j" % "2.1.2",
-        "org.scalatest" %% "scalatest" % "2.1.7" % "test"
+        "org.scalatest" %% "scalatest" % "2.2.1" % "test"
       )
     )
   )
@@ -53,6 +56,10 @@ object SqlestBuild extends Build {
     version := "0.5.0-SNAPSHOT",
     scalaVersion := "2.11.5",
     scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-language:implicitConversions", "-language:existentials")
+  )
+
+  def scaladocSettings = SbtSite.site.settings ++ SbtSite.site.includeScaladoc() ++ SbtGhPages.ghpages.settings ++ Seq(
+    gitRemoteRepo := "git@github.com:jhc-systems/sqlest.git"
   )
 
   def publishingSettings = sonatypeSettings ++ Seq(
