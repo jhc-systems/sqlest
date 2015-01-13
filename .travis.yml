@@ -8,5 +8,13 @@ after_success:
 
 env:
   global:
-    - secure: bY18Su7LC6f/YGpqnozbXzI1wPBRh50/ouG1RdBA6BPSQ5c+eHcthsr21T2OLSoWkxKr5N6+gUPm/Y9srXUpwyjFD2DPsfqeUK3LNT8bADwS4g5JoigCYdWBqcpBdVmpgWVy0h/vAq+BWMb1lUR6So/eV0tSFvTisf8R/F96+i8=
-    - secure: KnD5loPz0o2ZHKxPX98XgbNIZcwiH7HY8V55aX0UdCywm+V82uA+ODnuOZholpnWVudqkHfJ5y+SSiKJjd3CEAyyLPpHfxEpmga12xL5CGIDmYHRVTIyoF08JYmR5y80jnSJMnb7XFPLPZbnQjkguIdw1moKJWeMmlmevRn2ybk=
+  - secure: bY18Su7LC6f/YGpqnozbXzI1wPBRh50/ouG1RdBA6BPSQ5c+eHcthsr21T2OLSoWkxKr5N6+gUPm/Y9srXUpwyjFD2DPsfqeUK3LNT8bADwS4g5JoigCYdWBqcpBdVmpgWVy0h/vAq+BWMb1lUR6So/eV0tSFvTisf8R/F96+i8=
+  - secure: KnD5loPz0o2ZHKxPX98XgbNIZcwiH7HY8V55aX0UdCywm+V82uA+ODnuOZholpnWVudqkHfJ5y+SSiKJjd3CEAyyLPpHfxEpmga12xL5CGIDmYHRVTIyoF08JYmR5y80jnSJMnb7XFPLPZbnQjkguIdw1moKJWeMmlmevRn2ybk=
+deploy:
+  provider: releases
+  api_key:
+    secure: hNP49YLxqGcjJWQBZ1Qw4WuEU0L9BlyuN8Gkd2gVYitulrrygTowuzY5QSzyeiRGqCESNGDI3Dkr+X5weYrXZYRG8Omx6U5jK2lmkJXBrEHHsOUdAAsiPkV2eFelPo3AneosrYn4pqr9E+yqDJdnvyCurm/IyTZ4eb12GCDaIv8=
+  file: ''
+  on:
+    tags: true
+    repo: jhc-systems/sqlest
