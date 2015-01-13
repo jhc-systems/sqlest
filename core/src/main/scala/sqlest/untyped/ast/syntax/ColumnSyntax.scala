@@ -53,8 +53,8 @@ class UntypedColumnHelpers {
     case BooleanColumnType => booleanArgument(right).map(right => InfixFunctionColumn[Boolean](op, left, right))
     case StringColumnType => stringArgument(right).map(right => InfixFunctionColumn[Boolean](op, left, right))
     case DateTimeColumnType => dateTimeArgument(right).map(right => InfixFunctionColumn[Boolean](op, left, right))
-    case optionColumnType: OptionColumnType[A, _] => infixExpression(op, left, right, optionColumnType.baseColumnType)
-    case mappedColumnType: MappedColumnType[A, _] =>
+    case optionColumnType: OptionColumnType[_, _] => infixExpression(op, left, right, optionColumnType.baseColumnType)
+    case mappedColumnType: MappedColumnType[_, _] =>
       mappedArgument(right, mappedColumnType).map { right =>
         val mappedRight = mappedColumnType.write(right)
         InfixFunctionColumn[Boolean](op, left, LiteralColumn(mappedRight)(mappedColumnType.baseColumnType))

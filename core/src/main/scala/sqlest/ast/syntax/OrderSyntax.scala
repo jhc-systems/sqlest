@@ -29,7 +29,7 @@ trait OrderSyntax {
 
   private def convertToSortedColumn[A](column: Column[A]): Column[_] = {
     column.columnType match {
-      case orderedColumnType: OrderedColumnType[A] => orderedColumnType.orderColumn(column)
+      case orderedColumnType: OrderedColumnType => orderedColumnType.orderColumn(column)
       case _ => column
     }
   }

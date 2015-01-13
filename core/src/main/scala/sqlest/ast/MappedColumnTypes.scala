@@ -63,8 +63,8 @@ trait EnumerationMappedColumnTypes {
 
   case class EnumerationColumnType[ValueType, DatabaseType](mappings: (ValueType, DatabaseType)*)(implicit val baseColumnType: BaseColumnType[DatabaseType]) extends BaseEnumerationColumnType[ValueType, DatabaseType]
 
-  case class OrderedEnumerationColumnType[ValueType, DatabaseType](mappings: (ValueType, DatabaseType)*)(implicit val baseColumnType: BaseColumnType[DatabaseType]) extends BaseEnumerationColumnType[ValueType, DatabaseType] with OrderedColumnType[ValueType] {
-    def orderColumn(column: Column[ValueType]) = {
+  case class OrderedEnumerationColumnType[ValueType, DatabaseType](mappings: (ValueType, DatabaseType)*)(implicit val baseColumnType: BaseColumnType[DatabaseType]) extends BaseEnumerationColumnType[ValueType, DatabaseType] with OrderedColumnType {
+    def orderColumn(column: Column[_]) = {
       val caseMappings =
         mappings
           .zipWithIndex
