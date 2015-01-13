@@ -1,0 +1,1047 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>Tuple18Extractor - sqlest.extractor.Tuple18Extractor</title>
+          <meta name="description" content="Tuple18Extractor - sqlest.extractor.Tuple18Extractor" />
+          <meta name="keywords" content="Tuple18Extractor sqlest.extractor.Tuple18Extractor" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../lib/template.js"></script>
+      <script type="text/javascript" src="../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../index.html';
+            var hash = 'sqlest.extractor.Tuple18Extractor';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="type">
+      <div id="definition">
+        <img src="../../lib/class_big.png" />
+        <p id="owner"><a href="../package.html" class="extype" name="sqlest">sqlest</a>.<a href="package.html" class="extype" name="sqlest.extractor">extractor</a></p>
+        <h1>Tuple18Extractor</h1><h3><span class="morelinks"><div>Related Doc:
+            <a href="package.html" class="extype" name="sqlest.extractor">package extractor</a>
+          </div></span></h3><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Tuple18Extractor</span><span class="tparams">[<span name="A1">A1</span>, <span name="A2">A2</span>, <span name="A3">A3</span>, <span name="A4">A4</span>, <span name="A5">A5</span>, <span name="A6">A6</span>, <span name="A7">A7</span>, <span name="A8">A8</span>, <span name="A9">A9</span>, <span name="A10">A10</span>, <span name="A11">A11</span>, <span name="A12">A12</span>, <span name="A13">A13</span>, <span name="A14">A14</span>, <span name="A15">A15</span>, <span name="A16">A16</span>, <span name="A17">A17</span>, <span name="A18">A18</span>]</span><span class="params">(<span name="e1">e1: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A1">A1</span>]</span>, <span name="e2">e2: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A2">A2</span>]</span>, <span name="e3">e3: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A3">A3</span>]</span>, <span name="e4">e4: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A4">A4</span>]</span>, <span name="e5">e5: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A5">A5</span>]</span>, <span name="e6">e6: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A6">A6</span>]</span>, <span name="e7">e7: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A7">A7</span>]</span>, <span name="e8">e8: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A8">A8</span>]</span>, <span name="e9">e9: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A9">A9</span>]</span>, <span name="e10">e10: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A10">A10</span>]</span>, <span name="e11">e11: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A11">A11</span>]</span>, <span name="e12">e12: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A12">A12</span>]</span>, <span name="e13">e13: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A13">A13</span>]</span>, <span name="e14">e14: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A14">A14</span>]</span>, <span name="e15">e15: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A15">A15</span>]</span>, <span name="e16">e16: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A16">A16</span>]</span>, <span name="e17">e17: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A17">A17</span>]</span>, <span name="e18">e18: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A18">A18</span>]</span>)</span><span class="result"> extends <a href="ProductExtractor.html" class="extype" name="sqlest.extractor.ProductExtractor">ProductExtractor</a>[(<span class="extype" name="sqlest.extractor.Tuple18Extractor.A1">A1</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A2">A2</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A3">A3</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A4">A4</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A5">A5</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A6">A6</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A7">A7</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A8">A8</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A9">A9</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A10">A10</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A11">A11</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A12">A12</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A13">A13</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A14">A14</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A15">A15</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A16">A16</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A17">A17</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A18">A18</span>)] with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.Product">Product</span>, <span class="extype" name="scala.Equals">Equals</span>, <a href="ProductExtractor.html" class="extype" name="sqlest.extractor.ProductExtractor">ProductExtractor</a>[(<span class="extype" name="sqlest.extractor.Tuple18Extractor.A1">A1</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A2">A2</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A3">A3</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A4">A4</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A5">A5</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A6">A6</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A7">A7</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A8">A8</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A9">A9</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A10">A10</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A11">A11</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A12">A12</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A13">A13</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A14">A14</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A15">A15</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A16">A16</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A17">A17</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A18">A18</span>)], <a href="SingleExtractor.html" class="extype" name="sqlest.extractor.SingleExtractor">SingleExtractor</a>[(<span class="extype" name="sqlest.extractor.Tuple18Extractor.A1">A1</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A2">A2</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A3">A3</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A4">A4</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A5">A5</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A6">A6</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A7">A7</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A8">A8</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A9">A9</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A10">A10</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A11">A11</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A12">A12</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A13">A13</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A14">A14</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A15">A15</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A16">A16</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A17">A17</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A18">A18</span>)], <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[(<span class="extype" name="sqlest.extractor.Tuple18Extractor.A1">A1</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A2">A2</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A3">A3</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A4">A4</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A5">A5</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A6">A6</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A7">A7</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A8">A8</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A9">A9</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A10">A10</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A11">A11</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A12">A12</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A13">A13</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A14">A14</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A15">A15</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A16">A16</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A17">A17</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A18">A18</span>)], <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="sqlest.extractor.Tuple18Extractor"><span>Tuple18Extractor</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.Product"><span>Product</span></li><li class="in" name="scala.Equals"><span>Equals</span></li><li class="in" name="sqlest.extractor.ProductExtractor"><span>ProductExtractor</span></li><li class="in" name="sqlest.extractor.SingleExtractor"><span>SingleExtractor</span></li><li class="in" name="sqlest.extractor.Extractor"><span>Extractor</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+            <a href="http://docs.scala-lang.org/overviews/scaladoc/usage.html#members" target="_blank">Learn more about member selection</a>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        <div id="constructors" class="members">
+              <h3>Instance Constructors</h3>
+              <ol><li name="sqlest.extractor.Tuple18Extractor#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;init&gt;(e1:sqlest.extractor.Extractor[A1],e2:sqlest.extractor.Extractor[A2],e3:sqlest.extractor.Extractor[A3],e4:sqlest.extractor.Extractor[A4],e5:sqlest.extractor.Extractor[A5],e6:sqlest.extractor.Extractor[A6],e7:sqlest.extractor.Extractor[A7],e8:sqlest.extractor.Extractor[A8],e9:sqlest.extractor.Extractor[A9],e10:sqlest.extractor.Extractor[A10],e11:sqlest.extractor.Extractor[A11],e12:sqlest.extractor.Extractor[A12],e13:sqlest.extractor.Extractor[A13],e14:sqlest.extractor.Extractor[A14],e15:sqlest.extractor.Extractor[A15],e16:sqlest.extractor.Extractor[A16],e17:sqlest.extractor.Extractor[A17],e18:sqlest.extractor.Extractor[A18]):sqlest.extractor.Tuple18Extractor[A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18]"></a>
+      <a id="&lt;init&gt;:Tuple18Extractor[A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">new</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Tuple18Extractor</span><span class="params">(<span name="e1">e1: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A1">A1</span>]</span>, <span name="e2">e2: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A2">A2</span>]</span>, <span name="e3">e3: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A3">A3</span>]</span>, <span name="e4">e4: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A4">A4</span>]</span>, <span name="e5">e5: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A5">A5</span>]</span>, <span name="e6">e6: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A6">A6</span>]</span>, <span name="e7">e7: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A7">A7</span>]</span>, <span name="e8">e8: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A8">A8</span>]</span>, <span name="e9">e9: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A9">A9</span>]</span>, <span name="e10">e10: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A10">A10</span>]</span>, <span name="e11">e11: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A11">A11</span>]</span>, <span name="e12">e12: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A12">A12</span>]</span>, <span name="e13">e13: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A13">A13</span>]</span>, <span name="e14">e14: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A14">A14</span>]</span>, <span name="e15">e15: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A15">A15</span>]</span>, <span name="e16">e16: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A16">A16</span>]</span>, <span name="e17">e17: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A17">A17</span>]</span>, <span name="e18">e18: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A18">A18</span>]</span>)</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@&lt;init&gt;(e1:sqlest.extractor.Extractor[A1],e2:sqlest.extractor.Extractor[A2],e3:sqlest.extractor.Extractor[A3],e4:sqlest.extractor.Extractor[A4],e5:sqlest.extractor.Extractor[A5],e6:sqlest.extractor.Extractor[A6],e7:sqlest.extractor.Extractor[A7],e8:sqlest.extractor.Extractor[A8],e9:sqlest.extractor.Extractor[A9],e10:sqlest.extractor.Extractor[A10],e11:sqlest.extractor.Extractor[A11],e12:sqlest.extractor.Extractor[A12],e13:sqlest.extractor.Extractor[A13],e14:sqlest.extractor.Extractor[A14],e15:sqlest.extractor.Extractor[A15],e16:sqlest.extractor.Extractor[A16],e17:sqlest.extractor.Extractor[A17],e18:sqlest.extractor.Extractor[A18]):sqlest.extractor.Tuple18Extractor[A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li></ol>
+            </div>
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="sqlest.extractor.Tuple18Extractor.Accumulator" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Accumulator=(Tuple18Extractor.this.e1.Accumulator,Tuple18Extractor.this.e2.Accumulator,Tuple18Extractor.this.e3.Accumulator,Tuple18Extractor.this.e4.Accumulator,Tuple18Extractor.this.e5.Accumulator,Tuple18Extractor.this.e6.Accumulator,Tuple18Extractor.this.e7.Accumulator,Tuple18Extractor.this.e8.Accumulator,Tuple18Extractor.this.e9.Accumulator,Tuple18Extractor.this.e10.Accumulator,Tuple18Extractor.this.e11.Accumulator,Tuple18Extractor.this.e12.Accumulator,Tuple18Extractor.this.e13.Accumulator,Tuple18Extractor.this.e14.Accumulator,Tuple18Extractor.this.e15.Accumulator,Tuple18Extractor.this.e16.Accumulator,Tuple18Extractor.this.e17.Accumulator,Tuple18Extractor.this.e18.Accumulator)"></a>
+      <a id="Accumulator:Accumulator"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Accumulator</span><span class="result"> = (<a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>)</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@Accumulator=(Tuple18Extractor.this.e1.Accumulator,Tuple18Extractor.this.e2.Accumulator,Tuple18Extractor.this.e3.Accumulator,Tuple18Extractor.this.e4.Accumulator,Tuple18Extractor.this.e5.Accumulator,Tuple18Extractor.this.e6.Accumulator,Tuple18Extractor.this.e7.Accumulator,Tuple18Extractor.this.e8.Accumulator,Tuple18Extractor.this.e9.Accumulator,Tuple18Extractor.this.e10.Accumulator,Tuple18Extractor.this.e11.Accumulator,Tuple18Extractor.this.e12.Accumulator,Tuple18Extractor.this.e13.Accumulator,Tuple18Extractor.this.e14.Accumulator,Tuple18Extractor.this.e15.Accumulator,Tuple18Extractor.this.e16.Accumulator,Tuple18Extractor.this.e17.Accumulator,Tuple18Extractor.this.e18.Accumulator)" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="sqlest.extractor.Tuple18Extractor">Tuple18Extractor</a> → <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a></dd></dl></div>
+    </li><li name="sqlest.extractor.SingleExtractor.SingleResult" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="SingleResult=A"></a>
+      <a id="SingleResult:SingleResult"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">SingleResult</span><span class="result"> = (<span class="extype" name="sqlest.extractor.Tuple18Extractor.A1">A1</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A2">A2</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A3">A3</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A4">A4</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A5">A5</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A6">A6</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A7">A7</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A8">A8</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A9">A9</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A10">A10</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A11">A11</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A12">A12</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A13">A13</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A14">A14</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A15">A15</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A16">A16</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A17">A17</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A18">A18</span>)</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@SingleResult=A" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="SingleExtractor.html" class="extype" name="sqlest.extractor.SingleExtractor">SingleExtractor</a> → <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a></dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scala.AnyRef#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:Any):Boolean"></a>
+      <a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@!=(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef###" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="##():Int"></a>
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@##():Int" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:Any):Boolean"></a>
+      <a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@==(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="sqlest.extractor.Tuple18Extractor#accumulate" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="accumulate(row:java.sql.ResultSet,accumulator:Tuple18Extractor.this.Accumulator):(Tuple18Extractor.this.e1.Accumulator,Tuple18Extractor.this.e2.Accumulator,Tuple18Extractor.this.e3.Accumulator,Tuple18Extractor.this.e4.Accumulator,Tuple18Extractor.this.e5.Accumulator,Tuple18Extractor.this.e6.Accumulator,Tuple18Extractor.this.e7.Accumulator,Tuple18Extractor.this.e8.Accumulator,Tuple18Extractor.this.e9.Accumulator,Tuple18Extractor.this.e10.Accumulator,Tuple18Extractor.this.e11.Accumulator,Tuple18Extractor.this.e12.Accumulator,Tuple18Extractor.this.e13.Accumulator,Tuple18Extractor.this.e14.Accumulator,Tuple18Extractor.this.e15.Accumulator,Tuple18Extractor.this.e16.Accumulator,Tuple18Extractor.this.e17.Accumulator,Tuple18Extractor.this.e18.Accumulator)"></a>
+      <a id="accumulate(ResultSet,Accumulator):(Extractor.Accumulator,Extractor.Accumulator,Extractor.Accumulator,Extractor.Accumulator,Extractor.Accumulator,Extractor.Accumulator,Extractor.Accumulator,Extractor.Accumulator,Extractor.Accumulator,Extractor.Accumulator,Extractor.Accumulator,Extractor.Accumulator,Extractor.Accumulator,Extractor.Accumulator,Extractor.Accumulator,Extractor.Accumulator,Extractor.Accumulator,Extractor.Accumulator)"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">accumulate</span><span class="params">(<span name="row">row: <span class="extype" name="java.sql.ResultSet">ResultSet</span></span>, <span name="accumulator">accumulator: <a href="#Accumulator=(Tuple18Extractor.this.e1.Accumulator,Tuple18Extractor.this.e2.Accumulator,Tuple18Extractor.this.e3.Accumulator,Tuple18Extractor.this.e4.Accumulator,Tuple18Extractor.this.e5.Accumulator,Tuple18Extractor.this.e6.Accumulator,Tuple18Extractor.this.e7.Accumulator,Tuple18Extractor.this.e8.Accumulator,Tuple18Extractor.this.e9.Accumulator,Tuple18Extractor.this.e10.Accumulator,Tuple18Extractor.this.e11.Accumulator,Tuple18Extractor.this.e12.Accumulator,Tuple18Extractor.this.e13.Accumulator,Tuple18Extractor.this.e14.Accumulator,Tuple18Extractor.this.e15.Accumulator,Tuple18Extractor.this.e16.Accumulator,Tuple18Extractor.this.e17.Accumulator,Tuple18Extractor.this.e18.Accumulator)" class="extmbr" name="sqlest.extractor.Tuple18Extractor.Accumulator">Accumulator</a></span>)</span><span class="result">: (<a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>)</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@accumulate(row:java.sql.ResultSet,accumulator:Tuple18Extractor.this.Accumulator):(Tuple18Extractor.this.e1.Accumulator,Tuple18Extractor.this.e2.Accumulator,Tuple18Extractor.this.e3.Accumulator,Tuple18Extractor.this.e4.Accumulator,Tuple18Extractor.this.e5.Accumulator,Tuple18Extractor.this.e6.Accumulator,Tuple18Extractor.this.e7.Accumulator,Tuple18Extractor.this.e8.Accumulator,Tuple18Extractor.this.e9.Accumulator,Tuple18Extractor.this.e10.Accumulator,Tuple18Extractor.this.e11.Accumulator,Tuple18Extractor.this.e12.Accumulator,Tuple18Extractor.this.e13.Accumulator,Tuple18Extractor.this.e14.Accumulator,Tuple18Extractor.this.e15.Accumulator,Tuple18Extractor.this.e16.Accumulator,Tuple18Extractor.this.e17.Accumulator,Tuple18Extractor.this.e18.Accumulator)" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="sqlest.extractor.Tuple18Extractor">Tuple18Extractor</a> → <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a></dd></dl></div>
+    </li><li name="sqlest.extractor.Tuple18Extractor#as" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="as[B](func:(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18)=&gt;B)(implicitnames:sqlest.untyped.ProductNames[B]):sqlest.untyped.extractor.NamedExtractor[(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18),B]"></a>
+      <a id="as[B]((A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18)⇒B)(untyped.ProductNames[B]):NamedExtractor[(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18),B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">as</span><span class="tparams">[<span name="B">B</span>]</span><span class="params">(<span name="func">func: (<span class="extype" name="sqlest.extractor.Tuple18Extractor.A1">A1</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A2">A2</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A3">A3</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A4">A4</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A5">A5</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A6">A6</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A7">A7</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A8">A8</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A9">A9</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A10">A10</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A11">A11</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A12">A12</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A13">A13</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A14">A14</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A15">A15</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A16">A16</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A17">A17</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A18">A18</span>) ⇒ <span class="extype" name="sqlest.extractor.Tuple18Extractor.as.B">B</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="names">names: <a href="../untyped/ProductNames.html" class="extype" name="sqlest.untyped.ProductNames">untyped.ProductNames</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.as.B">B</span>]</span>)</span><span class="result">: <a href="../untyped/extractor/NamedExtractor.html" class="extype" name="sqlest.untyped.extractor.NamedExtractor">NamedExtractor</a>[(<span class="extype" name="sqlest.extractor.Tuple18Extractor.A1">A1</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A2">A2</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A3">A3</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A4">A4</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A5">A5</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A6">A6</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A7">A7</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A8">A8</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A9">A9</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A10">A10</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A11">A11</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A12">A12</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A13">A13</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A14">A14</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A15">A15</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A16">A16</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A17">A17</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A18">A18</span>), <span class="extype" name="sqlest.extractor.Tuple18Extractor.as.B">B</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@as[B](func:(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18)=&gt;B)(implicitnames:sqlest.untyped.ProductNames[B]):sqlest.untyped.extractor.NamedExtractor[(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18),B]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@asInstanceOf[T0]:T0" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="sqlest.extractor.SingleExtractor#asList" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asList:sqlest.extractor.ListMultiExtractor[A]"></a>
+      <a id="asList:ListMultiExtractor[(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18)]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asList</span><span class="result">: <a href="ListMultiExtractor.html" class="extype" name="sqlest.extractor.ListMultiExtractor">ListMultiExtractor</a>[(<span class="extype" name="sqlest.extractor.Tuple18Extractor.A1">A1</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A2">A2</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A3">A3</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A4">A4</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A5">A5</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A6">A6</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A7">A7</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A8">A8</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A9">A9</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A10">A10</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A11">A11</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A12">A12</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A13">A13</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A14">A14</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A15">A15</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A16">A16</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A17">A17</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A18">A18</span>)]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@asList:sqlest.extractor.ListMultiExtractor[A]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="SingleExtractor.html" class="extype" name="sqlest.extractor.SingleExtractor">SingleExtractor</a></dd></dl></div>
+    </li><li name="sqlest.extractor.Extractor#asOption" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asOption:sqlest.extractor.OptionExtractor[A]"></a>
+      <a id="asOption:OptionExtractor[(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18)]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asOption</span><span class="result">: <a href="OptionExtractor.html" class="extype" name="sqlest.extractor.OptionExtractor">OptionExtractor</a>[(<span class="extype" name="sqlest.extractor.Tuple18Extractor.A1">A1</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A2">A2</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A3">A3</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A4">A4</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A5">A5</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A6">A6</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A7">A7</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A8">A8</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A9">A9</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A10">A10</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A11">A11</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A12">A12</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A13">A13</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A14">A14</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A15">A15</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A16">A16</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A17">A17</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A18">A18</span>)]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@asOption:sqlest.extractor.OptionExtractor[A]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a></dd></dl></div>
+    </li><li name="sqlest.extractor.Extractor#checkNullValueAndGet" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkNullValueAndGet[T](t:Option[T]):T"></a>
+      <a id="checkNullValueAndGet[T](Option[T]):T"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkNullValueAndGet</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="t">t: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="sqlest.extractor.Extractor.checkNullValueAndGet.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="sqlest.extractor.Extractor.checkNullValueAndGet.T">T</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@checkNullValueAndGet[T](t:Option[T]):T" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a></dd></dl></div>
+    </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="clone():Object"></a>
+      <a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">clone</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@clone():Object" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.CloneNotSupportedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="sqlest.extractor.Tuple18Extractor#columns" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="columns:List[sqlest.ast.AliasedColumn[_]]"></a>
+      <a id="columns:List[AliasedColumn[_]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">columns</span><span class="result">: <span class="extype" name="scala.collection.immutable.List">List</span>[<a href="../ast/AliasedColumn.html" class="extype" name="sqlest.ast.AliasedColumn">AliasedColumn</a>[_]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@columns:List[sqlest.ast.AliasedColumn[_]]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="sqlest.extractor.Tuple18Extractor">Tuple18Extractor</a> → <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a></dd></dl></div>
+    </li><li name="sqlest.extractor.Tuple18Extractor#e1" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="e1:sqlest.extractor.Extractor[A1]"></a>
+      <a id="e1:Extractor[A1]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">e1</span><span class="result">: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A1">A1</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@e1:sqlest.extractor.Extractor[A1]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="sqlest.extractor.Tuple18Extractor#e10" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="e10:sqlest.extractor.Extractor[A10]"></a>
+      <a id="e10:Extractor[A10]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">e10</span><span class="result">: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A10">A10</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@e10:sqlest.extractor.Extractor[A10]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="sqlest.extractor.Tuple18Extractor#e11" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="e11:sqlest.extractor.Extractor[A11]"></a>
+      <a id="e11:Extractor[A11]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">e11</span><span class="result">: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A11">A11</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@e11:sqlest.extractor.Extractor[A11]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="sqlest.extractor.Tuple18Extractor#e12" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="e12:sqlest.extractor.Extractor[A12]"></a>
+      <a id="e12:Extractor[A12]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">e12</span><span class="result">: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A12">A12</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@e12:sqlest.extractor.Extractor[A12]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="sqlest.extractor.Tuple18Extractor#e13" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="e13:sqlest.extractor.Extractor[A13]"></a>
+      <a id="e13:Extractor[A13]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">e13</span><span class="result">: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A13">A13</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@e13:sqlest.extractor.Extractor[A13]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="sqlest.extractor.Tuple18Extractor#e14" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="e14:sqlest.extractor.Extractor[A14]"></a>
+      <a id="e14:Extractor[A14]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">e14</span><span class="result">: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A14">A14</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@e14:sqlest.extractor.Extractor[A14]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="sqlest.extractor.Tuple18Extractor#e15" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="e15:sqlest.extractor.Extractor[A15]"></a>
+      <a id="e15:Extractor[A15]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">e15</span><span class="result">: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A15">A15</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@e15:sqlest.extractor.Extractor[A15]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="sqlest.extractor.Tuple18Extractor#e16" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="e16:sqlest.extractor.Extractor[A16]"></a>
+      <a id="e16:Extractor[A16]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">e16</span><span class="result">: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A16">A16</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@e16:sqlest.extractor.Extractor[A16]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="sqlest.extractor.Tuple18Extractor#e17" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="e17:sqlest.extractor.Extractor[A17]"></a>
+      <a id="e17:Extractor[A17]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">e17</span><span class="result">: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A17">A17</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@e17:sqlest.extractor.Extractor[A17]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="sqlest.extractor.Tuple18Extractor#e18" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="e18:sqlest.extractor.Extractor[A18]"></a>
+      <a id="e18:Extractor[A18]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">e18</span><span class="result">: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A18">A18</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@e18:sqlest.extractor.Extractor[A18]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="sqlest.extractor.Tuple18Extractor#e2" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="e2:sqlest.extractor.Extractor[A2]"></a>
+      <a id="e2:Extractor[A2]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">e2</span><span class="result">: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A2">A2</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@e2:sqlest.extractor.Extractor[A2]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="sqlest.extractor.Tuple18Extractor#e3" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="e3:sqlest.extractor.Extractor[A3]"></a>
+      <a id="e3:Extractor[A3]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">e3</span><span class="result">: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A3">A3</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@e3:sqlest.extractor.Extractor[A3]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="sqlest.extractor.Tuple18Extractor#e4" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="e4:sqlest.extractor.Extractor[A4]"></a>
+      <a id="e4:Extractor[A4]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">e4</span><span class="result">: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A4">A4</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@e4:sqlest.extractor.Extractor[A4]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="sqlest.extractor.Tuple18Extractor#e5" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="e5:sqlest.extractor.Extractor[A5]"></a>
+      <a id="e5:Extractor[A5]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">e5</span><span class="result">: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A5">A5</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@e5:sqlest.extractor.Extractor[A5]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="sqlest.extractor.Tuple18Extractor#e6" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="e6:sqlest.extractor.Extractor[A6]"></a>
+      <a id="e6:Extractor[A6]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">e6</span><span class="result">: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A6">A6</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@e6:sqlest.extractor.Extractor[A6]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="sqlest.extractor.Tuple18Extractor#e7" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="e7:sqlest.extractor.Extractor[A7]"></a>
+      <a id="e7:Extractor[A7]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">e7</span><span class="result">: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A7">A7</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@e7:sqlest.extractor.Extractor[A7]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="sqlest.extractor.Tuple18Extractor#e8" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="e8:sqlest.extractor.Extractor[A8]"></a>
+      <a id="e8:Extractor[A8]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">e8</span><span class="result">: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A8">A8</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@e8:sqlest.extractor.Extractor[A8]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="sqlest.extractor.Tuple18Extractor#e9" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="e9:sqlest.extractor.Extractor[A9]"></a>
+      <a id="e9:Extractor[A9]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">e9</span><span class="result">: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.Tuple18Extractor.A9">A9</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@e9:sqlest.extractor.Extractor[A9]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="sqlest.extractor.Tuple18Extractor#emit" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="emit(accumulator:Tuple18Extractor.this.Accumulator):Option[(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18)]"></a>
+      <a id="emit(Accumulator):Option[(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18)]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">emit</span><span class="params">(<span name="accumulator">accumulator: <a href="#Accumulator=(Tuple18Extractor.this.e1.Accumulator,Tuple18Extractor.this.e2.Accumulator,Tuple18Extractor.this.e3.Accumulator,Tuple18Extractor.this.e4.Accumulator,Tuple18Extractor.this.e5.Accumulator,Tuple18Extractor.this.e6.Accumulator,Tuple18Extractor.this.e7.Accumulator,Tuple18Extractor.this.e8.Accumulator,Tuple18Extractor.this.e9.Accumulator,Tuple18Extractor.this.e10.Accumulator,Tuple18Extractor.this.e11.Accumulator,Tuple18Extractor.this.e12.Accumulator,Tuple18Extractor.this.e13.Accumulator,Tuple18Extractor.this.e14.Accumulator,Tuple18Extractor.this.e15.Accumulator,Tuple18Extractor.this.e16.Accumulator,Tuple18Extractor.this.e17.Accumulator,Tuple18Extractor.this.e18.Accumulator)" class="extmbr" name="sqlest.extractor.Tuple18Extractor.Accumulator">Accumulator</a></span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[(<span class="extype" name="sqlest.extractor.Tuple18Extractor.A1">A1</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A2">A2</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A3">A3</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A4">A4</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A5">A5</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A6">A6</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A7">A7</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A8">A8</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A9">A9</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A10">A10</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A11">A11</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A12">A12</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A13">A13</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A14">A14</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A15">A15</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A16">A16</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A17">A17</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A18">A18</span>)]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@emit(accumulator:Tuple18Extractor.this.Accumulator):Option[(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18)]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="sqlest.extractor.Tuple18Extractor">Tuple18Extractor</a> → <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a></dd></dl></div>
+    </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eq(x$1:AnyRef):Boolean"></a>
+      <a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@eq(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="sqlest.extractor.SingleExtractor#extractAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="extractAll(row:java.sql.ResultSet):List[A]"></a>
+      <a id="extractAll(ResultSet):List[(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18)]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">extractAll</span><span class="params">(<span name="row">row: <span class="extype" name="java.sql.ResultSet">ResultSet</span></span>)</span><span class="result">: <span class="extype" name="scala.List">List</span>[(<span class="extype" name="sqlest.extractor.Tuple18Extractor.A1">A1</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A2">A2</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A3">A3</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A4">A4</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A5">A5</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A6">A6</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A7">A7</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A8">A8</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A9">A9</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A10">A10</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A11">A11</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A12">A12</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A13">A13</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A14">A14</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A15">A15</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A16">A16</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A17">A17</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A18">A18</span>)]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@extractAll(row:java.sql.ResultSet):List[A]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="SingleExtractor.html" class="extype" name="sqlest.extractor.SingleExtractor">SingleExtractor</a> → <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a></dd></dl></div>
+    </li><li name="sqlest.extractor.SingleExtractor#extractHeadOption" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="extractHeadOption(row:java.sql.ResultSet):Option[A]"></a>
+      <a id="extractHeadOption(ResultSet):Option[(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18)]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">extractHeadOption</span><span class="params">(<span name="row">row: <span class="extype" name="java.sql.ResultSet">ResultSet</span></span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[(<span class="extype" name="sqlest.extractor.Tuple18Extractor.A1">A1</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A2">A2</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A3">A3</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A4">A4</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A5">A5</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A6">A6</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A7">A7</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A8">A8</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A9">A9</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A10">A10</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A11">A11</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A12">A12</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A13">A13</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A14">A14</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A15">A15</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A16">A16</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A17">A17</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A18">A18</span>)]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@extractHeadOption(row:java.sql.ResultSet):Option[A]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="SingleExtractor.html" class="extype" name="sqlest.extractor.SingleExtractor">SingleExtractor</a> → <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a></dd></dl></div>
+    </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="finalize():Unit"></a>
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@finalize():Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Throwable]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getClass():Class[_]"></a>
+      <a id="getClass():Class[_]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@getClass():Class[_]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="sqlest.extractor.SingleExtractor#groupBy" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="groupBy[B](groupBy:sqlest.extractor.Extractor[B]):sqlest.extractor.GroupedMultiExtractor[A,B]"></a>
+      <a id="groupBy[B](Extractor[B]):GroupedMultiExtractor[(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18),B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">groupBy</span><span class="tparams">[<span name="B">B</span>]</span><span class="params">(<span name="groupBy">groupBy: <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[<span class="extype" name="sqlest.extractor.SingleExtractor.groupBy.B">B</span>]</span>)</span><span class="result">: <a href="GroupedMultiExtractor.html" class="extype" name="sqlest.extractor.GroupedMultiExtractor">GroupedMultiExtractor</a>[(<span class="extype" name="sqlest.extractor.Tuple18Extractor.A1">A1</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A2">A2</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A3">A3</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A4">A4</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A5">A5</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A6">A6</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A7">A7</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A8">A8</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A9">A9</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A10">A10</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A11">A11</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A12">A12</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A13">A13</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A14">A14</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A15">A15</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A16">A16</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A17">A17</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A18">A18</span>), <span class="extype" name="sqlest.extractor.SingleExtractor.groupBy.B">B</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@groupBy[B](groupBy:sqlest.extractor.Extractor[B]):sqlest.extractor.GroupedMultiExtractor[A,B]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="SingleExtractor.html" class="extype" name="sqlest.extractor.SingleExtractor">SingleExtractor</a></dd></dl></div>
+    </li><li name="sqlest.extractor.Tuple18Extractor#initialize" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="initialize(row:java.sql.ResultSet):(Tuple18Extractor.this.e1.Accumulator,Tuple18Extractor.this.e2.Accumulator,Tuple18Extractor.this.e3.Accumulator,Tuple18Extractor.this.e4.Accumulator,Tuple18Extractor.this.e5.Accumulator,Tuple18Extractor.this.e6.Accumulator,Tuple18Extractor.this.e7.Accumulator,Tuple18Extractor.this.e8.Accumulator,Tuple18Extractor.this.e9.Accumulator,Tuple18Extractor.this.e10.Accumulator,Tuple18Extractor.this.e11.Accumulator,Tuple18Extractor.this.e12.Accumulator,Tuple18Extractor.this.e13.Accumulator,Tuple18Extractor.this.e14.Accumulator,Tuple18Extractor.this.e15.Accumulator,Tuple18Extractor.this.e16.Accumulator,Tuple18Extractor.this.e17.Accumulator,Tuple18Extractor.this.e18.Accumulator)"></a>
+      <a id="initialize(ResultSet):(Extractor.Accumulator,Extractor.Accumulator,Extractor.Accumulator,Extractor.Accumulator,Extractor.Accumulator,Extractor.Accumulator,Extractor.Accumulator,Extractor.Accumulator,Extractor.Accumulator,Extractor.Accumulator,Extractor.Accumulator,Extractor.Accumulator,Extractor.Accumulator,Extractor.Accumulator,Extractor.Accumulator,Extractor.Accumulator,Extractor.Accumulator,Extractor.Accumulator)"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">initialize</span><span class="params">(<span name="row">row: <span class="extype" name="java.sql.ResultSet">ResultSet</span></span>)</span><span class="result">: (<a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>, <a href="Extractor.html#Accumulator" class="extmbr" name="sqlest.extractor.Extractor.Accumulator">Extractor.Accumulator</a>)</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@initialize(row:java.sql.ResultSet):(Tuple18Extractor.this.e1.Accumulator,Tuple18Extractor.this.e2.Accumulator,Tuple18Extractor.this.e3.Accumulator,Tuple18Extractor.this.e4.Accumulator,Tuple18Extractor.this.e5.Accumulator,Tuple18Extractor.this.e6.Accumulator,Tuple18Extractor.this.e7.Accumulator,Tuple18Extractor.this.e8.Accumulator,Tuple18Extractor.this.e9.Accumulator,Tuple18Extractor.this.e10.Accumulator,Tuple18Extractor.this.e11.Accumulator,Tuple18Extractor.this.e12.Accumulator,Tuple18Extractor.this.e13.Accumulator,Tuple18Extractor.this.e14.Accumulator,Tuple18Extractor.this.e15.Accumulator,Tuple18Extractor.this.e16.Accumulator,Tuple18Extractor.this.e17.Accumulator,Tuple18Extractor.this.e18.Accumulator)" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="sqlest.extractor.Tuple18Extractor">Tuple18Extractor</a> → <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a></dd></dl></div>
+    </li><li name="sqlest.extractor.Tuple18Extractor#innerExtractors" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="innerExtractors:List[sqlest.extractor.Extractor[_&gt;:A18withA17withA16withA15withA14withA13withA12withA11withA10withA9withA8withA7withA6withA5withA4withA3withA2withA1]]"></a>
+      <a id="innerExtractors:List[Extractor[_&gt;:A18withA17withA16withA15withA14withA13withA12withA11withA10withA9withA8withA7withA6withA5withA4withA3withA2withA1]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">innerExtractors</span><span class="result">: <span class="extype" name="scala.collection.immutable.List">List</span>[<a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[_ &gt;: <span class="extype" name="sqlest.extractor.Tuple18Extractor.A18">A18</span> with <span class="extype" name="sqlest.extractor.Tuple18Extractor.A17">A17</span> with <span class="extype" name="sqlest.extractor.Tuple18Extractor.A16">A16</span> with <span class="extype" name="sqlest.extractor.Tuple18Extractor.A15">A15</span> with <span class="extype" name="sqlest.extractor.Tuple18Extractor.A14">A14</span> with <span class="extype" name="sqlest.extractor.Tuple18Extractor.A13">A13</span> with <span class="extype" name="sqlest.extractor.Tuple18Extractor.A12">A12</span> with <span class="extype" name="sqlest.extractor.Tuple18Extractor.A11">A11</span> with <span class="extype" name="sqlest.extractor.Tuple18Extractor.A10">A10</span> with <span class="extype" name="sqlest.extractor.Tuple18Extractor.A9">A9</span> with <span class="extype" name="sqlest.extractor.Tuple18Extractor.A8">A8</span> with <span class="extype" name="sqlest.extractor.Tuple18Extractor.A7">A7</span> with <span class="extype" name="sqlest.extractor.Tuple18Extractor.A6">A6</span> with <span class="extype" name="sqlest.extractor.Tuple18Extractor.A5">A5</span> with <span class="extype" name="sqlest.extractor.Tuple18Extractor.A4">A4</span> with <span class="extype" name="sqlest.extractor.Tuple18Extractor.A3">A3</span> with <span class="extype" name="sqlest.extractor.Tuple18Extractor.A2">A2</span> with <span class="extype" name="sqlest.extractor.Tuple18Extractor.A1">A1</span>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@innerExtractors:List[sqlest.extractor.Extractor[_&gt;:A18withA17withA16withA15withA14withA13withA12withA11withA10withA9withA8withA7withA6withA5withA4withA3withA2withA1]]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="sqlest.extractor.Tuple18Extractor">Tuple18Extractor</a> → <a href="ProductExtractor.html" class="extype" name="sqlest.extractor.ProductExtractor">ProductExtractor</a></dd></dl></div>
+    </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@isInstanceOf[T0]:Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="sqlest.extractor.Tuple18Extractor#map" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="map[B](func:(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18)=&gt;B):sqlest.extractor.MappedExtractor[(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18),B]"></a>
+      <a id="map[B]((A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18)⇒B):MappedExtractor[(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18),B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">map</span><span class="tparams">[<span name="B">B</span>]</span><span class="params">(<span name="func">func: (<span class="extype" name="sqlest.extractor.Tuple18Extractor.A1">A1</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A2">A2</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A3">A3</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A4">A4</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A5">A5</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A6">A6</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A7">A7</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A8">A8</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A9">A9</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A10">A10</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A11">A11</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A12">A12</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A13">A13</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A14">A14</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A15">A15</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A16">A16</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A17">A17</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A18">A18</span>) ⇒ <span class="extype" name="sqlest.extractor.Tuple18Extractor.map.B">B</span></span>)</span><span class="result">: <a href="MappedExtractor.html" class="extype" name="sqlest.extractor.MappedExtractor">MappedExtractor</a>[(<span class="extype" name="sqlest.extractor.Tuple18Extractor.A1">A1</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A2">A2</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A3">A3</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A4">A4</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A5">A5</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A6">A6</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A7">A7</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A8">A8</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A9">A9</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A10">A10</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A11">A11</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A12">A12</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A13">A13</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A14">A14</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A15">A15</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A16">A16</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A17">A17</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A18">A18</span>), <span class="extype" name="sqlest.extractor.Tuple18Extractor.map.B">B</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@map[B](func:(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18)=&gt;B):sqlest.extractor.MappedExtractor[(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18),B]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="sqlest.extractor.Extractor#map" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="map[B](func:A=&gt;B):sqlest.extractor.MappedExtractor[A,B]"></a>
+      <a id="map[B](((A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18))⇒B):MappedExtractor[(A1,A2,A3,A4,A5,A6,A7,A8,A9,A10,A11,A12,A13,A14,A15,A16,A17,A18),B]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">map</span><span class="tparams">[<span name="B">B</span>]</span><span class="params">(<span name="func">func: ((<span class="extype" name="sqlest.extractor.Tuple18Extractor.A1">A1</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A2">A2</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A3">A3</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A4">A4</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A5">A5</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A6">A6</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A7">A7</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A8">A8</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A9">A9</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A10">A10</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A11">A11</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A12">A12</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A13">A13</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A14">A14</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A15">A15</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A16">A16</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A17">A17</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A18">A18</span>)) ⇒ <span class="extype" name="sqlest.extractor.Extractor.map.B">B</span></span>)</span><span class="result">: <a href="MappedExtractor.html" class="extype" name="sqlest.extractor.MappedExtractor">MappedExtractor</a>[(<span class="extype" name="sqlest.extractor.Tuple18Extractor.A1">A1</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A2">A2</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A3">A3</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A4">A4</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A5">A5</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A6">A6</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A7">A7</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A8">A8</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A9">A9</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A10">A10</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A11">A11</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A12">A12</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A13">A13</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A14">A14</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A15">A15</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A16">A16</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A17">A17</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A18">A18</span>), <span class="extype" name="sqlest.extractor.Extractor.map.B">B</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@map[B](func:A=&gt;B):sqlest.extractor.MappedExtractor[A,B]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a></dd></dl></div>
+    </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ne(x$1:AnyRef):Boolean"></a>
+      <a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@ne(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notify" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notify():Unit"></a>
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@notify():Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notifyAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notifyAll():Unit"></a>
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@notifyAll():Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
+      <a id="synchronized[T0](⇒T0):T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@synchronized[T0](x$1:=&gt;T0):T0" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait():Unit"></a>
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@wait():Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long,x$2:Int):Unit"></a>
+      <a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@wait(x$1:Long,x$2:Int):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long):Unit"></a>
+      <a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.extractor.Tuple18Extractor@wait(x$1:Long):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scala.Serializable">
+              <h3>Inherited from <span class="extype" name="scala.Serializable">Serializable</span></h3>
+            </div><div class="parent" name="java.io.Serializable">
+              <h3>Inherited from <span class="extype" name="java.io.Serializable">Serializable</span></h3>
+            </div><div class="parent" name="scala.Product">
+              <h3>Inherited from <span class="extype" name="scala.Product">Product</span></h3>
+            </div><div class="parent" name="scala.Equals">
+              <h3>Inherited from <span class="extype" name="scala.Equals">Equals</span></h3>
+            </div><div class="parent" name="sqlest.extractor.ProductExtractor">
+              <h3>Inherited from <a href="ProductExtractor.html" class="extype" name="sqlest.extractor.ProductExtractor">ProductExtractor</a>[(<span class="extype" name="sqlest.extractor.Tuple18Extractor.A1">A1</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A2">A2</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A3">A3</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A4">A4</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A5">A5</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A6">A6</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A7">A7</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A8">A8</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A9">A9</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A10">A10</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A11">A11</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A12">A12</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A13">A13</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A14">A14</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A15">A15</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A16">A16</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A17">A17</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A18">A18</span>)]</h3>
+            </div><div class="parent" name="sqlest.extractor.SingleExtractor">
+              <h3>Inherited from <a href="SingleExtractor.html" class="extype" name="sqlest.extractor.SingleExtractor">SingleExtractor</a>[(<span class="extype" name="sqlest.extractor.Tuple18Extractor.A1">A1</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A2">A2</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A3">A3</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A4">A4</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A5">A5</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A6">A6</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A7">A7</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A8">A8</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A9">A9</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A10">A10</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A11">A11</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A12">A12</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A13">A13</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A14">A14</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A15">A15</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A16">A16</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A17">A17</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A18">A18</span>)]</h3>
+            </div><div class="parent" name="sqlest.extractor.Extractor">
+              <h3>Inherited from <a href="Extractor.html" class="extype" name="sqlest.extractor.Extractor">Extractor</a>[(<span class="extype" name="sqlest.extractor.Tuple18Extractor.A1">A1</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A2">A2</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A3">A3</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A4">A4</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A5">A5</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A6">A6</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A7">A7</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A8">A8</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A9">A9</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A10">A10</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A11">A11</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A12">A12</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A13">A13</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A14">A14</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A15">A15</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A16">A16</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A17">A17</span>, <span class="extype" name="sqlest.extractor.Tuple18Extractor.A18">A18</span>)]</h3>
+            </div><div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

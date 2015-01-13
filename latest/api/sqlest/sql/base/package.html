@@ -1,0 +1,203 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>base - sqlest.sql.base</title>
+          <meta name="description" content="base - sqlest.sql.base" />
+          <meta name="keywords" content="base sqlest.sql.base" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../../index.html';
+            var hash = 'sqlest.sql.base.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img src="../../../lib/package_big.png" />
+        <p id="owner"><a href="../../package.html" class="extype" name="sqlest">sqlest</a>.<a href="../package.html" class="extype" name="sqlest.sql">sql</a></p>
+        <h1>base</h1><span class="permalink">
+      <a href="../../../index.html#sqlest.sql.base.package" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">base</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        
+        
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="sqlest.sql.base.BaseStatementBuilder" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="BaseStatementBuilderextendsAnyRef"></a>
+      <a id="BaseStatementBuilder:BaseStatementBuilder"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="BaseStatementBuilder.html"><span class="name">BaseStatementBuilder</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#sqlest.sql.base.package@BaseStatementBuilderextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="sqlest.sql.base.DeleteStatementBuilder" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="DeleteStatementBuilderextendsBaseStatementBuilder"></a>
+      <a id="DeleteStatementBuilder:DeleteStatementBuilder"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="DeleteStatementBuilder.html"><span class="name">DeleteStatementBuilder</span></a><span class="result"> extends <a href="BaseStatementBuilder.html" class="extype" name="sqlest.sql.base.BaseStatementBuilder">BaseStatementBuilder</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#sqlest.sql.base.package@DeleteStatementBuilderextendsBaseStatementBuilder" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="sqlest.sql.base.InsertStatementBuilder" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="InsertStatementBuilderextendsBaseStatementBuilder"></a>
+      <a id="InsertStatementBuilder:InsertStatementBuilder"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="InsertStatementBuilder.html"><span class="name">InsertStatementBuilder</span></a><span class="result"> extends <a href="BaseStatementBuilder.html" class="extype" name="sqlest.sql.base.BaseStatementBuilder">BaseStatementBuilder</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#sqlest.sql.base.package@InsertStatementBuilderextendsBaseStatementBuilder" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="sqlest.sql.base.SelectStatementBuilder" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="SelectStatementBuilderextendsBaseStatementBuilder"></a>
+      <a id="SelectStatementBuilder:SelectStatementBuilder"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="SelectStatementBuilder.html"><span class="name">SelectStatementBuilder</span></a><span class="result"> extends <a href="BaseStatementBuilder.html" class="extype" name="sqlest.sql.base.BaseStatementBuilder">BaseStatementBuilder</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#sqlest.sql.base.package@SelectStatementBuilderextendsBaseStatementBuilder" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="sqlest.sql.base.StatementBuilder" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="StatementBuilderextendsBaseStatementBuilderwithSelectStatementBuilderwithInsertStatementBuilderwithUpdateStatementBuilderwithDeleteStatementBuilderwithLogging"></a>
+      <a id="StatementBuilder:StatementBuilder"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="StatementBuilder.html"><span class="name">StatementBuilder</span></a><span class="result"> extends <a href="BaseStatementBuilder.html" class="extype" name="sqlest.sql.base.BaseStatementBuilder">BaseStatementBuilder</a> with <a href="SelectStatementBuilder.html" class="extype" name="sqlest.sql.base.SelectStatementBuilder">SelectStatementBuilder</a> with <a href="InsertStatementBuilder.html" class="extype" name="sqlest.sql.base.InsertStatementBuilder">InsertStatementBuilder</a> with <a href="UpdateStatementBuilder.html" class="extype" name="sqlest.sql.base.UpdateStatementBuilder">UpdateStatementBuilder</a> with <a href="DeleteStatementBuilder.html" class="extype" name="sqlest.sql.base.DeleteStatementBuilder">DeleteStatementBuilder</a> with <a href="../../util/Logging.html" class="extype" name="sqlest.util.Logging">Logging</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#sqlest.sql.base.package@StatementBuilderextendsBaseStatementBuilderwithSelectStatementBuilderwithInsertStatementBuilderwithUpdateStatementBuilderwithDeleteStatementBuilderwithLogging" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="sqlest.sql.base.UpdateStatementBuilder" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="UpdateStatementBuilderextendsBaseStatementBuilder"></a>
+      <a id="UpdateStatementBuilder:UpdateStatementBuilder"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="UpdateStatementBuilder.html"><span class="name">UpdateStatementBuilder</span></a><span class="result"> extends <a href="BaseStatementBuilder.html" class="extype" name="sqlest.sql.base.BaseStatementBuilder">BaseStatementBuilder</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#sqlest.sql.base.package@UpdateStatementBuilderextendsBaseStatementBuilder" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li></ol>
+            </div>
+
+        
+
+        
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

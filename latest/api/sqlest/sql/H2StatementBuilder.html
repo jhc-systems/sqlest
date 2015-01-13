@@ -1,0 +1,1764 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>H2StatementBuilder - sqlest.sql.H2StatementBuilder</title>
+          <meta name="description" content="H2StatementBuilder - sqlest.sql.H2StatementBuilder" />
+          <meta name="keywords" content="H2StatementBuilder sqlest.sql.H2StatementBuilder" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../lib/template.js"></script>
+      <script type="text/javascript" src="../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../index.html';
+            var hash = 'sqlest.sql.H2StatementBuilder';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="type">
+      <div id="definition">
+        <a href="H2StatementBuilder$.html" title="Go to companion"><img src="../../lib/trait_to_object_big.png" /></a>
+        <p id="owner"><a href="../package.html" class="extype" name="sqlest">sqlest</a>.<a href="package.html" class="extype" name="sqlest.sql">sql</a></p>
+        <h1><a href="H2StatementBuilder$.html" title="Go to companion">H2StatementBuilder</a></h1><h3><span class="morelinks"><div>
+            Related Docs:
+            <a href="H2StatementBuilder$.html" title="See companion">object H2StatementBuilder</a>
+            | <a href="package.html" class="extype" name="sqlest.sql">package sql</a>
+          </div></span></h3><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <span class="name">H2StatementBuilder</span><span class="result"> extends <a href="base/StatementBuilder.html" class="extype" name="sqlest.sql.base.StatementBuilder">sql.base.StatementBuilder</a></span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><a href="base/StatementBuilder.html" class="extype" name="sqlest.sql.base.StatementBuilder">base.StatementBuilder</a>, <a href="../util/Logging.html" class="extype" name="sqlest.util.Logging">Logging</a>, <span class="extype" name="com.typesafe.scalalogging.slf4j.LazyLogging">LazyLogging</span>, <span class="extype" name="com.typesafe.scalalogging.Logging">Logging</span>, <a href="base/DeleteStatementBuilder.html" class="extype" name="sqlest.sql.base.DeleteStatementBuilder">DeleteStatementBuilder</a>, <a href="base/UpdateStatementBuilder.html" class="extype" name="sqlest.sql.base.UpdateStatementBuilder">UpdateStatementBuilder</a>, <a href="base/InsertStatementBuilder.html" class="extype" name="sqlest.sql.base.InsertStatementBuilder">InsertStatementBuilder</a>, <a href="base/SelectStatementBuilder.html" class="extype" name="sqlest.sql.base.SelectStatementBuilder">SelectStatementBuilder</a>, <a href="base/BaseStatementBuilder.html" class="extype" name="sqlest.sql.base.BaseStatementBuilder">BaseStatementBuilder</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div><div class="toggleContainer block">
+            <span class="toggle">Known Subclasses</span>
+            <div class="subClasses hiddenContent"><a href="H2StatementBuilder$.html" class="extype" name="sqlest.sql.H2StatementBuilder">H2StatementBuilder</a></div>
+          </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="sqlest.sql.H2StatementBuilder"><span>H2StatementBuilder</span></li><li class="in" name="sqlest.sql.base.StatementBuilder"><span>StatementBuilder</span></li><li class="in" name="sqlest.util.Logging"><span>Logging</span></li><li class="in" name="com.typesafe.scalalogging.slf4j.LazyLogging"><span>LazyLogging</span></li><li class="in" name="com.typesafe.scalalogging.Logging"><span>Logging</span></li><li class="in" name="sqlest.sql.base.DeleteStatementBuilder"><span>DeleteStatementBuilder</span></li><li class="in" name="sqlest.sql.base.UpdateStatementBuilder"><span>UpdateStatementBuilder</span></li><li class="in" name="sqlest.sql.base.InsertStatementBuilder"><span>InsertStatementBuilder</span></li><li class="in" name="sqlest.sql.base.SelectStatementBuilder"><span>SelectStatementBuilder</span></li><li class="in" name="sqlest.sql.base.BaseStatementBuilder"><span>BaseStatementBuilder</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+            <a href="http://docs.scala-lang.org/overviews/scaladoc/usage.html#members" target="_blank">Learn more about member selection</a>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="scala.AnyRef#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:Any):Boolean"></a>
+      <a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@!=(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef###" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="##():Int"></a>
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@##():Int" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:Any):Boolean"></a>
+      <a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@==(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="sqlest.sql.base.BaseStatementBuilder#aliasColumnsFromSubselects" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="aliasColumnsFromSubselects(operation:sqlest.ast.Operation):sqlest.ast.Operation"></a>
+      <a id="aliasColumnsFromSubselects(Operation):Operation"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">aliasColumnsFromSubselects</span><span class="params">(<span name="operation">operation: <a href="../ast/Operation.html" class="extype" name="sqlest.ast.Operation">Operation</a></span>)</span><span class="result">: <a href="../ast/Operation.html" class="extype" name="sqlest.ast.Operation">Operation</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@aliasColumnsFromSubselects(operation:sqlest.ast.Operation):sqlest.ast.Operation" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/BaseStatementBuilder.html" class="extype" name="sqlest.sql.base.BaseStatementBuilder">BaseStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.StatementBuilder#apply" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="apply(connection:java.sql.Connection,operation:sqlest.ast.Operation):java.sql.PreparedStatement"></a>
+      <a id="apply(Connection,Operation):PreparedStatement"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">apply</span><span class="params">(<span name="connection">connection: <span class="extype" name="java.sql.Connection">Connection</span></span>, <span name="operation">operation: <a href="../ast/Operation.html" class="extype" name="sqlest.ast.Operation">Operation</a></span>)</span><span class="result">: <span class="extype" name="java.sql.PreparedStatement">PreparedStatement</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@apply(connection:java.sql.Connection,operation:sqlest.ast.Operation):java.sql.PreparedStatement" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/StatementBuilder.html" class="extype" name="sqlest.sql.base.StatementBuilder">StatementBuilder</a></dd></dl></div>
+    </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@asInstanceOf[T0]:T0" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="sqlest.sql.base.BaseStatementBuilder#caseColumnSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="caseColumnSql(column:sqlest.ast.Column[_],mappings:List[(sqlest.ast.Column[_],sqlest.ast.Column[_])],else:Option[sqlest.ast.Column[_]]):String"></a>
+      <a id="caseColumnSql(Column[_],List[(Column[_],Column[_])],Option[Column[_]]):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">caseColumnSql</span><span class="params">(<span name="column">column: <a href="../ast/Column.html" class="extype" name="sqlest.ast.Column">Column</a>[_]</span>, <span name="mappings">mappings: <span class="extype" name="scala.List">List</span>[(<a href="../ast/Column.html" class="extype" name="sqlest.ast.Column">Column</a>[_], <a href="../ast/Column.html" class="extype" name="sqlest.ast.Column">Column</a>[_])]</span>, <span name="else">else: <span class="extype" name="scala.Option">Option</span>[<a href="../ast/Column.html" class="extype" name="sqlest.ast.Column">Column</a>[_]]</span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@caseColumnSql(column:sqlest.ast.Column[_],mappings:List[(sqlest.ast.Column[_],sqlest.ast.Column[_])],else:Option[sqlest.ast.Column[_]]):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/BaseStatementBuilder.html" class="extype" name="sqlest.sql.base.BaseStatementBuilder">BaseStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.BaseStatementBuilder#caseSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="caseSql(whens:List[sqlest.ast.When[_]],else:Option[sqlest.ast.Column[_]]):String"></a>
+      <a id="caseSql(List[When[_]],Option[Column[_]]):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">caseSql</span><span class="params">(<span name="whens">whens: <span class="extype" name="scala.List">List</span>[<a href="../ast/When.html" class="extype" name="sqlest.ast.When">When</a>[_]]</span>, <span name="else">else: <span class="extype" name="scala.Option">Option</span>[<a href="../ast/Column.html" class="extype" name="sqlest.ast.Column">Column</a>[_]]</span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@caseSql(whens:List[sqlest.ast.When[_]],else:Option[sqlest.ast.Column[_]]):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/BaseStatementBuilder.html" class="extype" name="sqlest.sql.base.BaseStatementBuilder">BaseStatementBuilder</a></dd></dl></div>
+    </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="clone():Object"></a>
+      <a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">clone</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@clone():Object" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.CloneNotSupportedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="sqlest.sql.base.BaseStatementBuilder#columnAliasArgs" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="columnAliasArgs(column:sqlest.ast.Column[_]):List[sqlest.ast.LiteralColumn[_]]"></a>
+      <a id="columnAliasArgs(Column[_]):List[LiteralColumn[_]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">columnAliasArgs</span><span class="params">(<span name="column">column: <a href="../ast/Column.html" class="extype" name="sqlest.ast.Column">Column</a>[_]</span>)</span><span class="result">: <span class="extype" name="scala.List">List</span>[<a href="../ast/LiteralColumn.html" class="extype" name="sqlest.ast.LiteralColumn">LiteralColumn</a>[_]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@columnAliasArgs(column:sqlest.ast.Column[_]):List[sqlest.ast.LiteralColumn[_]]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/BaseStatementBuilder.html" class="extype" name="sqlest.sql.base.BaseStatementBuilder">BaseStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.BaseStatementBuilder#columnAliasListArgs" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="columnAliasListArgs(columns:Seq[sqlest.ast.Column[_]]):List[sqlest.ast.LiteralColumn[_]]"></a>
+      <a id="columnAliasListArgs(Seq[Column[_]]):List[LiteralColumn[_]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">columnAliasListArgs</span><span class="params">(<span name="columns">columns: <span class="extype" name="scala.Seq">Seq</span>[<a href="../ast/Column.html" class="extype" name="sqlest.ast.Column">Column</a>[_]]</span>)</span><span class="result">: <span class="extype" name="scala.List">List</span>[<a href="../ast/LiteralColumn.html" class="extype" name="sqlest.ast.LiteralColumn">LiteralColumn</a>[_]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@columnAliasListArgs(columns:Seq[sqlest.ast.Column[_]]):List[sqlest.ast.LiteralColumn[_]]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/BaseStatementBuilder.html" class="extype" name="sqlest.sql.base.BaseStatementBuilder">BaseStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.BaseStatementBuilder#columnAliasListSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="columnAliasListSql(columns:Seq[sqlest.ast.Column[_]]):String"></a>
+      <a id="columnAliasListSql(Seq[Column[_]]):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">columnAliasListSql</span><span class="params">(<span name="columns">columns: <span class="extype" name="scala.Seq">Seq</span>[<a href="../ast/Column.html" class="extype" name="sqlest.ast.Column">Column</a>[_]]</span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@columnAliasListSql(columns:Seq[sqlest.ast.Column[_]]):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/BaseStatementBuilder.html" class="extype" name="sqlest.sql.base.BaseStatementBuilder">BaseStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.BaseStatementBuilder#columnAliasSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="columnAliasSql(column:sqlest.ast.Column[_]):String"></a>
+      <a id="columnAliasSql(Column[_]):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">columnAliasSql</span><span class="params">(<span name="column">column: <a href="../ast/Column.html" class="extype" name="sqlest.ast.Column">Column</a>[_]</span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@columnAliasSql(column:sqlest.ast.Column[_]):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/BaseStatementBuilder.html" class="extype" name="sqlest.sql.base.BaseStatementBuilder">BaseStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.BaseStatementBuilder#columnArgs" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="columnArgs(column:sqlest.ast.Column[_]):List[sqlest.ast.LiteralColumn[_]]"></a>
+      <a id="columnArgs(Column[_]):List[LiteralColumn[_]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">columnArgs</span><span class="params">(<span name="column">column: <a href="../ast/Column.html" class="extype" name="sqlest.ast.Column">Column</a>[_]</span>)</span><span class="result">: <span class="extype" name="scala.List">List</span>[<a href="../ast/LiteralColumn.html" class="extype" name="sqlest.ast.LiteralColumn">LiteralColumn</a>[_]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@columnArgs(column:sqlest.ast.Column[_]):List[sqlest.ast.LiteralColumn[_]]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/BaseStatementBuilder.html" class="extype" name="sqlest.sql.base.BaseStatementBuilder">BaseStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.BaseStatementBuilder#columnSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="columnSql(column:sqlest.ast.Column[_]):String"></a>
+      <a id="columnSql(Column[_]):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">columnSql</span><span class="params">(<span name="column">column: <a href="../ast/Column.html" class="extype" name="sqlest.ast.Column">Column</a>[_]</span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@columnSql(column:sqlest.ast.Column[_]):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/BaseStatementBuilder.html" class="extype" name="sqlest.sql.base.BaseStatementBuilder">BaseStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.BaseStatementBuilder#constantSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="constantSql[A](columnType:sqlest.ast.ColumnType[A],value:A):String"></a>
+      <a id="constantSql[A](ColumnType[A],A):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">constantSql</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="columnType">columnType: <a href="../ast/ColumnType.html" class="extype" name="sqlest.ast.ColumnType">ColumnType</a>[<span class="extype" name="sqlest.sql.base.BaseStatementBuilder.constantSql.A">A</span>]</span>, <span name="value">value: <span class="extype" name="sqlest.sql.base.BaseStatementBuilder.constantSql.A">A</span></span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@constantSql[A](columnType:sqlest.ast.ColumnType[A],value:A):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/BaseStatementBuilder.html" class="extype" name="sqlest.sql.base.BaseStatementBuilder">BaseStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.DeleteStatementBuilder#deleteArgs" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="deleteArgs(delete:sqlest.ast.Delete):List[sqlest.ast.LiteralColumn[_]]"></a>
+      <a id="deleteArgs(Delete):List[LiteralColumn[_]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">deleteArgs</span><span class="params">(<span name="delete">delete: <a href="../ast/Delete.html" class="extype" name="sqlest.ast.Delete">Delete</a></span>)</span><span class="result">: <span class="extype" name="scala.List">List</span>[<a href="../ast/LiteralColumn.html" class="extype" name="sqlest.ast.LiteralColumn">LiteralColumn</a>[_]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@deleteArgs(delete:sqlest.ast.Delete):List[sqlest.ast.LiteralColumn[_]]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/DeleteStatementBuilder.html" class="extype" name="sqlest.sql.base.DeleteStatementBuilder">DeleteStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.DeleteStatementBuilder#deleteFromSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="deleteFromSql(from:sqlest.ast.Table):String"></a>
+      <a id="deleteFromSql(ast.Table):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">deleteFromSql</span><span class="params">(<span name="from">from: <a href="../ast/Table.html" class="extype" name="sqlest.ast.Table">ast.Table</a></span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@deleteFromSql(from:sqlest.ast.Table):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/DeleteStatementBuilder.html" class="extype" name="sqlest.sql.base.DeleteStatementBuilder">DeleteStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.DeleteStatementBuilder#deleteSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="deleteSql(delete:sqlest.ast.Delete):String"></a>
+      <a id="deleteSql(Delete):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">deleteSql</span><span class="params">(<span name="delete">delete: <a href="../ast/Delete.html" class="extype" name="sqlest.ast.Delete">Delete</a></span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@deleteSql(delete:sqlest.ast.Delete):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/DeleteStatementBuilder.html" class="extype" name="sqlest.sql.base.DeleteStatementBuilder">DeleteStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.DeleteStatementBuilder#deleteWhereArgs" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="deleteWhereArgs(where:Option[sqlest.ast.Column[Boolean]]):List[sqlest.ast.LiteralColumn[_]]"></a>
+      <a id="deleteWhereArgs(Option[Column[Boolean]]):List[LiteralColumn[_]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">deleteWhereArgs</span><span class="params">(<span name="where">where: <span class="extype" name="scala.Option">Option</span>[<a href="../ast/Column.html" class="extype" name="sqlest.ast.Column">Column</a>[<span class="extype" name="scala.Boolean">Boolean</span>]]</span>)</span><span class="result">: <span class="extype" name="scala.List">List</span>[<a href="../ast/LiteralColumn.html" class="extype" name="sqlest.ast.LiteralColumn">LiteralColumn</a>[_]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@deleteWhereArgs(where:Option[sqlest.ast.Column[Boolean]]):List[sqlest.ast.LiteralColumn[_]]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/DeleteStatementBuilder.html" class="extype" name="sqlest.sql.base.DeleteStatementBuilder">DeleteStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.DeleteStatementBuilder#deleteWhereSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="deleteWhereSql(where:Option[sqlest.ast.Column[Boolean]]):Option[String]"></a>
+      <a id="deleteWhereSql(Option[Column[Boolean]]):Option[String]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">deleteWhereSql</span><span class="params">(<span name="where">where: <span class="extype" name="scala.Option">Option</span>[<a href="../ast/Column.html" class="extype" name="sqlest.ast.Column">Column</a>[<span class="extype" name="scala.Boolean">Boolean</span>]]</span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@deleteWhereSql(where:Option[sqlest.ast.Column[Boolean]]):Option[String]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/DeleteStatementBuilder.html" class="extype" name="sqlest.sql.base.DeleteStatementBuilder">DeleteStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.BaseStatementBuilder#doubleInfixSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="doubleInfixSql(op1:String,op2:String,parameter1:sqlest.ast.Column[_],parameter2:sqlest.ast.Column[_],parameter3:sqlest.ast.Column[_]):String"></a>
+      <a id="doubleInfixSql(String,String,Column[_],Column[_],Column[_]):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">doubleInfixSql</span><span class="params">(<span name="op1">op1: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="op2">op2: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="parameter1">parameter1: <a href="../ast/Column.html" class="extype" name="sqlest.ast.Column">Column</a>[_]</span>, <span name="parameter2">parameter2: <a href="../ast/Column.html" class="extype" name="sqlest.ast.Column">Column</a>[_]</span>, <span name="parameter3">parameter3: <a href="../ast/Column.html" class="extype" name="sqlest.ast.Column">Column</a>[_]</span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@doubleInfixSql(op1:String,op2:String,parameter1:sqlest.ast.Column[_],parameter2:sqlest.ast.Column[_],parameter3:sqlest.ast.Column[_]):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/BaseStatementBuilder.html" class="extype" name="sqlest.sql.base.BaseStatementBuilder">BaseStatementBuilder</a></dd></dl></div>
+    </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eq(x$1:AnyRef):Boolean"></a>
+      <a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@eq(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#equals" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equals(x$1:Any):Boolean"></a>
+      <a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@equals(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="sqlest.sql.base.BaseStatementBuilder#escapeSqlString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="escapeSqlString(string:String):String"></a>
+      <a id="escapeSqlString(String):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">escapeSqlString</span><span class="params">(<span name="string">string: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@escapeSqlString(string:String):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/BaseStatementBuilder.html" class="extype" name="sqlest.sql.base.BaseStatementBuilder">BaseStatementBuilder</a></dd></dl></div>
+    </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="finalize():Unit"></a>
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@finalize():Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Throwable]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="sqlest.sql.base.BaseStatementBuilder#findSubselects" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="findSubselects(relation:sqlest.ast.Relation):List[sqlest.ast.Select[_,_]]"></a>
+      <a id="findSubselects(Relation):List[Select[_,_]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">findSubselects</span><span class="params">(<span name="relation">relation: <a href="../ast/Relation.html" class="extype" name="sqlest.ast.Relation">Relation</a></span>)</span><span class="result">: <span class="extype" name="scala.List">List</span>[<a href="../ast/Select.html" class="extype" name="sqlest.ast.Select">Select</a>[_, _]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@findSubselects(relation:sqlest.ast.Relation):List[sqlest.ast.Select[_,_]]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/BaseStatementBuilder.html" class="extype" name="sqlest.sql.base.BaseStatementBuilder">BaseStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.BaseStatementBuilder#functionSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="functionSql(op:String,parameters:Seq[sqlest.ast.Column[_]]):String"></a>
+      <a id="functionSql(String,Seq[Column[_]]):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">functionSql</span><span class="params">(<span name="op">op: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="parameters">parameters: <span class="extype" name="scala.Seq">Seq</span>[<a href="../ast/Column.html" class="extype" name="sqlest.ast.Column">Column</a>[_]]</span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@functionSql(op:String,parameters:Seq[sqlest.ast.Column[_]]):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/BaseStatementBuilder.html" class="extype" name="sqlest.sql.base.BaseStatementBuilder">BaseStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.StatementBuilder#generateRawSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="generateRawSql(operation:sqlest.ast.Operation):String"></a>
+      <a id="generateRawSql(Operation):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">generateRawSql</span><span class="params">(<span name="operation">operation: <a href="../ast/Operation.html" class="extype" name="sqlest.ast.Operation">Operation</a></span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@generateRawSql(operation:sqlest.ast.Operation):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/StatementBuilder.html" class="extype" name="sqlest.sql.base.StatementBuilder">StatementBuilder</a></dd></dl></div>
+    </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getClass():Class[_]"></a>
+      <a id="getClass():Class[_]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@getClass():Class[_]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="sqlest.sql.base.BaseStatementBuilder#groupListSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="groupListSql(groups:Seq[sqlest.ast.Group]):String"></a>
+      <a id="groupListSql(Seq[Group]):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">groupListSql</span><span class="params">(<span name="groups">groups: <span class="extype" name="scala.Seq">Seq</span>[<a href="../ast/Group.html" class="extype" name="sqlest.ast.Group">Group</a>]</span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@groupListSql(groups:Seq[sqlest.ast.Group]):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/BaseStatementBuilder.html" class="extype" name="sqlest.sql.base.BaseStatementBuilder">BaseStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.H2StatementBuilder#groupSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="groupSql(group:sqlest.ast.Group):String"></a>
+      <a id="groupSql(Group):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">groupSql</span><span class="params">(<span name="group">group: <a href="../ast/Group.html" class="extype" name="sqlest.ast.Group">Group</a></span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@groupSql(group:sqlest.ast.Group):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="sqlest.sql.H2StatementBuilder">H2StatementBuilder</a> → <a href="base/BaseStatementBuilder.html" class="extype" name="sqlest.sql.base.BaseStatementBuilder">BaseStatementBuilder</a></dd></dl></div>
+    </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hashCode():Int"></a>
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@hashCode():Int" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="sqlest.sql.base.BaseStatementBuilder#identifierSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="identifierSql(identifier:String):String"></a>
+      <a id="identifierSql(String):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">identifierSql</span><span class="params">(<span name="identifier">identifier: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@identifierSql(identifier:String):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/BaseStatementBuilder.html" class="extype" name="sqlest.sql.base.BaseStatementBuilder">BaseStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.BaseStatementBuilder#infixSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="infixSql(op:String,parameter1:sqlest.ast.Column[_],parameter2:sqlest.ast.Column[_]):String"></a>
+      <a id="infixSql(String,Column[_],Column[_]):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">infixSql</span><span class="params">(<span name="op">op: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="parameter1">parameter1: <a href="../ast/Column.html" class="extype" name="sqlest.ast.Column">Column</a>[_]</span>, <span name="parameter2">parameter2: <a href="../ast/Column.html" class="extype" name="sqlest.ast.Column">Column</a>[_]</span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@infixSql(op:String,parameter1:sqlest.ast.Column[_],parameter2:sqlest.ast.Column[_]):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/BaseStatementBuilder.html" class="extype" name="sqlest.sql.base.BaseStatementBuilder">BaseStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.InsertStatementBuilder#insertArgs" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="insertArgs(insert:sqlest.ast.Insert):List[sqlest.ast.LiteralColumn[_]]"></a>
+      <a id="insertArgs(Insert):List[LiteralColumn[_]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">insertArgs</span><span class="params">(<span name="insert">insert: <a href="../ast/Insert.html" class="extype" name="sqlest.ast.Insert">Insert</a></span>)</span><span class="result">: <span class="extype" name="scala.List">List</span>[<a href="../ast/LiteralColumn.html" class="extype" name="sqlest.ast.LiteralColumn">LiteralColumn</a>[_]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@insertArgs(insert:sqlest.ast.Insert):List[sqlest.ast.LiteralColumn[_]]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/InsertStatementBuilder.html" class="extype" name="sqlest.sql.base.InsertStatementBuilder">InsertStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.InsertStatementBuilder#insertColumnsSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="insertColumnsSql(columns:Seq[sqlest.ast.TableColumn[_]]):String"></a>
+      <a id="insertColumnsSql(Seq[TableColumn[_]]):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">insertColumnsSql</span><span class="params">(<span name="columns">columns: <span class="extype" name="scala.Seq">Seq</span>[<a href="../ast/TableColumn.html" class="extype" name="sqlest.ast.TableColumn">TableColumn</a>[_]]</span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@insertColumnsSql(columns:Seq[sqlest.ast.TableColumn[_]]):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/InsertStatementBuilder.html" class="extype" name="sqlest.sql.base.InsertStatementBuilder">InsertStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.InsertStatementBuilder#insertIntoSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="insertIntoSql(into:sqlest.ast.Table):String"></a>
+      <a id="insertIntoSql(ast.Table):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">insertIntoSql</span><span class="params">(<span name="into">into: <a href="../ast/Table.html" class="extype" name="sqlest.ast.Table">ast.Table</a></span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@insertIntoSql(into:sqlest.ast.Table):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/InsertStatementBuilder.html" class="extype" name="sqlest.sql.base.InsertStatementBuilder">InsertStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.InsertStatementBuilder#insertSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="insertSql(insert:sqlest.ast.Insert):String"></a>
+      <a id="insertSql(Insert):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">insertSql</span><span class="params">(<span name="insert">insert: <a href="../ast/Insert.html" class="extype" name="sqlest.ast.Insert">Insert</a></span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@insertSql(insert:sqlest.ast.Insert):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/InsertStatementBuilder.html" class="extype" name="sqlest.sql.base.InsertStatementBuilder">InsertStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.InsertStatementBuilder#insertValuesArgs" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="insertValuesArgs(setterLists:Seq[Seq[sqlest.ast.Setter[_,_]]]):List[sqlest.ast.LiteralColumn[_]]"></a>
+      <a id="insertValuesArgs(Seq[Seq[Setter[_,_]]]):List[LiteralColumn[_]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">insertValuesArgs</span><span class="params">(<span name="setterLists">setterLists: <span class="extype" name="scala.Seq">Seq</span>[<span class="extype" name="scala.Seq">Seq</span>[<a href="../ast/Setter.html" class="extype" name="sqlest.ast.Setter">Setter</a>[_, _]]]</span>)</span><span class="result">: <span class="extype" name="scala.List">List</span>[<a href="../ast/LiteralColumn.html" class="extype" name="sqlest.ast.LiteralColumn">LiteralColumn</a>[_]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@insertValuesArgs(setterLists:Seq[Seq[sqlest.ast.Setter[_,_]]]):List[sqlest.ast.LiteralColumn[_]]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/InsertStatementBuilder.html" class="extype" name="sqlest.sql.base.InsertStatementBuilder">InsertStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.InsertStatementBuilder#insertValuesSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="insertValuesSql(columns:Seq[sqlest.ast.TableColumn[_]]):String"></a>
+      <a id="insertValuesSql(Seq[TableColumn[_]]):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">insertValuesSql</span><span class="params">(<span name="columns">columns: <span class="extype" name="scala.Seq">Seq</span>[<a href="../ast/TableColumn.html" class="extype" name="sqlest.ast.TableColumn">TableColumn</a>[_]]</span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@insertValuesSql(columns:Seq[sqlest.ast.TableColumn[_]]):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/InsertStatementBuilder.html" class="extype" name="sqlest.sql.base.InsertStatementBuilder">InsertStatementBuilder</a></dd></dl></div>
+    </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@isInstanceOf[T0]:Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="sqlest.sql.base.SelectStatementBuilder#joinArgs" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="joinArgs(relation:sqlest.ast.Relation):List[sqlest.ast.LiteralColumn[_]]"></a>
+      <a id="joinArgs(Relation):List[LiteralColumn[_]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">joinArgs</span><span class="params">(<span name="relation">relation: <a href="../ast/Relation.html" class="extype" name="sqlest.ast.Relation">Relation</a></span>)</span><span class="result">: <span class="extype" name="scala.List">List</span>[<a href="../ast/LiteralColumn.html" class="extype" name="sqlest.ast.LiteralColumn">LiteralColumn</a>[_]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@joinArgs(relation:sqlest.ast.Relation):List[sqlest.ast.LiteralColumn[_]]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/SelectStatementBuilder.html" class="extype" name="sqlest.sql.base.SelectStatementBuilder">SelectStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.SelectStatementBuilder#joinSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="joinSql(relation:sqlest.ast.Relation):String"></a>
+      <a id="joinSql(Relation):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">joinSql</span><span class="params">(<span name="relation">relation: <a href="../ast/Relation.html" class="extype" name="sqlest.ast.Relation">Relation</a></span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@joinSql(relation:sqlest.ast.Relation):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/SelectStatementBuilder.html" class="extype" name="sqlest.sql.base.SelectStatementBuilder">SelectStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.BaseStatementBuilder#literalSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="literalSql[A](literal:A):String"></a>
+      <a id="literalSql[A](A):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">literalSql</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="literal">literal: <span class="extype" name="sqlest.sql.base.BaseStatementBuilder.literalSql.A">A</span></span>)</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@literalSql[A](literal:A):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/BaseStatementBuilder.html" class="extype" name="sqlest.sql.base.BaseStatementBuilder">BaseStatementBuilder</a></dd></dl></div>
+    </li><li name="com.typesafe.scalalogging.slf4j.LazyLogging#logger" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="logger:com.typesafe.scalalogging.slf4j.Logger"></a>
+      <a id="logger:Logger"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">lazy val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">logger</span><span class="result">: <span class="extype" name="com.typesafe.scalalogging.slf4j.Logger">Logger</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@logger:com.typesafe.scalalogging.slf4j.Logger" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd>LazyLogging → Logging</dd></dl></div>
+    </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ne(x$1:AnyRef):Boolean"></a>
+      <a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@ne(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notify" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notify():Unit"></a>
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@notify():Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notifyAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notifyAll():Unit"></a>
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@notifyAll():Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="sqlest.sql.base.BaseStatementBuilder#orderListSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="orderListSql(orders:Seq[sqlest.ast.Order]):String"></a>
+      <a id="orderListSql(Seq[Order]):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">orderListSql</span><span class="params">(<span name="orders">orders: <span class="extype" name="scala.Seq">Seq</span>[<a href="../ast/Order.html" class="extype" name="sqlest.ast.Order">Order</a>]</span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@orderListSql(orders:Seq[sqlest.ast.Order]):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/BaseStatementBuilder.html" class="extype" name="sqlest.sql.base.BaseStatementBuilder">BaseStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.BaseStatementBuilder#orderSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="orderSql(order:sqlest.ast.Order):String"></a>
+      <a id="orderSql(Order):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">orderSql</span><span class="params">(<span name="order">order: <a href="../ast/Order.html" class="extype" name="sqlest.ast.Order">Order</a></span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@orderSql(order:sqlest.ast.Order):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/BaseStatementBuilder.html" class="extype" name="sqlest.sql.base.BaseStatementBuilder">BaseStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.BaseStatementBuilder#postfixSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="postfixSql(op:String,parameter:sqlest.ast.Column[_]):String"></a>
+      <a id="postfixSql(String,Column[_]):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">postfixSql</span><span class="params">(<span name="op">op: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="parameter">parameter: <a href="../ast/Column.html" class="extype" name="sqlest.ast.Column">Column</a>[_]</span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@postfixSql(op:String,parameter:sqlest.ast.Column[_]):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/BaseStatementBuilder.html" class="extype" name="sqlest.sql.base.BaseStatementBuilder">BaseStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.BaseStatementBuilder#prefixSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="prefixSql(op:String,parameter:sqlest.ast.Column[_]):String"></a>
+      <a id="prefixSql(String,Column[_]):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">prefixSql</span><span class="params">(<span name="op">op: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="parameter">parameter: <a href="../ast/Column.html" class="extype" name="sqlest.ast.Column">Column</a>[_]</span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@prefixSql(op:String,parameter:sqlest.ast.Column[_]):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/BaseStatementBuilder.html" class="extype" name="sqlest.sql.base.BaseStatementBuilder">BaseStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.StatementBuilder#prepareStatement" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="prepareStatement(connection:java.sql.Connection,operation:sqlest.ast.Operation):java.sql.PreparedStatement"></a>
+      <a id="prepareStatement(Connection,Operation):PreparedStatement"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">prepareStatement</span><span class="params">(<span name="connection">connection: <span class="extype" name="java.sql.Connection">Connection</span></span>, <span name="operation">operation: <a href="../ast/Operation.html" class="extype" name="sqlest.ast.Operation">Operation</a></span>)</span><span class="result">: <span class="extype" name="java.sql.PreparedStatement">PreparedStatement</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@prepareStatement(connection:java.sql.Connection,operation:sqlest.ast.Operation):java.sql.PreparedStatement" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/StatementBuilder.html" class="extype" name="sqlest.sql.base.StatementBuilder">StatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.BaseStatementBuilder#preprocess" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="preprocess(operation:sqlest.ast.Operation):sqlest.ast.Operation"></a>
+      <a id="preprocess(Operation):Operation"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">preprocess</span><span class="params">(<span name="operation">operation: <a href="../ast/Operation.html" class="extype" name="sqlest.ast.Operation">Operation</a></span>)</span><span class="result">: <a href="../ast/Operation.html" class="extype" name="sqlest.ast.Operation">Operation</a></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@preprocess(operation:sqlest.ast.Operation):sqlest.ast.Operation" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/BaseStatementBuilder.html" class="extype" name="sqlest.sql.base.BaseStatementBuilder">BaseStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.SelectStatementBuilder#selectArgs" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="selectArgs(select:sqlest.ast.Select[_,_&lt;:sqlest.ast.Relation]):List[sqlest.ast.LiteralColumn[_]]"></a>
+      <a id="selectArgs(Select[_,_&lt;:Relation]):List[LiteralColumn[_]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">selectArgs</span><span class="params">(<span name="select">select: <a href="../ast/Select.html" class="extype" name="sqlest.ast.Select">Select</a>[_, _ &lt;: <a href="../ast/Relation.html" class="extype" name="sqlest.ast.Relation">Relation</a>]</span>)</span><span class="result">: <span class="extype" name="scala.List">List</span>[<a href="../ast/LiteralColumn.html" class="extype" name="sqlest.ast.LiteralColumn">LiteralColumn</a>[_]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@selectArgs(select:sqlest.ast.Select[_,_&lt;:sqlest.ast.Relation]):List[sqlest.ast.LiteralColumn[_]]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/SelectStatementBuilder.html" class="extype" name="sqlest.sql.base.SelectStatementBuilder">SelectStatementBuilder</a> → <a href="base/BaseStatementBuilder.html" class="extype" name="sqlest.sql.base.BaseStatementBuilder">BaseStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.SelectStatementBuilder#selectConnectByArgs" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="selectConnectByArgs(connectBy:Option[sqlest.ast.Column[Boolean]]):List[sqlest.ast.LiteralColumn[_]]"></a>
+      <a id="selectConnectByArgs(Option[Column[Boolean]]):List[LiteralColumn[_]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">selectConnectByArgs</span><span class="params">(<span name="connectBy">connectBy: <span class="extype" name="scala.Option">Option</span>[<a href="../ast/Column.html" class="extype" name="sqlest.ast.Column">Column</a>[<span class="extype" name="scala.Boolean">Boolean</span>]]</span>)</span><span class="result">: <span class="extype" name="scala.List">List</span>[<a href="../ast/LiteralColumn.html" class="extype" name="sqlest.ast.LiteralColumn">LiteralColumn</a>[_]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@selectConnectByArgs(connectBy:Option[sqlest.ast.Column[Boolean]]):List[sqlest.ast.LiteralColumn[_]]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/SelectStatementBuilder.html" class="extype" name="sqlest.sql.base.SelectStatementBuilder">SelectStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.SelectStatementBuilder#selectConnectBySql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="selectConnectBySql(connectBy:Option[sqlest.ast.Column[Boolean]]):Option[String]"></a>
+      <a id="selectConnectBySql(Option[Column[Boolean]]):Option[String]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">selectConnectBySql</span><span class="params">(<span name="connectBy">connectBy: <span class="extype" name="scala.Option">Option</span>[<a href="../ast/Column.html" class="extype" name="sqlest.ast.Column">Column</a>[<span class="extype" name="scala.Boolean">Boolean</span>]]</span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@selectConnectBySql(connectBy:Option[sqlest.ast.Column[Boolean]]):Option[String]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/SelectStatementBuilder.html" class="extype" name="sqlest.sql.base.SelectStatementBuilder">SelectStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.SelectStatementBuilder#selectFromArgs" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="selectFromArgs(from:sqlest.ast.Relation):List[sqlest.ast.LiteralColumn[_]]"></a>
+      <a id="selectFromArgs(Relation):List[LiteralColumn[_]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">selectFromArgs</span><span class="params">(<span name="from">from: <a href="../ast/Relation.html" class="extype" name="sqlest.ast.Relation">Relation</a></span>)</span><span class="result">: <span class="extype" name="scala.List">List</span>[<a href="../ast/LiteralColumn.html" class="extype" name="sqlest.ast.LiteralColumn">LiteralColumn</a>[_]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@selectFromArgs(from:sqlest.ast.Relation):List[sqlest.ast.LiteralColumn[_]]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/SelectStatementBuilder.html" class="extype" name="sqlest.sql.base.SelectStatementBuilder">SelectStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.SelectStatementBuilder#selectFromSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="selectFromSql(from:sqlest.ast.Relation):String"></a>
+      <a id="selectFromSql(Relation):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">selectFromSql</span><span class="params">(<span name="from">from: <a href="../ast/Relation.html" class="extype" name="sqlest.ast.Relation">Relation</a></span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@selectFromSql(from:sqlest.ast.Relation):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/SelectStatementBuilder.html" class="extype" name="sqlest.sql.base.SelectStatementBuilder">SelectStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.SelectStatementBuilder#selectGroupByArgs" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="selectGroupByArgs(group:Seq[sqlest.ast.Group]):List[sqlest.ast.LiteralColumn[_]]"></a>
+      <a id="selectGroupByArgs(Seq[Group]):List[LiteralColumn[_]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">selectGroupByArgs</span><span class="params">(<span name="group">group: <span class="extype" name="scala.Seq">Seq</span>[<a href="../ast/Group.html" class="extype" name="sqlest.ast.Group">Group</a>]</span>)</span><span class="result">: <span class="extype" name="scala.List">List</span>[<a href="../ast/LiteralColumn.html" class="extype" name="sqlest.ast.LiteralColumn">LiteralColumn</a>[_]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@selectGroupByArgs(group:Seq[sqlest.ast.Group]):List[sqlest.ast.LiteralColumn[_]]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/SelectStatementBuilder.html" class="extype" name="sqlest.sql.base.SelectStatementBuilder">SelectStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.SelectStatementBuilder#selectGroupBySql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="selectGroupBySql(group:Seq[sqlest.ast.Group]):Option[String]"></a>
+      <a id="selectGroupBySql(Seq[Group]):Option[String]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">selectGroupBySql</span><span class="params">(<span name="group">group: <span class="extype" name="scala.Seq">Seq</span>[<a href="../ast/Group.html" class="extype" name="sqlest.ast.Group">Group</a>]</span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@selectGroupBySql(group:Seq[sqlest.ast.Group]):Option[String]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/SelectStatementBuilder.html" class="extype" name="sqlest.sql.base.SelectStatementBuilder">SelectStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.SelectStatementBuilder#selectHavingArgs" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="selectHavingArgs(having:Option[sqlest.ast.Column[Boolean]]):List[sqlest.ast.LiteralColumn[_]]"></a>
+      <a id="selectHavingArgs(Option[Column[Boolean]]):List[LiteralColumn[_]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">selectHavingArgs</span><span class="params">(<span name="having">having: <span class="extype" name="scala.Option">Option</span>[<a href="../ast/Column.html" class="extype" name="sqlest.ast.Column">Column</a>[<span class="extype" name="scala.Boolean">Boolean</span>]]</span>)</span><span class="result">: <span class="extype" name="scala.List">List</span>[<a href="../ast/LiteralColumn.html" class="extype" name="sqlest.ast.LiteralColumn">LiteralColumn</a>[_]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@selectHavingArgs(having:Option[sqlest.ast.Column[Boolean]]):List[sqlest.ast.LiteralColumn[_]]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/SelectStatementBuilder.html" class="extype" name="sqlest.sql.base.SelectStatementBuilder">SelectStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.SelectStatementBuilder#selectHavingSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="selectHavingSql(having:Option[sqlest.ast.Column[Boolean]]):Option[String]"></a>
+      <a id="selectHavingSql(Option[Column[Boolean]]):Option[String]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">selectHavingSql</span><span class="params">(<span name="having">having: <span class="extype" name="scala.Option">Option</span>[<a href="../ast/Column.html" class="extype" name="sqlest.ast.Column">Column</a>[<span class="extype" name="scala.Boolean">Boolean</span>]]</span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@selectHavingSql(having:Option[sqlest.ast.Column[Boolean]]):Option[String]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/SelectStatementBuilder.html" class="extype" name="sqlest.sql.base.SelectStatementBuilder">SelectStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.SelectStatementBuilder#selectLimitArgs" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="selectLimitArgs(limit:Option[Long]):List[sqlest.ast.LiteralColumn[_]]"></a>
+      <a id="selectLimitArgs(Option[Long]):List[LiteralColumn[_]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">selectLimitArgs</span><span class="params">(<span name="limit">limit: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Long">Long</span>]</span>)</span><span class="result">: <span class="extype" name="scala.List">List</span>[<a href="../ast/LiteralColumn.html" class="extype" name="sqlest.ast.LiteralColumn">LiteralColumn</a>[_]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@selectLimitArgs(limit:Option[Long]):List[sqlest.ast.LiteralColumn[_]]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/SelectStatementBuilder.html" class="extype" name="sqlest.sql.base.SelectStatementBuilder">SelectStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.SelectStatementBuilder#selectLimitSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="selectLimitSql(limit:Option[Long]):Option[String]"></a>
+      <a id="selectLimitSql(Option[Long]):Option[String]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">selectLimitSql</span><span class="params">(<span name="limit">limit: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Long">Long</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@selectLimitSql(limit:Option[Long]):Option[String]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/SelectStatementBuilder.html" class="extype" name="sqlest.sql.base.SelectStatementBuilder">SelectStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.SelectStatementBuilder#selectOffsetArgs" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="selectOffsetArgs(offset:Option[Long]):List[sqlest.ast.LiteralColumn[_]]"></a>
+      <a id="selectOffsetArgs(Option[Long]):List[LiteralColumn[_]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">selectOffsetArgs</span><span class="params">(<span name="offset">offset: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Long">Long</span>]</span>)</span><span class="result">: <span class="extype" name="scala.List">List</span>[<a href="../ast/LiteralColumn.html" class="extype" name="sqlest.ast.LiteralColumn">LiteralColumn</a>[_]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@selectOffsetArgs(offset:Option[Long]):List[sqlest.ast.LiteralColumn[_]]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/SelectStatementBuilder.html" class="extype" name="sqlest.sql.base.SelectStatementBuilder">SelectStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.SelectStatementBuilder#selectOffsetSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="selectOffsetSql(offset:Option[Long]):Option[String]"></a>
+      <a id="selectOffsetSql(Option[Long]):Option[String]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">selectOffsetSql</span><span class="params">(<span name="offset">offset: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Long">Long</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@selectOffsetSql(offset:Option[Long]):Option[String]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/SelectStatementBuilder.html" class="extype" name="sqlest.sql.base.SelectStatementBuilder">SelectStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.SelectStatementBuilder#selectOrderByArgs" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="selectOrderByArgs(order:Seq[sqlest.ast.Order]):List[sqlest.ast.LiteralColumn[_]]"></a>
+      <a id="selectOrderByArgs(Seq[Order]):List[LiteralColumn[_]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">selectOrderByArgs</span><span class="params">(<span name="order">order: <span class="extype" name="scala.Seq">Seq</span>[<a href="../ast/Order.html" class="extype" name="sqlest.ast.Order">Order</a>]</span>)</span><span class="result">: <span class="extype" name="scala.List">List</span>[<a href="../ast/LiteralColumn.html" class="extype" name="sqlest.ast.LiteralColumn">LiteralColumn</a>[_]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@selectOrderByArgs(order:Seq[sqlest.ast.Order]):List[sqlest.ast.LiteralColumn[_]]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/SelectStatementBuilder.html" class="extype" name="sqlest.sql.base.SelectStatementBuilder">SelectStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.SelectStatementBuilder#selectOrderBySql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="selectOrderBySql(order:Seq[sqlest.ast.Order]):Option[String]"></a>
+      <a id="selectOrderBySql(Seq[Order]):Option[String]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">selectOrderBySql</span><span class="params">(<span name="order">order: <span class="extype" name="scala.Seq">Seq</span>[<a href="../ast/Order.html" class="extype" name="sqlest.ast.Order">Order</a>]</span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@selectOrderBySql(order:Seq[sqlest.ast.Order]):Option[String]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/SelectStatementBuilder.html" class="extype" name="sqlest.sql.base.SelectStatementBuilder">SelectStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.SelectStatementBuilder#selectSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="selectSql(select:sqlest.ast.Select[_,_&lt;:sqlest.ast.Relation]):String"></a>
+      <a id="selectSql(Select[_,_&lt;:Relation]):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">selectSql</span><span class="params">(<span name="select">select: <a href="../ast/Select.html" class="extype" name="sqlest.ast.Select">Select</a>[_, _ &lt;: <a href="../ast/Relation.html" class="extype" name="sqlest.ast.Relation">Relation</a>]</span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@selectSql(select:sqlest.ast.Select[_,_&lt;:sqlest.ast.Relation]):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/SelectStatementBuilder.html" class="extype" name="sqlest.sql.base.SelectStatementBuilder">SelectStatementBuilder</a> → <a href="base/BaseStatementBuilder.html" class="extype" name="sqlest.sql.base.BaseStatementBuilder">BaseStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.SelectStatementBuilder#selectStartWithArgs" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="selectStartWithArgs(startWith:Option[sqlest.ast.Column[Boolean]]):List[sqlest.ast.LiteralColumn[_]]"></a>
+      <a id="selectStartWithArgs(Option[Column[Boolean]]):List[LiteralColumn[_]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">selectStartWithArgs</span><span class="params">(<span name="startWith">startWith: <span class="extype" name="scala.Option">Option</span>[<a href="../ast/Column.html" class="extype" name="sqlest.ast.Column">Column</a>[<span class="extype" name="scala.Boolean">Boolean</span>]]</span>)</span><span class="result">: <span class="extype" name="scala.List">List</span>[<a href="../ast/LiteralColumn.html" class="extype" name="sqlest.ast.LiteralColumn">LiteralColumn</a>[_]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@selectStartWithArgs(startWith:Option[sqlest.ast.Column[Boolean]]):List[sqlest.ast.LiteralColumn[_]]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/SelectStatementBuilder.html" class="extype" name="sqlest.sql.base.SelectStatementBuilder">SelectStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.SelectStatementBuilder#selectStartWithSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="selectStartWithSql(startWith:Option[sqlest.ast.Column[Boolean]]):Option[String]"></a>
+      <a id="selectStartWithSql(Option[Column[Boolean]]):Option[String]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">selectStartWithSql</span><span class="params">(<span name="startWith">startWith: <span class="extype" name="scala.Option">Option</span>[<a href="../ast/Column.html" class="extype" name="sqlest.ast.Column">Column</a>[<span class="extype" name="scala.Boolean">Boolean</span>]]</span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@selectStartWithSql(startWith:Option[sqlest.ast.Column[Boolean]]):Option[String]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/SelectStatementBuilder.html" class="extype" name="sqlest.sql.base.SelectStatementBuilder">SelectStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.SelectStatementBuilder#selectUnionArgs" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="selectUnionArgs(union:Seq[sqlest.ast.Union[_]]):List[sqlest.ast.LiteralColumn[_]]"></a>
+      <a id="selectUnionArgs(Seq[Union[_]]):List[LiteralColumn[_]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">selectUnionArgs</span><span class="params">(<span name="union">union: <span class="extype" name="scala.Seq">Seq</span>[<a href="../ast/Union.html" class="extype" name="sqlest.ast.Union">Union</a>[_]]</span>)</span><span class="result">: <span class="extype" name="scala.List">List</span>[<a href="../ast/LiteralColumn.html" class="extype" name="sqlest.ast.LiteralColumn">LiteralColumn</a>[_]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@selectUnionArgs(union:Seq[sqlest.ast.Union[_]]):List[sqlest.ast.LiteralColumn[_]]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/SelectStatementBuilder.html" class="extype" name="sqlest.sql.base.SelectStatementBuilder">SelectStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.SelectStatementBuilder#selectUnionSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="selectUnionSql(union:Seq[sqlest.ast.Union[_]]):Option[String]"></a>
+      <a id="selectUnionSql(Seq[Union[_]]):Option[String]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">selectUnionSql</span><span class="params">(<span name="union">union: <span class="extype" name="scala.Seq">Seq</span>[<a href="../ast/Union.html" class="extype" name="sqlest.ast.Union">Union</a>[_]]</span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@selectUnionSql(union:Seq[sqlest.ast.Union[_]]):Option[String]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/SelectStatementBuilder.html" class="extype" name="sqlest.sql.base.SelectStatementBuilder">SelectStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.SelectStatementBuilder#selectWhatArgs" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="selectWhatArgs(columns:Seq[sqlest.ast.Column[_]]):List[sqlest.ast.LiteralColumn[_]]"></a>
+      <a id="selectWhatArgs(Seq[Column[_]]):List[LiteralColumn[_]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">selectWhatArgs</span><span class="params">(<span name="columns">columns: <span class="extype" name="scala.Seq">Seq</span>[<a href="../ast/Column.html" class="extype" name="sqlest.ast.Column">Column</a>[_]]</span>)</span><span class="result">: <span class="extype" name="scala.List">List</span>[<a href="../ast/LiteralColumn.html" class="extype" name="sqlest.ast.LiteralColumn">LiteralColumn</a>[_]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@selectWhatArgs(columns:Seq[sqlest.ast.Column[_]]):List[sqlest.ast.LiteralColumn[_]]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/SelectStatementBuilder.html" class="extype" name="sqlest.sql.base.SelectStatementBuilder">SelectStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.SelectStatementBuilder#selectWhatSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="selectWhatSql(columns:Seq[sqlest.ast.Column[_]]):String"></a>
+      <a id="selectWhatSql(Seq[Column[_]]):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">selectWhatSql</span><span class="params">(<span name="columns">columns: <span class="extype" name="scala.Seq">Seq</span>[<a href="../ast/Column.html" class="extype" name="sqlest.ast.Column">Column</a>[_]]</span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@selectWhatSql(columns:Seq[sqlest.ast.Column[_]]):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/SelectStatementBuilder.html" class="extype" name="sqlest.sql.base.SelectStatementBuilder">SelectStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.SelectStatementBuilder#selectWhereArgs" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="selectWhereArgs(where:Option[sqlest.ast.Column[Boolean]]):List[sqlest.ast.LiteralColumn[_]]"></a>
+      <a id="selectWhereArgs(Option[Column[Boolean]]):List[LiteralColumn[_]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">selectWhereArgs</span><span class="params">(<span name="where">where: <span class="extype" name="scala.Option">Option</span>[<a href="../ast/Column.html" class="extype" name="sqlest.ast.Column">Column</a>[<span class="extype" name="scala.Boolean">Boolean</span>]]</span>)</span><span class="result">: <span class="extype" name="scala.List">List</span>[<a href="../ast/LiteralColumn.html" class="extype" name="sqlest.ast.LiteralColumn">LiteralColumn</a>[_]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@selectWhereArgs(where:Option[sqlest.ast.Column[Boolean]]):List[sqlest.ast.LiteralColumn[_]]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/SelectStatementBuilder.html" class="extype" name="sqlest.sql.base.SelectStatementBuilder">SelectStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.SelectStatementBuilder#selectWhereSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="selectWhereSql(where:Option[sqlest.ast.Column[Boolean]]):Option[String]"></a>
+      <a id="selectWhereSql(Option[Column[Boolean]]):Option[String]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">selectWhereSql</span><span class="params">(<span name="where">where: <span class="extype" name="scala.Option">Option</span>[<a href="../ast/Column.html" class="extype" name="sqlest.ast.Column">Column</a>[<span class="extype" name="scala.Boolean">Boolean</span>]]</span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@selectWhereSql(where:Option[sqlest.ast.Column[Boolean]]):Option[String]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/SelectStatementBuilder.html" class="extype" name="sqlest.sql.base.SelectStatementBuilder">SelectStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.SelectStatementBuilder#subselectSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="subselectSql(select:sqlest.ast.Select[_,_&lt;:sqlest.ast.Relation]):String"></a>
+      <a id="subselectSql(Select[_,_&lt;:Relation]):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">subselectSql</span><span class="params">(<span name="select">select: <a href="../ast/Select.html" class="extype" name="sqlest.ast.Select">Select</a>[_, _ &lt;: <a href="../ast/Relation.html" class="extype" name="sqlest.ast.Relation">Relation</a>]</span>)</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@subselectSql(select:sqlest.ast.Select[_,_&lt;:sqlest.ast.Relation]):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/SelectStatementBuilder.html" class="extype" name="sqlest.sql.base.SelectStatementBuilder">SelectStatementBuilder</a></dd></dl></div>
+    </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
+      <a id="synchronized[T0](⇒T0):T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@synchronized[T0](x$1:=&gt;T0):T0" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@toString():String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="sqlest.sql.base.UpdateStatementBuilder#updateArgs" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="updateArgs(update:sqlest.ast.Update):List[sqlest.ast.LiteralColumn[_]]"></a>
+      <a id="updateArgs(Update):List[LiteralColumn[_]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">updateArgs</span><span class="params">(<span name="update">update: <a href="../ast/Update.html" class="extype" name="sqlest.ast.Update">Update</a></span>)</span><span class="result">: <span class="extype" name="scala.List">List</span>[<a href="../ast/LiteralColumn.html" class="extype" name="sqlest.ast.LiteralColumn">LiteralColumn</a>[_]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@updateArgs(update:sqlest.ast.Update):List[sqlest.ast.LiteralColumn[_]]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/UpdateStatementBuilder.html" class="extype" name="sqlest.sql.base.UpdateStatementBuilder">UpdateStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.UpdateStatementBuilder#updateSetArgs" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="updateSetArgs(setters:Seq[sqlest.ast.Setter[_,_]]):List[sqlest.ast.LiteralColumn[_]]"></a>
+      <a id="updateSetArgs(Seq[Setter[_,_]]):List[LiteralColumn[_]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">updateSetArgs</span><span class="params">(<span name="setters">setters: <span class="extype" name="scala.Seq">Seq</span>[<a href="../ast/Setter.html" class="extype" name="sqlest.ast.Setter">Setter</a>[_, _]]</span>)</span><span class="result">: <span class="extype" name="scala.List">List</span>[<a href="../ast/LiteralColumn.html" class="extype" name="sqlest.ast.LiteralColumn">LiteralColumn</a>[_]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@updateSetArgs(setters:Seq[sqlest.ast.Setter[_,_]]):List[sqlest.ast.LiteralColumn[_]]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/UpdateStatementBuilder.html" class="extype" name="sqlest.sql.base.UpdateStatementBuilder">UpdateStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.UpdateStatementBuilder#updateSetSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="updateSetSql(setters:Seq[sqlest.ast.Setter[_,_]]):String"></a>
+      <a id="updateSetSql(Seq[Setter[_,_]]):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">updateSetSql</span><span class="params">(<span name="setters">setters: <span class="extype" name="scala.Seq">Seq</span>[<a href="../ast/Setter.html" class="extype" name="sqlest.ast.Setter">Setter</a>[_, _]]</span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@updateSetSql(setters:Seq[sqlest.ast.Setter[_,_]]):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/UpdateStatementBuilder.html" class="extype" name="sqlest.sql.base.UpdateStatementBuilder">UpdateStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.UpdateStatementBuilder#updateSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="updateSql(update:sqlest.ast.Update):String"></a>
+      <a id="updateSql(Update):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">updateSql</span><span class="params">(<span name="update">update: <a href="../ast/Update.html" class="extype" name="sqlest.ast.Update">Update</a></span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@updateSql(update:sqlest.ast.Update):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/UpdateStatementBuilder.html" class="extype" name="sqlest.sql.base.UpdateStatementBuilder">UpdateStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.UpdateStatementBuilder#updateTableSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="updateTableSql(table:sqlest.ast.Table):String"></a>
+      <a id="updateTableSql(ast.Table):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">updateTableSql</span><span class="params">(<span name="table">table: <a href="../ast/Table.html" class="extype" name="sqlest.ast.Table">ast.Table</a></span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@updateTableSql(table:sqlest.ast.Table):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/UpdateStatementBuilder.html" class="extype" name="sqlest.sql.base.UpdateStatementBuilder">UpdateStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.UpdateStatementBuilder#updateWhereArgs" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="updateWhereArgs(where:Option[sqlest.ast.Column[Boolean]]):List[sqlest.ast.LiteralColumn[_]]"></a>
+      <a id="updateWhereArgs(Option[Column[Boolean]]):List[LiteralColumn[_]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">updateWhereArgs</span><span class="params">(<span name="where">where: <span class="extype" name="scala.Option">Option</span>[<a href="../ast/Column.html" class="extype" name="sqlest.ast.Column">Column</a>[<span class="extype" name="scala.Boolean">Boolean</span>]]</span>)</span><span class="result">: <span class="extype" name="scala.List">List</span>[<a href="../ast/LiteralColumn.html" class="extype" name="sqlest.ast.LiteralColumn">LiteralColumn</a>[_]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@updateWhereArgs(where:Option[sqlest.ast.Column[Boolean]]):List[sqlest.ast.LiteralColumn[_]]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/UpdateStatementBuilder.html" class="extype" name="sqlest.sql.base.UpdateStatementBuilder">UpdateStatementBuilder</a></dd></dl></div>
+    </li><li name="sqlest.sql.base.UpdateStatementBuilder#updateWhereSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="updateWhereSql(where:Option[sqlest.ast.Column[Boolean]]):Option[String]"></a>
+      <a id="updateWhereSql(Option[Column[Boolean]]):Option[String]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">updateWhereSql</span><span class="params">(<span name="where">where: <span class="extype" name="scala.Option">Option</span>[<a href="../ast/Column.html" class="extype" name="sqlest.ast.Column">Column</a>[<span class="extype" name="scala.Boolean">Boolean</span>]]</span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<span class="extype" name="scala.Predef.String">String</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@updateWhereSql(where:Option[sqlest.ast.Column[Boolean]]):Option[String]" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/UpdateStatementBuilder.html" class="extype" name="sqlest.sql.base.UpdateStatementBuilder">UpdateStatementBuilder</a></dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait():Unit"></a>
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@wait():Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long,x$2:Int):Unit"></a>
+      <a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@wait(x$1:Long,x$2:Int):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long):Unit"></a>
+      <a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@wait(x$1:Long):Unit" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="sqlest.sql.base.BaseStatementBuilder#windowFunctionSql" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="windowFunctionSql(partitionByColumns:Seq[sqlest.ast.Column[_]],orders:Seq[sqlest.ast.Order]):String"></a>
+      <a id="windowFunctionSql(Seq[Column[_]],Seq[Order]):String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">windowFunctionSql</span><span class="params">(<span name="partitionByColumns">partitionByColumns: <span class="extype" name="scala.Seq">Seq</span>[<a href="../ast/Column.html" class="extype" name="sqlest.ast.Column">Column</a>[_]]</span>, <span name="orders">orders: <span class="extype" name="scala.Seq">Seq</span>[<a href="../ast/Order.html" class="extype" name="sqlest.ast.Order">Order</a>]</span>)</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../index.html#sqlest.sql.H2StatementBuilder@windowFunctionSql(partitionByColumns:Seq[sqlest.ast.Column[_]],orders:Seq[sqlest.ast.Order]):String" title="Permalink" target="_top">
+        <img src="../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="base/BaseStatementBuilder.html" class="extype" name="sqlest.sql.base.BaseStatementBuilder">BaseStatementBuilder</a></dd></dl></div>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="sqlest.sql.base.StatementBuilder">
+              <h3>Inherited from <a href="base/StatementBuilder.html" class="extype" name="sqlest.sql.base.StatementBuilder">base.StatementBuilder</a></h3>
+            </div><div class="parent" name="sqlest.util.Logging">
+              <h3>Inherited from <a href="../util/Logging.html" class="extype" name="sqlest.util.Logging">Logging</a></h3>
+            </div><div class="parent" name="com.typesafe.scalalogging.slf4j.LazyLogging">
+              <h3>Inherited from <span class="extype" name="com.typesafe.scalalogging.slf4j.LazyLogging">LazyLogging</span></h3>
+            </div><div class="parent" name="com.typesafe.scalalogging.Logging">
+              <h3>Inherited from <span class="extype" name="com.typesafe.scalalogging.Logging">Logging</span></h3>
+            </div><div class="parent" name="sqlest.sql.base.DeleteStatementBuilder">
+              <h3>Inherited from <a href="base/DeleteStatementBuilder.html" class="extype" name="sqlest.sql.base.DeleteStatementBuilder">DeleteStatementBuilder</a></h3>
+            </div><div class="parent" name="sqlest.sql.base.UpdateStatementBuilder">
+              <h3>Inherited from <a href="base/UpdateStatementBuilder.html" class="extype" name="sqlest.sql.base.UpdateStatementBuilder">UpdateStatementBuilder</a></h3>
+            </div><div class="parent" name="sqlest.sql.base.InsertStatementBuilder">
+              <h3>Inherited from <a href="base/InsertStatementBuilder.html" class="extype" name="sqlest.sql.base.InsertStatementBuilder">InsertStatementBuilder</a></h3>
+            </div><div class="parent" name="sqlest.sql.base.SelectStatementBuilder">
+              <h3>Inherited from <a href="base/SelectStatementBuilder.html" class="extype" name="sqlest.sql.base.SelectStatementBuilder">SelectStatementBuilder</a></h3>
+            </div><div class="parent" name="sqlest.sql.base.BaseStatementBuilder">
+              <h3>Inherited from <a href="base/BaseStatementBuilder.html" class="extype" name="sqlest.sql.base.BaseStatementBuilder">BaseStatementBuilder</a></h3>
+            </div><div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>
