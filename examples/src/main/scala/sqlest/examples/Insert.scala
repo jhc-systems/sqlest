@@ -10,6 +10,7 @@ object InsertExamples extends App with DatabaseExample {
       .values(FruitTable.id -> 1, FruitTable.name -> "Watermelon", FruitTable.juiciness -> 10)
       .values(FruitTable.id -> 1, FruitTable.name -> "Tomato", FruitTable.juiciness -> 9)
       .values(FruitTable.id -> 1, FruitTable.name -> "Grape", FruitTable.juiciness -> 8)
+      .values(FruitTable.id -> 1, FruitTable.name -> "Banana", FruitTable.juiciness -> 4)
 
   // Write operations must be run in a transaction
   try {
