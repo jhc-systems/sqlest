@@ -3,29 +3,52 @@ package sqlest.examples
 import sqlest._
 
 object InsertExamples extends App with DatabaseExample {
-  lazy val insertStatement =
+  lazy val fruitTableInsertStatement =
     insert
       .into(FruitTable)
       .columns(FruitTable.id, FruitTable.name, FruitTable.juiciness)
       .values(FruitTable.id -> 1, FruitTable.name -> "Watermelon", FruitTable.juiciness -> 10)
-      .values(FruitTable.id -> 1, FruitTable.name -> "Tomato", FruitTable.juiciness -> 9)
-      .values(FruitTable.id -> 1, FruitTable.name -> "Grape", FruitTable.juiciness -> 8)
-      .values(FruitTable.id -> 1, FruitTable.name -> "Banana", FruitTable.juiciness -> 4)
+      .values(FruitTable.id -> 2, FruitTable.name -> "Tomato", FruitTable.juiciness -> 9)
+      .values(FruitTable.id -> 3, FruitTable.name -> "Grape", FruitTable.juiciness -> 8)
+      .values(FruitTable.id -> 4, FruitTable.name -> "Banana", FruitTable.juiciness -> 4)
+
+  lazy val smoothyTableInsertStatement =
+    insert
+      .into(SmoothyTable)
+      .columns(SmoothyTable.id, SmoothyTable.description)
+      .values(SmoothyTable.id -> 1, SmoothyTable.description -> "Watermelon & grape smoothie")
+      .values(SmoothyTable.id -> 2, SmoothyTable.description -> "Super banana smoothie")
+      .values(SmoothyTable.id -> 3, SmoothyTable.description -> "Cranberry & raspberry smoothie")
+
+  lazy val ingredientsTableInsertStatement =
+    insert
+      .into(IngredientsTable)
+      .columns(IngredientsTable.smoothyId, IngredientsTable.fruitId)
+      .values(IngredientsTable.smoothyId -> 1, IngredientsTable.fruitId -> 1)
+      .values(IngredientsTable.smoothyId -> 1, IngredientsTable.fruitId -> 3)
 
   // Write operations must be run in a transaction
   try {
-    insertStatement.execute
+    fruitTableInsertStatement.execute
   } catch {
     case e: AssertionError => println(e.getMessage)
   }
 
   database.withTransaction {
-    val numberInsert = insertStatement.execute
-    println(numberInsert)
+    val fruitTableNumberInsert = fruitTableInsertStatement.execute
+    println(fruitTableNumberInsert)
+    
+    val smoothyTableNumberInsert = smoothyTableInsertStatement.execute
+    println(smoothyTableNumberInsert)
+
+    val ingredientsTableNumberInsert = ingredientsTableInsertStatement.execute
+    println(ingredientsTableNumberInsert)
   }
 
   def insertAll = database.withTransaction {
-    insertStatement.execute
+    fruitTableInsertStatement.execute
+    smoothyTableInsertStatement.execute
+    ingredientsTableInsertStatement.execute
   }
 
 }
