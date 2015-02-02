@@ -12,3 +12,20 @@ lib_managed/
 *.sublime-project
 *.sublime-workspace
 test.*.db
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# Intellij
+.idea/
+*.iml
+*.iws
+
+# Mac
+.DS_Store
+
+# Maven
+log/
+target/
