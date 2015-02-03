@@ -139,7 +139,7 @@ case class Select[A, R <: Relation](
     subselectAlias: Option[String] = None)(implicit val aliasedColumns: AliasedColumns[A]) extends Relation with Query {
 
   if (union.headOption.map(union => union.select.columns.size != columns.size).getOrElse(false))
-    throw new AssertionError("Number of columns in unioned selects does not match. Maybe your extractor has different columns from your query")
+    throw new AssertionError(s"Number of columns (${columns.size} and ${union.head.select.columns.size}) in unioned selects does not match. Maybe your extractor has different columns from your query")
 
   def columns = aliasedColumns.columnList(cols)
 

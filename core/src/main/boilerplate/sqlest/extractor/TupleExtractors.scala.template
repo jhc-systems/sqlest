@@ -21,7 +21,6 @@ import sqlest.untyped._
 
 case class Tuple1Extractor[A1](e1: Extractor[A1]) extends ProductExtractor[Tuple1[A1]] {
   type Accumulator = Tuple1[e1.Accumulator]
-  val columns = e1.columns.distinct
 
   val innerExtractors = List(e1)
 
@@ -34,7 +33,6 @@ case class Tuple1Extractor[A1](e1: Extractor[A1]) extends ProductExtractor[Tuple
 
 [2..22#case class Tuple1Extractor[[#A1#]]([#e1: Extractor[A1]#]) extends ProductExtractor[Tuple1[[#A1#]]] {
   type Accumulator = Tuple1[[#e1.Accumulator#]]
-  val columns = ([#e1.columns# ++]).distinct
 
   val innerExtractors = List([#e1#])
 

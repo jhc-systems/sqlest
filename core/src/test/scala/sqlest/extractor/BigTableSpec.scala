@@ -93,11 +93,11 @@ class BigTableSpec extends FlatSpec with Matchers {
     val col29: Int,
     val col30: Int)
 
-  object DomainClassExtractor extends SingleExtractor[DomainClass] {
+  object DomainClassExtractor extends ProductExtractor[DomainClass] {
     import TableOne._
 
     type Accumulator = DomainClass
-    val columns = List(col1, col2, col3, col4, col5, col6, col7, col8, col9, col10, col11, col12, col13, col14, col15, col16, col17, col18, col19, col20, col21, col22, col23, col24, col25, col26, col27, col28, col29, col30)
+    val innerExtractors = List(extractColumn(col1), extractColumn(col2), extractColumn(col3), extractColumn(col4), extractColumn(col5), extractColumn(col6), extractColumn(col7), extractColumn(col8), extractColumn(col9), extractColumn(col10), extractColumn(col11), extractColumn(col12), extractColumn(col13), extractColumn(col14), extractColumn(col15), extractColumn(col16), extractColumn(col17), extractColumn(col18), extractColumn(col19), extractColumn(col20), extractColumn(col21), extractColumn(col22), extractColumn(col23), extractColumn(col24), extractColumn(col25), extractColumn(col26), extractColumn(col27), extractColumn(col28), extractColumn(col29), extractColumn(col30))
 
     def initialize(row: ResultSet) = read(row)
 

@@ -23,7 +23,7 @@ import sqlest.ast._
 
 sealed trait Extractor[A] {
   type Accumulator
-  def columns: List[AliasedColumn[_]]
+  // def extractors: Seq[Extractor[_]]
 
   type SingleResult
 
@@ -43,7 +43,7 @@ sealed trait Extractor[A] {
   def asOption = OptionExtractor(this)
 }
 
-trait SingleExtractor[A] extends Extractor[A] {
+sealed trait SingleExtractor[A] extends Extractor[A] {
   final type SingleResult = A
 
   final def extractHeadOption(row: ResultSet): Option[A] =
@@ -65,7 +65,7 @@ trait SingleExtractor[A] extends Extractor[A] {
   def groupBy[B](groupBy: Extractor[B]) = GroupedMultiExtractor(this, groupBy)
 }
 
-trait MultiExtractor[A] extends Extractor[List[A]] {
+sealed trait MultiExtractor[A] extends Extractor[List[A]] {
   type Accumulator <: Traversable[_]
 
   final type SingleResult = A
@@ -96,7 +96,6 @@ trait MultiExtractor[A] extends Extractor[List[A]] {
  */
 case class ConstantExtractor[A](value: A) extends SingleExtractor[A] {
   type Accumulator = A
-  val columns = Nil
 
   def initialize(row: ResultSet) = value
   def accumulate(row: ResultSet, accumulator: A) = value
@@ -108,7 +107,6 @@ case class ConstantExtractor[A](value: A) extends SingleExtractor[A] {
  */
 case class ColumnExtractor[A](column: AliasedColumn[A]) extends SingleExtractor[A] {
   type Accumulator = Option[A]
-  val columns = List(column)
 
   def initialize(row: ResultSet) = read(row, column.columnType)
 
@@ -150,7 +148,6 @@ trait ProductExtractor[A <: Product] extends SingleExtractor[A] {
  */
 case class MappedExtractor[A, B](inner: Extractor[A], func: A => B) extends SingleExtractor[B] {
   type Accumulator = inner.Accumulator
-  val columns = inner.columns
 
   def initialize(row: ResultSet) = inner.initialize(row)
 
@@ -168,7 +165,6 @@ case class MappedExtractor[A, B](inner: Extractor[A], func: A => B) extends Sing
  */
 case class OptionExtractor[A](inner: Extractor[A]) extends SingleExtractor[Option[A]] {
   type Accumulator = inner.Accumulator
-  val columns = inner.columns
 
   def initialize(row: ResultSet) = inner.initialize(row)
 
@@ -182,7 +178,6 @@ case class OptionExtractor[A](inner: Extractor[A]) extends SingleExtractor[Optio
  */
 case class SeqExtractor[A](extractors: Seq[Extractor[A]]) extends SingleExtractor[Seq[A]] {
   type Accumulator = Seq[Option[A]]
-  val columns = extractors.flatMap(_.columns).toList
 
   def initialize(row: ResultSet): Accumulator = extractors.map(inner => inner.emit(inner.initialize(row)))
 
@@ -197,7 +192,6 @@ case class SeqExtractor[A](extractors: Seq[Extractor[A]]) extends SingleExtracto
  */
 case class ListMultiExtractor[A](inner: Extractor[A]) extends MultiExtractor[A] {
   type Accumulator = Queue[Option[A]]
-  val columns = inner.columns
 
   def initialize(row: ResultSet) = Queue(inner.emit(inner.initialize(row)))
 
@@ -223,7 +217,6 @@ case class ListMultiExtractor[A](inner: Extractor[A]) extends MultiExtractor[A] 
 case class GroupedMultiExtractor[A, B](inner: Extractor[A], groupBy: Extractor[B]) extends MultiExtractor[A] {
   // Consider using a tuple of a Queue and a HashMap as the Accumulator for efficiency
   type Accumulator = ListMap[B, inner.Accumulator]
-  val columns = (inner.columns ++ groupBy.columns).distinct
 
   def initialize(row: ResultSet) =
     ListMap(checkNullValueAndGet(groupBy.emit(groupBy.initialize(row))) -> inner.initialize(row))

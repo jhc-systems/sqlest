@@ -34,10 +34,23 @@ trait ExecutorSyntax {
       extractHeadOption(extractor).getOrElse(throw new NoSuchElementException("extractHead when no results returned"))
 
     def extractHeadOption(extractor: Extractor[_]): Option[extractor.SingleResult] =
-      database.executeSelect(select.what(extractor.columns))(row => extractor.extractHeadOption(row))
+      database.executeSelect(select.what(extractorColumns(extractor)))(row => extractor.extractHeadOption(row))
 
     def extractAll(extractor: Extractor[_]): List[extractor.SingleResult] =
-      database.executeSelect(select.what(extractor.columns))(row => extractor.extractAll(row))
+      database.executeSelect(select.what(extractorColumns(extractor)))(row => extractor.extractAll(row))
+
+    private def extractorColumns(extractor: Extractor[_]): List[AliasedColumn[_]] = {
+      extractor match {
+        case ConstantExtractor(_) => Nil
+        case ColumnExtractor(column) => List(column)
+        case productExtractor: ProductExtractor[_] => productExtractor.innerExtractors.flatMap(extractorColumns)
+        case MappedExtractor(innerExtractor, _) => extractorColumns(innerExtractor)
+        case OptionExtractor(innerExtractor) => extractorColumns(innerExtractor)
+        case SeqExtractor(extractors) => extractors.flatMap(extractorColumns).toList
+        case ListMultiExtractor(innerExtractor) => extractorColumns(innerExtractor)
+        case GroupedMultiExtractor(innerExtractor, groupByExtractor) => extractorColumns(innerExtractor) ++ extractorColumns(groupByExtractor)
+      }
+    }
   }
 
   implicit class InsertExecutorOps(insert: Insert) {
