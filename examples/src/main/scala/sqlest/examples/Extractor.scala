@@ -30,7 +30,7 @@ object ExtractorExamples extends App with DatabaseExample {
 
   // inner joins can be used as follows
   val smoothies =
-    select(smoothyExtractor.columns)  // Extractors maintain a list of columns they use
+    select
       .from(
         SmoothyTable
           .innerJoin(IngredientsTable).on(SmoothyTable.id === IngredientsTable.smoothyId)
