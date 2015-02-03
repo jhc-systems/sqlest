@@ -33,15 +33,15 @@ object Row {
   implicit class ResultSetRowIterator(resultSet: ResultSet) extends Iterator[Row] {
     private var readNextRow = false
     private var hasNextRow = false
-    val resultSetRow = ResultSetRow(resultSet)
+    private val resultSetRow = ResultSetRow(resultSet)
 
-    def next = {
+    def next: Row = {
       if (!readNextRow) resultSet.next
       readNextRow = false
       resultSetRow
     }
 
-    def hasNext = {
+    def hasNext: Boolean = {
       if (!readNextRow) {
         hasNextRow = resultSet.next
         readNextRow = true

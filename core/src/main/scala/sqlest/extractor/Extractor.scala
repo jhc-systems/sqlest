@@ -116,7 +116,7 @@ case class ColumnExtractor[A](column: AliasedColumn[A]) extends SingleExtractor[
     columnType match {
       case baseColumnType: BaseColumnType[B] => readBaseType(row, baseColumnType)
       case optionColumnType: OptionColumnType[_, _] => optionColumnType.read(readBaseType(row, optionColumnType.baseColumnType))
-      case mappedColumnType: MappedColumnType[B, _] => mappedColumnType.read(readBaseType(row, mappedColumnType.baseColumnType))
+      case mappedColumnType: MappedColumnType[_, _] => mappedColumnType.read(readBaseType(row, mappedColumnType.baseColumnType))
     }
 
   private def readBaseType[B](row: Row, columnType: BaseColumnType[B]): Option[B] = {
