@@ -40,10 +40,6 @@ case class TestResultSet(columns: Seq[AliasedColumn[_]])(rows: Seq[Any]*) extend
     }
   }
 
-  override def isBeforeFirst() = currentRow == -1
-
-  override def isFirst() = currentRow == 0
-
   override def getInt(columnName: String) =
     get[Int](columnName, 0)
 

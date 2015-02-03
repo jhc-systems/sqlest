@@ -38,7 +38,7 @@ class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
   "mapped column extractor" should "extract mapped value" in {
     val extractor = extract(TableSix.trimmedString, TableSix.zeroIsNoneWrappedInt, TableSix.zeroIsNoneDateTime)
 
-    val testResultSet = TestResultSet(TableSix.columns)(
+    def testResultSet = TestResultSet(TableSix.columns)(
       Seq("test", 5, 20150101),
       Seq(" test ", 0, 21000101),
       Seq("   ", 0, 0)

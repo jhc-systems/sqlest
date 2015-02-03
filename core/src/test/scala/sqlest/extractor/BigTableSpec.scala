@@ -17,7 +17,6 @@
 package sqlest
 package extractor
 
-import java.sql.ResultSet
 import org.scalatest._
 import org.scalatest.matchers._
 
@@ -99,13 +98,13 @@ class BigTableSpec extends FlatSpec with Matchers {
     type Accumulator = DomainClass
     val innerExtractors = List(extractColumn(col1), extractColumn(col2), extractColumn(col3), extractColumn(col4), extractColumn(col5), extractColumn(col6), extractColumn(col7), extractColumn(col8), extractColumn(col9), extractColumn(col10), extractColumn(col11), extractColumn(col12), extractColumn(col13), extractColumn(col14), extractColumn(col15), extractColumn(col16), extractColumn(col17), extractColumn(col18), extractColumn(col19), extractColumn(col20), extractColumn(col21), extractColumn(col22), extractColumn(col23), extractColumn(col24), extractColumn(col25), extractColumn(col26), extractColumn(col27), extractColumn(col28), extractColumn(col29), extractColumn(col30))
 
-    def initialize(row: ResultSet) = read(row)
+    def initialize(row: Row) = read(row)
 
-    def accumulate(row: ResultSet, accumulator: DomainClass) = read(row)
+    def accumulate(accumulator: DomainClass, row: Row) = read(row)
 
     def emit(accumulator: DomainClass) = Some(accumulator)
 
-    def read(row: ResultSet) = new DomainClass(
+    def read(row: Row) = new DomainClass(
       col1.emit(col1.initialize(row)).get,
       col2.emit(col2.initialize(row)).get,
       col3.emit(col3.initialize(row)).get,

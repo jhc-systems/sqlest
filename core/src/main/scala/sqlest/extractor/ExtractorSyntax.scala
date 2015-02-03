@@ -16,7 +16,6 @@
 
 package sqlest.extractor
 
-import java.sql.ResultSet
 import org.joda.time.DateTime
 import sqlest.ast._
 
