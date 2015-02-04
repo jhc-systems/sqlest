@@ -21,11 +21,6 @@ import sqlest.ast._
 import scala.language.experimental.macros
 import sqlest.untyped.extractor.syntax.NamedExtractSyntax
 
-trait LowPriorityExtractors {
-  implicit def extractConstant[A](value: A) = ConstantExtractor(value)
-  implicit def extractConstantSeq[A](valueSeq: Seq[A]) = valueSeq.map(ConstantExtractor(_))
-}
-
 case class ColumnExtractor[A](column: AliasedColumn[A]) extends CellExtractor[A] {
   def read(row: Row) =
     column.columnType match {
@@ -45,14 +40,12 @@ case class ColumnExtractor[A](column: AliasedColumn[A]) extends CellExtractor[A]
   }
 }
 
-trait Extractors extends LowPriorityExtractors {
+trait Extractors {
   def extract[A]: Dynamic = macro NamedExtractSyntax.extractImpl[A]
 
-  implicit def extractColumn[A](column: AliasedColumn[A]) =
-    ColumnExtractor(column)
+  def extractConstant[A](value: A) = ConstantExtractor(value)
 
-  implicit def extractSeq[A](columnSeq: Seq[AliasedColumn[A]]): Seq[Extractor[A]] =
-    columnSeq.map(extractColumn)
+  implicit def extractColumn[A](column: AliasedColumn[A]) = ColumnExtractor(column)
 
   def extractColumnByName[A: ColumnType](name: String) =
     extractColumn(AliasColumn[A](null, name))
