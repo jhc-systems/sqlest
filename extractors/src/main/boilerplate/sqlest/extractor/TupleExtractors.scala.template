@@ -49,9 +49,6 @@ case class Tuple1Extractor[A1](e1: Extractor[A1]) extends ProductExtractor[Tuple
 
   def map[B](func: ([#A1#]) => B) =
     MappedExtractor(this, func.tupled)
-
-  def as[B](func: ([#A1#]) => B)(implicit names: ProductNames[B]) =
-    sqlest.untyped.extractor.NamedExtractor(this, func.tupled, names.names)
 }#
 
 ]

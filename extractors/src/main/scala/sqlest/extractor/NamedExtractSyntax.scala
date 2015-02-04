@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-package sqlest.untyped.extractor.syntax
+package sqlest.extractor
 
-import scala.language.experimental.macros
 import scala.reflect.macros.whitebox.Context
-import sqlest.extractor._
 
 case class NamedExtractSyntax(c: Context) {
   import c.universe._
@@ -75,7 +73,7 @@ case class NamedExtractSyntax(c: Context) {
     val tupleAccessors = buildTupleAccessors(applyMethod, tupleArg)
 
     // Build the extractor definitions
-    val namedExtractor = tq"sqlest.untyped.extractor.NamedExtractor[$tupleType, $typeOfA]"
+    val namedExtractor = tq"sqlest.extractor.NamedExtractor[$tupleType, $typeOfA]"
     val tupleExtractor = productExtractorType(extractMappedParams(applyMethod).length)
     val tupleExtractorParams = buildExtractorParams(applyMethod, caseClassParamNames, appliedTypeArgTypes)
 

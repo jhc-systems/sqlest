@@ -39,5 +39,5 @@ package object sqlest extends SqlestCore
   with ScalarFunctionSyntax
   with GroupSyntax
   with TupleGroups
-  with SqlestUntyped
+  with CellExtractorFinderSyntax
   with UntypedColumnSyntax
