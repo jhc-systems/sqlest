@@ -40,7 +40,7 @@ object ExtractorExamples extends App with DatabaseExample {
       .extractAll(smoothyExtractor)
 
   println(smoothies)
-  
+
   def selectAll = {
     select(FruitTable.name, FruitTable.juiciness)
       .from(FruitTable)
