@@ -31,11 +31,9 @@ object ExtractorExamples extends App with DatabaseExample {
   // inner joins can be used as follows
   val smoothies =
     select
-      .from(
-        SmoothyTable
-          .innerJoin(IngredientsTable).on(SmoothyTable.id === IngredientsTable.smoothyId)
-          .innerJoin(FruitTable).on(IngredientsTable.fruitId === FruitTable.id)
-      )
+      .from(SmoothyTable)
+      .innerJoin(IngredientsTable).on(SmoothyTable.id === IngredientsTable.smoothyId)
+      .innerJoin(FruitTable).on(IngredientsTable.fruitId === FruitTable.id)
       .where(SmoothyTable.description === "Watermelon & grape smoothie")
       .extractAll(smoothyExtractor)
 

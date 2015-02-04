@@ -91,11 +91,11 @@ trait Database extends Logging {
     executeOperation(delete)
   }
 
-  private def executeOperation(op: Operation): Int = {
+  private def executeOperation(command: Command): Int = {
     checkInTransaction
-    val preparedStatement = statementBuilder(connection, op)
+    val preparedStatement = statementBuilder(connection, command)
     try {
-      logger.debug(s"Executing " + op.toString)
+      logger.debug(s"Executing command")
       preparedStatement.executeUpdate
     } finally {
       try {

@@ -8,7 +8,7 @@ object DeleteExamples extends App with DatabaseExample {
   val deleteStatement =
     delete
       .from(FruitTable)
-      .where(FruitTable.name === """Banana""")
+      .where(FruitTable.name === "Banana")
 
   // Write operations must be run in a transaction - the below will throw an exception
   try {
