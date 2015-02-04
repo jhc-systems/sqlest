@@ -27,14 +27,14 @@ trait Extractable[A] {
   def extractor(a: A): Extractor[_] { type SingleResult = Out }
 }
 
-object Extractable {
+object Extractable extends Extractors {
   @implicitNotFound("No default extractor for ${A} exists. Pass an extractor to the fetch method")
   type Aux[A, B] = Extractable[A] { type Out = B }
 
   implicit def extractableColumn[C1]: Extractable.Aux[AliasedColumn[C1], C1] =
     new Extractable[AliasedColumn[C1]] {
       type Out = C1
-      def extractor(column: AliasedColumn[C1]) = ColumnExtractor(column)
+      def extractor(column: AliasedColumn[C1]) = extractColumn(column)
     }
 
 [2..22#  implicit def extractableTuple1[[#C1#]]: Extractable.Aux[Tuple1[[#AliasedColumn[C1]#]], Tuple1[[#C1#]]] =

@@ -16,6 +16,7 @@
 
 package sqlest.extractor
 
+import org.joda.time.DateTime
 import sqlest.ast._
 import scala.language.experimental.macros
 import sqlest.untyped.extractor.syntax.NamedExtractSyntax
@@ -25,14 +26,33 @@ trait LowPriorityExtractors {
   implicit def extractConstantSeq[A](valueSeq: Seq[A]) = valueSeq.map(ConstantExtractor(_))
 }
 
+case class ColumnExtractor[A](column: AliasedColumn[A]) extends CellExtractor[A] {
+  def read(row: Row) =
+    column.columnType match {
+      case baseColumnType: BaseColumnType[A] => readRow(row, baseColumnType)
+      case optionColumnType: OptionColumnType[_, _] => optionColumnType.read(readRow(row, optionColumnType.baseColumnType)).asInstanceOf[Option[A]]
+      case mappedColumnType: MappedColumnType[_, _] => mappedColumnType.read(readRow(row, mappedColumnType.baseColumnType))
+    }
+
+  def readRow[B](row: Row, columnType: BaseColumnType[B]): Option[B] = columnType match {
+    case IntColumnType => row.getValue[Int](column.columnAlias)
+    case LongColumnType => row.getValue[Long](column.columnAlias)
+    case DoubleColumnType => row.getValue[Double](column.columnAlias)
+    case BigDecimalColumnType => row.getValue[BigDecimal](column.columnAlias)
+    case BooleanColumnType => row.getValue[Boolean](column.columnAlias)
+    case StringColumnType => row.getValue[String](column.columnAlias)
+    case DateTimeColumnType => row.getValue[DateTime](column.columnAlias)
+  }
+}
+
 trait Extractors extends LowPriorityExtractors {
   def extract[A]: Dynamic = macro NamedExtractSyntax.extractImpl[A]
 
-  implicit def extractColumn[A](column: AliasedColumn[A]): ColumnExtractor[A] =
+  implicit def extractColumn[A](column: AliasedColumn[A]): CellExtractor[A] =
     ColumnExtractor(column)
 
   implicit def extractSeq[A](columnSeq: Seq[AliasedColumn[A]]): Seq[Extractor[A]] =
-    columnSeq.map(ColumnExtractor(_))
+    columnSeq.map(extractColumn)
 
 [2..22#  implicit def extractTuple1[[#A1#]](t: Tuple1[[#AliasedColumn[A1]#]]): Tuple1Extractor[[#A1#]] =
     new Tuple1Extractor[[#A1#]]([#t._1#])#

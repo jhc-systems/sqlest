@@ -18,15 +18,10 @@ package sqlest.extractor
 
 import java.sql.ResultSet
 import org.joda.time.DateTime
+import scala.reflect.runtime.universe._
 
 trait Row {
-  def getBoolean(columnName: String): Option[Boolean]
-  def getInt(columnName: String): Option[Int]
-  def getLong(columnName: String): Option[Long]
-  def getDouble(columnName: String): Option[Double]
-  def getBigDecimal(columnName: String): Option[BigDecimal]
-  def getString(columnName: String): Option[String]
-  def getDateTime(columnName: String): Option[DateTime]
+  def getValue[A: TypeTag](columnName: String): Option[A]
 }
 
 object Row {
@@ -51,16 +46,20 @@ object Row {
   }
 
   case class ResultSetRow(resultSet: ResultSet) extends Row {
-    def checkNull[A](value: A): Option[A] =
+    def getValue[A: TypeTag](columnName: String): Option[A] = (
+      typeOf[A] match {
+        case t if t =:= typeOf[Boolean] => checkNull(resultSet.getBoolean(columnName))
+        case t if t =:= typeOf[Int] => checkNull(resultSet.getInt(columnName))
+        case t if t =:= typeOf[Long] => checkNull(resultSet.getLong(columnName))
+        case t if t =:= typeOf[Double] => checkNull(resultSet.getDouble(columnName))
+        case t if t =:= typeOf[BigDecimal] => Option(resultSet.getBigDecimal(columnName)).map(BigDecimal.apply)
+        case t if t =:= typeOf[String] => checkNull(resultSet.getString(columnName))
+        case t if t =:= typeOf[DateTime] => checkNull(new DateTime(resultSet.getDate(columnName)))
+      }
+    ).asInstanceOf[Option[A]]
+
+    private def checkNull[A](value: A): Option[A] =
       if (!resultSet.wasNull) Some(value)
       else None
-
-    def getBoolean(columnName: String) = checkNull(resultSet.getBoolean(columnName))
-    def getInt(columnName: String) = checkNull(resultSet.getInt(columnName))
-    def getLong(columnName: String) = checkNull(resultSet.getLong(columnName))
-    def getDouble(columnName: String) = checkNull(resultSet.getDouble(columnName))
-    def getBigDecimal(columnName: String) = Option(resultSet.getBigDecimal(columnName)).map(BigDecimal.apply)
-    def getString(columnName: String) = checkNull(resultSet.getString(columnName))
-    def getDateTime(columnName: String) = checkNull(new DateTime(resultSet.getDate(columnName)))
   }
 }

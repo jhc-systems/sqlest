@@ -43,6 +43,7 @@ trait ExecutorSyntax {
       extractor match {
         case ConstantExtractor(_) => Nil
         case ColumnExtractor(column) => List(column)
+        case _: CellExtractor[_] => Nil
         case productExtractor: ProductExtractor[_] => productExtractor.innerExtractors.flatMap(extractorColumns)
         case MappedExtractor(innerExtractor, _) => extractorColumns(innerExtractor)
         case OptionExtractor(innerExtractor) => extractorColumns(innerExtractor)

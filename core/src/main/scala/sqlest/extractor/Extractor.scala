@@ -103,34 +103,16 @@ case class ConstantExtractor[A](value: A) extends SingleExtractor[A] {
 /**
  * Extractor that emits the values for a single `column`.
  */
-case class ColumnExtractor[A](column: AliasedColumn[A]) extends SingleExtractor[A] {
+trait CellExtractor[A] extends SingleExtractor[A] {
   type Accumulator = Option[A]
 
-  def initialize(row: Row) = read(row, column.columnType)
+  def initialize(row: Row) = read(row)
 
-  def accumulate(accumulator: Accumulator, row: Row) = read(row, column.columnType)
+  def accumulate(accumulator: Accumulator, row: Row) = read(row)
 
   def emit(accumulator: Accumulator) = accumulator
 
-  private def read[B](row: Row, columnType: ColumnType[B]): Option[B] =
-    columnType match {
-      case baseColumnType: BaseColumnType[B] => readBaseType(row, baseColumnType)
-      case optionColumnType: OptionColumnType[_, _] => optionColumnType.read(readBaseType(row, optionColumnType.baseColumnType))
-      case mappedColumnType: MappedColumnType[_, _] => mappedColumnType.read(readBaseType(row, mappedColumnType.baseColumnType))
-    }
-
-  private def readBaseType[B](row: Row, columnType: BaseColumnType[B]): Option[B] = {
-    columnType match {
-      case BooleanColumnType => row.getBoolean(column.columnAlias)
-      case IntColumnType => row.getInt(column.columnAlias)
-      case LongColumnType => row.getLong(column.columnAlias)
-      case DoubleColumnType => row.getDouble(column.columnAlias)
-      case BigDecimalColumnType => row.getBigDecimal(column.columnAlias)
-      case StringColumnType => row.getString(column.columnAlias)
-      case DateTimeColumnType => row.getDateTime(column.columnAlias)
-    }
-  }
-
+  def read(row: Row): Option[A]
 }
 
 trait ProductExtractor[A <: Product] extends SingleExtractor[A] {

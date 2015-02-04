@@ -39,9 +39,9 @@ trait ExtractorSyntax extends Extractors {
 
   implicit def columnExtractorBuilder[A] = new ExtractorBuilder[AliasedColumn[A]] {
     type Result = A
-    def apply(column: AliasedColumn[A]) = ColumnExtractor(column)
+    def apply(column: AliasedColumn[A]) = extractColumn(column)
   }
 
-  def extractColumnByName[A: ColumnType](name: String)(implicit builder: ExtractorBuilder[AliasedColumn[A]]): ColumnExtractor[A] =
-    builder(AliasColumn[A](null, name)).asInstanceOf[ColumnExtractor[A]]
+  def extractColumnByName[A: ColumnType](name: String)(implicit builder: ExtractorBuilder[AliasedColumn[A]]): CellExtractor[A] =
+    builder(AliasColumn[A](null, name)).asInstanceOf[CellExtractor[A]]
 }
