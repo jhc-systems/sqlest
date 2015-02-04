@@ -16,7 +16,7 @@ object UpdateExamples extends App with DatabaseExample {
   } catch {
     case e: AssertionError => println(e.getMessage)
   }
-  
+
   database.withTransaction {
     // running execute on the update statement returns the number of lines changed (ie updated)
     val numberInsert = updateStatement.execute

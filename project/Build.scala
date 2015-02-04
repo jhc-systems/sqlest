@@ -13,7 +13,7 @@ object SqlestBuild extends Build {
   lazy val root = Project(
     id = "root",
     base = file("."),
-    aggregate = Seq(core, examples),
+    aggregate = Seq(sqlest, extractors, examples),
     settings = commonSettings ++ Seq(
       moduleName := "root",
 
@@ -22,12 +22,28 @@ object SqlestBuild extends Build {
     )
   )
 
-  lazy val core = Project(
-    id = "core",
-    base = file("core"),
+  lazy val sqlest = Project(
+    id = "sqlest",
+    base = file("sqlest"),
 
     settings = commonSettings ++ publishingSettings ++ scaladocSettings ++ Boilerplate.settings ++ Seq(
       moduleName := "sqlest",
+
+      libraryDependencies ++= Seq(
+        "joda-time" % "joda-time" % "2.3",
+        "org.joda" % "joda-convert" % "1.6",
+        "com.typesafe.scala-logging" %% "scala-logging-slf4j" % "2.1.2",
+        "org.scalatest" %% "scalatest" % "2.2.1" % "test"
+      )
+    )
+  ).dependsOn(extractors)
+
+  lazy val extractors = Project(
+    id = "extractors",
+    base = file("extractors"),
+
+    settings = commonSettings ++ publishingSettings ++ scaladocSettings ++ Boilerplate.settings ++ Seq(
+      moduleName := "sqlest-extractors",
 
       libraryDependencies ++= Seq(
         "joda-time" % "joda-time" % "2.3",
@@ -41,7 +57,6 @@ object SqlestBuild extends Build {
   lazy val examples = Project(
     id = "examples",
     base = file("examples"),
-    dependencies = Seq(core),
 
     settings = commonSettings ++ Seq(
       libraryDependencies += "com.h2database" % "h2" % "1.4.180",
@@ -49,7 +64,7 @@ object SqlestBuild extends Build {
       publish := (),
       publishLocal := ()
     )
-  )
+  ).dependsOn(sqlest)
 
   def commonSettings = SbtScalariform.scalariformSettings ++ Seq(
     organization := "uk.co.jhc",

@@ -101,7 +101,7 @@ case class ConstantExtractor[A](value: A) extends SingleExtractor[A] {
 }
 
 /**
- * Extractor that emits the values for a single `column`.
+ * Extractor that emits the values for a single cell.
  */
 trait CellExtractor[A] extends SingleExtractor[A] {
   type Accumulator = Option[A]
