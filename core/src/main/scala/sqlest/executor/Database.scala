@@ -83,15 +83,15 @@ trait Database extends Logging {
     }
   }
 
-  def executeUpdate(update: Update): Int = {
+  def executeCommand(update: Update): Int = {
     executeOperation(update)
   }
 
-  def executeDelete(delete: Delete): Int = {
+  def executeCommand(delete: Delete): Int = {
     executeOperation(delete)
   }
 
-  private def executeOperation(command: Command): Int = {
+  private def executeCommand(command: Command): Int = {
     checkInTransaction
     val preparedStatement = statementBuilder(connection, command)
     try {
