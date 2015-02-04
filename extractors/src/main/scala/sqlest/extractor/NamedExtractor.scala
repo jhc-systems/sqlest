@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package sqlest.untyped.syntax
+package sqlest.extractor
 
-import sqlest.extractor._
-import sqlest.untyped._
+class NamedExtractor[A, B](inner: Extractor[A], func: A => B, val names: List[String]) extends MappedExtractor[A, B](inner, func) {
+  override def toString = s"NamedExtractor($inner,$func,$names)"
+}
 
-trait CellExtractorFinderSyntax {
-  implicit class CellExtractorFinderOps[A](extractor: Extractor[A]) {
-    def findCellExtractor(path: String) = CellExtractorFinder(extractor, path)
-  }
+object NamedExtractor {
+  def apply[A, B](inner: Extractor[A], func: A => B, names: List[String]) =
+    new NamedExtractor(inner, func, names)
+
+  def unapply[A, B](in: NamedExtractor[A, B]) =
+    Some((in.inner, in.func))
 }

@@ -14,15 +14,10 @@
  * limitations under the License.
  */
 
-package sqlest.untyped
+package sqlest.extractor
 
-import sqlest.extractor._
-import sqlest.untyped.extractor.syntax.NamedExtractSyntax
-import sqlest.untyped.syntax.CellExtractorFinderSyntax
-
-trait SqlestUntyped extends CellExtractorFinderSyntax {
-  val CellExtractorFinder = sqlest.untyped.CellExtractorFinder
-
-  type ProductNames[A] = sqlest.untyped.ProductNames[A]
-  val ProductNames = sqlest.untyped.ProductNames
+trait CellExtractorFinderSyntax {
+  implicit class CellExtractorFinderOps[A](extractor: Extractor[A]) {
+    def findCellExtractor(path: String) = CellExtractorFinder(extractor, path)
+  }
 }

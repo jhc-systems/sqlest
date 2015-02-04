@@ -17,7 +17,6 @@
 package sqlest.extractor
 
 import scala.language.experimental.macros
-import sqlest.untyped.extractor.syntax.NamedExtractSyntax
 
 trait Extractors {
   def extract[A]: Dynamic = macro NamedExtractSyntax.extractImpl[A]

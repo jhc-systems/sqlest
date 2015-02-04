@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package sqlest.untyped
+package sqlest.extractor
 
-import sqlest.extractor._
-import sqlest.untyped.extractor._
 import scala.util.Try
 
 object CellExtractorFinder {
