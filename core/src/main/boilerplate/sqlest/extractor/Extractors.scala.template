@@ -48,19 +48,22 @@ case class ColumnExtractor[A](column: AliasedColumn[A]) extends CellExtractor[A]
 trait Extractors extends LowPriorityExtractors {
   def extract[A]: Dynamic = macro NamedExtractSyntax.extractImpl[A]
 
-  implicit def extractColumn[A](column: AliasedColumn[A]): CellExtractor[A] =
+  implicit def extractColumn[A](column: AliasedColumn[A]) =
     ColumnExtractor(column)
 
   implicit def extractSeq[A](columnSeq: Seq[AliasedColumn[A]]): Seq[Extractor[A]] =
     columnSeq.map(extractColumn)
+
+  def extractColumnByName[A: ColumnType](name: String) =
+    extractColumn(AliasColumn[A](null, name))
 
 [2..22#  implicit def extractTuple1[[#A1#]](t: Tuple1[[#AliasedColumn[A1]#]]): Tuple1Extractor[[#A1#]] =
     new Tuple1Extractor[[#A1#]]([#t._1#])#
 
 ]
 
-[2..22#  def extract[[#A1#]]([#a1: A1#])(implicit [#b1: ExtractorBuilder[A1]#]) =
-    new Tuple1Extractor[[#b1.Result#]]([#b1(a1)#])#
+[2..22#  def extract[[#A1#]]([#e1: Extractor[A1]#]) =
+    new Tuple1Extractor[[#A1#]]([#e1#])#
 
 ]
 }

@@ -20,7 +20,7 @@ import scala.language.experimental.macros
 import scala.reflect.macros.whitebox.Context
 import sqlest.extractor._
 
-case class NamedExtractSyntax(c: Context) extends ExtractorSyntax {
+case class NamedExtractSyntax(c: Context) {
   import c.universe._
   import definitions._
 

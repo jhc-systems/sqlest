@@ -26,7 +26,7 @@ package object sqlest extends SqlestCore
   with ColumnSyntax
   with JoinSyntax
   with OrderSyntax
-  with ExtractorSyntax
+  with Extractors
   with ExecutorSyntax
   with MappedColumnTypes
   with TableFunctions
