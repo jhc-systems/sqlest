@@ -83,25 +83,27 @@ trait Database extends Logging {
     }
   }
 
-  def executeCommand(update: Update): Int = {
-    executeOperation(update)
+  def executeUpdate(update: Update): Int = {
+    executeCommand(update)
   }
 
-  def executeCommand(delete: Delete): Int = {
-    executeOperation(delete)
+  def executeDelete(delete: Delete): Int = {
+    executeCommand(delete)
   }
 
   private def executeCommand(command: Command): Int = {
     checkInTransaction
-    val preparedStatement = statementBuilder(connection, command)
-    try {
-      logger.debug(s"Executing command")
-      preparedStatement.executeUpdate
-    } finally {
+    executeWithConnection { connection =>
+      val preparedStatement = statementBuilder(connection, command)
       try {
-        if (preparedStatement != null) preparedStatement.close
-      } catch {
-        case e: SQLException =>
+        logger.debug(s"Executing command")
+        preparedStatement.executeUpdate
+      } finally {
+        try {
+          if (preparedStatement != null) preparedStatement.close
+        } catch {
+          case e: SQLException =>
+        }
       }
     }
   }
