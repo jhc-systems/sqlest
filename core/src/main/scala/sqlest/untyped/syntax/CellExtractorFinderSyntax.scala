@@ -19,8 +19,8 @@ package sqlest.untyped.syntax
 import sqlest.extractor._
 import sqlest.untyped._
 
-trait ColumnFinderSyntax {
-  implicit class ColumnFinderOps[A](extractor: Extractor[A]) {
-    def findColumn(path: String) = ColumnFinder(extractor, path)
+trait CellExtractorFinderSyntax {
+  implicit class CellExtractorFinderOps[A](extractor: Extractor[A]) {
+    def findColumn(path: String) = CellExtractorFinder(extractor, path)
   }
 }

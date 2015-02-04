@@ -19,10 +19,10 @@ package sqlest.untyped
 import sqlest.extractor._
 import sqlest.untyped.ast.syntax.ColumnSyntax
 import sqlest.untyped.extractor.syntax.NamedExtractSyntax
-import sqlest.untyped.syntax.ColumnFinderSyntax
+import sqlest.untyped.syntax.CellExtractorFinderSyntax
 
-trait SqlestUntyped extends ColumnSyntax with ColumnFinderSyntax {
-  val ColumnFinder = sqlest.untyped.ColumnFinder
+trait SqlestUntyped extends ColumnSyntax with CellExtractorFinderSyntax {
+  val CellExtractorFinder = sqlest.untyped.CellExtractorFinder
 
   type ProductNames[A] = sqlest.untyped.ProductNames[A]
   val ProductNames = sqlest.untyped.ProductNames

@@ -71,8 +71,8 @@ class NamedExtractSyntaxSpec extends FlatSpec with Matchers with PathDependenceT
   }
 
   it should "support findColumn syntax" in {
-    simpleExtractor.findColumn("a") should equal(Some(TableOne.col1))
-    simpleExtractor.findColumn("b") should equal(Some(TableOne.col2))
+    simpleExtractor.findColumn("a") should equal(Some(extractColumn(TableOne.col1)))
+    simpleExtractor.findColumn("b") should equal(Some(extractColumn(TableOne.col2)))
     simpleExtractor.findColumn("c") should equal(None)
   }
 
@@ -91,8 +91,8 @@ class NamedExtractSyntaxSpec extends FlatSpec with Matchers with PathDependenceT
   }
 
   it should "support findColumn syntax" in {
-    nestedExtractor.findColumn("one.a") should equal(Some(TableOne.col1))
-    nestedExtractor.findColumn("two.b") should equal(Some(TableTwo.col3))
+    nestedExtractor.findColumn("one.a") should equal(Some(extractColumn(TableOne.col1)))
+    nestedExtractor.findColumn("two.b") should equal(Some(extractColumn(TableTwo.col3)))
     nestedExtractor.findColumn("two.c") should equal(None)
   }
 

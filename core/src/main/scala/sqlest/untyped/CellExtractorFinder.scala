@@ -21,19 +21,19 @@ import sqlest.extractor._
 import sqlest.untyped.extractor._
 import scala.util.Try
 
-object ColumnFinder {
-  def apply(extractor: Extractor[_], path: String): Option[AliasedColumn[_]] = {
+object CellExtractorFinder {
+  def apply(extractor: Extractor[_], path: String): Option[CellExtractor[_]] = {
     path.trim match {
       case "" => apply(extractor, Nil)
       case str => apply(extractor, path.split("\\.").toList)
     }
   }
 
-  def apply(extractor: Extractor[_], path: List[String]): Option[AliasedColumn[_]] = {
+  def apply(extractor: Extractor[_], path: List[String]): Option[CellExtractor[_]] = {
     extractor match {
-      case ColumnExtractor(column) =>
+      case cellExtractor: CellExtractor[_] =>
         path match {
-          case Nil => Some(column)
+          case Nil => Some(cellExtractor)
           case _ => None
         }
 
@@ -49,6 +49,14 @@ object ColumnFinder {
           case _ => None
         }
 
+      case ConstantExtractor(_) => None
+
+      case SeqExtractor(extractors) =>
+        path match {
+          case StringToInt(index) :: tail => apply(extractors(index), tail)
+          case _ => None
+        }
+
       case MappedExtractor(inner, _) =>
         apply(inner, path)
 
@@ -60,8 +68,6 @@ object ColumnFinder {
 
       case GroupedMultiExtractor(inner, _) =>
         apply(inner, path)
-
-      case other => sys.error(s"Unsupported extractor type: $other")
     }
   }
 
