@@ -18,8 +18,6 @@ package sqlest.extractor
 
 import org.joda.time.DateTime
 import sqlest.ast._
-import scala.language.experimental.macros
-import sqlest.untyped.extractor.syntax.NamedExtractSyntax
 
 case class ColumnExtractor[A](column: AliasedColumn[A]) extends CellExtractor[A] {
   def read(row: Row) =
@@ -30,33 +28,23 @@ case class ColumnExtractor[A](column: AliasedColumn[A]) extends CellExtractor[A]
     }
 
   def readRow[B](row: Row, columnType: BaseColumnType[B]): Option[B] = columnType match {
-    case IntColumnType => row.getValue[Int](column.columnAlias)
-    case LongColumnType => row.getValue[Long](column.columnAlias)
-    case DoubleColumnType => row.getValue[Double](column.columnAlias)
-    case BigDecimalColumnType => row.getValue[BigDecimal](column.columnAlias)
-    case BooleanColumnType => row.getValue[Boolean](column.columnAlias)
-    case StringColumnType => row.getValue[String](column.columnAlias)
-    case DateTimeColumnType => row.getValue[DateTime](column.columnAlias)
+    case IntColumnType => row.cellValue[Int](column.columnAlias)
+    case LongColumnType => row.cellValue[Long](column.columnAlias)
+    case DoubleColumnType => row.cellValue[Double](column.columnAlias)
+    case BigDecimalColumnType => row.cellValue[BigDecimal](column.columnAlias)
+    case BooleanColumnType => row.cellValue[Boolean](column.columnAlias)
+    case StringColumnType => row.cellValue[String](column.columnAlias)
+    case DateTimeColumnType => row.cellValue[DateTime](column.columnAlias)
   }
 }
 
-trait Extractors {
-  def extract[A]: Dynamic = macro NamedExtractSyntax.extractImpl[A]
-
-  def extractConstant[A](value: A) = ConstantExtractor(value)
-
+trait ColumnExtractors {
   implicit def extractColumn[A](column: AliasedColumn[A]) = ColumnExtractor(column)
 
   def extractColumnByName[A: ColumnType](name: String) =
     extractColumn(AliasColumn[A](null, name))
 
-[2..22#  implicit def extractTuple1[[#A1#]](t: Tuple1[[#AliasedColumn[A1]#]]): Tuple1Extractor[[#A1#]] =
-    new Tuple1Extractor[[#A1#]]([#t._1#])#
-
-]
-
-[2..22#  def extract[[#A1#]]([#e1: Extractor[A1]#]) =
-    new Tuple1Extractor[[#A1#]]([#e1#])#
-
-]
+  implicit def columnExtractorBuilder[A] = new ExtractorBuilder[AliasedColumn[A], A] {
+    def apply(column: AliasedColumn[A]) = ColumnExtractor(column)
+  }
 }

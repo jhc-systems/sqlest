@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package sqlest.untyped.extractor
+package sqlest.untyped
 
-import sqlest.ast._
 import sqlest.extractor._
+import sqlest.untyped.extractor.syntax.NamedExtractSyntax
+import sqlest.untyped.syntax.CellExtractorFinderSyntax
 
-class NamedExtractor[A, B](inner: Extractor[A], func: A => B, val names: List[String]) extends MappedExtractor[A, B](inner, func) {
-  override def toString = s"NamedExtractor($inner,$func,$names)"
-}
+trait SqlestUntyped extends CellExtractorFinderSyntax {
+  val CellExtractorFinder = sqlest.untyped.CellExtractorFinder
 
-object NamedExtractor {
-  def apply[A, B](inner: Extractor[A], func: A => B, names: List[String]) =
-    new NamedExtractor(inner, func, names)
-
-  def unapply[A, B](in: NamedExtractor[A, B]) =
-    Some((in.inner, in.func))
+  type ProductNames[A] = sqlest.untyped.ProductNames[A]
+  val ProductNames = sqlest.untyped.ProductNames
 }

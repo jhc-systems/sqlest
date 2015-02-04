@@ -18,7 +18,6 @@ package sqlest.extractor
 
 import org.joda.time.DateTime
 import scala.collection.immutable.{ Queue, ListMap }
-import sqlest.ast._
 
 sealed trait Extractor[A] {
   type Accumulator

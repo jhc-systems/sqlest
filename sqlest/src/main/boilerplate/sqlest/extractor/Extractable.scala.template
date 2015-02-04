@@ -27,7 +27,7 @@ trait Extractable[A] {
   def extractor(a: A): Extractor[_] { type SingleResult = Out }
 }
 
-object Extractable extends Extractors {
+object Extractable extends ColumnExtractors {
   @implicitNotFound("No default extractor for ${A} exists. Pass an extractor to the fetch method")
   type Aux[A, B] = Extractable[A] { type Out = B }
 

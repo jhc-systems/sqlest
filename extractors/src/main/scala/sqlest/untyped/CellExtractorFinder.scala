@@ -16,7 +16,6 @@
 
 package sqlest.untyped
 
-import sqlest.ast._
 import sqlest.extractor._
 import sqlest.untyped.extractor._
 import scala.util.Try

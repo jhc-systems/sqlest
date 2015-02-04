@@ -72,7 +72,7 @@ class UntypedColumnHelpers {
 
 }
 
-trait ColumnSyntax {
+trait UntypedColumnSyntax {
   implicit class UntypedColumnOps(left: Column[_]) {
     val helpers = new UntypedColumnHelpers
 

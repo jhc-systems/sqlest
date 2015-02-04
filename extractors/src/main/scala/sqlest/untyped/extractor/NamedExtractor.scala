@@ -14,30 +14,18 @@
  * limitations under the License.
  */
 
-import sqlest.ast._
-import sqlest.ast.operations._
-import sqlest.ast.syntax._
-import sqlest.executor._
-import sqlest.extractor._
-import sqlest.untyped._
-import sqlest.untyped.ast.syntax._
+package sqlest.untyped.extractor
 
-package object sqlest extends SqlestCore
-  with QuerySyntax
-  with ColumnSyntax
-  with JoinSyntax
-  with OrderSyntax
-  with Extractors
-  with ColumnExtractors
-  with ExecutorSyntax
-  with MappedColumnTypes
-  with TableFunctions
-  with ScalarFunctions
-  with AggregateFunctionSyntax
-  with OlapFunctionSyntax
-  with CaseSyntax
-  with ScalarFunctionSyntax
-  with GroupSyntax
-  with TupleGroups
-  with SqlestUntyped
-  with UntypedColumnSyntax
+import sqlest.extractor._
+
+class NamedExtractor[A, B](inner: Extractor[A], func: A => B, val names: List[String]) extends MappedExtractor[A, B](inner, func) {
+  override def toString = s"NamedExtractor($inner,$func,$names)"
+}
+
+object NamedExtractor {
+  def apply[A, B](inner: Extractor[A], func: A => B, names: List[String]) =
+    new NamedExtractor(inner, func, names)
+
+  def unapply[A, B](in: NamedExtractor[A, B]) =
+    Some((in.inner, in.func))
+}

@@ -21,7 +21,7 @@ import org.joda.time.DateTime
 import scala.reflect.runtime.universe._
 
 trait Row {
-  def getValue[A: TypeTag](columnName: String): Option[A]
+  def cellValue[A: TypeTag](name: String): Option[A]
 }
 
 object Row {
@@ -46,15 +46,15 @@ object Row {
   }
 
   case class ResultSetRow(resultSet: ResultSet) extends Row {
-    def getValue[A: TypeTag](columnName: String): Option[A] = (
+    def cellValue[A: TypeTag](name: String): Option[A] = (
       typeOf[A] match {
-        case t if t =:= typeOf[Boolean] => checkNull(resultSet.getBoolean(columnName))
-        case t if t =:= typeOf[Int] => checkNull(resultSet.getInt(columnName))
-        case t if t =:= typeOf[Long] => checkNull(resultSet.getLong(columnName))
-        case t if t =:= typeOf[Double] => checkNull(resultSet.getDouble(columnName))
-        case t if t =:= typeOf[BigDecimal] => Option(resultSet.getBigDecimal(columnName)).map(BigDecimal.apply)
-        case t if t =:= typeOf[String] => checkNull(resultSet.getString(columnName))
-        case t if t =:= typeOf[DateTime] => checkNull(new DateTime(resultSet.getDate(columnName)))
+        case t if t =:= typeOf[Boolean] => checkNull(resultSet.getBoolean(name))
+        case t if t =:= typeOf[Int] => checkNull(resultSet.getInt(name))
+        case t if t =:= typeOf[Long] => checkNull(resultSet.getLong(name))
+        case t if t =:= typeOf[Double] => checkNull(resultSet.getDouble(name))
+        case t if t =:= typeOf[BigDecimal] => Option(resultSet.getBigDecimal(name)).map(BigDecimal.apply)
+        case t if t =:= typeOf[String] => checkNull(resultSet.getString(name))
+        case t if t =:= typeOf[DateTime] => checkNull(new DateTime(resultSet.getDate(name)))
       }
     ).asInstanceOf[Option[A]]
 
