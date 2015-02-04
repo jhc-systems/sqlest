@@ -18,10 +18,9 @@ package sqlest.extractor
 
 /**
  * Function capable of building an extractor of type `B` from a value of type `A`.
- * `A` is typically a column or another extractor.
  *
- * We use this in `Extractors` to allow us to build large extractors from
- * mixed tuples of columns and extractors.
+ * We use this in `Extractors` to allow us to build TupleExtractors from
+ * mixed tuples of non-extractors and extractors.
  */
 trait ExtractorBuilder[-A, B] {
   def apply(preExtractor: A): Extractor[B]

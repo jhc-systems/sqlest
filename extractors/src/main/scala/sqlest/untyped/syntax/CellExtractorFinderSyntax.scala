@@ -21,6 +21,6 @@ import sqlest.untyped._
 
 trait CellExtractorFinderSyntax {
   implicit class CellExtractorFinderOps[A](extractor: Extractor[A]) {
-    def findColumn(path: String) = CellExtractorFinder(extractor, path)
+    def findCellExtractor(path: String) = CellExtractorFinder(extractor, path)
   }
 }

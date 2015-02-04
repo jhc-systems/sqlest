@@ -132,10 +132,10 @@ case class MappedExtractor[A, B](inner: Extractor[A], func: A => B) extends Sing
 }
 
 /**
- * An extractor that returns `None` if all of the columns in the
- * `inner` extractor are `null` in the Row.
+ * An extractor that returns `None` if all of the cells in the
+ * `inner` extractor are `null` in the row.
  *
- * If any underlying column is non-`null`, this returns `Some`
+ * If any underlying cell is non-`null`, this returns `Some`
  * of `inner`'s result.
  */
 case class OptionExtractor[A](inner: Extractor[A]) extends SingleExtractor[Option[A]] {

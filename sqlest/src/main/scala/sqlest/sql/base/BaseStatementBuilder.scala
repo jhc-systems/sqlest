@@ -76,7 +76,7 @@ trait BaseStatementBuilder {
   }
 
   def columnSql(column: Column[_]): String =
-    // findColumnInRelation(column).getOrElse(
+    // findCellExtractorInRelation(column).getOrElse(
     column match {
       case LiteralColumn(literal) => literalSql(literal)
       case column: ConstantColumn[_] => constantSql(column.columnType, column.value)

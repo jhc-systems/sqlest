@@ -70,10 +70,10 @@ class NamedExtractSyntaxSpec extends FlatSpec with Matchers with PathDependenceT
     ))
   }
 
-  it should "support findColumn syntax" in {
-    simpleExtractor.findColumn("a") should equal(Some(extractColumn(TableOne.col1)))
-    simpleExtractor.findColumn("b") should equal(Some(extractColumn(TableOne.col2)))
-    simpleExtractor.findColumn("c") should equal(None)
+  it should "support findCellExtractor syntax" in {
+    simpleExtractor.findCellExtractor("a") should equal(Some(extractColumn(TableOne.col1)))
+    simpleExtractor.findCellExtractor("b") should equal(Some(extractColumn(TableOne.col2)))
+    simpleExtractor.findCellExtractor("c") should equal(None)
   }
 
   "nested extract" should "have the correct extractHeadOption behaviour" in {
@@ -90,10 +90,10 @@ class NamedExtractSyntaxSpec extends FlatSpec with Matchers with PathDependenceT
     ))
   }
 
-  it should "support findColumn syntax" in {
-    nestedExtractor.findColumn("one.a") should equal(Some(extractColumn(TableOne.col1)))
-    nestedExtractor.findColumn("two.b") should equal(Some(extractColumn(TableTwo.col3)))
-    nestedExtractor.findColumn("two.c") should equal(None)
+  it should "support findCellExtractor syntax" in {
+    nestedExtractor.findCellExtractor("one.a") should equal(Some(extractColumn(TableOne.col1)))
+    nestedExtractor.findCellExtractor("two.b") should equal(Some(extractColumn(TableTwo.col3)))
+    nestedExtractor.findCellExtractor("two.c") should equal(None)
   }
 
   "general namedExtract" should "work for case classes with one field" in {
