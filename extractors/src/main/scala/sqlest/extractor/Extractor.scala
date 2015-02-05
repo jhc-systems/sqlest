@@ -122,7 +122,7 @@ trait ProductExtractor[A <: Product] extends SingleRowExtractor[A] {
 }
 
 /**
- * Add ProductExtractorNames to a ProductExtractorOptionally to allow
+ * Add ProductExtractorNames to a ProductExtractor to allow
  * inner extractors to be found by name
  */
 trait ProductExtractorNames {
