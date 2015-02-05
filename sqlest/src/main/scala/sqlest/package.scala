@@ -27,7 +27,7 @@ package object sqlest extends SqlestCore
   with ColumnSyntax
   with JoinSyntax
   with OrderSyntax
-  with Extractors
+  with ExtractorSyntax
   with ColumnExtractors
   with ExecutorSyntax
   with MappedColumnTypes
@@ -39,5 +39,4 @@ package object sqlest extends SqlestCore
   with ScalarFunctionSyntax
   with GroupSyntax
   with TupleGroups
-  with CellExtractorFinderSyntax
   with UntypedColumnSyntax

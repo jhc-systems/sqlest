@@ -21,7 +21,7 @@ import sqlest.extractor.TestResultSet
 import org.scalatest._
 import org.scalatest.matchers._
 
-// TODO: The NamedExtractSyntax macro has issues with path-dependent types.
+// TODO: The CaseClassExtractorMacro macro has issues with path-dependent types.
 // We don't use path dependent types in our production codebase, so we've
 // decided not to address this for now. This test data feeds a pending
 // test case below that illustrates the problem:
@@ -31,7 +31,7 @@ trait PathDependenceTestData {
   case class PathDependentOneTwo(one: PathDependentOne, two: PathDependentTwo)
 }
 
-class NamedExtractSyntaxSpec extends FlatSpec with Matchers with PathDependenceTestData {
+class CaseClassExtractorMacroSpec extends FlatSpec with Matchers with PathDependenceTestData {
   import TestData._
 
   // TODO: We can't currently inherit from TestData here

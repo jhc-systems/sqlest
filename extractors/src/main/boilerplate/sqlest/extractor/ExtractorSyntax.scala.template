@@ -16,8 +16,19 @@
 
 package sqlest.extractor
 
-trait CellExtractorFinderSyntax {
-  implicit class CellExtractorFinderOps[A](extractor: Extractor[A]) {
-    def findCellExtractor(path: String) = CellExtractorFinder(extractor, path)
-  }
+import scala.language.experimental.macros
+
+trait ExtractorSyntax {
+  def extract[A]: Dynamic = macro CaseClassExtractorMacro.apply[A]
+
+  def extractConstant[A](value: A) = ConstantExtractor(value)
+
+[2..22#  implicit def extractTuple1[[#A1#], [#B1#]](t: Tuple1[[#A1#]])(implicit [#b1: ExtractorBuilder[A1, B1]#]) =
+    new Tuple1Extractor[[#B1#]]([#b1(t._1)#])#
+
+]
+[2..22#  implicit def extract[[#A1#], [#B1#]]([#a1: A1#])(implicit [#b1: ExtractorBuilder[A1, B1]#]) =
+    new Tuple1Extractor[[#B1#]]([#b1(a1)#])#
+
+]
 }

@@ -48,8 +48,8 @@ trait ExecutorSyntax {
         case MappedExtractor(innerExtractor, _) => extractorColumns(innerExtractor)
         case OptionExtractor(innerExtractor) => extractorColumns(innerExtractor)
         case SeqExtractor(extractors) => extractors.flatMap(extractorColumns).toList
-        case ListMultiExtractor(innerExtractor) => extractorColumns(innerExtractor)
-        case GroupedMultiExtractor(innerExtractor, groupByExtractor) => extractorColumns(innerExtractor) ++ extractorColumns(groupByExtractor)
+        case ListMultiRowExtractor(innerExtractor) => extractorColumns(innerExtractor)
+        case GroupedMultiRowExtractor(innerExtractor, groupByExtractor) => extractorColumns(innerExtractor) ++ extractorColumns(groupByExtractor)
       }
     }
   }

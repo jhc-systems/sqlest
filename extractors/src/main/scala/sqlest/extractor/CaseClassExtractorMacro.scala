@@ -18,7 +18,7 @@ package sqlest.extractor
 
 import scala.reflect.macros.whitebox.Context
 
-case class NamedExtractSyntax(c: Context) {
+case class CaseClassExtractorMacro(c: Context) {
   import c.universe._
   import definitions._
 
@@ -28,7 +28,7 @@ case class NamedExtractSyntax(c: Context) {
    */
   val repeatedParamClass = RepeatedParamClass
 
-  def extractImpl[A: c.WeakTypeTag] = {
+  def apply[A: c.WeakTypeTag] = {
     // Extract useful information from the type A:
     val typeOfA = weakTypeOf[A]
     val typeArgs = typeOfA.dealias.typeArgs
@@ -73,18 +73,17 @@ case class NamedExtractSyntax(c: Context) {
     val tupleAccessors = buildTupleAccessors(applyMethod, tupleArg)
 
     // Build the extractor definitions
-    val namedExtractor = tq"sqlest.extractor.NamedExtractor[$tupleType, $typeOfA]"
     val tupleExtractor = productExtractorType(extractMappedParams(applyMethod).length)
     val tupleExtractorParams = buildExtractorParams(applyMethod, caseClassParamNames, appliedTypeArgTypes)
 
     q"""
-        def apply(..$applyParams) =
-          new $namedExtractor(
-            new $tupleExtractor(..$tupleExtractorParams),
-            ($tupleArg: $tupleType) => $companion.$applyMethod(..$tupleAccessors),
-            List(..$caseClassParamStrings)
-          )
-      """
+      def apply(..$applyParams) = new sqlest.extractor.MappedExtractor(
+        new $tupleExtractor(..$tupleExtractorParams) with sqlest.extractor.ProductExtractorNames {
+          val innerExtractorNames = List(..$caseClassParamStrings)
+        },
+        (arg: $tupleType) => $companion.$applyMethod(..$tupleAccessors)
+      )
+    """
   }
 
   def extractMappedParams[B](applyMethod: MethodSymbol, f: TermSymbol => B = identity[TermSymbol](_)): List[B] = {
