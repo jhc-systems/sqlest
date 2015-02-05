@@ -37,7 +37,7 @@ object InsertExamples extends App with DatabaseExample {
   database.withTransaction {
     val fruitTableNumberInsert = fruitTableInsertStatement.execute
     println(fruitTableNumberInsert)
-    
+
     val smoothyTableNumberInsert = smoothyTableInsertStatement.execute
     println(smoothyTableNumberInsert)
 

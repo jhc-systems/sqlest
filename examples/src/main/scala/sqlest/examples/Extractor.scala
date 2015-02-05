@@ -21,7 +21,7 @@ object ExtractorExamples extends App with DatabaseExample {
     name = FruitTable.name,
     juiciness = FruitTable.juiciness
   )
-  
+
   def selectAll = {
     select(FruitTable.name, FruitTable.juiciness)
       .from(FruitTable)
