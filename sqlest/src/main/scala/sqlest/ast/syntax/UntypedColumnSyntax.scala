@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package sqlest.untyped.ast.syntax
+package sqlest.ast.syntax
 
 import org.joda.time.DateTime
 import scala.reflect.runtime.{ universe => ru }
 import scala.util.Try
 import sqlest.ast._
 import sqlest.ast.syntax._
-import sqlest.untyped.ast._
+import sqlest.util.Iso8601
 
 class UntypedColumnHelpers extends ColumnSyntax {
   def stringArgument(arg: String) = Some(arg)

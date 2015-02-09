@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package sqlest.untyped.ast
+package sqlest.util
 
 import org.joda.time._
 import org.joda.time.format._

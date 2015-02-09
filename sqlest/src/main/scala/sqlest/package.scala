@@ -15,28 +15,36 @@
  */
 
 import sqlest.ast._
-import sqlest.ast.operations._
 import sqlest.ast.syntax._
 import sqlest.executor._
 import sqlest.extractor._
-import sqlest.untyped._
-import sqlest.untyped.ast.syntax._
 
-package object sqlest extends SqlestCore
-  with QuerySyntax
-  with ColumnSyntax
-  with JoinSyntax
-  with OrderSyntax
-  with ExtractorSyntax[java.sql.ResultSet]
-  with ColumnExtractorSyntax
-  with ExecutorSyntax
-  with MappedColumnTypes
-  with TableFunctions
-  with ScalarFunctions
-  with AggregateFunctionSyntax
-  with OlapFunctionSyntax
-  with CaseSyntax
-  with ScalarFunctionSyntax
-  with GroupSyntax
-  with TupleGroups
-  with UntypedColumnSyntax
+package object sqlest
+    // sqlest.ast
+    extends MappedColumnTypes
+    with ScalarFunctions
+    with TableFunctions
+    with TupleGroups
+    // sqlest.ast.syntax
+    with QuerySyntax
+    with ColumnSyntax
+    with JoinSyntax
+    with OrderSyntax
+    with GroupSyntax
+    with CaseSyntax
+    with ScalarFunctionSyntax
+    with AggregateFunctionSyntax
+    with OlapFunctionSyntax
+    with UntypedColumnSyntax
+    // sqlest.extractor
+    with ExtractorSyntax[java.sql.ResultSet]
+    with ColumnExtractorSyntax
+    // sqlest.executor
+    with ExecutorSyntax {
+  type Table = sqlest.ast.Table
+
+  type StatementBuilder = sqlest.sql.base.StatementBuilder
+
+  type Database = sqlest.executor.Database
+  val Database = sqlest.executor.Database
+}
