@@ -16,7 +16,9 @@
 
 package sqlest.ast
 
-case class Delete(from: Table, where: Option[Column[Boolean]]) extends Command {
+import sqlest.ast.syntax._
+
+case class Delete(from: Table, where: Option[Column[Boolean]]) extends Command with ColumnSyntax {
   def where(expr: Column[Boolean]): Delete =
     this.copy(where = this.where map (_ && expr) orElse Some(expr))
 }

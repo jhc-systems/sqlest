@@ -27,8 +27,8 @@ package object sqlest extends SqlestCore
   with ColumnSyntax
   with JoinSyntax
   with OrderSyntax
-  with ExtractorSyntax
-  with ColumnExtractors
+  with ExtractorSyntax[java.sql.ResultSet]
+  with ColumnExtractorSyntax
   with ExecutorSyntax
   with MappedColumnTypes
   with TableFunctions

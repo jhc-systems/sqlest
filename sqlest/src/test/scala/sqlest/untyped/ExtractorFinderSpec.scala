@@ -21,30 +21,30 @@ import sqlest.extractor.TestResultSet
 import org.scalatest._
 import org.scalatest.matchers._
 
-class CellExtractorFinderSpec extends FlatSpec with Matchers {
+class ExtractorFinderSpec extends FlatSpec with Matchers {
   import TestData._
 
   "cell extractor finder" should "find a cell extractor in a single extractor" in {
-    val extractor = extractColumn(TableOne.col1)
-    extractor.findCellExtractor("") should equal(Some(extractColumn(TableOne.col1)))
+    val extractor = TableOne.col1
+    extractor.findCellExtractor("") should equal(Some(TableOne.col1))
     extractor.findCellExtractor("foo") should equal(None)
   }
 
   it should "find a cell extractor in a bare mapped extractor" in {
     val extractor = TableOne.col1.map(_ * 2)
-    extractor.findCellExtractor("") should equal(Some(extractColumn(TableOne.col1)))
+    extractor.findCellExtractor("") should equal(Some(TableOne.col1))
     extractor.findCellExtractor("foo") should equal(None)
   }
 
   it should "find a cell extractor in a bare list extractor" in {
     val extractor = TableOne.col1.asList
-    extractor.findCellExtractor("") should equal(Some(extractColumn(TableOne.col1)))
+    extractor.findCellExtractor("") should equal(Some(TableOne.col1))
     extractor.findCellExtractor("foo") should equal(None)
   }
 
   it should "find a cell extractor in a bare grouped extractor" in {
     val extractor = TableOne.col1.groupBy(TableOne.col1)
-    extractor.findCellExtractor("") should equal(Some(extractColumn(TableOne.col1)))
+    extractor.findCellExtractor("") should equal(Some(TableOne.col1))
     extractor.findCellExtractor("foo") should equal(None)
   }
 
@@ -54,8 +54,8 @@ class CellExtractorFinderSpec extends FlatSpec with Matchers {
       TableOne.col2
     )
 
-    extractor.findCellExtractor("0") should equal(Some(extractColumn(TableOne.col1)))
-    extractor.findCellExtractor("1") should equal(Some(extractColumn(TableOne.col2)))
+    extractor.findCellExtractor("0") should equal(Some(TableOne.col1))
+    extractor.findCellExtractor("1") should equal(Some(TableOne.col2))
     extractor.findCellExtractor("2") should equal(None)
     extractor.findCellExtractor("foo") should equal(None)
     extractor.findCellExtractor("") should equal(None)
@@ -80,8 +80,8 @@ class CellExtractorFinderSpec extends FlatSpec with Matchers {
       b = TableOne.col2
     )
 
-    extractor.findCellExtractor("a") should equal(Some(extractColumn(TableOne.col1)))
-    extractor.findCellExtractor("b") should equal(Some(extractColumn(TableOne.col2)))
+    extractor.findCellExtractor("a") should equal(Some(TableOne.col1))
+    extractor.findCellExtractor("b") should equal(Some(TableOne.col2))
     extractor.findCellExtractor("2") should equal(None)
     extractor.findCellExtractor("foo") should equal(None)
     extractor.findCellExtractor("") should equal(None)
@@ -105,12 +105,12 @@ class CellExtractorFinderSpec extends FlatSpec with Matchers {
       )
     )
 
-    extractor.findCellExtractor("oneTwo.one.a") should equal(Some(extractColumn(TableOne.col1)))
-    extractor.findCellExtractor("oneTwo.one.b") should equal(Some(extractColumn(TableOne.col2)))
-    extractor.findCellExtractor("oneTwo.two.a") should equal(Some(extractColumn(TableTwo.col2)))
-    extractor.findCellExtractor("oneTwo.two.b") should equal(Some(extractColumn(TableTwo.col3)))
-    extractor.findCellExtractor("three.a") should equal(Some(extractColumn(TableThree.col3)))
-    extractor.findCellExtractor("three.b") should equal(Some(extractColumn(TableThree.col4)))
+    extractor.findCellExtractor("oneTwo.one.a") should equal(Some(TableOne.col1))
+    extractor.findCellExtractor("oneTwo.one.b") should equal(Some(TableOne.col2))
+    extractor.findCellExtractor("oneTwo.two.a") should equal(Some(TableTwo.col2))
+    extractor.findCellExtractor("oneTwo.two.b") should equal(Some(TableTwo.col3))
+    extractor.findCellExtractor("three.a") should equal(Some(TableThree.col3))
+    extractor.findCellExtractor("three.b") should equal(Some(TableThree.col4))
     extractor.findCellExtractor("oneTwo.a") should equal(None)
     extractor.findCellExtractor("one.a") should equal(None)
     extractor.findCellExtractor("oneTwo") should equal(None)
@@ -139,12 +139,12 @@ class CellExtractorFinderSpec extends FlatSpec with Matchers {
       )
     )
 
-    extractor.findCellExtractor("oneTwo.0.a") should equal(Some(extractColumn(TableOne.col1)))
-    extractor.findCellExtractor("oneTwo.0.b") should equal(Some(extractColumn(TableOne.col2)))
-    extractor.findCellExtractor("oneTwo.1.a") should equal(Some(extractColumn(TableTwo.col2)))
-    extractor.findCellExtractor("oneTwo.1.b") should equal(Some(extractColumn(TableTwo.col3)))
-    extractor.findCellExtractor("three.a") should equal(Some(extractColumn(TableThree.col3)))
-    extractor.findCellExtractor("three.b") should equal(Some(extractColumn(TableThree.col4)))
+    extractor.findCellExtractor("oneTwo.0.a") should equal(Some(TableOne.col1))
+    extractor.findCellExtractor("oneTwo.0.b") should equal(Some(TableOne.col2))
+    extractor.findCellExtractor("oneTwo.1.a") should equal(Some(TableTwo.col2))
+    extractor.findCellExtractor("oneTwo.1.b") should equal(Some(TableTwo.col3))
+    extractor.findCellExtractor("three.a") should equal(Some(TableThree.col3))
+    extractor.findCellExtractor("three.b") should equal(Some(TableThree.col4))
     extractor.findCellExtractor("oneTwo.a") should equal(None)
     extractor.findCellExtractor("one.a") should equal(None)
     extractor.findCellExtractor("oneTwo") should equal(None)

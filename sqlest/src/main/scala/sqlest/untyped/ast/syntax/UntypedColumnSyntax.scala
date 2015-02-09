@@ -20,9 +20,10 @@ import org.joda.time.DateTime
 import scala.reflect.runtime.{ universe => ru }
 import scala.util.Try
 import sqlest.ast._
+import sqlest.ast.syntax._
 import sqlest.untyped.ast._
 
-class UntypedColumnHelpers {
+class UntypedColumnHelpers extends ColumnSyntax {
   def stringArgument(arg: String) = Some(arg)
   def intArgument(arg: String) = Try(arg.toInt).toOption
   def longArgument(arg: String) = Try(arg.toLong).toOption

@@ -26,8 +26,6 @@ trait SqlestCore {
 
   type StatementBuilder = sqlest.sql.base.StatementBuilder
 
-  type Extractor[A] = sqlest.extractor.Extractor[A]
-
   type Database = sqlest.executor.Database
   val Database = sqlest.executor.Database
 }

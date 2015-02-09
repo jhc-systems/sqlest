@@ -19,34 +19,30 @@ package sqlest.extractor
 import scala.util.Try
 
 object ExtractorFinder {
-  def apply(extractor: Extractor[_], path: String): Option[Extractor[_]] = {
+  def apply(extractor: Extractor[_, _], path: String): Option[Extractor[_, _]] = {
     path.trim match {
       case "" => apply(extractor, Nil)
       case str => apply(extractor, path.split("\\.").toList)
     }
   }
 
-  def apply(extractor: Extractor[_], path: List[String]): Option[Extractor[_]] =
+  def apply(extractor: Extractor[_, _], path: List[String]): Option[Extractor[_, _]] =
     extractor match {
-      case _: CellExtractor[_] =>
+      case _: CellExtractor[_, _] =>
         path match {
           case Nil => Some(extractor)
           case _ => None
         }
 
-      case _: ConstantExtractor[_] =>
-        path match {
-          case Nil => Some(extractor)
-          case _ => None
-        }
+      case _: ConstantExtractor[_, _] => None
 
-      case productExtractorNames: ProductExtractor[_] with ProductExtractorNames =>
+      case productExtractorNames: ProductExtractor[_, _] with ProductExtractorNames =>
         path match {
           case head :: tail => findByName(productExtractorNames, head).flatMap(apply(_, tail))
           case _ => None
         }
 
-      case productExtractor: ProductExtractor[_] =>
+      case productExtractor: ProductExtractor[_, _] =>
         path match {
           case StringToInt(index) :: tail => findByIndex(productExtractor, index).flatMap(apply(_, tail))
           case _ => None
@@ -64,13 +60,13 @@ object ExtractorFinder {
       case GroupedMultiRowExtractor(inner, _) => apply(inner, path)
     }
 
-  def findByName(productExtractorNames: ProductExtractor[_] with ProductExtractorNames, name: String): Option[Extractor[_]] =
+  def findByName(productExtractorNames: ProductExtractor[_, _] with ProductExtractorNames, name: String): Option[Extractor[_, _]] =
     for {
       index <- productExtractorNames.innerExtractorNames.zipWithIndex.find(_._1 == name).map(_._2)
       extractor <- findByIndex(productExtractorNames, index)
     } yield extractor
 
-  def findByIndex(productExtractor: ProductExtractor[_], index: Int): Option[Extractor[_]] =
+  def findByIndex(productExtractor: ProductExtractor[_, _], index: Int): Option[Extractor[_, _]] =
     if (index >= 0 && index < productExtractor.innerExtractors.length) {
       Some(productExtractor.innerExtractors(index))
     } else {

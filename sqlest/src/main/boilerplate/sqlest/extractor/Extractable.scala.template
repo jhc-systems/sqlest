@@ -16,6 +16,7 @@
 
 package sqlest.extractor
 
+import java.sql.ResultSet
 import scala.annotation.implicitNotFound
 import sqlest.ast.AliasedColumn
 
@@ -24,17 +25,17 @@ import sqlest.ast.AliasedColumn
  */
 trait Extractable[A] {
   type Out
-  def extractor(a: A): Extractor[_] { type SingleResult = Out }
+  def extractor(a: A): Extractor[ResultSet, _] { type SingleResult = Out }
 }
 
-object Extractable extends ColumnExtractors {
+object Extractable {
   @implicitNotFound("No default extractor for ${A} exists. Pass an extractor to the fetch method")
   type Aux[A, B] = Extractable[A] { type Out = B }
 
   implicit def extractableColumn[C1]: Extractable.Aux[AliasedColumn[C1], C1] =
     new Extractable[AliasedColumn[C1]] {
       type Out = C1
-      def extractor(column: AliasedColumn[C1]) = extractColumn(column)
+      def extractor(column: AliasedColumn[C1]) = column
     }
 
 [2..22#  implicit def extractableTuple1[[#C1#]]: Extractable.Aux[Tuple1[[#AliasedColumn[C1]#]], Tuple1[[#C1#]]] =

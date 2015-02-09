@@ -28,8 +28,9 @@ case class CaseClassExtractorMacro(c: Context) {
    */
   val repeatedParamClass = RepeatedParamClass
 
-  def apply[A: c.WeakTypeTag] = {
+  def apply[Row: c.WeakTypeTag, A: c.WeakTypeTag] = {
     // Extract useful information from the type A:
+    val typeOfRow = weakTypeOf[Row]
     val typeOfA = weakTypeOf[A]
     val typeArgs = typeOfA.dealias.typeArgs
     val companion = typeOfA.typeSymbol.companion
@@ -39,10 +40,10 @@ case class CaseClassExtractorMacro(c: Context) {
     if (applyMethods.isEmpty) c.abort(c.enclosingPosition, s"No apply method found for ${companion.name.toString}")
 
     // Construct extractor methods for this case class corresponding to each apply method
-    val liftedApplyMethods = applyMethods.map(liftApplyMethod(_, typeOfA, typeArgs, companion))
+    val liftedApplyMethods = applyMethods.map(liftApplyMethod(_, typeOfRow, typeOfA, typeArgs, companion))
 
     // import scala.language.dynamics to avoid having to do so at the call site
-    c.Expr(q"import scala.language.dynamics; new Dynamic { ..$liftedApplyMethods }")
+    q"import scala.language.dynamics; new Dynamic { ..$liftedApplyMethods }"
   }
 
   def findApplyMethods(companionType: Type): List[MethodSymbol] = {
@@ -54,7 +55,7 @@ case class CaseClassExtractorMacro(c: Context) {
     applyMethods.filter(_.paramLists.length == 1)
   }
 
-  def liftApplyMethod(applyMethod: MethodSymbol, typeOfA: Type, typeArgs: List[Type], companion: Symbol) = {
+  def liftApplyMethod(applyMethod: MethodSymbol, typeOfRow: Type, typeOfA: Type, typeArgs: List[Type], companion: Symbol) = {
     // Extract useful information about the parameter list for the `apply` method
     val caseClassParamNames = extractMappedParams(applyMethod, _.name)
     val caseClassParamTypes = extractMappedParams(applyMethod, _.typeSignature)
@@ -65,7 +66,7 @@ case class CaseClassExtractorMacro(c: Context) {
     val appliedTypeArgTypes = substituteTypeParams(applyMethod, typeArgs, caseClassParamTypes)
 
     // Build a matching apply method for the extractor
-    val applyParams = buildApplyParams(caseClassParamNames, appliedTypeArgTypes, caseClassParamDefaultValues)
+    val applyParams = buildApplyParams(typeOfRow, caseClassParamNames, appliedTypeArgTypes, caseClassParamDefaultValues)
 
     // Build the tuple definition
     val tupleArg = TermName("arg")
@@ -74,10 +75,10 @@ case class CaseClassExtractorMacro(c: Context) {
 
     // Build the extractor definitions
     val tupleExtractor = productExtractorType(extractMappedParams(applyMethod).length)
-    val tupleExtractorParams = buildExtractorParams(applyMethod, caseClassParamNames, appliedTypeArgTypes)
+    val tupleExtractorParams = buildExtractorParams(applyMethod, typeOfRow, caseClassParamNames, appliedTypeArgTypes)
 
     q"""
-      def apply(..$applyParams) = new sqlest.extractor.MappedExtractor(
+      def apply(..$applyParams) = new sqlest.extractor.MappedExtractor[$typeOfRow, $tupleType, $typeOfA](
         new $tupleExtractor(..$tupleExtractorParams) with sqlest.extractor.ProductExtractorNames {
           val innerExtractorNames = List(..$caseClassParamStrings)
         },
@@ -107,12 +108,12 @@ case class CaseClassExtractorMacro(c: Context) {
     else paramTypes
   }
 
-  def buildApplyParams(paramNames: List[TermName], paramTypes: List[Type], defaultValues: List[Option[Tree]]): List[Tree] = {
+  def buildApplyParams(typeOfRow: Type, paramNames: List[TermName], paramTypes: List[Type], defaultValues: List[Option[Tree]]): List[Tree] = {
     val liftParam: PartialFunction[Type, Tree] = {
       case TypeRef(_, `repeatedParamClass`, typ :: Nil) =>
-        tq"$repeatedParamClass[sqlest.extractor.Extractor[$typ]]"
+        tq"$repeatedParamClass[sqlest.extractor.Extractor[$typeOfRow, $typ]]"
       case inner: TypeRef =>
-        tq"sqlest.extractor.Extractor[$inner]"
+        tq"sqlest.extractor.Extractor[$typeOfRow, $inner]"
     }
 
     val liftedParamTypes = paramTypes.map(liftParam)
@@ -150,11 +151,11 @@ case class CaseClassExtractorMacro(c: Context) {
       accessors :+ Select(Ident(tupleArg), TermName("_" + length))
   }
 
-  def buildExtractorParams(applyMethod: MethodSymbol, paramNames: List[TermName], paramTypes: List[Type]): List[Tree] = {
+  def buildExtractorParams(applyMethod: MethodSymbol, typeOfRow: Type, paramNames: List[TermName], paramTypes: List[Type]): List[Tree] = {
     val treeNames = paramNames.map(name => q"$name")
     if (applyMethod.isVarargs) {
       val varargsBaseType = paramTypes.last match { case TypeRef(_, _, typ :: Nil) => typ }
-      treeNames.init :+ q"sqlest.extractor.SeqExtractor[$varargsBaseType](${paramNames.last}.toSeq)"
+      treeNames.init :+ q"sqlest.extractor.SeqExtractor[$typeOfRow, $varargsBaseType](${paramNames.last}.toSeq)"
     } else treeNames
   }
 

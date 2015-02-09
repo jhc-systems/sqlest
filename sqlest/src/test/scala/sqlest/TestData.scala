@@ -16,8 +16,10 @@
 
 package sqlest
 
+import java.sql.ResultSet
 import org.joda.time.DateTime
 import sqlest.extractor.TestResultSet
+import sqlest.executor.ResultSetIterator
 
 object TestData {
   class TableOne(alias: Option[String]) extends Table("one", alias) {
@@ -80,4 +82,6 @@ object TestData {
       Seq(-1, "e", "f", 6, null, null)
     )
   }
+
+  implicit def resultSetIterator(resultSet: ResultSet) = ResultSetIterator(resultSet)
 }

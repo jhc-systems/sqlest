@@ -16,18 +16,8 @@
 
 package sqlest.extractor
 
-/**
- * Function capable of building an extractor of type `B` from a value of type `A`.
- *
- * We use this in `Extractors` to allow us to build TupleExtractors from
- * mixed tuples of non-extractors and extractors.
- */
-trait ExtractorBuilder[-A, B] {
-  def apply(preExtractor: A): Extractor[B]
-}
+import sqlest.ast._
 
-object ExtractorBuilder {
-  implicit def identityExtractorBuilder[A] = new ExtractorBuilder[Extractor[A], A] {
-    def apply(extractor: Extractor[A]) = extractor
-  }
+trait ColumnExtractorSyntax {
+  def extractColumnByName[A: ColumnType](name: String) = AliasColumn[A](null, name)
 }

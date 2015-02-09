@@ -16,6 +16,10 @@
 
 package sqlest.ast
 
+import java.sql.ResultSet
+import org.joda.time.DateTime
+import sqlest.extractor.CellExtractor
+
 /**
  * A column, column literal, or column expression.
  *
@@ -74,8 +78,32 @@ case class ScalarFunctionColumn[A](name: String, parameters: Seq[Column[_]])(imp
  * SELECT a as a_alias, b as b_alias, c as c_alias FROM ...
  * ```
  */
-sealed trait AliasedColumn[A] extends Column[A] {
+sealed trait AliasedColumn[A] extends Column[A] with CellExtractor[ResultSet, A] {
   def columnAlias: String
+
+  def read(resultSet: ResultSet) =
+    columnType match {
+      case baseColumnType: BaseColumnType[A] => readBaseType(resultSet, baseColumnType)
+      case optionColumnType: OptionColumnType[_, _] => optionColumnType.read(readBaseType(resultSet, optionColumnType.baseColumnType)).asInstanceOf[Option[A]]
+      case mappedColumnType: MappedColumnType[_, _] => mappedColumnType.read(readBaseType(resultSet, mappedColumnType.baseColumnType))
+    }
+
+  def readBaseType[B](resultSet: ResultSet, columnType: BaseColumnType[B]): Option[B] = {
+    def checkNull[A](value: A): Option[A] =
+      if (!resultSet.wasNull) Some(value)
+      else None
+
+    columnType match {
+      case IntColumnType => checkNull(resultSet.getInt(columnAlias))
+      case LongColumnType => checkNull(resultSet.getLong(columnAlias))
+      case DoubleColumnType => checkNull(resultSet.getDouble(columnAlias))
+      case BigDecimalColumnType => Option(resultSet.getBigDecimal(columnAlias)).map(BigDecimal.apply)
+      case BooleanColumnType => checkNull(resultSet.getBoolean(columnAlias))
+      case StringColumnType => checkNull(resultSet.getString(columnAlias))
+      case DateTimeColumnType => checkNull(new DateTime(resultSet.getDate(columnAlias)))
+    }
+  }
+
 }
 
 /** Columns from tables. */

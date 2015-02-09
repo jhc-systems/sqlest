@@ -18,17 +18,18 @@ package sqlest.extractor
 
 import scala.language.experimental.macros
 
-trait ExtractorSyntax {
-  def extract[A]: Dynamic = macro CaseClassExtractorMacro.apply[A]
+trait ExtractorSyntax[Row] {
+  def extractConstant[A](value: A) = ConstantExtractor[Row, A](value)
 
-  def extractConstant[A](value: A) = ConstantExtractor(value)
+  def extract[A]: Dynamic = macro CaseClassExtractorMacro.apply[Row, A]
 
-[2..22#  implicit def extractTuple1[[#A1#], [#B1#]](t: Tuple1[[#A1#]])(implicit [#b1: ExtractorBuilder[A1, B1]#]) =
-    new Tuple1Extractor[[#B1#]]([#b1(t._1)#])#
+[2..22#  implicit def extract[Row, [#A1#]](t: Tuple1[[#Extractor[Row, A1]#]]) =
+    new Tuple1Extractor[Row, [#A1#]]([#t._1#])#
 
 ]
-[2..22#  implicit def extract[[#A1#], [#B1#]]([#a1: A1#])(implicit [#b1: ExtractorBuilder[A1, B1]#]) =
-    new Tuple1Extractor[[#B1#]]([#b1(a1)#])#
+
+[2..22#  def extract[Row, [#A1#]]([#e1: Extractor[Row, A1]#]) =
+    new Tuple1Extractor[Row, [#A1#]]([#e1#])#
 
 ]
 }

@@ -14,15 +14,25 @@
  * limitations under the License.
  */
 
-package sqlest.ast
+package sqlest.executor
 
-import sqlest.ast.syntax._
+import java.sql.ResultSet
 
-/** An update statement. */
-case class Update(table: Table, set: Seq[Setter[_, _]], where: Option[Column[Boolean]] = None) extends Command with ColumnSyntax {
-  def set(setters: Setter[_, _]*) =
-    this.copy(set = this.set ++ setters)
+case class ResultSetIterator(resultSet: ResultSet) extends Iterator[ResultSet] {
+  private var readNextRow = false
+  private var hasNextRow = false
 
-  def where(expr: Column[Boolean]): Update =
-    this.copy(where = this.where map (_ && expr) orElse Some(expr))
+  def next: ResultSet = {
+    if (!readNextRow) resultSet.next
+    readNextRow = false
+    resultSet
+  }
+
+  def hasNext: Boolean = {
+    if (!readNextRow) {
+      hasNextRow = resultSet.next
+      readNextRow = true
+    }
+    hasNextRow
+  }
 }

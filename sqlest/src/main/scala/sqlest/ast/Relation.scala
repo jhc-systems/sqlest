@@ -17,6 +17,7 @@
 package sqlest.ast
 
 import scala.language.experimental.macros
+import sqlest.ast.syntax._
 
 /**
  * A source of columns from the database.
@@ -136,7 +137,7 @@ case class Select[A, R <: Relation](
     limit: Option[Long] = None,
     offset: Option[Long] = None,
     union: List[Union[_]] = Nil,
-    subselectAlias: Option[String] = None)(implicit val aliasedColumns: AliasedColumns[A]) extends Relation with Query {
+    subselectAlias: Option[String] = None)(implicit val aliasedColumns: AliasedColumns[A]) extends Relation with Query with ColumnSyntax {
 
   if (union.headOption.map(union => union.select.columns.size != columns.size).getOrElse(false))
     throw new AssertionError(s"Number of columns (${columns.size} and ${union.head.select.columns.size}) in unioned selects does not match. Maybe your extractor has different columns from your query")

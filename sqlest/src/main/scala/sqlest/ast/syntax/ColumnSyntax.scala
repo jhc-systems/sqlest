@@ -66,10 +66,8 @@ trait ColumnSyntax {
   /**
    * This implicit conversion allows using as a column: a select statement which selects a single column
    */
-  implicit def SelectColumnOps[A](select: Select[AliasedColumn[A], _ <: Relation]) = {
-    val column = select.cols
-    AliasColumn(SelectColumn(select)(column.columnType), column.columnAlias)(column.columnType)
-  }
+  implicit def SelectColumnOps[A](select: Select[AliasedColumn[A], _ <: Relation]) =
+    SelectColumn(select)(select.cols.columnType)
 
   implicit class NullableColumnsOps[A](left: Column[A]) {
     def isNull = PostfixFunctionColumn[Boolean]("is null", left)

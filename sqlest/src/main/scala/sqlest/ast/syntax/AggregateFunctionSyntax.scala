@@ -18,7 +18,7 @@ package sqlest.ast.syntax
 
 import sqlest.ast._
 
-trait AggregateFunctionSyntax {
+trait AggregateFunctionSyntax extends ColumnSyntax {
   def count[A](column: Column[A] = AliasColumn[String](ConstantColumn("*"), "*")) = ScalarFunctionColumn[Int]("count", Seq(column)).as("count")
   def distinct[A](column: Column[A]) = AliasColumn((ScalarFunctionColumn[A]("distinct", Seq(column))(column.columnType)), "distinct")(column.columnType)
   def min[A](column: Column[A]) = AliasColumn((ScalarFunctionColumn[A]("min", Seq(column))(column.columnType)), "min")(column.columnType.toOptionColumnType)
