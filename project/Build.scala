@@ -30,8 +30,6 @@ object SqlestBuild extends Build {
       moduleName := "sqlest",
 
       libraryDependencies ++= Seq(
-        "joda-time" % "joda-time" % "2.3",
-        "org.joda" % "joda-convert" % "1.6",
         "com.typesafe.scala-logging" %% "scala-logging-slf4j" % "2.1.2",
         "org.scalatest" %% "scalatest" % "2.2.1" % "test"
       )
@@ -46,9 +44,9 @@ object SqlestBuild extends Build {
       moduleName := "sqlest-extractors",
 
       libraryDependencies ++= Seq(
+        "org.scala-lang" % "scala-reflect" % scalaVersion.value,
         "joda-time" % "joda-time" % "2.3",
         "org.joda" % "joda-convert" % "1.6",
-        "com.typesafe.scala-logging" %% "scala-logging-slf4j" % "2.1.2",
         "org.scalatest" %% "scalatest" % "2.2.1" % "test"
       )
     )
