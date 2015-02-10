@@ -19,7 +19,7 @@ package sqlest
 import java.sql.ResultSet
 import org.joda.time.DateTime
 import sqlest.extractor.TestResultSet
-import sqlest.executor.ResultSetIterator
+import sqlest.executor.ResultSetIterable
 
 object TestData {
   class TableOne(alias: Option[String]) extends Table("one", alias) {
@@ -83,5 +83,5 @@ object TestData {
     )
   }
 
-  implicit def resultSetIterator(resultSet: ResultSet) = ResultSetIterator(resultSet)
+  implicit def resultSetIterable(resultSet: ResultSet) = ResultSetIterable(resultSet)
 }

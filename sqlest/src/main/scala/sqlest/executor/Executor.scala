@@ -41,7 +41,7 @@ trait ExecutorSyntax extends QuerySyntax {
     def extractAll(extractor: Extractor[ResultSet, _]): List[extractor.SingleResult] =
       database.executeSelect(select.what(extractorColumns(extractor)))(row => extractor.extractAll(row))
 
-    private implicit def resultSetIterator(resultSet: ResultSet): Iterator[ResultSet] = ResultSetIterator(resultSet)
+    private implicit def resultSetIterable(resultSet: ResultSet): Iterable[ResultSet] = ResultSetIterable(resultSet)
 
     private def extractorColumns(extractor: Extractor[ResultSet, _]): List[AliasedColumn[_]] = {
       extractor match {

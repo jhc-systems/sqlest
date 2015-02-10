@@ -24,8 +24,8 @@ sealed trait Extractor[Row, A] {
 
   type SingleResult
 
-  def extractHeadOption(row: Iterator[Row]): Option[SingleResult]
-  def extractAll(row: Iterator[Row]): List[SingleResult]
+  def extractHeadOption(row: Iterable[Row]): Option[SingleResult]
+  def extractAll(row: Iterable[Row]): List[SingleResult]
 
   def initialize(row: Row): Accumulator
   def accumulate(accumulator: Accumulator, row: Row): Accumulator
@@ -43,20 +43,24 @@ sealed trait Extractor[Row, A] {
 sealed trait SingleRowExtractor[Row, A] extends Extractor[Row, A] {
   final type SingleResult = A
 
-  final def extractHeadOption(rows: Iterator[Row]): Option[A] =
-    if (rows.hasNext) {
-      Some(checkNullValueAndGet(emit(initialize(rows.next))))
+  final def extractHeadOption(rows: Iterable[Row]): Option[A] = {
+    val rowIterator = rows.iterator
+    if (rowIterator.hasNext) {
+      Some(checkNullValueAndGet(emit(initialize(rowIterator.next))))
     } else None
+  }
 
-  final def extractAll(rows: Iterator[Row]): List[A] =
-    if (rows.hasNext) {
-      var accumulator = Queue(checkNullValueAndGet(emit(initialize(rows.next))))
+  final def extractAll(rows: Iterable[Row]): List[A] = {
+    val rowIterator = rows.iterator
+    if (rowIterator.hasNext) {
+      var accumulator = Queue(checkNullValueAndGet(emit(initialize(rowIterator.next))))
 
-      while (rows.hasNext)
-        accumulator = accumulator :+ checkNullValueAndGet(emit(initialize(rows.next)))
+      while (rowIterator.hasNext)
+        accumulator = accumulator :+ checkNullValueAndGet(emit(initialize(rowIterator.next)))
 
       accumulator.toList
     } else Nil
+  }
 
   def asList = ListMultiRowExtractor(this)
   def groupBy[B](groupBy: Extractor[Row, B]) = GroupedMultiRowExtractor(this, groupBy)
@@ -67,25 +71,29 @@ sealed trait MultiRowExtractor[Row, A] extends Extractor[Row, List[A]] {
 
   final type SingleResult = A
 
-  final def extractHeadOption(rows: Iterator[Row]): Option[A] =
-    if (rows.hasNext) {
-      var accumulator = initialize(rows.next)
+  final def extractHeadOption(rows: Iterable[Row]): Option[A] = {
+    val rowIterator = rows.iterator
+    if (rowIterator.hasNext) {
+      var accumulator = initialize(rowIterator.next)
 
-      while (rows.hasNext && accumulator.size == 1)
-        accumulator = accumulate(accumulator, rows.next)
+      while (rowIterator.hasNext && accumulator.size == 1)
+        accumulator = accumulate(accumulator, rowIterator.next)
 
       checkNullValueAndGet(emit(accumulator)).headOption
     } else None
+  }
 
-  final def extractAll(rows: Iterator[Row]): List[A] =
-    if (rows.hasNext) {
-      var accumulator = initialize(rows.next)
+  final def extractAll(rows: Iterable[Row]): List[A] = {
+    val rowIterator = rows.iterator
+    if (rowIterator.hasNext) {
+      var accumulator = initialize(rowIterator.next)
 
-      while (rows.hasNext)
-        accumulator = accumulate(accumulator, rows.next)
+      while (rowIterator.hasNext)
+        accumulator = accumulate(accumulator, rowIterator.next)
 
       checkNullValueAndGet(emit(accumulator))
     } else Nil
+  }
 }
 
 /**

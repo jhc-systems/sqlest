@@ -18,6 +18,10 @@ package sqlest.executor
 
 import java.sql.ResultSet
 
+case class ResultSetIterable(resultSet: ResultSet) extends Iterable[ResultSet] {
+  def iterator = ResultSetIterator(resultSet)
+}
+
 case class ResultSetIterator(resultSet: ResultSet) extends Iterator[ResultSet] {
   private var readNextRow = false
   private var hasNextRow = false
