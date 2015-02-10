@@ -29,196 +29,190 @@ trait PathDependenceTestData {
   case class PathDependentOneTwo(one: PathDependentOne, two: PathDependentTwo)
 }
 
-class CaseClassExtractorMacroSpec extends FlatSpec with Matchers with ExtractorSyntax[Map[String, String]] with PathDependenceTestData {
+sealed trait Shape
+case object Circle extends Shape
+case object Tetrahedron extends Shape
+case object Plane extends Shape
+
+class CaseClassExtractorMacroSpec extends FlatSpec with Matchers with ExtractorSyntax[Tuple3[Shape, Int, String]] with PathDependenceTestData {
 
   // TODO: We can't currently inherit from TestData here
   // because the macro can't reify TestData.this.One and
   // NamedExtractorSyntaxSpec.this.One. Fix this!
 
   case class One(a: Int, b: String)
-  case class Two(a: String, b: Int)
-  case class Three(a: Option[Int], b: Option[String])
+  case class Two(a: String, b: Shape)
 
   case class AggregateOneTwo(one: One, two: Two)
-  case class AggregateOneTwoThree(one: One, two: Two, three: Three)
-  case class AggregateOneTwoOptionThree(one: One, two: Two, three: Option[Three])
-  case class AggregateOneTwoThenThree(oneTwo: AggregateOneTwo, three: Three)
 
   case class Tiny(a: Int)
 
-  type Row1 = Map[String, String]
-  case class IntExtractor(key: String) extends CellExtractor[Row1, Int] {
-    def read(row: Row1) = row.get(key).map(_.toInt)
+  case object ShapeExtractor extends CellExtractor[Tuple3[Shape, Int, String], Shape] {
+    def read(row: Tuple3[Shape, Int, String]) = Some(row._1)
   }
-  case class StringExtractor(key: String) extends CellExtractor[Row1, String] {
-    def read(row: Row1) = row.get(key)
+
+  case object IntExtractor extends CellExtractor[Tuple3[Shape, Int, String], Int] {
+    def read(row: Tuple3[Shape, Int, String]) = Some(row._2)
   }
-  object TestExtractors {
-    val intExtractor = new CellExtractor[Row1, Int] {
-      def read(row: Row1) = row.get("key").map(_.toInt)
-    }
+
+  case object StringExtractor extends CellExtractor[Tuple3[Shape, Int, String], String] {
+    def read(row: Tuple3[Shape, Int, String]) = Some(row._3)
   }
 
   val simpleExtractor = extract[One](
-    a = IntExtractor(""),
-    b = StringExtractor("")
+    a = IntExtractor,
+    b = StringExtractor
   )
 
-  val e2: Extractor[Row1, One] =
-    MappedExtractor[Row1, (Int, String), One](Tuple2Extractor(IntExtractor(""), StringExtractor("")), One.tupled)
+  val nestedExtractor = extract[AggregateOneTwo](
+    one = extract[One](
+      a = IntExtractor,
+      b = StringExtractor
+    ),
+    two = extract[Two](
+      a = StringExtractor,
+      b = ShapeExtractor
+    )
+  )
 
-  // def apply(..$applyParams) = new sqlest.extractor.MappedExtractor(
-  //   new $tupleExtractor(..$tupleExtractorParams) with sqlest.extractor.ProductExtractorNames {
-  //     val innerExtractorNames = List(..$caseClassParamStrings)
-  //   },
-  //   (arg: $tupleType) => $companion.$applyMethod(..$tupleAccessors)
-  // )
+  val tupleList = List(
+    (Circle, 1, "a"),
+    (Tetrahedron, 3, "c"),
+    (Plane, -1, "e")
+  )
 
-  // val nestedExtractor = extract[AggregateOneTwo](
-  //   one = extract[One](
-  //     a = TableOne.col1,
-  //     b = TableOne.col2
-  //   ),
-  //   two = extract[Two](
-  //     a = TableTwo.col2,
-  //     b = TableTwo.col3
-  //   )
-  // )
+  "extract[A]" should "have the correct extractHeadOption behaviour" in {
+    simpleExtractor.extractHeadOption(tupleList) should equal(Some(
+      One(1, "a")
+    ))
+  }
 
-  // "simple extract" should "have the correct extractHeadOption behaviour" in {
-  //   simpleExtractor.extractHeadOption(testResultSet) should equal(Some(
-  //     One(1, "a")
-  //   ))
-  // }
+  it should "have the correct extractAll behaviour" in {
+    simpleExtractor.extractAll(tupleList) should equal(List(
+      One(1, "a"),
+      One(3, "c"),
+      One(-1, "e")
+    ))
+  }
 
-  // it should "have the correct extractAll behaviour" in {
-  //   simpleExtractor.extractAll(testResultSet) should equal(List(
-  //     One(1, "a"),
-  //     One(3, "c"),
-  //     One(-1, "e")
-  //   ))
-  // }
+  it should "support findCellExtractor syntax" in {
+    simpleExtractor.findCellExtractor("a") should equal(Some(IntExtractor))
+    simpleExtractor.findCellExtractor("b") should equal(Some(StringExtractor))
+    simpleExtractor.findCellExtractor("c") should equal(None)
+  }
 
-  // it should "support findCellExtractor syntax" in {
-  //   simpleExtractor.findCellExtractor("a") should equal(Some(extractColumn(TableOne.col1)))
-  //   simpleExtractor.findCellExtractor("b") should equal(Some(extractColumn(TableOne.col2)))
-  //   simpleExtractor.findCellExtractor("c") should equal(None)
-  // }
+  it should "work for case classes with one field" in {
+    extract[Tiny](a = IntExtractor)
+  }
 
-  // "nested extract" should "have the correct extractHeadOption behaviour" in {
-  //   nestedExtractor.extractHeadOption(testResultSet) should equal(Some(
-  //     AggregateOneTwo(One(1, "a"), Two("b", 2))
-  //   ))
-  // }
+  class Multiple(a: Int, b: Int)
+  object Multiple {
+    def apply(a: Int) = new Multiple(a, 37)
+    def apply(a: Int, b: Int) = new Multiple(a, b)
+    def apply(a: Int, b: Int, c: Int) = new Multiple(a, b + c)
+  }
+  it should "work for classes with multiple apply methods" in {
+    extract[Multiple](a = IntExtractor)
+    extract[Multiple](a = IntExtractor, b = IntExtractor)
+    extract[Multiple](a = IntExtractor, b = IntExtractor, c = IntExtractor)
+  }
 
-  // it should "have the correct extractAll behaviour" in {
-  //   nestedExtractor.extractAll(testResultSet) should equal(List(
-  //     AggregateOneTwo(One(1, "a"), Two("b", 2)),
-  //     AggregateOneTwo(One(3, "c"), Two("d", 4)),
-  //     AggregateOneTwo(One(-1, "e"), Two("f", 6))
-  //   ))
-  // }
+  case class DefaultParams(a: Int, b: String = "sweet")
+  it should "work for apply methods with default parameters" in {
+    extract[DefaultParams](a = IntExtractor, b = StringExtractor)
+    extract[DefaultParams](a = IntExtractor)
+  }
 
-  // it should "support findCellExtractor syntax" in {
-  //   nestedExtractor.findCellExtractor("one.a") should equal(Some(extractColumn(TableOne.col1)))
-  //   nestedExtractor.findCellExtractor("two.b") should equal(Some(extractColumn(TableTwo.col3)))
-  //   nestedExtractor.findCellExtractor("two.c") should equal(None)
-  // }
+  case class VarargsParams(a: Int, b: String*)
+  it should "work for apply methods with varargs" in {
+    extract[VarargsParams](IntExtractor, StringExtractor, StringExtractor)
+    extract[VarargsParams](IntExtractor, StringExtractor)
+    extract[VarargsParams](IntExtractor)
+  }
 
-  // "general namedExtract" should "work for case classes with one field" in {
-  //   extract[Tiny](a = TableOne.col1)
-  // }
+  case class TypeParamClass[A, B](a: A, b: B)
+  case class ReversedTypeParamClass[A, B](b: B, a: A)
+  case class DuplicateTypeParamClass[A](a1: A, a2: A)
+  case class MixedTypeParamClass[A](s: String, a: A)
+  it should "work for apply methods with type parameters" in {
+    extract[TypeParamClass[String, Int]](StringExtractor, IntExtractor)
+    extract[TypeParamClass[String, Int]](StringExtractor, extractConstant(6))
+    extract[ReversedTypeParamClass[String, Int]](IntExtractor, StringExtractor)
+    extract[DuplicateTypeParamClass[Int]](IntExtractor, IntExtractor)
+    extract[MixedTypeParamClass[Int]](StringExtractor, IntExtractor)
+    extract[List[String]](StringExtractor, StringExtractor)
+    extract[Map[Int, String]](IntExtractor -> StringExtractor, IntExtractor -> StringExtractor)
+  }
 
-  // class Multiple(a: Int, b: Int)
-  // object Multiple {
-  //   def apply(a: Int) = new Multiple(a, 37)
-  //   def apply(a: Int, b: Int) = new Multiple(a, b)
-  //   def apply(a: Int, b: Int, c: Int) = new Multiple(a, b + c)
-  // }
-  // it should "work for classes with multiple apply methods" in {
-  //   extract[Multiple](a = TableOne.col1)
-  //   extract[Multiple](a = TableOne.col1, b = TableOne.col1)
-  //   extract[Multiple](a = TableOne.col1, b = TableOne.col1, c = TableOne.col1)
-  // }
+  it should "handle path-dependent types correctly" in {
+    pending
+    // TODO: This should compile, but doesn't due to a bug related to path dependent types:
+    // extract[PathDependentOneTwo](
+    //   one = extract[PathDependentOne](
+    //     a = IntExtractor,
+    //     b = StringExtractor
+    //   ),
+    //   two = extract[PathDependentTwo](
+    //     a = StringExtractor,
+    //     b = IntExtractor
+    //   )
+    // )
+  }
 
-  // case class DefaultParams(a: Int, b: String = "sweet")
-  // it should "work for apply methods with default parameters" in {
-  //   extract[DefaultParams](a = TableOne.col1, b = TableOne.col2)
-  //   extract[DefaultParams](a = TableOne.col1)
-  // }
+  "nested extract[A]" should "have the correct extractHeadOption behaviour" in {
+    nestedExtractor.extractHeadOption(tupleList) should equal(Some(
+      AggregateOneTwo(One(1, "a"), Two("a", Circle))
+    ))
+  }
 
-  // case class VarargsParams(a: Int, b: String*)
-  // it should "work for apply methods with varargs" in {
-  //   extract[VarargsParams](TableOne.col1, TableOne.col2, TableOne.col2)
-  //   extract[VarargsParams](TableOne.col1, TableOne.col2)
-  //   extract[VarargsParams](TableOne.col1)
-  // }
+  it should "have the correct extractAll behaviour" in {
+    nestedExtractor.extractAll(tupleList) should equal(List(
+      AggregateOneTwo(One(1, "a"), Two("a", Circle)),
+      AggregateOneTwo(One(3, "c"), Two("c", Tetrahedron)),
+      AggregateOneTwo(One(-1, "e"), Two("e", Plane))
+    ))
+  }
 
-  // case class TypeParamClass[A, B](a: A, b: B)
-  // case class ReversedTypeParamClass[A, B](b: B, a: A)
-  // case class DuplicateTypeParamClass[A](a1: A, a2: A)
-  // case class MixedTypeParamClass[A](s: String, a: A)
-  // it should "work for apply methods with type parameters" in {
-  //   extract[TypeParamClass[String, Int]](TableOne.col2, TableOne.col1)
-  //   extract[TypeParamClass[String, Int]](TableOne.col2, extractConstant(6))
-  //   extract[ReversedTypeParamClass[String, Int]](TableOne.col1, TableOne.col2)
-  //   extract[DuplicateTypeParamClass[Int]](TableOne.col1, TableTwo.col3)
-  //   extract[MixedTypeParamClass[Int]](TableTwo.col2, TableOne.col1)
-  //   extract[List[String]](TableOne.col2, TableTwo.col2)
-  //   extract[Map[Int, String]](TableOne.col1 -> TableOne.col2, TableTwo.col3 -> TableTwo.col2)
-  // }
+  it should "support findCellExtractor syntax" in {
+    nestedExtractor.findCellExtractor("one.a") should equal(Some(IntExtractor))
+    nestedExtractor.findCellExtractor("two.b") should equal(Some(ShapeExtractor))
+    nestedExtractor.findCellExtractor("two.c") should equal(None)
+  }
 
-  // it should "handle path-dependent types correctly" in {
-  //   pending
-  //   // TODO: This should compile, but doesn't due to a bug related to path dependent types:
-  //   // extract[PathDependentOneTwo](
-  //   //   one = extract[PathDependentOne](
-  //   //     a = TableOne.col1,
-  //   //     b = TableOne.col2
-  //   //   ),
-  //   //   two = extract[PathDependentTwo](
-  //   //     a = TableTwo.col2,
-  //   //     b = TableTwo.col3
-  //   //   )
-  //   // )
-  // }
+  // TODO: Implement this test with illTyped:
+  "extract[A]" should "fail if there are too few arguments" in {
+    pending
+    // extract[One](
+    //   a = IntExtractor
+    // )
+  }
 
-  // // --------------------------
+  // TODO: Implement this test with illTyped:
+  it should "fail if there are too many arguments" in {
+    pending
+    // extract[One](
+    //   a = IntExtractor,
+    //   b = IntExtractor,
+    //   c = IntExtractor
+    // )
+  }
 
-  // // TODO: Implement this test with illTyped:
-  // it should "fail if there are too few arguments" in {
-  //   pending
-  //   // extract[One](
-  //   //   a = TableOne.col1
-  //   // )
-  // }
+  // TODO: Implement this test with illTyped:
+  it should "fail on the wrong types of arguments" in {
+    pending
+    // extract[One](
+    //   a = StringExtractor,
+    //   b = IntExtractor
+    // )
+  }
 
-  // // TODO: Implement this test with illTyped:
-  // it should "fail if there are too many arguments" in {
-  //   pending
-  //   // extract[One](
-  //   //   a = TableOne.col1,
-  //   //   b = TableOne.col1,
-  //   //   c = TableOne.col1
-  //   // )
-  // }
-
-  // // TODO: Implement this test with illTyped:
-  // it should "fail on the wrong types of arguments" in {
-  //   pending
-  //   // extract[One](
-  //   //   a = TableOne.col2,
-  //   //   b = TableOne.col1
-  //   // )
-  // }
-
-  // // TODO: Implement this test with illTyped:
-  // it should "fail on the wrong argument names" in {
-  //   pending
-  //   // extract[One](
-  //   //   b = TableOne.col1,
-  //   //   a = TableOne.col2
-  //   // )
-  // }
+  // TODO: Implement this test with illTyped:
+  it should "fail on the wrong argument names" in {
+    pending
+    // extract[One](
+    //   b = IntExtractor,
+    //   a = StringExtractor
+    // )
+  }
 
 }
