@@ -21,7 +21,7 @@ import org.scalatest.matchers._
 import sqlest._
 import sqlest.ast._
 
-class UpdateSyntaxSpec extends FlatSpec with Matchers with CustomMatchers {
+class UpdateSyntaxSpec extends FlatSpec with Matchers {
   class MyTable(alias: Option[String]) extends Table("mytable", alias) {
     val col1 = column[Int]("col1")
     val col2 = column[Int]("col2")
@@ -29,8 +29,8 @@ class UpdateSyntaxSpec extends FlatSpec with Matchers with CustomMatchers {
   object MyTable extends MyTable(None)
 
   "update" should "not be created without set clause and where clause" in {
-    update(MyTable) should not be (anInstanceOf[Update])
-    update(MyTable).set(MyTable.col1 -> LiteralColumn(1)) should not be (anInstanceOf[Update])
+    update(MyTable) should not be a[Update]
+    update(MyTable).set(MyTable.col1 -> LiteralColumn(1)) should not be a[Update]
   }
 
   // TODO

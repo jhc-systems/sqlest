@@ -21,7 +21,7 @@ import org.scalatest.matchers._
 import sqlest._
 import sqlest.ast._
 
-class AggrgateFunctionSyntaxSpec extends FlatSpec with Matchers with CustomMatchers {
+class AggrgateFunctionSyntaxSpec extends FlatSpec with Matchers {
   class MyTable(alias: Option[String]) extends Table("mytable", alias) {
     val col1 = column[Int]("col1")
     val col2 = column[String]("col2")

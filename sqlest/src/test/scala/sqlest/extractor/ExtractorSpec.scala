@@ -21,7 +21,7 @@ import org.scalatest._
 import org.scalatest.matchers._
 import sqlest._
 
-class ExtractorSpec extends FlatSpec with Matchers with CustomMatchers {
+class ExtractorSpec extends FlatSpec with Matchers {
   import TestData._
 
   case class Inner(b: Int, c: List[Int])

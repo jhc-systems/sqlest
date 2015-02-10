@@ -41,37 +41,37 @@ class CaseClassExtractorMacroSpec extends FlatSpec with Matchers with ExtractorS
   case class AggregateOneTwo(one: One, two: Two)
   case class Tiny(a: Shape)
 
-  case object ShapeExtractor extends CellExtractor[Tuple3[Shape, Int, String], Shape] {
+  val shapeExtractor = new CellExtractor[Tuple3[Shape, Int, String], Shape] {
     def read(row: Tuple3[Shape, Int, String]) = Some(row._1)
   }
 
-  case object IntExtractor extends CellExtractor[Tuple3[Shape, Int, String], Int] {
+  val intExtractor = new CellExtractor[Tuple3[Shape, Int, String], Int] {
     def read(row: Tuple3[Shape, Int, String]) = Some(row._2)
   }
 
-  case object StringExtractor extends CellExtractor[Tuple3[Shape, Int, String], String] {
+  val stringExtractor = new CellExtractor[Tuple3[Shape, Int, String], String] {
     def read(row: Tuple3[Shape, Int, String]) = Some(row._3)
   }
 
-  val tupleList = List(
+  val tupleRows = List(
     (Circle, 1, "a"),
     (Tetrahedron, 3, "c"),
     (Plane, -1, "e")
   )
 
   val simpleExtractor = extract[One](
-    a = IntExtractor,
-    b = StringExtractor
+    a = intExtractor,
+    b = stringExtractor
   )
 
   "extract[A]" should "have the correct extractHeadOption behaviour" in {
-    simpleExtractor.extractHeadOption(tupleList) should equal(Some(
+    simpleExtractor.extractHeadOption(tupleRows) should equal(Some(
       One(1, "a")
     ))
   }
 
   it should "have the correct extractAll behaviour" in {
-    simpleExtractor.extractAll(tupleList) should equal(List(
+    simpleExtractor.extractAll(tupleRows) should equal(List(
       One(1, "a"),
       One(3, "c"),
       One(-1, "e")
@@ -79,19 +79,19 @@ class CaseClassExtractorMacroSpec extends FlatSpec with Matchers with ExtractorS
   }
 
   it should "support findCellExtractor syntax" in {
-    simpleExtractor.findCellExtractor("a") should equal(Some(IntExtractor))
-    simpleExtractor.findCellExtractor("b") should equal(Some(StringExtractor))
+    simpleExtractor.findCellExtractor("a") should equal(Some(intExtractor))
+    simpleExtractor.findCellExtractor("b") should equal(Some(stringExtractor))
     simpleExtractor.findCellExtractor("c") should equal(None)
   }
 
   it should "work for case classes with one field" in {
-    val extractor = extract[Tiny](a = ShapeExtractor)
+    val extractor = extract[Tiny](a = shapeExtractor)
 
-    extractor.extractHeadOption(tupleList) should equal(Some(
+    extractor.extractHeadOption(tupleRows) should equal(Some(
       Tiny(Circle)
     ))
 
-    extractor.extractAll(tupleList) should equal(List(
+    extractor.extractAll(tupleRows) should equal(List(
       Tiny(Circle),
       Tiny(Tetrahedron),
       Tiny(Plane)
@@ -105,22 +105,22 @@ class CaseClassExtractorMacroSpec extends FlatSpec with Matchers with ExtractorS
     def apply(a: Int, b: Int, c: Int) = new Multiple(a, b + c)
   }
   it should "work for classes with multiple apply methods" in {
-    extract[Multiple](a = IntExtractor)
-    extract[Multiple](a = IntExtractor, b = IntExtractor)
-    extract[Multiple](a = IntExtractor, b = IntExtractor, c = IntExtractor)
+    extract[Multiple](a = intExtractor)
+    extract[Multiple](a = intExtractor, b = intExtractor)
+    extract[Multiple](a = intExtractor, b = intExtractor, c = intExtractor)
   }
 
   case class DefaultParams(a: Int, b: String = "sweet")
   it should "work for apply methods with default parameters" in {
-    extract[DefaultParams](a = IntExtractor, b = StringExtractor)
-    extract[DefaultParams](a = IntExtractor)
+    extract[DefaultParams](a = intExtractor, b = stringExtractor)
+    extract[DefaultParams](a = intExtractor)
   }
 
   case class VarargsParams(a: Int, b: String*)
   it should "work for apply methods with varargs" in {
-    extract[VarargsParams](IntExtractor, StringExtractor, StringExtractor)
-    extract[VarargsParams](IntExtractor, StringExtractor)
-    extract[VarargsParams](IntExtractor)
+    extract[VarargsParams](intExtractor, stringExtractor, stringExtractor)
+    extract[VarargsParams](intExtractor, stringExtractor)
+    extract[VarargsParams](intExtractor)
   }
 
   case class TypeParamClass[A, B](a: A, b: B)
@@ -128,13 +128,13 @@ class CaseClassExtractorMacroSpec extends FlatSpec with Matchers with ExtractorS
   case class DuplicateTypeParamClass[A](a1: A, a2: A)
   case class MixedTypeParamClass[A](s: String, a: A)
   it should "work for apply methods with type parameters" in {
-    extract[TypeParamClass[String, Int]](StringExtractor, IntExtractor)
-    extract[TypeParamClass[String, Int]](StringExtractor, extractConstant(6))
-    extract[ReversedTypeParamClass[String, Int]](IntExtractor, StringExtractor)
-    extract[DuplicateTypeParamClass[Int]](IntExtractor, IntExtractor)
-    extract[MixedTypeParamClass[Int]](StringExtractor, IntExtractor)
-    extract[List[String]](StringExtractor, StringExtractor)
-    extract[Map[Int, String]](IntExtractor -> StringExtractor, IntExtractor -> StringExtractor)
+    extract[TypeParamClass[String, Int]](stringExtractor, intExtractor)
+    extract[TypeParamClass[String, Int]](stringExtractor, extractConstant(6))
+    extract[ReversedTypeParamClass[String, Int]](intExtractor, stringExtractor)
+    extract[DuplicateTypeParamClass[Int]](intExtractor, intExtractor)
+    extract[MixedTypeParamClass[Int]](stringExtractor, intExtractor)
+    extract[List[String]](stringExtractor, stringExtractor)
+    extract[Map[Int, String]](intExtractor -> stringExtractor, intExtractor -> stringExtractor)
   }
 
   it should "handle path-dependent types correctly" in {
@@ -148,41 +148,41 @@ class CaseClassExtractorMacroSpec extends FlatSpec with Matchers with ExtractorS
     // of the resolved types and `asSeenFrom` doesn't work on those types
 
     // extract[PathDependentOne](
-    //   a = IntExtractor,
-    //   b = StringExtractor
+    //   a = intExtractor,
+    //   b = stringExtractor
     // )
 
     // extract[PathDependentOneTwo](
     //   one = extract[PathDependentOne](
-    //     a = IntExtractor,
-    //     b = StringExtractor
+    //     a = intExtractor,
+    //     b = stringExtractor
     //   ),
     //   two = extract[PathDependentTwo](
-    //     a = StringExtractor,
-    //     b = IntExtractor
+    //     a = stringExtractor,
+    //     b = intExtractor
     //   )
     // )
   }
 
   val nestedExtractor = extract[AggregateOneTwo](
     one = extract[One](
-      a = IntExtractor,
-      b = StringExtractor
+      a = intExtractor,
+      b = stringExtractor
     ),
     two = extract[Two](
-      a = StringExtractor,
-      b = ShapeExtractor
+      a = stringExtractor,
+      b = shapeExtractor
     )
   )
 
   "nested extract[A]" should "have the correct extractHeadOption behaviour" in {
-    nestedExtractor.extractHeadOption(tupleList) should equal(Some(
+    nestedExtractor.extractHeadOption(tupleRows) should equal(Some(
       AggregateOneTwo(One(1, "a"), Two("a", Circle))
     ))
   }
 
   it should "have the correct extractAll behaviour" in {
-    nestedExtractor.extractAll(tupleList) should equal(List(
+    nestedExtractor.extractAll(tupleRows) should equal(List(
       AggregateOneTwo(One(1, "a"), Two("a", Circle)),
       AggregateOneTwo(One(3, "c"), Two("c", Tetrahedron)),
       AggregateOneTwo(One(-1, "e"), Two("e", Plane))
@@ -190,8 +190,8 @@ class CaseClassExtractorMacroSpec extends FlatSpec with Matchers with ExtractorS
   }
 
   it should "support findCellExtractor syntax" in {
-    nestedExtractor.findCellExtractor("one.a") should equal(Some(IntExtractor))
-    nestedExtractor.findCellExtractor("two.b") should equal(Some(ShapeExtractor))
+    nestedExtractor.findCellExtractor("one.a") should equal(Some(intExtractor))
+    nestedExtractor.findCellExtractor("two.b") should equal(Some(shapeExtractor))
     nestedExtractor.findCellExtractor("two.c") should equal(None)
   }
 
@@ -199,7 +199,7 @@ class CaseClassExtractorMacroSpec extends FlatSpec with Matchers with ExtractorS
   "extract[A]" should "fail if there are too few arguments" in {
     pending
     // extract[One](
-    //   a = IntExtractor
+    //   a = intExtractor
     // )
   }
 
@@ -207,9 +207,9 @@ class CaseClassExtractorMacroSpec extends FlatSpec with Matchers with ExtractorS
   it should "fail if there are too many arguments" in {
     pending
     // extract[One](
-    //   a = IntExtractor,
-    //   b = IntExtractor,
-    //   c = IntExtractor
+    //   a = intExtractor,
+    //   b = intExtractor,
+    //   c = intExtractor
     // )
   }
 
@@ -217,8 +217,8 @@ class CaseClassExtractorMacroSpec extends FlatSpec with Matchers with ExtractorS
   it should "fail on the wrong types of arguments" in {
     pending
     // extract[One](
-    //   a = StringExtractor,
-    //   b = IntExtractor
+    //   a = stringExtractor,
+    //   b = intExtractor
     // )
   }
 
@@ -226,8 +226,8 @@ class CaseClassExtractorMacroSpec extends FlatSpec with Matchers with ExtractorS
   it should "fail on the wrong argument names" in {
     pending
     // extract[One](
-    //   b = IntExtractor,
-    //   a = StringExtractor
+    //   b = intExtractor,
+    //   a = stringExtractor
     // )
   }
 

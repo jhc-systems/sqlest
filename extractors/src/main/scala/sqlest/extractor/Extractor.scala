@@ -35,9 +35,6 @@ sealed trait Extractor[Row, A] {
 
   protected def checkNullValueAndGet[T](t: Option[T]) =
     t.getOrElse(throw new NullPointerException("Tried to extract a null value without an OptionExtractor"))
-
-  def map[B](func: A => B) = MappedExtractor(this, func)
-  def asOption = OptionExtractor(this)
 }
 
 sealed trait SingleRowExtractor[Row, A] extends Extractor[Row, A] {
@@ -62,6 +59,8 @@ sealed trait SingleRowExtractor[Row, A] extends Extractor[Row, A] {
     } else Nil
   }
 
+  def map[B](func: A => B) = MappedExtractor(this, func)
+  def asOption = OptionExtractor(this)
   def asList = ListMultiRowExtractor(this)
   def groupBy[B](groupBy: Extractor[Row, B]) = GroupedMultiRowExtractor(this, groupBy)
 }
@@ -152,6 +151,26 @@ case class MappedExtractor[Row, A, B](inner: Extractor[Row, A], func: A => B) ex
 }
 
 /**
+ * An extractor that aggregates results from a seq of extractors into a seq.
+ */
+case class SeqExtractor[Row, A](extractors: Seq[Extractor[Row, A]]) extends SingleRowExtractor[Row, Seq[A]] {
+  type Accumulator = Seq[Any]
+
+  def initialize(row: Row): Accumulator = extractors.map(_.initialize(row))
+
+  def accumulate(accumulators: Accumulator, row: Row) = extractors.zip(accumulators).map {
+    case (extractor, accumulator) => extractor.accumulate(accumulator.asInstanceOf[extractor.Accumulator], row)
+  }
+
+  def emit(accumulators: Accumulator) = {
+    val innerEmitted = extractors.zip(accumulators).map {
+      case (extractor, accumulator) => extractor.emit(accumulator.asInstanceOf[extractor.Accumulator])
+    }
+    if (innerEmitted.exists(_.isEmpty)) None else Some(innerEmitted.map(_.get))
+  }
+}
+
+/**
  * An extractor that returns `None` if all of the cells in the
  * `inner` extractor are `null` in the row.
  *
@@ -166,20 +185,6 @@ case class OptionExtractor[Row, A](inner: Extractor[Row, A]) extends SingleRowEx
   def accumulate(accumulator: inner.Accumulator, row: Row) = inner.accumulate(accumulator, row)
 
   def emit(accumulator: inner.Accumulator) = Some(inner.emit(accumulator))
-}
-
-/**
- * An extractor that aggregates results from a seq of extractors into a seq.
- */
-case class SeqExtractor[Row, A](extractors: Seq[Extractor[Row, A]]) extends SingleRowExtractor[Row, Seq[A]] {
-  type Accumulator = Seq[Option[A]]
-
-  def initialize(row: Row): Accumulator = extractors.map(inner => inner.emit(inner.initialize(row)))
-
-  def accumulate(accumulator: Accumulator, row: Row) =
-    accumulator ++ extractors.map(inner => inner.emit(inner.initialize(row)))
-
-  def emit(accumulator: Accumulator) = Some(accumulator.map(checkNullValueAndGet))
 }
 
 /**

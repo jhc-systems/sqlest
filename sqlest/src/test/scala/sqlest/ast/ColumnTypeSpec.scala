@@ -20,18 +20,18 @@ import org.scalatest._
 import org.scalatest.matchers._
 import sqlest._
 
-class ColumnTypeSpec extends FlatSpec with Matchers with CustomMatchers {
+class ColumnTypeSpec extends FlatSpec with Matchers {
   "basic data types" should "have implicit ColumnTypes" in {
-    implicitly[ColumnType[Boolean]] should be(anInstanceOf[ColumnType[Boolean]])
-    implicitly[ColumnType[Int]] should be(anInstanceOf[ColumnType[Int]])
-    implicitly[ColumnType[Double]] should be(anInstanceOf[ColumnType[Double]])
-    implicitly[ColumnType[String]] should be(anInstanceOf[ColumnType[String]])
+    implicitly[ColumnType[Boolean]]
+    implicitly[ColumnType[Int]]
+    implicitly[ColumnType[Double]]
+    implicitly[ColumnType[String]]
   }
 
   "optional data types" should "have implicit ColumnTypes" in {
-    implicitly[ColumnType[Option[Boolean]]] should be(anInstanceOf[OptionColumnType[Boolean, Boolean]])
-    implicitly[ColumnType[Option[Int]]] should be(anInstanceOf[OptionColumnType[Int, Int]])
-    implicitly[ColumnType[Option[Double]]] should be(anInstanceOf[OptionColumnType[Double, Double]])
-    implicitly[ColumnType[Option[String]]] should be(anInstanceOf[OptionColumnType[String, String]])
+    implicitly[ColumnType[Option[Boolean]]]
+    implicitly[ColumnType[Option[Int]]]
+    implicitly[ColumnType[Option[Double]]]
+    implicitly[ColumnType[Option[String]]]
   }
 }
