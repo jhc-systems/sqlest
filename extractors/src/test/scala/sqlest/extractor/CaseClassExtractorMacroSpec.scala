@@ -36,16 +36,10 @@ case object Plane extends Shape
 
 class CaseClassExtractorMacroSpec extends FlatSpec with Matchers with ExtractorSyntax[Tuple3[Shape, Int, String]] with PathDependenceTestData {
 
-  // TODO: We can't currently inherit from TestData here
-  // because the macro can't reify TestData.this.One and
-  // NamedExtractorSyntaxSpec.this.One. Fix this!
-
   case class One(a: Int, b: String)
   case class Two(a: String, b: Shape)
-
   case class AggregateOneTwo(one: One, two: Two)
-
-  case class Tiny(a: Int)
+  case class Tiny(a: Shape)
 
   case object ShapeExtractor extends CellExtractor[Tuple3[Shape, Int, String], Shape] {
     def read(row: Tuple3[Shape, Int, String]) = Some(row._1)
@@ -59,26 +53,15 @@ class CaseClassExtractorMacroSpec extends FlatSpec with Matchers with ExtractorS
     def read(row: Tuple3[Shape, Int, String]) = Some(row._3)
   }
 
-  val simpleExtractor = extract[One](
-    a = IntExtractor,
-    b = StringExtractor
-  )
-
-  val nestedExtractor = extract[AggregateOneTwo](
-    one = extract[One](
-      a = IntExtractor,
-      b = StringExtractor
-    ),
-    two = extract[Two](
-      a = StringExtractor,
-      b = ShapeExtractor
-    )
-  )
-
   val tupleList = List(
     (Circle, 1, "a"),
     (Tetrahedron, 3, "c"),
     (Plane, -1, "e")
+  )
+
+  val simpleExtractor = extract[One](
+    a = IntExtractor,
+    b = StringExtractor
   )
 
   "extract[A]" should "have the correct extractHeadOption behaviour" in {
@@ -102,7 +85,17 @@ class CaseClassExtractorMacroSpec extends FlatSpec with Matchers with ExtractorS
   }
 
   it should "work for case classes with one field" in {
-    extract[Tiny](a = IntExtractor)
+    val extractor = extract[Tiny](a = ShapeExtractor)
+
+    extractor.extractHeadOption(tupleList) should equal(Some(
+      Tiny(Circle)
+    ))
+
+    extractor.extractAll(tupleList) should equal(List(
+      Tiny(Circle),
+      Tiny(Tetrahedron),
+      Tiny(Plane)
+    ))
   }
 
   class Multiple(a: Int, b: Int)
@@ -147,6 +140,18 @@ class CaseClassExtractorMacroSpec extends FlatSpec with Matchers with ExtractorS
   it should "handle path-dependent types correctly" in {
     pending
     // TODO: This should compile, but doesn't due to a bug related to path dependent types:
+    // This is particularly hard because even if the basic version of this is fixed by using
+    //   val enclosingType = c.prefix.actualType
+    //   val typeOfA = weakTypeOf[A].asSeenFrom(enclosingType, enclosingType.typeSymbol.asClass)
+    //   (arg: $tupleType) => ${companion.name.toTermName}.$applyMethod(..$tupleAccessors)
+    // the apply method for the nested version refers to the path dependent inner types instead
+    // of the resolved types and `asSeenFrom` doesn't work on those types
+
+    // extract[PathDependentOne](
+    //   a = IntExtractor,
+    //   b = StringExtractor
+    // )
+
     // extract[PathDependentOneTwo](
     //   one = extract[PathDependentOne](
     //     a = IntExtractor,
@@ -158,6 +163,17 @@ class CaseClassExtractorMacroSpec extends FlatSpec with Matchers with ExtractorS
     //   )
     // )
   }
+
+  val nestedExtractor = extract[AggregateOneTwo](
+    one = extract[One](
+      a = IntExtractor,
+      b = StringExtractor
+    ),
+    two = extract[Two](
+      a = StringExtractor,
+      b = ShapeExtractor
+    )
+  )
 
   "nested extract[A]" should "have the correct extractHeadOption behaviour" in {
     nestedExtractor.extractHeadOption(tupleList) should equal(Some(
