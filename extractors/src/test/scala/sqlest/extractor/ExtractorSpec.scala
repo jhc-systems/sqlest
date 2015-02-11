@@ -257,11 +257,11 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
   it should "wrap a SeqExtractor and return Some of the extracted value or None if NullPointerException would have been thrown" in {
     val seqRows = List(Seq(null, 1, 2), Seq(2, 3, 4), Seq(5, 6, null))
     val seqExtractor: OptionExtractor[Seq[Any], Seq[Int]] =
-      extractSeq(
+      SeqExtractor(Seq(
         intExtractorAtIndex(0),
         intExtractorAtIndex(1),
         intExtractorAtIndex(2).map(_ * 2)
-      ).asOption
+      )).asOption
 
     seqExtractor.extractHeadOption(Nil) should be(None)
     seqExtractor.extractHeadOption(seqRows) should be(Some(None))

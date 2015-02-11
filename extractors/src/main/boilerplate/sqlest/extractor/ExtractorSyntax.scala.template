@@ -21,8 +21,6 @@ import scala.language.experimental.macros
 trait ExtractorSyntax[Row] {
   def extractConstant[A](value: A) = ConstantExtractor[Row, A](value)
 
-  def extractSeq[A](extractors: Extractor[Row, A]*) = SeqExtractor(extractors)
-
   def extract[A]: Dynamic = macro CaseClassExtractorMacro.apply[Row, A]
 
 [2..22#  implicit def extract[Row, [#A1#]](t: Tuple1[[#Extractor[Row, A1]#]]) =
