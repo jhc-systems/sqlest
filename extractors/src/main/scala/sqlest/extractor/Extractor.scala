@@ -35,19 +35,28 @@ sealed trait Extractor[Row, A] {
 
   protected def checkNullValueAndGet[T](t: Option[T]) =
     t.getOrElse(throw new NullPointerException("Tried to extract a null value without an OptionExtractor"))
+
+  def map[B](func: A => B) = MappedExtractor(this, func)
+  def asOption = OptionExtractor(this)
 }
 
-sealed trait SingleRowExtractor[Row, A] extends Extractor[Row, A] {
-  final type SingleResult = A
+/**
+ * A SimpleExtractor is an Extractor where the extracted type is the same as the emitted type.
+ * This is the case for almost all extractors
+ */
+trait SimpleExtractor[Row, A] {
+  this: Extractor[Row, A] =>
 
-  final def extractHeadOption(rows: Iterable[Row]): Option[A] = {
+  type SingleResult = A
+
+  def extractHeadOption(rows: Iterable[Row]): Option[A] = {
     val rowIterator = rows.iterator
     if (rowIterator.hasNext) {
       Some(checkNullValueAndGet(emit(initialize(rowIterator.next))))
     } else None
   }
 
-  final def extractAll(rows: Iterable[Row]): List[A] = {
+  def extractAll(rows: Iterable[Row]): List[A] = {
     val rowIterator = rows.iterator
     if (rowIterator.hasNext) {
       var accumulator = Queue(checkNullValueAndGet(emit(initialize(rowIterator.next))))
@@ -59,46 +68,18 @@ sealed trait SingleRowExtractor[Row, A] extends Extractor[Row, A] {
     } else Nil
   }
 
-  def map[B](func: A => B) = MappedExtractor(this, func)
-  def asOption = OptionExtractor(this)
-  def asList = ListMultiRowExtractor(this)
-  def groupBy[B](groupBy: Extractor[Row, B]) = GroupedMultiRowExtractor(this, groupBy)
+  def groupBy[B](groupBy: Extractor[Row, B]) = GroupedExtractor(this, groupBy)
 }
 
-sealed trait MultiRowExtractor[Row, A] extends Extractor[Row, List[A]] {
-  type Accumulator <: Traversable[_]
-
-  final type SingleResult = A
-
-  final def extractHeadOption(rows: Iterable[Row]): Option[A] = {
-    val rowIterator = rows.iterator
-    if (rowIterator.hasNext) {
-      var accumulator = initialize(rowIterator.next)
-
-      while (rowIterator.hasNext && accumulator.size == 1)
-        accumulator = accumulate(accumulator, rowIterator.next)
-
-      checkNullValueAndGet(emit(accumulator)).headOption
-    } else None
-  }
-
-  final def extractAll(rows: Iterable[Row]): List[A] = {
-    val rowIterator = rows.iterator
-    if (rowIterator.hasNext) {
-      var accumulator = initialize(rowIterator.next)
-
-      while (rowIterator.hasNext)
-        accumulator = accumulate(accumulator, rowIterator.next)
-
-      checkNullValueAndGet(emit(accumulator))
-    } else Nil
-  }
+trait SingleRowExtractor[Row, A] {
+  this: Extractor[Row, A] =>
+  def asList = ListMultiRowExtractor(this)
 }
 
 /**
  * Extractor that always returns the same value
  */
-case class ConstantExtractor[Row, A](value: A) extends SingleRowExtractor[Row, A] {
+case class ConstantExtractor[Row, A](value: A) extends Extractor[Row, A] with SimpleExtractor[Row, A] with SingleRowExtractor[Row, A] {
   type Accumulator = A
 
   def initialize(row: Row) = value
@@ -109,7 +90,7 @@ case class ConstantExtractor[Row, A](value: A) extends SingleRowExtractor[Row, A
 /**
  * Extractor that emits the values for a single cell.
  */
-trait CellExtractor[Row, A] extends SingleRowExtractor[Row, A] {
+trait CellExtractor[Row, A] extends Extractor[Row, A] with SimpleExtractor[Row, A] with SingleRowExtractor[Row, A] {
   type Accumulator = Option[A]
 
   def initialize(row: Row) = read(row)
@@ -124,7 +105,7 @@ trait CellExtractor[Row, A] extends SingleRowExtractor[Row, A] {
 /**
  * An extractor acts as a base type for extracting Product types
  */
-trait ProductExtractor[Row, A <: Product] extends SingleRowExtractor[Row, A] {
+trait ProductExtractor[Row, A <: Product] extends Extractor[Row, A] with SimpleExtractor[Row, A] with SingleRowExtractor[Row, A] {
   def innerExtractors: List[Extractor[Row, _]]
 }
 
@@ -140,7 +121,7 @@ trait ProductExtractorNames {
 /**
  * An extractor that behaves as `inner` but pipes its `emitted` values through `func`.
  */
-case class MappedExtractor[Row, A, B](inner: Extractor[Row, A], func: A => B) extends SingleRowExtractor[Row, B] {
+case class MappedExtractor[Row, A, B](inner: Extractor[Row, A], func: A => B) extends Extractor[Row, B] with SimpleExtractor[Row, B] with SingleRowExtractor[Row, B] {
   type Accumulator = inner.Accumulator
 
   def initialize(row: Row) = inner.initialize(row)
@@ -153,7 +134,7 @@ case class MappedExtractor[Row, A, B](inner: Extractor[Row, A], func: A => B) ex
 /**
  * An extractor that aggregates results from a seq of extractors into a seq.
  */
-case class SeqExtractor[Row, A](extractors: Seq[Extractor[Row, A]]) extends SingleRowExtractor[Row, Seq[A]] {
+case class SeqExtractor[Row, A](extractors: Seq[Extractor[Row, A]]) extends Extractor[Row, Seq[A]] with SimpleExtractor[Row, Seq[A]] with SingleRowExtractor[Row, Seq[A]] {
   type Accumulator = Seq[Any]
 
   def initialize(row: Row): Accumulator = extractors.map(_.initialize(row))
@@ -177,7 +158,7 @@ case class SeqExtractor[Row, A](extractors: Seq[Extractor[Row, A]]) extends Sing
  * If any underlying cell is non-`null`, this returns `Some`
  * of `inner`'s result.
  */
-case class OptionExtractor[Row, A](inner: Extractor[Row, A]) extends SingleRowExtractor[Row, Option[A]] {
+case class OptionExtractor[Row, A](inner: Extractor[Row, A]) extends Extractor[Row, Option[A]] with SimpleExtractor[Row, Option[A]] with SingleRowExtractor[Row, Option[A]] {
   type Accumulator = inner.Accumulator
 
   def initialize(row: Row) = inner.initialize(row)
@@ -188,9 +169,9 @@ case class OptionExtractor[Row, A](inner: Extractor[Row, A]) extends SingleRowEx
 }
 
 /**
- * An extractor that accumulates results into a list.
+ * An extractor that accumulates results from rows into a list.
  */
-case class ListMultiRowExtractor[Row, A](inner: Extractor[Row, A]) extends SingleRowExtractor[Row, List[A]] {
+case class ListMultiRowExtractor[Row, A](inner: Extractor[Row, A]) extends Extractor[Row, List[A]] with SimpleExtractor[Row, List[A]] {
   type Accumulator = Queue[Option[A]]
 
   def initialize(row: Row) = Queue(inner.emit(inner.initialize(row)))
@@ -214,8 +195,9 @@ case class ListMultiRowExtractor[Row, A](inner: Extractor[Row, A]) extends Singl
 /**
  * An extractor that accumulates results with the same groupBy value into the same value
  */
-case class GroupedMultiRowExtractor[Row, A, B](inner: Extractor[Row, A], groupBy: Extractor[Row, B]) extends MultiRowExtractor[Row, A] {
+case class GroupedExtractor[Row, A, B](inner: Extractor[Row, A], groupBy: Extractor[Row, B]) extends Extractor[Row, List[A]] {
   // Consider using a tuple of a Queue and a HashMap as the Accumulator for efficiency
+  type SingleResult = A
   type Accumulator = ListMap[B, inner.Accumulator]
 
   def initialize(row: Row) =
@@ -233,6 +215,30 @@ case class GroupedMultiRowExtractor[Row, A, B](inner: Extractor[Row, A], groupBy
   }
 
   def emit(accumulator: ListMap[B, inner.Accumulator]) = Some(accumulator.values.map(inner.emit).toList.map(checkNullValueAndGet))
+
+  def extractHeadOption(rows: Iterable[Row]): Option[A] = {
+    val rowIterator = rows.iterator
+    if (rowIterator.hasNext) {
+      var accumulator = initialize(rowIterator.next)
+
+      while (rowIterator.hasNext && accumulator.size == 1)
+        accumulator = accumulate(accumulator, rowIterator.next)
+
+      checkNullValueAndGet(emit(accumulator)).headOption
+    } else None
+  }
+
+  def extractAll(rows: Iterable[Row]): List[A] = {
+    val rowIterator = rows.iterator
+    if (rowIterator.hasNext) {
+      var accumulator = initialize(rowIterator.next)
+
+      while (rowIterator.hasNext)
+        accumulator = accumulate(accumulator, rowIterator.next)
+
+      checkNullValueAndGet(emit(accumulator))
+    } else Nil
+  }
 }
 
 object Extractor {

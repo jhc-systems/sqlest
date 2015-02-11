@@ -53,7 +53,7 @@ trait ExecutorSyntax extends QuerySyntax {
         case OptionExtractor(innerExtractor) => extractorColumns(innerExtractor)
         case SeqExtractor(extractors) => extractors.flatMap(extractorColumns).toList
         case ListMultiRowExtractor(innerExtractor) => extractorColumns(innerExtractor)
-        case GroupedMultiRowExtractor(innerExtractor, groupByExtractor) => extractorColumns(innerExtractor) ++ extractorColumns(groupByExtractor)
+        case GroupedExtractor(innerExtractor, groupByExtractor) => extractorColumns(innerExtractor) ++ extractorColumns(groupByExtractor)
       }
     }
   }

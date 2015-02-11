@@ -57,7 +57,7 @@ object ExtractorFinder {
       case MappedExtractor(inner, _) => apply(inner, path)
       case OptionExtractor(inner) => apply(inner, path)
       case ListMultiRowExtractor(inner) => apply(inner, path)
-      case GroupedMultiRowExtractor(inner, _) => apply(inner, path)
+      case GroupedExtractor(inner, _) => apply(inner, path)
     }
 
   def findByName(productExtractorNames: ProductExtractor[_, _] with ProductExtractorNames, name: String): Option[Extractor[_, _]] =

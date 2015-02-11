@@ -260,7 +260,7 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
     ))
   }
 
-  "ListMultiRowExtractor" should "wrap the value from each row in a list when not in a GroupedMultiRowExtractor" in {
+  "ListMultiRowExtractor" should "wrap the value from each row in a list when not in a GroupedExtractor" in {
     val seqRows = List(
       Seq(1, "a"),
       Seq(3, "c"),
@@ -306,9 +306,9 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
     ))
   }
 
-  "ListMultiRowExtractor within a GroupedMultiRowExtractor" should "accumulate all values with the same group by value into a list" in {
+  "ListMultiRowExtractor within a GroupedExtractor" should "accumulate all values with the same group by value into a list" in {
     val seqRows = List(Seq(0, "first"), Seq(0, "second"), Seq(1, "third"), Seq(2, "forth"), Seq(2, "fifth"))
-    val groupedExtractor: GroupedMultiRowExtractor[Seq[Any], (Int, List[String]), Int] =
+    val groupedExtractor: GroupedExtractor[Seq[Any], (Int, List[String]), Int] =
       extract(
         intExtractorAtIndex(0),
         stringExtractorAtIndex(1).asList
@@ -363,7 +363,7 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
 
   it should "stop in extractHeadOption when group by value changes" in {
     val seqRows = List(Seq(0, "first"), Seq(0, "second"), Seq(1, "third"), Seq(0, "forth"))
-    val groupedExtractor: GroupedMultiRowExtractor[Seq[Any], (Int, List[String]), Int] =
+    val groupedExtractor: GroupedExtractor[Seq[Any], (Int, List[String]), Int] =
       extract(
         intExtractorAtIndex(0),
         stringExtractorAtIndex(1).asList
@@ -375,7 +375,7 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
 
   it should "return an empty list if all inner values are null values" in {
     val seqRows = List(Seq(0, null), Seq(0, null), Seq(1, "third"), Seq(2, null))
-    val groupedExtractor: GroupedMultiRowExtractor[Seq[Any], (Int, List[String]), Int] =
+    val groupedExtractor: GroupedExtractor[Seq[Any], (Int, List[String]), Int] =
       extract(
         intExtractorAtIndex(0),
         stringExtractorAtIndex(1).asList
@@ -392,7 +392,7 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
 
   it should "throw a NullPointerException if some but not all of the inner values are null values" in {
     val seqRows = List(Seq(0, "first"), Seq(0, null), Seq(1, "third"), Seq(2, null))
-    val groupedExtractor: GroupedMultiRowExtractor[Seq[Any], (Int, List[String]), Int] =
+    val groupedExtractor: GroupedExtractor[Seq[Any], (Int, List[String]), Int] =
       extract(
         intExtractorAtIndex(0),
         stringExtractorAtIndex(1).asList
