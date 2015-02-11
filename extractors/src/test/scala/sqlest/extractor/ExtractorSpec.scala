@@ -16,21 +16,10 @@
 
 package sqlest.extractor
 
-import org.joda.time.DateTime
 import org.scalatest._
 import org.scalatest.matchers._
-import sqlest._
 
 class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]] {
-
-  case class One(a: Int, b: String)
-  case class Two(a: String, b: Int)
-  case class Three(a: Option[Int], b: Option[String])
-
-  case class AggregateOneTwo(one: One, two: Two)
-  case class AggregateOneTwoThree(one: One, two: Two, three: Three)
-  case class AggregateOneTwoOptionThree(one: One, two: Two, three: Option[Three])
-  case class AggregateOneTwoThenThree(oneTwo: AggregateOneTwo, three: Three)
 
   def intExtractorAtIndex(index: Int) = new CellExtractor[Seq[Any], Int] {
     def read(seq: Seq[Any]) = Option(seq(index)).map(value => Integer.parseInt(value.toString))
@@ -39,23 +28,6 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
   def stringExtractorAtIndex(index: Int) = new CellExtractor[Seq[Any], String] {
     def read(seq: Seq[Any]) = Option(seq(index)).map(_.toString)
   }
-
-  val seqRows = List(
-    Seq(1, "a", "b", 2, null, "x"),
-    Seq(3, "c", "d", 4, 9, null),
-    Seq(-1, "e", "f", 6, null, null)
-  )
-
-  case class Inner(b: Int, c: List[Int])
-  case class Outer(a: Int, b: List[Inner])
-  case class Flattened(a: Int, b: List[Int], c: List[Int])
-  case class AggregateOnePointFive(one: One, str: String)
-  case class DefaultParams(a: Int, b: String = "sweet")
-  case class VarargsParams(a: Int, b: String*)
-  case class TypeParamClass[A, B](a: A, b: B)
-  case class ReversedTypeParamClass[A, B](b: B, a: A)
-  case class DuplicateTypeParamClass[A](a1: A, a2: A)
-  case class MixedTypeParamClass[A](s: String, a: A)
 
   "ConstantExtractor" should "extract the passed parameter for every row" in {
     val seqRows = List(Seq(), Seq(), Seq())
@@ -83,7 +55,7 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
     stringExtractor.extractAll(seqRows) should be(List("a", "c", "e"))
   }
 
-  it should "throw a NullPointerException if read returns a None" in {
+  it should "throw a NullPointerException if it reads a null value" in {
     val seqRows = List(Seq(null, null), Seq(2, "a"), Seq(4, "b"))
     val intExtractor: CellExtractor[Seq[Any], Int] = intExtractorAtIndex(0)
     val stringExtractor: CellExtractor[Seq[Any], String] = stringExtractorAtIndex(1)
@@ -119,7 +91,7 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
     mappedStringExtractor.extractAll(seqRows) should be(List("olleh", "eyb", "level"))
   }
 
-  it should "throw a NullPointerException if the inner extractor would have thrown a NullPointerException" in {
+  it should "throw a NullPointerException if the inner extractor extracted a null value" in {
     val seqRows = List(Seq(null), Seq(2), Seq(null))
     val mappedIntExtractor: MappedExtractor[Seq[Any], Int, Boolean] = intExtractorAtIndex(0).map(_ == 2)
 
@@ -142,7 +114,11 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
 
     tuple3Extractor.extractHeadOption(Nil) should be(None)
     tuple3Extractor.extractHeadOption(seqRows) should be(Some((0, "olleh", false)))
-    tuple3Extractor.extractAll(seqRows) should be(List((0, "olleh", false), (2, "eyb", true), (4, "level", false)))
+    tuple3Extractor.extractAll(seqRows) should be(List(
+      (0, "olleh", false),
+      (2, "eyb", true),
+      (4, "level", false)
+    ))
   }
 
   it should "create a MappedExtractor using the map method that works with the parameters not in a tuple" in {
@@ -158,10 +134,14 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
 
     tuple3Extractor.extractHeadOption(Nil) should be(None)
     tuple3Extractor.extractHeadOption(seqRows) should be(Some(Triple(0, "olleh", false)))
-    tuple3Extractor.extractAll(seqRows) should be(List(Triple(0, "olleh", false), Triple(2, "eyb", true), Triple(4, "level", false)))
+    tuple3Extractor.extractAll(seqRows) should be(List(
+      Triple(0, "olleh", false),
+      Triple(2, "eyb", true),
+      Triple(4, "level", false)
+    ))
   }
 
-  it should "throw a NullPointerException if any of the inner extractors would have thrown a NullPointerException" in {
+  it should "throw a NullPointerException if any of the inner extractors extracted a null value" in {
     val seqRows = List(Seq(0, null), Seq(2, "bye"), Seq(4, "level"))
 
     case class Triple(a: Int, b: String, c: Boolean)
@@ -191,10 +171,14 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
 
     seqExtractor.extractHeadOption(Nil) should be(None)
     seqExtractor.extractHeadOption(seqRows) should be(Some(Seq(0, 1, 4)))
-    seqExtractor.extractAll(seqRows) should be(List(Seq(0, 1, 4), Seq(2, 3, 8), Seq(5, 6, 14)))
+    seqExtractor.extractAll(seqRows) should be(List(
+      Seq(0, 1, 4),
+      Seq(2, 3, 8),
+      Seq(5, 6, 14)
+    ))
   }
 
-  it should "throw a NullPointerException if any of the inner extractors would have thrown a NullPointerException" in {
+  it should "throw a NullPointerException if any of the inner extractors extracted a null value" in {
     val seqRows = List(Seq(null, 1, 2), Seq(2, 3, 4), Seq(5, 6, null))
     val seqExtractor: SeqExtractor[Seq[Any], Int] =
       SeqExtractor(Seq(
@@ -220,7 +204,7 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
     optionConstantExtractor.extractAll(seqRows) should be(List(Some(10), Some(10), Some(10)))
   }
 
-  it should "wrap a CellExtractor and return Some of the extracted value or None if NullPointerException would have been thrown" in {
+  it should "wrap a CellExtractor and wrap any null value in an Option" in {
     val seqRows = List(Seq(null), Seq(2), Seq(null))
     val optionIntExtractor: OptionExtractor[Seq[Any], Int] = intExtractorAtIndex(0).asOption
 
@@ -229,7 +213,7 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
     optionIntExtractor.extractAll(seqRows) should be(List(None, Some(2), None))
   }
 
-  it should "wrap a MappedExtractor and return Some of the extracted value or None if NullPointerException would have been thrown" in {
+  it should "wrap a MappedExtractor and wrap any null value in an Option" in {
     val seqRows = List(Seq(null), Seq(2), Seq(4))
     val optionMappedIntExtractor: OptionExtractor[Seq[Any], Boolean] = intExtractorAtIndex(0).map(_ == 2).asOption
 
@@ -238,7 +222,7 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
     optionMappedIntExtractor.extractAll(seqRows) should be(List(None, Some(true), Some(false)))
   }
 
-  it should "wrap a TupleExtractor and return Some of the extracted value or None if NullPointerException would have been thrown" in {
+  it should "wrap a TupleExtractor and wrap any null value in an Option" in {
     val seqRows = List(Seq(0, null), Seq(2, "bye"), Seq(4, "level"))
 
     case class Triple(a: Int, b: String, c: Boolean)
@@ -251,10 +235,14 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
 
     tuple3Extractor.extractHeadOption(Nil) should be(None)
     tuple3Extractor.extractHeadOption(seqRows) should be(Some(None))
-    tuple3Extractor.extractAll(seqRows) should be(List(None, Some((2, "eyb", true)), Some((4, "level", false))))
+    tuple3Extractor.extractAll(seqRows) should be(List(
+      None,
+      Some((2, "eyb", true)),
+      Some((4, "level", false))
+    ))
   }
 
-  it should "wrap a SeqExtractor and return Some of the extracted value or None if NullPointerException would have been thrown" in {
+  it should "wrap a SeqExtractor and wrap any null value in an Option" in {
     val seqRows = List(Seq(null, 1, 2), Seq(2, 3, 4), Seq(5, 6, null))
     val seqExtractor: OptionExtractor[Seq[Any], Seq[Int]] =
       SeqExtractor(Seq(
@@ -265,6 +253,157 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
 
     seqExtractor.extractHeadOption(Nil) should be(None)
     seqExtractor.extractHeadOption(seqRows) should be(Some(None))
-    seqExtractor.extractAll(seqRows) should be(List(None, Some(List(2, 3, 8)), None))
+    seqExtractor.extractAll(seqRows) should be(List(
+      None,
+      Some(List(2, 3, 8)),
+      None
+    ))
+  }
+
+  "ListMultiRowExtractor" should "wrap the value from each row in a list when not in a GroupedMultiRowExtractor" in {
+    val seqRows = List(
+      Seq(1, "a"),
+      Seq(3, "c"),
+      Seq(-1, "e")
+    )
+
+    val intListExtractor: ListMultiRowExtractor[Seq[Any], Int] = intExtractorAtIndex(0).asList
+    intListExtractor.extractHeadOption(Nil) should be(None)
+    intListExtractor.extractHeadOption(seqRows) should be(Some(List(1)))
+    intListExtractor.extractAll(seqRows) should be(List(List(1), List(3), List(-1)))
+
+    val stringListExtractor: ListMultiRowExtractor[Seq[Any], String] = stringExtractorAtIndex(1).asList
+    stringListExtractor.extractHeadOption(Nil) should be(None)
+    stringListExtractor.extractHeadOption(seqRows) should be(Some(List("a")))
+    stringListExtractor.extractAll(seqRows) should be(List(List("a"), List("c"), List("e")))
+  }
+
+  it should "be composable with an OptionExtractor" in {
+    val seqRows = List(Seq(null), Seq(3), Seq(null), Seq(-1))
+
+    val intListExtractor: ListMultiRowExtractor[Seq[Any], Option[Int]] = intExtractorAtIndex(0).asOption.asList
+    intListExtractor.extractHeadOption(Nil) should be(None)
+    intListExtractor.extractHeadOption(seqRows) should be(Some(List(None)))
+    intListExtractor.extractAll(seqRows) should be(List(
+      List(None),
+      List(Some(3)),
+      List(None),
+      List(Some(-1))
+    ))
+  }
+
+  it should "work with another ListMultiRowExtractor as peers within another extractor" in {
+    val seqRows = List(Seq(0, "hello"), Seq(2, "bye"), Seq(4, "level"))
+    val tupleOfListExtractors: Tuple2Extractor[Seq[Any], List[Int], List[String]] =
+      extract(intExtractorAtIndex(0).asList, stringExtractorAtIndex(1).asList)
+
+    tupleOfListExtractors.extractHeadOption(Nil) should be(None)
+    tupleOfListExtractors.extractHeadOption(seqRows) should be(Some(List(0), List("hello")))
+    tupleOfListExtractors.extractAll(seqRows) should be(List(
+      (List(0), List("hello")),
+      (List(2), List("bye")),
+      (List(4), List("level"))
+    ))
+  }
+
+  "ListMultiRowExtractor within a GroupedMultiRowExtractor" should "accumulate all values with the same group by value into a list" in {
+    val seqRows = List(Seq(0, "first"), Seq(0, "second"), Seq(1, "third"), Seq(2, "forth"), Seq(2, "fifth"))
+    val groupedExtractor: GroupedMultiRowExtractor[Seq[Any], (Int, List[String]), Int] =
+      extract(
+        intExtractorAtIndex(0),
+        stringExtractorAtIndex(1).asList
+      ).groupBy(intExtractorAtIndex(0))
+
+    groupedExtractor.extractHeadOption(Nil) should be(None)
+    groupedExtractor.extractHeadOption(seqRows) should be(Some((0, List("first", "second"))))
+    groupedExtractor.extractAll(seqRows) should be(List(
+      (0, List("first", "second")),
+      (1, List("third")),
+      (2, List("forth", "fifth"))
+    ))
+  }
+
+  it should "nest with another ListMultiRowExtractor" in {
+    val seqRows = List(
+      Seq(1, 1, 1),
+      Seq(1, 1, 2),
+      Seq(1, 2, 3),
+      Seq(1, 2, 4),
+      Seq(2, 3, 5),
+      Seq(2, 3, 6),
+      Seq(2, 4, 7),
+      Seq(2, 4, 8)
+    )
+
+    val nestedListExtractor = extract(
+      intExtractorAtIndex(0),
+      extract(
+        intExtractorAtIndex(1),
+        intExtractorAtIndex(2).asList
+      ).asList
+    ).groupBy(intExtractorAtIndex(0))
+
+    nestedListExtractor.extractHeadOption(Nil) should be(None)
+    nestedListExtractor.extractHeadOption(seqRows) should be(Some((1, List((1, List(1)), (1, List(2)), (2, List(3)), (2, List(4))))))
+    nestedListExtractor.extractAll(seqRows) should be(List(
+      (1,
+        List(
+          (1, List(1)),
+          (1, List(2)),
+          (2, List(3)),
+          (2, List(4)))),
+      (2,
+        List(
+          (3, List(5)),
+          (3, List(6)),
+          (4, List(7)),
+          (4, List(8))))
+    ))
+  }
+
+  it should "stop in extractHeadOption when group by value changes" in {
+    val seqRows = List(Seq(0, "first"), Seq(0, "second"), Seq(1, "third"), Seq(0, "forth"))
+    val groupedExtractor: GroupedMultiRowExtractor[Seq[Any], (Int, List[String]), Int] =
+      extract(
+        intExtractorAtIndex(0),
+        stringExtractorAtIndex(1).asList
+      ).groupBy(intExtractorAtIndex(0))
+
+    groupedExtractor.extractHeadOption(Nil) should be(None)
+    groupedExtractor.extractHeadOption(seqRows) should be(Some((0, List("first", "second"))))
+  }
+
+  it should "return an empty list if all inner values are null values" in {
+    val seqRows = List(Seq(0, null), Seq(0, null), Seq(1, "third"), Seq(2, null))
+    val groupedExtractor: GroupedMultiRowExtractor[Seq[Any], (Int, List[String]), Int] =
+      extract(
+        intExtractorAtIndex(0),
+        stringExtractorAtIndex(1).asList
+      ).groupBy(intExtractorAtIndex(0))
+
+    groupedExtractor.extractHeadOption(Nil) should be(None)
+    groupedExtractor.extractHeadOption(seqRows) should be(Some((0, Nil)))
+    groupedExtractor.extractAll(seqRows) should be(List(
+      (0, Nil),
+      (1, List("third")),
+      (2, Nil)
+    ))
+  }
+
+  it should "throw a NullPointerException if some but not all of the inner values are null values" in {
+    val seqRows = List(Seq(0, "first"), Seq(0, null), Seq(1, "third"), Seq(2, null))
+    val groupedExtractor: GroupedMultiRowExtractor[Seq[Any], (Int, List[String]), Int] =
+      extract(
+        intExtractorAtIndex(0),
+        stringExtractorAtIndex(1).asList
+      ).groupBy(intExtractorAtIndex(0))
+
+    intercept[NullPointerException] {
+      groupedExtractor.extractHeadOption(seqRows) should be(Some((0, Nil)))
+    }
+
+    intercept[NullPointerException] {
+      groupedExtractor.extractAll(seqRows)
+    }
   }
 }

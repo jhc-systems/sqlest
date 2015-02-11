@@ -190,7 +190,7 @@ case class OptionExtractor[Row, A](inner: Extractor[Row, A]) extends SingleRowEx
 /**
  * An extractor that accumulates results into a list.
  */
-case class ListMultiRowExtractor[Row, A](inner: Extractor[Row, A]) extends MultiRowExtractor[Row, A] {
+case class ListMultiRowExtractor[Row, A](inner: Extractor[Row, A]) extends SingleRowExtractor[Row, List[A]] {
   type Accumulator = Queue[Option[A]]
 
   def initialize(row: Row) = Queue(inner.emit(inner.initialize(row)))
