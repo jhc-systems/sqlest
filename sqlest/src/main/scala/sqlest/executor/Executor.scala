@@ -36,26 +36,12 @@ trait ExecutorSyntax extends QuerySyntax {
       extractHeadOption(extractor).getOrElse(throw new NoSuchElementException("extractHead when no results returned"))
 
     def extractHeadOption(extractor: Extractor[ResultSet, _]): Option[extractor.SingleResult] =
-      database.executeSelect(select.what(extractorColumns(extractor)))(row => extractor.extractHeadOption(row))
+      database.executeSelect(select.what(extractor.columns))(row => extractor.extractHeadOption(row))
 
     def extractAll(extractor: Extractor[ResultSet, _]): List[extractor.SingleResult] =
-      database.executeSelect(select.what(extractorColumns(extractor)))(row => extractor.extractAll(row))
+      database.executeSelect(select.what(extractor.columns))(row => extractor.extractAll(row))
 
     private implicit def resultSetIterable(resultSet: ResultSet): Iterable[ResultSet] = ResultSetIterable(resultSet)
-
-    private def extractorColumns(extractor: Extractor[ResultSet, _]): List[AliasedColumn[_]] = {
-      extractor match {
-        case ConstantExtractor(_) => Nil
-        case column: AliasedColumn[_] => List(column)
-        case _: CellExtractor[_, _] => Nil
-        case productExtractor: ProductExtractor[_, _] => productExtractor.innerExtractors.flatMap(extractorColumns)
-        case MappedExtractor(innerExtractor, _) => extractorColumns(innerExtractor)
-        case OptionExtractor(innerExtractor) => extractorColumns(innerExtractor)
-        case SeqExtractor(extractors) => extractors.flatMap(extractorColumns).toList
-        case ListMultiRowExtractor(innerExtractor) => extractorColumns(innerExtractor)
-        case GroupedExtractor(innerExtractor, groupByExtractor) => extractorColumns(innerExtractor) ++ extractorColumns(groupByExtractor)
-      }
-    }
   }
 
   implicit class InsertExecutorOps(insert: Insert) {

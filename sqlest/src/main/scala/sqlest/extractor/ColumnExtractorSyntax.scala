@@ -20,4 +20,25 @@ import sqlest.ast._
 
 trait ColumnExtractorSyntax {
   def extractColumnByName[A: ColumnType](name: String) = AliasColumn[A](null, name)
+
+  implicit class ColumnExtractorOps(extractor: Extractor[java.sql.ResultSet, _]) {
+    def findColumn(path: String): Option[AliasedColumn[_]] = extractor.findCellExtractor(path) match {
+      case Some(aliasedColumn: AliasedColumn[_]) => Some(aliasedColumn)
+      case _ => None
+    }
+
+    def columns: List[AliasedColumn[_]] = {
+      extractor match {
+        case ConstantExtractor(_) => Nil
+        case column: AliasedColumn[_] => List(column)
+        case _: CellExtractor[_, _] => Nil
+        case productExtractor: ProductExtractor[_, _] => productExtractor.innerExtractors.flatMap(_.columns)
+        case MappedExtractor(innerExtractor, _) => innerExtractor.columns
+        case OptionExtractor(innerExtractor) => innerExtractor.columns
+        case SeqExtractor(extractors) => extractors.flatMap(_.columns).toList
+        case ListMultiRowExtractor(innerExtractor) => innerExtractor.columns
+        case GroupedExtractor(innerExtractor, groupByExtractor) => innerExtractor.columns ++ groupByExtractor.columns
+      }
+    }
+  }
 }
