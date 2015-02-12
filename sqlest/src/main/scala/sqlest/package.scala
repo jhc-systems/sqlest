@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import java.sql.ResultSet
 import sqlest.ast._
 import sqlest.ast.syntax._
 import sqlest.executor._
@@ -37,7 +38,7 @@ package object sqlest
     with OlapFunctionSyntax
     with UntypedColumnSyntax
     // sqlest.extractor
-    with ExtractorSyntax[java.sql.ResultSet]
+    with ExtractorSyntax[ResultSet]
     with ColumnExtractorSyntax
     // sqlest.executor
     with ExecutorSyntax {
@@ -47,4 +48,6 @@ package object sqlest
 
   type Database = sqlest.executor.Database
   val Database = sqlest.executor.Database
+
+  type Extractor[A] = sqlest.extractor.Extractor[ResultSet, A]
 }
