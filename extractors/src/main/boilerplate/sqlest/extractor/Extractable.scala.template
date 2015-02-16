@@ -16,32 +16,30 @@
 
 package sqlest.extractor
 
-import java.sql.ResultSet
 import scala.annotation.implicitNotFound
-import sqlest.ast.AliasedColumn
 
 /**
  * Type class witnessing that a default extractor for type `A` exists
  */
-trait Extractable[A] {
+trait Extractable[Row, -A] {
   type Out
-  def extractor(a: A): Extractor[ResultSet, _] { type SingleResult = Out }
+  def extractor(a: A): Extractor[Row, _] { type SingleResult = Out }
 }
 
 object Extractable {
-  @implicitNotFound("No default extractor for ${A} exists. Pass an extractor to the fetch method")
-  type Aux[A, B] = Extractable[A] { type Out = B }
+  @implicitNotFound("No default extractor for ${A} exists")
+  type Aux[Row, A, B] = Extractable[Row, A] { type Out = B }
 
-  implicit def extractableColumn[C1]: Extractable.Aux[AliasedColumn[C1], C1] =
-    new Extractable[AliasedColumn[C1]] {
+  implicit def extractableCellExtractor[Row, C1]: Extractable.Aux[Row, Extractor[Row, C1] with SimpleExtractor[Row, C1], C1] =
+    new Extractable[Row, Extractor[Row, C1] with SimpleExtractor[Row, C1]] {
       type Out = C1
-      def extractor(column: AliasedColumn[C1]) = column
+      def extractor(inExtractor: Extractor[Row, C1] with SimpleExtractor[Row, C1]) = inExtractor
     }
 
-[2..22#  implicit def extractableTuple1[[#C1#]]: Extractable.Aux[Tuple1[[#AliasedColumn[C1]#]], Tuple1[[#C1#]]] =
-    new Extractable[Tuple1[[#AliasedColumn[C1]#]]] {
+[2..22#  implicit def extractableTuple1[Row, [#C1#]]: Extractable.Aux[Row, Tuple1[[#Extractor[Row, C1]#]], Tuple1[[#C1#]]] =
+    new Extractable[Row, Tuple1[[#Extractor[Row, C1]#]]] {
       type Out = Tuple1[[#C1#]]
-      def extractor(columnTuple: Tuple1[[#AliasedColumn[C1]#]]) = Tuple1Extractor([#columnTuple._1#])
+      def extractor(extractorTuple: Tuple1[[#Extractor[Row, C1]#]]) = Tuple1Extractor([#extractorTuple._1#])
     }#
 
 ]
