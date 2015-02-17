@@ -57,8 +57,17 @@ trait EnumerationMappedColumnTypes {
     val toDatabaseMappings = mappings.toMap
     val toValueMappings = mappings.map { case (value, database) => (database, value) }.toMap
 
-    def read(database: Option[DatabaseType]) = database.map(toValueMappings)
-    def write(value: ValueType) = toDatabaseMappings(value)
+    def read(database: Option[DatabaseType]) =
+      database.map { database =>
+        toValueMappings
+          .get(database)
+          .getOrElse(throw new NoSuchElementException(s"Could not read database value $database in EnumerationColumn"))
+      }
+
+    def write(value: ValueType) =
+      toDatabaseMappings
+        .get(value)
+        .getOrElse(throw new NoSuchElementException(s"Could not write $value in EnumerationColumn"))
   }
 
   case class EnumerationColumnType[ValueType, DatabaseType](mappings: (ValueType, DatabaseType)*)(implicit val baseColumnType: BaseColumnType[DatabaseType]) extends BaseEnumerationColumnType[ValueType, DatabaseType]

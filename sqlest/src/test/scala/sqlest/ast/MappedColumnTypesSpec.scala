@@ -40,6 +40,7 @@ class MappedColumnTypeSpec extends FlatSpec with Matchers with MappedColumnTypes
   sealed trait Animal
   case object Snake extends Animal
   case object Gigantosaurus extends Animal
+  case object Troglodyte extends Animal
 
   "EnumerationColumnType" should "convert database values to the enumeration" in {
     val AnimalColumnType = EnumerationColumnType(
@@ -49,8 +50,16 @@ class MappedColumnTypeSpec extends FlatSpec with Matchers with MappedColumnTypes
 
     AnimalColumnType.write(Snake) should be("S")
     AnimalColumnType.write(Gigantosaurus) should be("G")
+
+    intercept[NoSuchElementException] {
+      AnimalColumnType.write(Troglodyte) should be("G")
+    }
     AnimalColumnType.read(Some("S")) should be(Some(Snake))
     AnimalColumnType.read(Some("G")) should be(Some(Gigantosaurus))
+
+    intercept[NoSuchElementException] {
+      AnimalColumnType.read(Some("X")) should be(Some(Gigantosaurus))
+    }
   }
 
   "OptionColumnType" should "convert zeroes in database to None" in {
