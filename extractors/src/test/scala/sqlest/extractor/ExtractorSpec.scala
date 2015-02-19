@@ -107,7 +107,7 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
   "TupleExtractors" should "extract values from all extractors and return them in a tuple" in {
     val seqRows = List(Seq(0, "hello"), Seq(2, "bye"), Seq(4, "level"))
     val tuple3Extractor: Tuple3Extractor[Seq[Any], Int, String, Boolean] =
-      extract(
+      extractTuple(
         intExtractorAtIndex(0),
         stringExtractorAtIndex(1).map(_.reverse),
         intExtractorAtIndex(0).map(_ == 2))
@@ -126,7 +126,7 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
 
     case class Triple(a: Int, b: String, c: Boolean)
     val tuple3Extractor: MappedExtractor[Seq[Any], (Int, String, Boolean), Triple] =
-      extract(
+      extractTuple(
         intExtractorAtIndex(0),
         stringExtractorAtIndex(1).map(_.reverse),
         intExtractorAtIndex(0).map(_ == 2)
@@ -146,7 +146,7 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
 
     case class Triple(a: Int, b: String, c: Boolean)
     val tuple3Extractor: MappedExtractor[Seq[Any], (Int, String, Boolean), Triple] =
-      extract(
+      extractTuple(
         intExtractorAtIndex(0),
         stringExtractorAtIndex(1).map(_.reverse),
         intExtractorAtIndex(0).map(_ == 2)
@@ -227,7 +227,7 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
 
     case class Triple(a: Int, b: String, c: Boolean)
     val tuple3Extractor: OptionExtractor[Seq[Any], (Int, String, Boolean)] =
-      extract(
+      extractTuple(
         intExtractorAtIndex(0),
         stringExtractorAtIndex(1).map(_.reverse),
         intExtractorAtIndex(0).map(_ == 2)
@@ -295,7 +295,7 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
   it should "work with another ListMultiRowExtractor as peers within another extractor" in {
     val seqRows = List(Seq(0, "hello"), Seq(2, "bye"), Seq(4, "level"))
     val tupleOfListExtractors: Tuple2Extractor[Seq[Any], List[Int], List[String]] =
-      extract(intExtractorAtIndex(0).asList, stringExtractorAtIndex(1).asList)
+      extractTuple(intExtractorAtIndex(0).asList, stringExtractorAtIndex(1).asList)
 
     tupleOfListExtractors.extractHeadOption(Nil) should be(None)
     tupleOfListExtractors.extractHeadOption(seqRows) should be(Some(List(0), List("hello")))
@@ -309,7 +309,7 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
   "ListMultiRowExtractor within a GroupedExtractor" should "accumulate all values with the same group by value into a list" in {
     val seqRows = List(Seq(0, "first"), Seq(0, "second"), Seq(1, "third"), Seq(2, "forth"), Seq(2, "fifth"))
     val groupedExtractor: GroupedExtractor[Seq[Any], (Int, List[String]), Int] =
-      extract(
+      extractTuple(
         intExtractorAtIndex(0),
         stringExtractorAtIndex(1).asList
       ).groupBy(intExtractorAtIndex(0))
@@ -335,9 +335,9 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
       Seq(2, 4, 8)
     )
 
-    val nestedListExtractor = extract(
+    val nestedListExtractor = extractTuple(
       intExtractorAtIndex(0),
-      extract(
+      extractTuple(
         intExtractorAtIndex(1),
         intExtractorAtIndex(2).asList
       ).asList
@@ -364,7 +364,7 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
   it should "stop in extractHeadOption when group by value changes" in {
     val seqRows = List(Seq(0, "first"), Seq(0, "second"), Seq(1, "third"), Seq(0, "forth"))
     val groupedExtractor: GroupedExtractor[Seq[Any], (Int, List[String]), Int] =
-      extract(
+      extractTuple(
         intExtractorAtIndex(0),
         stringExtractorAtIndex(1).asList
       ).groupBy(intExtractorAtIndex(0))
@@ -376,7 +376,7 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
   it should "return an empty list if all inner values are null values" in {
     val seqRows = List(Seq(0, null), Seq(0, null), Seq(1, "third"), Seq(2, null))
     val groupedExtractor: GroupedExtractor[Seq[Any], (Int, List[String]), Int] =
-      extract(
+      extractTuple(
         intExtractorAtIndex(0),
         stringExtractorAtIndex(1).asList
       ).groupBy(intExtractorAtIndex(0))
@@ -393,7 +393,7 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
   it should "throw a NullPointerException if some but not all of the inner values are null values" in {
     val seqRows = List(Seq(0, "first"), Seq(0, null), Seq(1, "third"), Seq(2, null))
     val groupedExtractor: GroupedExtractor[Seq[Any], (Int, List[String]), Int] =
-      extract(
+      extractTuple(
         intExtractorAtIndex(0),
         stringExtractorAtIndex(1).asList
       ).groupBy(intExtractorAtIndex(0))

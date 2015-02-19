@@ -43,7 +43,15 @@ case class CaseClassExtractorMacro(c: Context) {
     val liftedApplyMethods = applyMethods.map(liftApplyMethod(_, typeOfRow, typeOfA, typeArgs, companion))
 
     // import scala.language.dynamics to avoid having to do so at the call site
-    q"import scala.language.dynamics; new Dynamic { ..$liftedApplyMethods }"
+    q"""
+      import scala.language.dynamics
+      import scala.language.experimental.macros
+      new Dynamic {
+        ..$liftedApplyMethods
+        def applyDynamic(method: String)(args: Any*): sqlest.extractor.Extractor[$typeOfRow, $typeOfA] = macro sqlest.extractor.AbortMacro.apply
+        def applyDynamicNamed(method: String)(args: (String, Any)*): sqlest.extractor.Extractor[$typeOfRow, $typeOfA] = macro sqlest.extractor.AbortMacro.apply
+      }
+    """
   }
 
   def findApplyMethods(companionType: Type): List[MethodSymbol] = {
@@ -186,4 +194,8 @@ case class CaseClassExtractorMacro(c: Context) {
       case _ => c.abort(c.enclosingPosition, s"Must have 1 to 22 arguments")
     }
   }
+}
+
+object AbortMacro {
+  def apply(c: Context)(method: c.Tree)(args: c.Tree*) = c.abort(c.enclosingPosition, "Only the apply method can be called here")
 }

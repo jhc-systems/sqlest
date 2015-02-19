@@ -21,14 +21,19 @@ import scala.language.experimental.macros
 trait ExtractorSyntax[Row] {
   def extractConstant[A](value: A) = ConstantExtractor[Row, A](value)
 
-  def extract[A]: Dynamic = macro CaseClassExtractorMacro.apply[Row, A]
+  // The return type should just be `Any` as this is whitebox macro.
+  // However the extended return type is included to overcome bugs in:
+  //   - Scala compiler does not add `apply` sugar after macro expansion but it works with Dynamic
+  //   - Intellij does not macro expand whitebox macros to determine the actual return type but it does understand the return type of `applyDynamic` and `applyDynamicNamed`
+  def extract[A]: Dynamic { def applyDynamic(method: String)(args: Any*): Extractor[Row, A]; def applyDynamicNamed(method: String)(namedArgs: (String, Any)*): Extractor[Row, A] } = 
+    macro CaseClassExtractorMacro.apply[Row, A]
 
-[2..22#  implicit def extract[Row, [#A1#]](t: Tuple1[[#Extractor[Row, A1]#]]) =
+[2..22#  implicit def extractTuple[Row, [#A1#]](t: Tuple1[[#Extractor[Row, A1]#]]) =
     new Tuple1Extractor[Row, [#A1#]]([#t._1#])#
 
 ]
 
-[2..22#  def extract[Row, [#A1#]]([#e1: Extractor[Row, A1]#]) =
+[2..22#  def extractTuple[Row, [#A1#]]([#e1: Extractor[Row, A1]#]) =
     new Tuple1Extractor[Row, [#A1#]]([#e1#])#
 
 ]

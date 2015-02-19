@@ -49,7 +49,7 @@ class ExtractorFinderSpec extends FlatSpec with Matchers {
   }
 
   it should "find a cell extractor in a bare product extractor" in {
-    val extractor = extract(
+    val extractor = extractTuple(
       TableOne.col1,
       TableOne.col2
     )
@@ -62,7 +62,7 @@ class ExtractorFinderSpec extends FlatSpec with Matchers {
   }
 
   it should "NOT find a cell extractor in a mapped/product extractor" in {
-    val extractor = extract(
+    val extractor = extractTuple(
       TableOne.col1,
       TableOne.col2
     ).map(One.tupled)
@@ -123,7 +123,7 @@ class ExtractorFinderSpec extends FlatSpec with Matchers {
   it should "find a cell extractor in a nested named and product extractor" in {
 
     val extractor = extract[Outer](
-      oneTwo = extract(
+      oneTwo = extractTuple(
         extract[One](
           a = TableOne.col1,
           b = TableOne.col2

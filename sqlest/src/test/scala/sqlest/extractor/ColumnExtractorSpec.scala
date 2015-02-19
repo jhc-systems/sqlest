@@ -36,7 +36,7 @@ class ColumnExtractorSpec extends FlatSpec with Matchers {
   case class MixedTypeParamClass[A](s: String, a: A)
 
   "mapped column extractor" should "extract mapped value" in {
-    val extractor = extract(TableSix.trimmedString, TableSix.zeroIsNoneWrappedInt, TableSix.zeroIsNoneDateTime)
+    val extractor = extractTuple(TableSix.trimmedString, TableSix.zeroIsNoneWrappedInt, TableSix.zeroIsNoneDateTime)
 
     def testResultSet = TestResultSet(TableSix.columns)(
       Seq("test", 5, 20150101),
@@ -170,7 +170,7 @@ class ColumnExtractorSpec extends FlatSpec with Matchers {
   }
 
   "tuple extractor" should "extract appropriate data structures" in {
-    val extractor = extract(TableOne.col1, TableOne.col2)
+    val extractor = extractTuple(TableOne.col1, TableOne.col2)
 
     extractor.extractHeadOption(testResultSet) should equal(Some(
       (1, "a")
@@ -260,21 +260,21 @@ class ColumnExtractorSpec extends FlatSpec with Matchers {
     }
 
     intercept[NullPointerException] {
-      extract(
+      extractTuple(
         TableOne.col1,
         TableOne.col2
       ).extractHeadOption(results)
     }
 
     intercept[NullPointerException] {
-      extract(
+      extractTuple(
         TableOne.col1.asOption,
         TableOne.col2
       ).extractHeadOption(results)
     }
 
     intercept[NullPointerException] {
-      extract(
+      extractTuple(
         TableOne.col1,
         TableOne.col2.asOption
       ).extractHeadOption(results)
@@ -304,7 +304,7 @@ class ColumnExtractorSpec extends FlatSpec with Matchers {
       Seq(1, "b")
     )
 
-    val extractor = extract(
+    val extractor = extractTuple(
       TableOne.col1,
       TableOne.col2.asList
     ).groupBy(TableOne.col1)
@@ -378,7 +378,7 @@ class ColumnExtractorSpec extends FlatSpec with Matchers {
   }
 
   "option extractor" should "handle nulls for compound tuples" in {
-    val extractor = extract(TableThree.col3, TableThree.col4).asOption
+    val extractor = extractTuple(TableThree.col3, TableThree.col4).asOption
 
     extractor.extractHeadOption(testResultSet) should equal(Some(
       Some((None, Some("x")))
@@ -475,7 +475,7 @@ class ColumnExtractorSpec extends FlatSpec with Matchers {
       Seq(2, "b", "c", 3)
     )
 
-    val extractor = extract(
+    val extractor = extractTuple(
       extract[One](
         a = TableOne.col1,
         b = TableOne.col2
@@ -484,7 +484,7 @@ class ColumnExtractorSpec extends FlatSpec with Matchers {
         a = TableTwo.col2,
         b = TableTwo.col3
       ).asList
-    ).groupBy(extract(
+    ).groupBy(extractTuple(
         TableOne.col1,
         TableOne.col2
       ))
@@ -508,7 +508,7 @@ class ColumnExtractorSpec extends FlatSpec with Matchers {
       Seq(null, "b", 6, null)
     )
 
-    val extractor = extract(
+    val extractor = extractTuple(
       extract[Three](
         a = TableThree.col3,
         b = TableThree.col4
@@ -538,7 +538,7 @@ class ColumnExtractorSpec extends FlatSpec with Matchers {
       Seq(null, "b", 6, null)
     )
 
-    val extractor = extract(
+    val extractor = extractTuple(
       extract[Three](
         a = TableThree.col3,
         b = TableThree.col4
@@ -581,7 +581,7 @@ class ColumnExtractorSpec extends FlatSpec with Matchers {
       Seq(2, 4, 8)
     )
 
-    val extractor = extract(
+    val extractor = extractTuple(
       col1,
       col2.asList,
       col3.asList
@@ -776,7 +776,7 @@ class ColumnExtractorSpec extends FlatSpec with Matchers {
       Seq(2, 4, null)
     )
 
-    val extractor = extract(
+    val extractor = extractTuple(
       col1,
       col2.asList,
       col3.asList
@@ -813,7 +813,7 @@ class ColumnExtractorSpec extends FlatSpec with Matchers {
       Seq(1, "b", 10)
     )
 
-    val extractor = extract(
+    val extractor = extractTuple(
       TableThree.col3,
       TableThree.col4,
       extractColumnByName[Int]("scalarFunction").asOption
