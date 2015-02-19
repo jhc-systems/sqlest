@@ -48,8 +48,8 @@ case class CaseClassExtractorMacro(c: Context) {
       import scala.language.experimental.macros
       new Dynamic {
         ..$liftedApplyMethods
-        def applyDynamic(method: String)(args: Any*): sqlest.extractor.Extractor[$typeOfRow, $typeOfA] = macro sqlest.extractor.AbortMacro.apply
-        def applyDynamicNamed(method: String)(args: (String, Any)*): sqlest.extractor.Extractor[$typeOfRow, $typeOfA] = macro sqlest.extractor.AbortMacro.apply
+        def applyDynamic(method: String)(args: Any*): sqlest.extractor.Extractor[$typeOfRow, $typeOfA] with sqlest.extractor.SimpleExtractor[$typeOfRow, $typeOfA] = macro sqlest.extractor.AbortMacro.apply
+        def applyDynamicNamed(method: String)(args: (String, Any)*): sqlest.extractor.Extractor[$typeOfRow, $typeOfA] with sqlest.extractor.SimpleExtractor[$typeOfRow, $typeOfA] = macro sqlest.extractor.AbortMacro.apply
       }
     """
   }
