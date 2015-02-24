@@ -24,9 +24,11 @@ resolvers ++= Seq(
 and the following library dependency
 ```scala
 libraryDependencies ++= Seq(
-  "co.uk.jhc" %% "sqlest-extractors" % "0.5.0"
+  "co.uk.jhc" %% "sqlest-extractors" % "0.6.0"
 )
 ```
+
+sqlest-extractors is available for Scala 2.11
 
 ## Overview
 Table data consists of multiple `Rows` of cells.
