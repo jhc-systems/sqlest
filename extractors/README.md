@@ -4,6 +4,12 @@
 
 - Minimal work to set up sqlest-extractors with a new table type
 - Extractors are defined declaratively and are easily composed
+- Support for:
+  - Tuples
+  - Options
+  - List, Seq, Map, etc.
+  - Mapped values
+  - Grouping rows into single results
 
 ## Using sqlest-extractors
 To use sqlest-extractors from an existing project add the following resolvers
@@ -26,6 +32,7 @@ libraryDependencies ++= Seq(
 Table data consists of multiple `Rows` of cells.
 
 To use sqlest-extractors:
+
 1. Determine the `Row` type
 2. Extend the `CellExtractor` trait to read a value from a cell in a `Row`
 3. Mixin `ExtractorSyntax[Row]`
@@ -137,3 +144,9 @@ See the tests for more examples of:
 - SeqExtractor
 - ListMultiRowExtractor
 - GroupedExtractor
+
+## Suggested usages
+- CSVs
+- java.util.ResultSet - this is what [sqlest](/..) uses extractors for
+- Fixed format record data
+- Converting list of Tuples into case classes
