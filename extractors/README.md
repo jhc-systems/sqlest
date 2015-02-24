@@ -15,7 +15,7 @@
 To use sqlest-extractors from an existing project add the following resolvers
 ```scala
 resolvers ++= Seq(
-  "Sonatype OSS Releases"  at "http://oss.sonatype.org/content/repositories/releases/",
+  "Sonatype OSS Releases" at "http://oss.sonatype.org/content/repositories/releases/",
   // Only needed if you are using a snapshot version of sqlest-extractors
   "Sonatype OSS Snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/"
 )
@@ -148,6 +148,6 @@ See the tests for more examples of:
 
 ## Suggested usages
 - CSVs
-- java.util.ResultSet - this is what [sqlest](/..) uses extractors for
+- java.util.ResultSet - this is what [sqlest](https://github.com/jhc-systems/sqlest) uses extractors for
 - Fixed format record data
-- Converting list of Tuples into case classes
+- Converting a list of Tuples into case classes
