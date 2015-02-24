@@ -2,6 +2,8 @@
 
 **sqlest** is a database library for Scala. It allows you to write SQL directly in Scala with type safety guarantees while also providing a simple mechanism of extracting domain specific case classes from the results.
 
+**sqlest-extractors** is a second library used for extracting case classes from table data. It is used within sqlest. Check out the [readme](extractors/README.md)
+
 [![Build Status](https://travis-ci.org/jhc-systems/sqlest.svg?branch=master)](https://travis-ci.org/jhc-systems/sqlest)
 
 ## Using sqlest
@@ -82,7 +84,7 @@ select(FruitTable.name, FruitTable.juiciness)
   .from(FruitTable)
   .where(FruitTable.juiciness >= 8)
   .orderBy(FruitTable.juiciness.desc)
-  .fetchList(fruitExtractor)    // fruitExtractor is defined below
+  .fetchAll(fruitExtractor)    // fruitExtractor is defined below
 
 ==> List(
       Fruit("Watermelon", 10),
@@ -105,7 +107,7 @@ Extractors are designed for composition to allow nested case classes to be extra
 lazy val smoothyExtractor = extract[Smoothy](
   description = SmoothyTable.description,
   fruits = fruitExtractor.asList
-).groupBy(SmoothyTable.id)
+).groupBy(SmoothyTable.id) // All results with the same value for this field are combined into a single result
 ```
 
 This extractor can then be used to find out which fruits are used in a smoothy
