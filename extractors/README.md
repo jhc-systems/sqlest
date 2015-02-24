@@ -77,10 +77,6 @@ case class IntExtractor(index: Int) extends CellExtractor[CSVRow, Int] {
   def read(row: CSVRow): Option[Int] = scala.util.Try(Integer.parseInt(row(index))).toOption
 }
 
-// Define the domain classes to extract from the CSV data
-case class Person(name: String, age: Int, address: Option[Address])
-case class Address(house: Int, street: String)
-
 // Extend the application with ExtractorSyntax for the row type
 // This provides the methods `extract`, `extractTuple` and `extractConstant`
 object CSVApp extends App with ExtractorSyntax[CSVRow] {
@@ -114,9 +110,14 @@ object CSVApp extends App with ExtractorSyntax[CSVRow] {
       (Charlie, 20, None, Some(Lost)))
   */
 
+  // Define the domain classes to extract from the CSV data
+  case class Person(name: String, age: Int, address: Option[Address])
+  case class Address(house: Int, street: String)
+
   // Create extractors to read the domain classes
   val addressExtractor = extract[Address](houseExtractor, streetExtractor)
-  // Name arguments often enhance the readibility of extractor definitions
+
+  // Named arguments often enhance the readibility of extractor definitions
   val personExtractor = extract[Person](
     name = nameExtractor,
     age = ageExtractor,
