@@ -30,7 +30,7 @@ object SqlestBuild extends Build {
       moduleName := "sqlest",
 
       libraryDependencies ++= Seq(
-        "com.typesafe.scala-logging" %% "scala-logging-slf4j" % "2.1.2",
+        "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
         "org.scalatest" %% "scalatest" % "2.2.1" % "test"
       )
     )

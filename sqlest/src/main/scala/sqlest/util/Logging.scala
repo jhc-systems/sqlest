@@ -16,6 +16,6 @@
 
 package sqlest.util
 
-import com.typesafe.scalalogging.slf4j._
+import com.typesafe.scalalogging._
 
 trait Logging extends LazyLogging
