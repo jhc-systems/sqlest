@@ -35,6 +35,7 @@ class UntypedColumnHelpers extends ColumnSyntax {
   }
   def bigDecimalArgument(arg: String) = Try(BigDecimal(arg)).toOption
   def dateTimeArgument(arg: String) = Iso8601.unapply(arg)
+  def byteArrayArgument(arg: String) = Try(javax.xml.bind.DatatypeConverter.parseHexBinary(arg)).toOption
   def mappedArgument[A](arg: String, columnType: ColumnType[A]): Option[A] = (columnType match {
     case IntColumnType => intArgument(arg)
     case LongColumnType => longArgument(arg)
@@ -43,6 +44,7 @@ class UntypedColumnHelpers extends ColumnSyntax {
     case BooleanColumnType => booleanArgument(arg)
     case StringColumnType => stringArgument(arg)
     case DateTimeColumnType => dateTimeArgument(arg)
+    case ByteArrayColumnType => byteArrayArgument(arg)
     case _ => sys.error(s"Untyped operators are not implemented for non-standard mapped types: $columnType")
   }).asInstanceOf[Option[A]]
 
@@ -54,6 +56,7 @@ class UntypedColumnHelpers extends ColumnSyntax {
     case BooleanColumnType => booleanArgument(right).map(right => InfixFunctionColumn[Boolean](op, left, right))
     case StringColumnType => stringArgument(right).map(right => InfixFunctionColumn[Boolean](op, left, right))
     case DateTimeColumnType => dateTimeArgument(right).map(right => InfixFunctionColumn[Boolean](op, left, right))
+    case ByteArrayColumnType => byteArrayArgument(right).map(right => InfixFunctionColumn[Boolean](op, left, right))
     case optionColumnType: OptionColumnType[_, _] => infixExpression(op, left, right, optionColumnType.baseColumnType)
     case mappedColumnType: MappedColumnType[_, _] =>
       mappedArgument(right, mappedColumnType).map { right =>

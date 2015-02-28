@@ -105,6 +105,7 @@ trait StatementBuilder extends BaseStatementBuilder
     case DoubleColumnType => statement.setDouble(index, value.asInstanceOf[Double])
     case BigDecimalColumnType => statement.setBigDecimal(index, value.asInstanceOf[BigDecimal].bigDecimal)
     case StringColumnType => statement.setString(index, value.asInstanceOf[String])
+    case ByteArrayColumnType => statement.setBytes(index, value.asInstanceOf[Array[Byte]])
     case DateTimeColumnType => statement.setTimestamp(index, new JdbcTimestamp(value.asInstanceOf[DateTime].getMillis))
     case optionType: OptionColumnType[_, _] =>
       val option = value.asInstanceOf[Option[_]]
@@ -119,6 +120,7 @@ trait StatementBuilder extends BaseStatementBuilder
     case DoubleColumnType => JdbcTypes.DOUBLE
     case BigDecimalColumnType => JdbcTypes.DECIMAL
     case StringColumnType => JdbcTypes.CHAR
+    case ByteArrayColumnType => JdbcTypes.BINARY
     case DateTimeColumnType => JdbcTypes.TIMESTAMP
     case optionType: OptionColumnType[_, _] => jdbcType(optionType.baseColumnType)
     case mappedType: MappedColumnType[_, _] => jdbcType(mappedType.baseColumnType)
