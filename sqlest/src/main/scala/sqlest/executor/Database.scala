@@ -103,7 +103,17 @@ trait Database extends Logging {
   def executeDelete(delete: Delete): Int = {
     checkInTransaction
     executeWithConnection { connection =>
-      0
+      val preparedStatement = statementBuilder(connection, delete)
+      try {
+        logger.debug(s"Executing delete")
+        preparedStatement.executeUpdate
+      } finally {
+        try {
+          if (preparedStatement != null) preparedStatement.close
+        } catch {
+          case e: SQLException =>
+        }
+      }
     }
   }
 
