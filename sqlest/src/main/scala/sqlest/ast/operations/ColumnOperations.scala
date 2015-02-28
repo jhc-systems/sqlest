@@ -20,9 +20,9 @@ import sqlest.ast._
 
 object ColumnOperations {
   implicit class SelectColumnsOps[A, R <: Relation](select: Select[A, R]) {
-    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_, _ <: Relation] => Select[_, _ <: Relation]): Select[A, _ <: Relation] =
+    def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_, _ <: Relation] => Select[_, _ <: Relation]): Select[_, _ <: Relation] =
       Select(
-        select.aliasedColumns.mapColumns(f, selectFunction, select.cols),
+        select.columns.map(_.mapColumns(f, selectFunction)).toList.asInstanceOf[List[AliasedColumn[_]]],
         select.from.mapColumns(f, selectFunction),
         select.where.map(_.mapColumns(f, selectFunction)),
         select.startWith.map(_.mapColumns(f, selectFunction)),
@@ -34,7 +34,7 @@ object ColumnOperations {
         select.offset,
         select.union.map(_.mapColumns(f, selectFunction)),
         select.subselectAlias
-      )(select.aliasedColumns)
+      )
   }
 
   implicit class InsertColumnsOps(insert: Insert) {

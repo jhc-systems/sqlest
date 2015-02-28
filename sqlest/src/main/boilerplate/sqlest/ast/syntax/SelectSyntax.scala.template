@@ -26,14 +26,11 @@ trait SelectSyntax {
   def apply() = SelectBuilder(Nil)
 
   def apply[C1](column1: AliasedColumn[C1]) = SelectBuilder(column1)
+  def apply[A: AliasedColumns](columns: A) = SelectBuilder(columns)
 
   // Convert arguments into a tuple
 [2..22#  def apply[[#C1#]]([#column1: AliasedColumn[C1]#]) = SelectBuilder(Tuple1([#column1#]))#
 ]
-
-  // Lists
-  def apply(columns: AliasedColumn[_]*) = SelectBuilder(columns.toList)
-  def apply(columns: List[AliasedColumn[_]]) = SelectBuilder(columns)
 }
 
 /** Helper class to enable the `select(...).from(...)` syntax. */
@@ -44,12 +41,5 @@ case class SelectBuilder[A: AliasedColumns](what: A) {
 case class SelectOps[A, R <: Relation](select: Select[A, R]) {
   def what() = select.copy(cols = Nil)
 
-  def what(columns: AliasedColumn[_]*) = select.copy(cols = columns.toList)
-  def what(columns: List[AliasedColumn[_]]) = select.copy(cols = columns)
-
-  def what[C1](column1: AliasedColumn[C1]) = select.copy(cols = column1)
-
-  // Convert arguments into a tuple
-[2..22#  def what[[#C1#]]([#column1: AliasedColumn[C1]#]) = select.copy(cols = Tuple1([#column1#]))#
-]
+  def what[A: AliasedColumns](columns: A) = select.copy(cols = columns)
 }

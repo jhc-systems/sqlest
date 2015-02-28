@@ -22,9 +22,8 @@ import sqlest.ast.operations.ColumnOperations._
 /**
  * Type class witnessing that all the elements in `A` are instances of `AliasedColumn[_]`
  */
-trait AliasedColumns[A] {
+trait AliasedColumns[-A] {
   def columnList(a: A): Seq[AliasedColumn[_]]
-  def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_, _ <: Relation] => Select[_, _ <: Relation], a: A): A
 }
 
 object AliasedColumns {
@@ -34,25 +33,21 @@ object AliasedColumns {
   implicit val nilAliasedColumns: AliasedColumns[Nil.type] =
     new AliasedColumns[Nil.type] {
       def columnList(nil: Nil.type) = Nil
-      def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_, _ <: Relation] => Select[_, _ <: Relation], nil: Nil.type) = nil
     }
 
   implicit val listAliasedColumns: AliasedColumns[List[AliasedColumn[_]]] =
     new AliasedColumns[List[AliasedColumn[_]]] {
       def columnList(list: List[AliasedColumn[_]]) = list
-      def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_, _ <: Relation] => Select[_, _ <: Relation], list: List[AliasedColumn[_]]) = list.map(_.mapColumns(f, selectFunction).asInstanceOf[AliasedColumn[_]])
     }
 
   implicit def aliasedColumn[A]: AliasedColumns[AliasedColumn[A]] =
     new AliasedColumns[AliasedColumn[A]] {
       def columnList(aliasedColumn: AliasedColumn[A]) = List(aliasedColumn)
-      def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_, _ <: Relation] => Select[_, _ <: Relation], aliasedColumn: AliasedColumn[A]) = aliasedColumn.mapColumns(f, selectFunction).asInstanceOf[AliasedColumn[A]]
     }
 
 [#  implicit def aliasedColumnTuple1[[#C1#]]: AliasedColumns[Tuple1[[#AliasedColumn[C1]#]]] =
     new AliasedColumns[Tuple1[[#AliasedColumn[C1]#]]] {
       def columnList(aliasedColumnTuple: Tuple1[[#AliasedColumn[C1]#]]) = List([#aliasedColumnTuple._1#])
-      def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_, _ <: Relation] => Select[_, _ <: Relation], aliasedColumnTuple: Tuple1[[#AliasedColumn[C1]#]]) = Tuple1([#aliasedColumnTuple._1.mapColumns(f, selectFunction).asInstanceOf[AliasedColumn[C1]]#])
     }#
 
 ]

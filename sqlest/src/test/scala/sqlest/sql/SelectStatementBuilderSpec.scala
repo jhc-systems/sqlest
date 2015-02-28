@@ -212,7 +212,8 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
         `case`()
           .when(MyTable.col1 === 1, 2)
           .when(MyTable.col2 === 2.constant, 3.constant)
-          .`else`(5.constant))
+          .`else`(5.constant)
+          .as("case"))
         .from(MyTable)
     } should equal(
       s"""
@@ -231,7 +232,8 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
       select(
         decode()
           .when(MyTable.col1 === 1, 2)
-          .when(MyTable.col2 === 2.constant, 3.constant))
+          .when(MyTable.col2 === 2.constant, 3.constant)
+          .as("case"))
         .from(MyTable)
     } should equal(
       s"""
@@ -249,7 +251,8 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
       select(
         `case`(MyTable.col1)
           .when(1, 2)
-          .when(2.constant, 3.constant))
+          .when(2.constant, 3.constant)
+          .as("case"))
         .from(MyTable)
     } should equal(
       s"""
@@ -268,7 +271,8 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
         `case`(MyTable.col1)
           .when(1, 2)
           .when(2.constant, 3.constant)
-          .`else`(4))
+          .`else`(4)
+          .as("case"))
         .from(MyTable)
     } should equal(
       s"""

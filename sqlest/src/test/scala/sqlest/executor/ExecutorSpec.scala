@@ -66,10 +66,10 @@ class ExecutorSpec extends FlatSpec with Matchers {
     val head: Int = select(TableOne.col1).from(TableOne).fetchHead
     head should be(1)
 
-    val headOption: Option[String] = select(TableOne.col2).from(TableOne).fetchHeadOption
-    headOption should be(Some("a"))
+    val headOption: Option[(Int, String)] = select(TableOne.col1, TableOne.col2).from(TableOne).fetchHeadOption
+    headOption should be(Some((1, "a")))
 
-    val all: List[(Int, String)] = select(TableOne.col1, TableOne.col2).from(TableOne).fetchAll
+    val all: List[(Int, String)] = select(TableOne.*).from(TableOne).fetchAll
     all should equal(Seq(
       (1, "a"),
       (3, "c"),
