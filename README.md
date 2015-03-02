@@ -112,12 +112,10 @@ lazy val smoothyExtractor = extract[Smoothy](
 
 This extractor can then be used to find out which fruits are used in a smoothy
 ```scala
-select(smoothyExtractor.columns)    // Extractors maintain a list of columns they use
-  .from(
-    SmoothyTable
-      .innerJoin(IngredientsTable).on(SmoothyTable.id === IngredientsTable.smoothyId)
-      .innerJoin(FruitTable).on(IngredientsTable.fruitId === FruitTable.id)
-  )
+select
+  .from(SmoothyTable)
+  .innerJoin(IngredientsTable).on(SmoothyTable.id === IngredientsTable.smoothyId)
+  .innerJoin(FruitTable).on(IngredientsTable.fruitId === FruitTable.id)
   .where(SmoothyTable.description === "Magic dream shake")
   .fetchOne(smoothyExtractor)
 

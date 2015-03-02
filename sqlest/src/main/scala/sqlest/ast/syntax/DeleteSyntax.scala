@@ -22,10 +22,12 @@ trait DeleteSyntax {
   /** Delete from a relation: `delete.from(...)`. */
   def from(from: Table) =
     new DeleteBuilder(from)
+}
 
-  /** Helper class to prevent users writing `delete.from(...)` without `.where(...)`. */
-  class DeleteBuilder(from: Table) {
-    def where(where: Column[Boolean]) =
-      Delete(from = from, where = Some(where))
-  }
+/** Helper class to prevent users writing `delete.from(...)` without `.where(...)`. */
+class DeleteBuilder(from: Table) {
+  def where(where: Column[Boolean]) =
+    Delete(from = from, where = Some(where))
+
+  def allRows = Delete(from = from, where = None)
 }
