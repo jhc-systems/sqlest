@@ -27,18 +27,9 @@ trait ColumnExtractorSyntax {
       case _ => None
     }
 
-    def columns: List[AliasedColumn[_]] = {
-      extractor match {
-        case ConstantExtractor(_) => Nil
-        case column: AliasedColumn[_] => List(column)
-        case _: CellExtractor[_, _] => Nil
-        case productExtractor: ProductExtractor[_, _] => productExtractor.innerExtractors.flatMap(_.columns)
-        case MappedExtractor(innerExtractor, _) => innerExtractor.columns
-        case OptionExtractor(innerExtractor) => innerExtractor.columns
-        case SeqExtractor(extractors) => extractors.flatMap(_.columns).toList
-        case ListMultiRowExtractor(innerExtractor) => innerExtractor.columns
-        case GroupedExtractor(innerExtractor, groupByExtractor) => innerExtractor.columns ++ groupByExtractor.columns
+    def columns: List[AliasedColumn[_]] =
+      extractor.cellExtractors.collect {
+        case column: AliasedColumn[_] => column
       }
-    }
   }
 }

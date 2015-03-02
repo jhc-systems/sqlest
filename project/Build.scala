@@ -57,7 +57,10 @@ object SqlestBuild extends Build {
     base = file("examples"),
 
     settings = commonSettings ++ Seq(
-      libraryDependencies += "com.h2database" % "h2" % "1.4.180",
+      libraryDependencies ++= Seq(
+        "com.h2database" % "h2" % "1.4.180",
+        "com.chuusai" %% "shapeless" % "2.1.0"
+      ),
 
       publish := (),
       publishLocal := ()

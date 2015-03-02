@@ -16,17 +16,21 @@
 
 package sqlest.ast.syntax
 
+import java.sql.ResultSet
 import sqlest.ast._
+import sqlest.extractor._
 
 trait SelectSyntax {
   /** `select.from(...)` */
   def from[R <: Relation](from: R) = Select(Nil, from = from)
-
-  /** Select a subset of columns from a relation: `select(...).from(...)`. */
+  /** `select().from(...)` */
   def apply() = SelectBuilder(Nil)
 
+  /** Select a single column */
   def apply[C1](column1: AliasedColumn[C1]) = SelectBuilder(column1)
-  def apply[A: AliasedColumns](columns: A) = SelectBuilder(columns)
+
+  /** Select a anything that can be extracted */
+  def apply[A](columns: A)(implicit extractable: Extractable[ResultSet, A]) = SelectBuilder(columns)
 
   // Convert arguments into a tuple
 [2..22#  def apply[[#C1#]]([#column1: AliasedColumn[C1]#]) = SelectBuilder(Tuple1([#column1#]))#
@@ -39,7 +43,5 @@ case class SelectBuilder[A: AliasedColumns](what: A) {
 }
 
 case class SelectOps[A, R <: Relation](select: Select[A, R]) {
-  def what() = select.copy(cols = Nil)
-
   def what[A: AliasedColumns](columns: A) = select.copy(cols = columns)
 }

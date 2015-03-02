@@ -30,10 +30,10 @@ object Extractable {
   @implicitNotFound("No default extractor for ${A} exists")
   type Aux[Row, A, B] = Extractable[Row, A] { type Out = B }
 
-  implicit def extractableCellExtractor[Row, C1]: Extractable.Aux[Row, Extractor[Row, C1] with SimpleExtractor[Row, C1], C1] =
-    new Extractable[Row, Extractor[Row, C1] with SimpleExtractor[Row, C1]] {
+  implicit def extractorExtractable[Row, C1]: Extractable.Aux[Row, Extractor.Aux[Row, _, C1], C1] =
+    new Extractable[Row, Extractor.Aux[Row, _, C1]] {
       type Out = C1
-      def extractor(inExtractor: Extractor[Row, C1] with SimpleExtractor[Row, C1]) = inExtractor
+      def extractor(inExtractor: Extractor.Aux[Row, _, C1]) = inExtractor
     }
 
 [2..22#  implicit def extractableTuple1[Row, [#C1#]]: Extractable.Aux[Row, Tuple1[[#Extractor[Row, C1]#]], Tuple1[[#C1#]]] =

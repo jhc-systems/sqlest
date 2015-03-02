@@ -16,8 +16,9 @@
 
 package sqlest.ast
 
+import java.sql.ResultSet
 import scala.language.higherKinds
-import sqlest.ast.operations.ColumnOperations._
+import sqlest.extractor._
 
 /**
  * Type class witnessing that all the elements in `A` are instances of `AliasedColumn[_]`
@@ -27,28 +28,15 @@ trait AliasedColumns[-A] {
 }
 
 object AliasedColumns {
-  def apply[A](implicit aliasedColumns: AliasedColumns[A]): AliasedColumns[A] =
-    aliasedColumns
+  def apply[A](implicit aliasedColumns: AliasedColumns[A]): AliasedColumns[A] = aliasedColumns
 
-  implicit val nilAliasedColumns: AliasedColumns[Nil.type] =
-    new AliasedColumns[Nil.type] {
-      def columnList(nil: Nil.type) = Nil
+  implicit def extractableAliasedColumns[A](implicit extractable: Extractable[ResultSet, A]): AliasedColumns[A] =
+    new AliasedColumns[A] {
+      def columnList(value: A) = extractable.extractor(value).columns
     }
 
-  implicit val listAliasedColumns: AliasedColumns[List[AliasedColumn[_]]] =
+  private[sqlest] implicit val listAliasedColumns: AliasedColumns[List[AliasedColumn[_]]] =
     new AliasedColumns[List[AliasedColumn[_]]] {
       def columnList(list: List[AliasedColumn[_]]) = list
     }
-
-  implicit def aliasedColumn[A]: AliasedColumns[AliasedColumn[A]] =
-    new AliasedColumns[AliasedColumn[A]] {
-      def columnList(aliasedColumn: AliasedColumn[A]) = List(aliasedColumn)
-    }
-
-[#  implicit def aliasedColumnTuple1[[#C1#]]: AliasedColumns[Tuple1[[#AliasedColumn[C1]#]]] =
-    new AliasedColumns[Tuple1[[#AliasedColumn[C1]#]]] {
-      def columnList(aliasedColumnTuple: Tuple1[[#AliasedColumn[C1]#]]) = List([#aliasedColumnTuple._1#])
-    }#
-
-]
 }

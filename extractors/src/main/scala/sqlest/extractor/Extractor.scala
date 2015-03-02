@@ -21,8 +21,9 @@ import scala.collection.immutable.{ Queue, ListMap }
 
 sealed trait Extractor[Row, A] {
   type Accumulator
-
   type SingleResult
+
+  def cellExtractors: List[CellExtractor[Row, _]]
 
   def extractHeadOption(row: Iterable[Row]): Option[SingleResult]
   def extractAll(row: Iterable[Row]): List[SingleResult]
@@ -81,6 +82,7 @@ trait SingleRowExtractor[Row, A] {
  */
 case class ConstantExtractor[Row, A](value: A) extends Extractor[Row, A] with SimpleExtractor[Row, A] with SingleRowExtractor[Row, A] {
   type Accumulator = A
+  def cellExtractors = Nil
 
   def initialize(row: Row) = value
   def accumulate(accumulator: A, row: Row) = value
@@ -92,6 +94,7 @@ case class ConstantExtractor[Row, A](value: A) extends Extractor[Row, A] with Si
  */
 trait CellExtractor[Row, A] extends Extractor[Row, A] with SimpleExtractor[Row, A] with SingleRowExtractor[Row, A] {
   type Accumulator = Option[A]
+  def cellExtractors = List(this)
 
   def initialize(row: Row) = read(row)
 
@@ -105,7 +108,8 @@ trait CellExtractor[Row, A] extends Extractor[Row, A] with SimpleExtractor[Row, 
 /**
  * An extractor acts as a base type for extracting Product types
  */
-trait ProductExtractor[Row, A <: Product] extends Extractor[Row, A] with SimpleExtractor[Row, A] with SingleRowExtractor[Row, A] {
+trait ProductExtractor[Row, A] extends Extractor[Row, A] with SimpleExtractor[Row, A] with SingleRowExtractor[Row, A] {
+  def cellExtractors = innerExtractors.flatMap(_.cellExtractors)
   def innerExtractors: List[Extractor[Row, _]]
 }
 
@@ -123,6 +127,7 @@ trait ProductExtractorNames {
  */
 case class MappedExtractor[Row, A, B](inner: Extractor[Row, A], func: A => B) extends Extractor[Row, B] with SimpleExtractor[Row, B] with SingleRowExtractor[Row, B] {
   type Accumulator = inner.Accumulator
+  def cellExtractors = inner.cellExtractors
 
   def initialize(row: Row) = inner.initialize(row)
 
@@ -136,6 +141,7 @@ case class MappedExtractor[Row, A, B](inner: Extractor[Row, A], func: A => B) ex
  */
 case class SeqExtractor[Row, A](extractors: Seq[Extractor[Row, A]]) extends Extractor[Row, Seq[A]] with SimpleExtractor[Row, Seq[A]] with SingleRowExtractor[Row, Seq[A]] {
   type Accumulator = Seq[Any]
+  def cellExtractors = extractors.flatMap(_.cellExtractors).toList
 
   def initialize(row: Row): Accumulator = extractors.map(_.initialize(row))
 
@@ -160,6 +166,7 @@ case class SeqExtractor[Row, A](extractors: Seq[Extractor[Row, A]]) extends Extr
  */
 case class OptionExtractor[Row, A](inner: Extractor[Row, A]) extends Extractor[Row, Option[A]] with SimpleExtractor[Row, Option[A]] with SingleRowExtractor[Row, Option[A]] {
   type Accumulator = inner.Accumulator
+  def cellExtractors = inner.cellExtractors
 
   def initialize(row: Row) = inner.initialize(row)
 
@@ -173,6 +180,7 @@ case class OptionExtractor[Row, A](inner: Extractor[Row, A]) extends Extractor[R
  */
 case class ListMultiRowExtractor[Row, A](inner: Extractor[Row, A]) extends Extractor[Row, List[A]] with SimpleExtractor[Row, List[A]] {
   type Accumulator = Queue[Option[A]]
+  def cellExtractors = inner.cellExtractors
 
   def initialize(row: Row) = Queue(inner.emit(inner.initialize(row)))
 
@@ -199,6 +207,7 @@ case class GroupedExtractor[Row, A, B](inner: Extractor[Row, A], groupBy: Extrac
   // Consider using a tuple of a Queue and a HashMap as the Accumulator for efficiency
   type SingleResult = A
   type Accumulator = ListMap[B, inner.Accumulator]
+  def cellExtractors = inner.cellExtractors ++ groupBy.cellExtractors
 
   def initialize(row: Row) =
     ListMap(checkNullValueAndGet(groupBy.emit(groupBy.initialize(row))) -> inner.initialize(row))
@@ -242,6 +251,8 @@ case class GroupedExtractor[Row, A, B](inner: Extractor[Row, A], groupBy: Extrac
 }
 
 object Extractor {
+  type Aux[Row, A, SR] = Extractor[Row, A] { type SingleResult = SR }
+
   implicit class ExtractorOps(extractor: Extractor[_, _]) {
     def findCellExtractor(path: String) = ExtractorFinder(extractor, path)
   }
