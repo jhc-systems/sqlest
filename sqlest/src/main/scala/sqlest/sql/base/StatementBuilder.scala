@@ -91,10 +91,9 @@ trait StatementBuilder extends BaseStatementBuilder
           innerSetParameters(params)
           statement.addBatch
       }
-      case _: InsertFromSelect[_] =>
+      case _ =>
         innerSetParameters(parameters)
         statement.addBatch
-      case _ => innerSetParameters(parameters)
     }
   }
 

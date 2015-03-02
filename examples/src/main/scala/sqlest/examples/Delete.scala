@@ -2,24 +2,25 @@ package sqlest.examples
 
 import sqlest._
 
-object UpdateExamples extends App with DatabaseExample {
+object DeleteExamples extends App with DatabaseExample {
   InsertExamples.insertAll
 
-  val updateStatement =
-    update(FruitTable)
-      .set(FruitTable.juiciness -> 9)
+  val deleteStatement =
+    delete
+      .from(FruitTable)
       .where(FruitTable.name === "Banana")
 
   // Write operations must be run in a transaction - the below will throw an exception
   try {
-    updateStatement.execute
+    deleteStatement.execute
   } catch {
     case e: AssertionError => println(e.getMessage)
   }
 
+  // try again to run the delete statement in a transaction
   database.withTransaction {
-    // running execute on the update statement returns the number of lines changed (ie updated)
-    val numberDelete = updateStatement.execute
+    // running the delete statement returns the number of lines changed (ie deleted)
+    val numberDelete = deleteStatement.execute
     println(numberDelete)
   }
 }
