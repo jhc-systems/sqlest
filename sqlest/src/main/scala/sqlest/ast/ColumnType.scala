@@ -51,6 +51,7 @@ case object BigDecimalColumnType extends NumericColumnType[BigDecimal]
 case object BooleanColumnType extends NonNumericColumnType[Boolean]
 case object StringColumnType extends NonNumericColumnType[String]
 case object DateTimeColumnType extends NonNumericColumnType[DateTime]
+case object ByteArrayColumnType extends NonNumericColumnType[Array[Byte]]
 
 /**
  * Class representing an nullable SQL column type that is mapped to an `Option` in Scala.
@@ -119,6 +120,7 @@ object ColumnType {
   implicit val bigDecimalColumnType = BigDecimalColumnType
   implicit val stringColumnType = StringColumnType
   implicit val dateTimeColumnType = DateTimeColumnType
+  implicit val byteArrayColumnType = ByteArrayColumnType
   implicit def apply[A, B]: MappedColumnType[A, B] = macro MaterializeColumnTypeMacro.materializeImpl[A, B]
 
   implicit def optionType[A, B](implicit base: ColumnType.Aux[A, B]) = OptionColumnType[A, B](base)

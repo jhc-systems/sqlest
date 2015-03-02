@@ -50,6 +50,7 @@ trait DB2StatementBuilder extends base.StatementBuilder {
       case DoubleColumnType => "double"
       case IntColumnType => "integer"
       case LongColumnType => "bigint"
+      case ByteArrayColumnType => "varbinary(32704)"
       case optionColumnType: OptionColumnType[_, _] => castLiteralSql(optionColumnType.baseColumnType)
       case mappedColumnType: MappedColumnType[_, _] => castLiteralSql(mappedColumnType.baseColumnType)
     }
