@@ -50,9 +50,16 @@ object TestData {
   object TableFour extends TableFour(None)
 
   class TableFive(alias: Option[String]) extends Table("five", alias) {
-    val dateTimeCol = column[DateTime]("dateTimeCol")
+    val intCol = column[Int]("intCol")
+    val longCol = column[Long]("longCol")
+    val doubleCol = column[Double]("doubleCol")
     val bigDecimalCol = column[BigDecimal]("bigDecimalCol")
-    def columns = List(dateTimeCol, bigDecimalCol)
+    val booleanColumn = column[Boolean]("booleanColumn")
+    val stringColumn = column[String]("stringColumn")
+    val dateTimeCol = column[DateTime]("dateTimeCol")
+    val byteArrayCol = column[Array[Byte]]("byteArrayCol")
+
+    def columns = List(intCol, longCol, doubleCol, bigDecimalCol, booleanColumn, stringColumn, dateTimeCol, byteArrayCol)
   }
   object TableFive extends TableFive(None)
 

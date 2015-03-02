@@ -35,6 +35,22 @@ class ColumnExtractorSpec extends FlatSpec with Matchers {
   case class DuplicateTypeParamClass[A](a1: A, a2: A)
   case class MixedTypeParamClass[A](s: String, a: A)
 
+  "columns" should "extract the column type" in {
+    val date = new java.sql.Date(new java.util.Date().getTime)
+    def results = TestResultSet(TableFive.columns)(
+      Seq(1, 10000000000L, 3.14, new java.math.BigDecimal("2.818"), true, "Hello mars", date, Array[Byte](1, 127))
+    )
+
+    TableFive.intCol.extractHeadOption(results) should be(Some(1))
+    TableFive.longCol.extractHeadOption(results) should be(Some(10000000000L))
+    TableFive.doubleCol.extractHeadOption(results) should be(Some(3.14))
+    TableFive.bigDecimalCol.extractHeadOption(results) should be(Some(BigDecimal(2.818)))
+    TableFive.booleanColumn.extractHeadOption(results) should be(Some(true))
+    TableFive.stringColumn.extractHeadOption(results) should be(Some("Hello mars"))
+    TableFive.dateTimeCol.extractHeadOption(results) should be(Some(new DateTime(date)))
+    TableFive.byteArrayCol.extractHeadOption(results).map(_.toList) should be(Some(Array[Byte](1, 127).toList))
+  }
+
   "mapped column extractor" should "extract mapped value" in {
     val extractor = extractTuple(TableSix.trimmedString, TableSix.zeroIsNoneWrappedInt, TableSix.zeroIsNoneDateTime)
 
@@ -243,12 +259,12 @@ class ColumnExtractorSpec extends FlatSpec with Matchers {
   }
 
   "non option extractors" should "throw exceptions when extracting nulls" in {
-    def results = TestResultSet(TableOne.columns ++ TableFive.columns)(
-      Seq(null, null, null, null)
+    def results = TestResultSet(TableFive.columns)(
+      Seq(null, null, null, null, null, null, null, null)
     )
 
     intercept[NullPointerException] {
-      TableOne.col1.extractHeadOption(results)
+      TableFive.intCol.extractHeadOption(results)
     }
 
     intercept[NullPointerException] {
@@ -260,30 +276,34 @@ class ColumnExtractorSpec extends FlatSpec with Matchers {
     }
 
     intercept[NullPointerException] {
+      TableFive.byteArrayCol.extractHeadOption(results)
+    }
+
+    intercept[NullPointerException] {
       extractTuple(
-        TableOne.col1,
-        TableOne.col2
+        TableFive.intCol,
+        TableFive.stringColumn
       ).extractHeadOption(results)
     }
 
     intercept[NullPointerException] {
       extractTuple(
-        TableOne.col1.asOption,
-        TableOne.col2
+        TableFive.intCol.asOption,
+        TableFive.stringColumn
       ).extractHeadOption(results)
     }
 
     intercept[NullPointerException] {
       extractTuple(
-        TableOne.col1,
-        TableOne.col2.asOption
+        TableFive.intCol,
+        TableFive.stringColumn.asOption
       ).extractHeadOption(results)
     }
 
     intercept[NullPointerException] {
       extract[One](
-        a = TableOne.col1,
-        b = TableOne.col2
+        a = TableFive.intCol,
+        b = TableFive.stringColumn
       ).extractHeadOption(results)
     }
   }

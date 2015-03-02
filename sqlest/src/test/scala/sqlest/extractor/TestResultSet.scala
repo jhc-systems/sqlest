@@ -43,17 +43,26 @@ case class TestResultSet(columns: Seq[AliasedColumn[_]])(rows: Seq[Any]*) extend
   override def getInt(columnName: String) =
     get[Int](columnName, 0)
 
-  override def getString(columnName: String) =
-    get[String](columnName, null)
+  override def getLong(columnName: String) =
+    get[Long](columnName, 0L)
+
+  override def getDouble(columnName: String) =
+    get[Double](columnName, 0.0)
 
   override def getBigDecimal(columnName: String) =
     get[java.math.BigDecimal](columnName, null)
 
+  override def getBoolean(columnName: String) =
+    get[Boolean](columnName, false)
+
+  override def getString(columnName: String) =
+    get[String](columnName, null)
+
+  override def getBytes(columnName: String) =
+    get[Array[Byte]](columnName, null)
+
   override def getDate(columnName: String) =
     get[java.sql.Date](columnName, null)
-
-  override def getObject(columnName: String) =
-    get[AnyRef](columnName, null)
 
   override def next() = {
     currentRow += 1

@@ -26,6 +26,7 @@ class ColumnTypeSpec extends FlatSpec with Matchers {
     implicitly[ColumnType[Int]]
     implicitly[ColumnType[Double]]
     implicitly[ColumnType[String]]
+    implicitly[ColumnType[Array[Byte]]]
   }
 
   "optional data types" should "have implicit ColumnTypes" in {
@@ -33,5 +34,6 @@ class ColumnTypeSpec extends FlatSpec with Matchers {
     implicitly[ColumnType[Option[Int]]]
     implicitly[ColumnType[Option[Double]]]
     implicitly[ColumnType[Option[String]]]
+    implicitly[ColumnType[Option[Array[Byte]]]]
   }
 }
