@@ -66,7 +66,7 @@ object SqlestBuild extends Build {
 
   def commonSettings = SbtScalariform.scalariformSettings ++ Seq(
     organization := "uk.co.jhc",
-    version := "0.6.0",
+    version := "0.6.1",
     scalaVersion := "2.11.5",
     scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-language:implicitConversions", "-language:existentials")
   )
