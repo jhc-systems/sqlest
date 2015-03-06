@@ -96,10 +96,10 @@ object MappedColumnType {
    * Convenience method for constructing a `MappedColumnType` from a pair of
    * bidirectional mapping functions and an implicitly provided `BaseColumnType`.
    */
-  def apply[A, B: BaseColumnType](r: Option[B] => Option[A], w: A => B) = new MappedColumnType[A, B] {
+  def apply[A, B: BaseColumnType](r: Option[B] => Option[A], w: A => B)(implicit innerColumnType: ColumnType.Aux[B, B]) = new MappedColumnType[A, B] {
     val baseColumnType = implicitly[BaseColumnType[B]]
-    def read(database: Option[Database]) = r(database)
-    def write(value: A) = w(value)
+    def read(database: Option[Database]) = r(innerColumnType.read(database))
+    def write(value: A) = innerColumnType.write(w(value))
   }
 
   implicit class MappedColumnTypeOps[A, B](mappedColumnType: MappedColumnType[A, B]) {

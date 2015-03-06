@@ -66,7 +66,9 @@ object TestData {
   case class WrappedString(inner: String)
   case class WrappedInt(inner: Int)
   class TableSix(alias: Option[String]) extends Table("six", alias) {
-    val trimmedString = column[Option[WrappedString]]("trimmedString")(BlankIsNoneColumnType(ColumnType[WrappedString, String].compose(TrimmedStringColumnType)))
+    // Check that the implicit TrimmedStringColumnType gets applied to the trimmedString column
+    implicit val tsct = TrimmedStringColumnType
+    val trimmedString = column[Option[WrappedString]]("trimmedString")(BlankIsNoneColumnType)
     val zeroIsNoneWrappedInt = column[Option[WrappedInt]]("zeroIsNoneWrappedInt")(ZeroIsNoneColumnType[WrappedInt, Int])
     val zeroIsNoneDateTime = column[Option[DateTime]]("zeroIsNoneDateTime")(ZeroIsNoneColumnType(YyyyMmDdColumnType))
     def columns = List(trimmedString, zeroIsNoneWrappedInt, zeroIsNoneDateTime)
