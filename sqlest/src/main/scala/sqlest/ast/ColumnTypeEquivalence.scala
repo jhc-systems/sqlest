@@ -28,13 +28,7 @@ package sqlest.ast
  */
 case class ColumnTypeEquivalence[A, B](leftOption: Boolean, rightOption: Boolean)
 
-object ColumnTypeEquivalence {
-  implicit def nonNumericEquivalence[A](implicit left: NonNumericColumnType[A], right: NonNumericColumnType[A]) =
-    ColumnTypeEquivalence[A, A](false, false)
-
-  implicit def numericEquivalence[A, B](implicit left: NumericColumnType[A], right: NumericColumnType[B]) =
-    ColumnTypeEquivalence[A, B](false, false)
-
+object ColumnTypeEquivalence extends LowPriorityImplicits {
   implicit def mappedColumnTypeEquivalence[A, B](implicit left: MappedColumnType[A, B], right: MappedColumnType[A, B]) =
     ColumnTypeEquivalence[A, A](false, false)
 
@@ -46,4 +40,15 @@ object ColumnTypeEquivalence {
 
   implicit def bothOptionColumnTypeEquivalence[A, B](implicit left: ColumnType[Option[A]], right: ColumnType[Option[B]], columnTypeEquivalence: ColumnTypeEquivalence[A, B]) =
     ColumnTypeEquivalence[Option[A], Option[B]](true, true)
+}
+
+trait LowPriorityImplicits {
+  // It's possible mappedColumnTypeEquivalence to clash with these, if for example TrimmedStringColumnType
+  // has been implicitly put in scope. Make these lower priority
+
+  implicit def nonNumericEquivalence[A](implicit left: NonNumericColumnType[A], right: NonNumericColumnType[A]) =
+    ColumnTypeEquivalence[A, A](false, false)
+
+  implicit def numericEquivalence[A, B](implicit left: NumericColumnType[A], right: NumericColumnType[B]) =
+    ColumnTypeEquivalence[A, B](false, false)
 }
