@@ -6,7 +6,7 @@ import sqlest._
 import sqlest.ast._
 import sqlest.extractor._
 
-case class HListExtractor[Row, L <: HList, O <: HList](extractors: L)(implicit comapped: Comapped.Aux[L, TableColumn, O]) extends ProductExtractor[Row, O] {
+case class HListExtractor[Row, L <: HList, O <: HList](extractors: L)(implicit comapped: Comapped.Aux[L, AliasedColumn, O]) extends ProductExtractor[Row, O] {
   type Accumulator
   def accumulate(accumulator: Accumulator, row: Row): Accumulator = ???
   def emit(accumulator: Accumulator): Option[O] = ???
@@ -17,7 +17,7 @@ case class HListExtractor[Row, L <: HList, O <: HList](extractors: L)(implicit c
 object SelectHListExample extends App with DatabaseExample {
   InsertExamples.insertAll
 
-  implicit def hlistExtractable[Row, L <: HList, O <: HList](implicit comapped: Comapped.Aux[L, TableColumn, O]): Extractable.Aux[Row, L, O] =
+  implicit def hlistExtractable[Row, L <: HList, O <: HList](implicit comapped: Comapped.Aux[L, AliasedColumn, O]): Extractable.Aux[Row, L, O] =
     new Extractable[Row, L] {
       type Out = O
       def extractor(l: L) = HListExtractor(l)
