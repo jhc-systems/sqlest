@@ -84,7 +84,7 @@ class MappedColumnTypeSpec extends FlatSpec with Matchers with MappedColumnTypes
   }
 
   "MappedColumnType.compose" should "compose read and write operations" in {
-    val zeroIsNoneStringColumn = OptionColumnType("0")(MappedColumnType[Int, String](_.map(_.toInt), _.toString))
+    val zeroIsNoneStringColumn = OptionColumnType("0")(MappedColumnType[Int, String](_.toInt, _.toString))
     zeroIsNoneStringColumn.write(Some(1)) should be("1")
     zeroIsNoneStringColumn.write(None) should be("0")
     zeroIsNoneStringColumn.read(Some("0")) should be(Some(None))
@@ -97,15 +97,17 @@ class MappedColumnTypeSpec extends FlatSpec with Matchers with MappedColumnTypes
     blankIsNoneTrimmedColumn.write(None) should be("")
 
     val chainedComposedMappedColumn =
-      MappedColumnType[Option[Int], Boolean](
-        db => db.map { db => if (db) Some(1) else None },
-        v => if (v.getOrElse(0) == 0) false else true
-      ).compose(
-          MappedBooleanColumnType(
-            new DateTime(1999, 12, 31, 0, 0),
-            new DateTime(2000, 1, 1, 0, 0)
+      YyyyMmDdColumnType.compose(
+        MappedBooleanColumnType(
+          new DateTime(1999, 12, 31, 0, 0),
+          new DateTime(2000, 1, 1, 0, 0)
+        ).compose(
+            MappedColumnType[Option[Int], Boolean](
+              db => if (db) Some(1) else None,
+              v => if (v.getOrElse(0) == 0) false else true
+            )
           )
-        ).compose(YyyyMmDdColumnType)
+      )
 
     chainedComposedMappedColumn.read(Some(19991231)) should be(Some(Some(1)))
     chainedComposedMappedColumn.read(Some(19900408)) should be(Some(None))
