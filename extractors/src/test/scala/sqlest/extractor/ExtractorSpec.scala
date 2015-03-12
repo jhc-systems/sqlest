@@ -165,9 +165,11 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
     val seqRows = List(Seq(0, 1, 2), Seq(2, 3, 4), Seq(5, 6, 7))
     val seqExtractor: SeqExtractor[Seq[Any], Int] =
       SeqExtractor(
-        intExtractorAtIndex(0),
-        intExtractorAtIndex(1),
-        intExtractorAtIndex(2).map(_ * 2)
+        Seq(
+          intExtractorAtIndex(0),
+          intExtractorAtIndex(1),
+          intExtractorAtIndex(2).map(_ * 2)
+        ): _*
       )
 
     seqExtractor.extractHeadOption(Nil) should be(None)
