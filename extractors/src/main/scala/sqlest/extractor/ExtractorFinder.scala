@@ -48,7 +48,7 @@ object ExtractorFinder {
           case _ => None
         }
 
-      case SeqExtractor(extractors) =>
+      case SeqExtractor(extractors @ _*) =>
         path match {
           case StringToInt(index) :: tail => apply(extractors(index), tail)
           case _ => None
