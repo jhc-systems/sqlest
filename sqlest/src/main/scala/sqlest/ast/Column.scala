@@ -100,7 +100,7 @@ sealed trait AliasedColumn[A] extends Column[A] with CellExtractor[ResultSet, A]
       case BigDecimalColumnType => Option(resultSet.getBigDecimal(columnAlias)).map(BigDecimal.apply)
       case BooleanColumnType => checkNull(resultSet.getBoolean(columnAlias))
       case StringColumnType => checkNull(resultSet.getString(columnAlias))
-      case DateTimeColumnType => checkNull(new DateTime(resultSet.getDate(columnAlias)))
+      case DateTimeColumnType => checkNull(new DateTime(resultSet.getTimestamp(columnAlias)))
       case ByteArrayColumnType => checkNull(resultSet.getBytes(columnAlias))
     }
   }

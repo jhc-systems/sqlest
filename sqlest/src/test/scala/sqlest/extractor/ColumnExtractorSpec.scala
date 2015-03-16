@@ -36,7 +36,7 @@ class ColumnExtractorSpec extends FlatSpec with Matchers {
   case class MixedTypeParamClass[A](s: String, a: A)
 
   "columns" should "extract the column type" in {
-    val date = new java.sql.Date(new java.util.Date().getTime)
+    val date = new java.sql.Timestamp(new java.util.Date().getTime)
     def results = TestResultSet(TableFive.columns)(
       Seq(1, 10000000000L, 3.14, new java.math.BigDecimal("2.818"), true, "Hello mars", date, Array[Byte](1, 127))
     )
