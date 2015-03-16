@@ -139,7 +139,7 @@ trait ColumnSyntax {
         column match {
           case LiteralColumn(value) => LiteralColumn(mappedValue(mappedColumnType, isOption, column, value))(mappedColumnType.baseColumnType.asInstanceOf[ColumnType[Any]])
           case ConstantColumn(value) => ConstantColumn(mappedValue(mappedColumnType, isOption, column, value))(mappedColumnType.baseColumnType.asInstanceOf[ColumnType[Any]])
-          case _ => throw new AssertionError(s"Cannot compare MappedColumn $mappedColumnType and non mapped column $column")
+          case _ => throw new AssertionError(s"Cannot compare $left and $right with column types ${left.columnType} and ${right.columnType}")
         }
 
       def mappedValue[A](mappedColumnType: MappedColumnType[A, _], isOption: Boolean, column: Column[_], value: Any): Any =
