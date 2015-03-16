@@ -16,7 +16,7 @@
 
 package sqlest.ast
 
-import org.joda.time.DateTime
+import org.joda.time.{ DateTime, LocalDate }
 import scala.language.experimental.macros
 import scala.reflect.macros.whitebox.Context
 
@@ -51,6 +51,7 @@ case object BigDecimalColumnType extends NumericColumnType[BigDecimal]
 case object BooleanColumnType extends NonNumericColumnType[Boolean]
 case object StringColumnType extends NonNumericColumnType[String]
 case object DateTimeColumnType extends NonNumericColumnType[DateTime]
+case object LocalDateColumnType extends NonNumericColumnType[LocalDate]
 case object ByteArrayColumnType extends NonNumericColumnType[Array[Byte]]
 
 /**
@@ -120,6 +121,7 @@ object ColumnType {
   implicit val bigDecimalColumnType = BigDecimalColumnType
   implicit val stringColumnType = StringColumnType
   implicit val dateTimeColumnType = DateTimeColumnType
+  implicit val localDateColumnType = LocalDateColumnType
   implicit val byteArrayColumnType = ByteArrayColumnType
   implicit def apply[A, B]: MappedColumnType[A, B] = macro MaterializeColumnTypeMacro.materializeImpl[A, B]
 

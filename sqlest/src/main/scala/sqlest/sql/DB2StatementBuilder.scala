@@ -47,6 +47,7 @@ trait DB2StatementBuilder extends base.StatementBuilder {
       case BigDecimalColumnType => "decimal"
       case BooleanColumnType => throw new AssertionError("DB2 does not support Boolean data types")
       case DateTimeColumnType => "timestamp"
+      case LocalDateColumnType => "date"
       case DoubleColumnType => "double"
       case IntColumnType => "integer"
       case LongColumnType => "bigint"

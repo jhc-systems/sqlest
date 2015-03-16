@@ -61,6 +61,9 @@ case class TestResultSet(columns: Seq[AliasedColumn[_]])(rows: Seq[Any]*) extend
   override def getBytes(columnName: String) =
     get[Array[Byte]](columnName, null)
 
+  override def getDate(columnName: String) =
+    get[java.sql.Date](columnName, null)
+
   override def getTimestamp(columnName: String) =
     get[java.sql.Timestamp](columnName, null)
 

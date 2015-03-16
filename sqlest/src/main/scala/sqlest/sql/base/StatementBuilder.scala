@@ -16,8 +16,8 @@
 
 package sqlest.sql.base
 
-import java.sql.{ Connection, PreparedStatement, Timestamp => JdbcTimestamp, Types => JdbcTypes, SQLException }
-import org.joda.time.DateTime
+import java.sql.{ Connection, Date => JdbcDate, PreparedStatement, Timestamp => JdbcTimestamp, Types => JdbcTypes, SQLException }
+import org.joda.time.{ DateTime, LocalDate }
 import sqlest.ast._
 import sqlest.util._
 
@@ -106,6 +106,7 @@ trait StatementBuilder extends BaseStatementBuilder
     case StringColumnType => statement.setString(index, value.asInstanceOf[String])
     case ByteArrayColumnType => statement.setBytes(index, value.asInstanceOf[Array[Byte]])
     case DateTimeColumnType => statement.setTimestamp(index, new JdbcTimestamp(value.asInstanceOf[DateTime].getMillis))
+    case LocalDateColumnType => statement.setDate(index, new JdbcDate(value.asInstanceOf[LocalDate].toDate.getTime))
     case optionType: OptionColumnType[_, _] =>
       val option = value.asInstanceOf[Option[_]]
       if (option.isEmpty) statement.setNull(index, jdbcType(optionType.baseColumnType)) else setParameter(statement, index, optionType.baseColumnType, value)
@@ -121,6 +122,7 @@ trait StatementBuilder extends BaseStatementBuilder
     case StringColumnType => JdbcTypes.CHAR
     case ByteArrayColumnType => JdbcTypes.BINARY
     case DateTimeColumnType => JdbcTypes.TIMESTAMP
+    case LocalDateColumnType => JdbcTypes.DATE
     case optionType: OptionColumnType[_, _] => jdbcType(optionType.baseColumnType)
     case mappedType: MappedColumnType[_, _] => jdbcType(mappedType.baseColumnType)
   }

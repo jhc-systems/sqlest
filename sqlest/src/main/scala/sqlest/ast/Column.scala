@@ -17,7 +17,7 @@
 package sqlest.ast
 
 import java.sql.ResultSet
-import org.joda.time.DateTime
+import org.joda.time.{ DateTime, LocalDate }
 import sqlest.extractor.CellExtractor
 
 /**
@@ -101,6 +101,7 @@ sealed trait AliasedColumn[A] extends Column[A] with CellExtractor[ResultSet, A]
       case BooleanColumnType => checkNull(resultSet.getBoolean(columnAlias))
       case StringColumnType => checkNull(resultSet.getString(columnAlias))
       case DateTimeColumnType => checkNull(new DateTime(resultSet.getTimestamp(columnAlias)))
+      case LocalDateColumnType => checkNull(new LocalDate(resultSet.getDate(columnAlias)))
       case ByteArrayColumnType => checkNull(resultSet.getBytes(columnAlias))
     }
   }

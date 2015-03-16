@@ -154,6 +154,7 @@ trait BaseStatementBuilder {
     case BigDecimalColumnType => value.toString
     case StringColumnType => "'" + escapeSqlString(value.toString) + "'"
     case DateTimeColumnType => value.toString
+    case LocalDateColumnType => value.toString
     case ByteArrayColumnType => javax.xml.bind.DatatypeConverter.printHexBinary(value.asInstanceOf[Array[Byte]])
     case optionType: OptionColumnType[_, _] =>
       val option = value.asInstanceOf[Option[_]]

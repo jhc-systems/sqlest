@@ -17,7 +17,7 @@
 package sqlest
 
 import java.sql.ResultSet
-import org.joda.time.DateTime
+import org.joda.time.{ DateTime, LocalDate }
 import sqlest.extractor.TestResultSet
 import sqlest.executor.ResultSetIterable
 
@@ -57,9 +57,10 @@ object TestData {
     val booleanColumn = column[Boolean]("booleanColumn")
     val stringColumn = column[String]("stringColumn")
     val dateTimeCol = column[DateTime]("dateTimeCol")
+    val localDateCol = column[LocalDate]("localDateCol")
     val byteArrayCol = column[Array[Byte]]("byteArrayCol")
 
-    def columns = List(intCol, longCol, doubleCol, bigDecimalCol, booleanColumn, stringColumn, dateTimeCol, byteArrayCol)
+    def columns = List(intCol, longCol, doubleCol, bigDecimalCol, booleanColumn, stringColumn, dateTimeCol, localDateCol, byteArrayCol)
   }
   object TableFive extends TableFive(None)
 
