@@ -164,10 +164,13 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
   "SeqExtractor" should "extract values from all extractors and return them in a Seq" in {
     val seqRows = List(Seq(0, 1, 2), Seq(2, 3, 4), Seq(5, 6, 7))
     val seqExtractor: SeqExtractor[Seq[Any], Int] =
-      SeqExtractor(Seq(
-        intExtractorAtIndex(0),
-        intExtractorAtIndex(1),
-        intExtractorAtIndex(2).map(_ * 2)))
+      SeqExtractor(
+        Seq(
+          intExtractorAtIndex(0),
+          intExtractorAtIndex(1),
+          intExtractorAtIndex(2).map(_ * 2)
+        ): _*
+      )
 
     seqExtractor.extractHeadOption(Nil) should be(None)
     seqExtractor.extractHeadOption(seqRows) should be(Some(Seq(0, 1, 4)))
@@ -181,10 +184,11 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
   it should "throw a NullPointerException if any of the inner extractors extracted a null value" in {
     val seqRows = List(Seq(null, 1, 2), Seq(2, 3, 4), Seq(5, 6, null))
     val seqExtractor: SeqExtractor[Seq[Any], Int] =
-      SeqExtractor(Seq(
+      SeqExtractor(
         intExtractorAtIndex(0),
         intExtractorAtIndex(1),
-        intExtractorAtIndex(2).map(_ * 2)))
+        intExtractorAtIndex(2).map(_ * 2)
+      )
 
     intercept[NullPointerException] {
       seqExtractor.extractHeadOption(seqRows)
@@ -245,11 +249,11 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
   it should "wrap a SeqExtractor and wrap any null value in an Option" in {
     val seqRows = List(Seq(null, 1, 2), Seq(2, 3, 4), Seq(5, 6, null))
     val seqExtractor: OptionExtractor[Seq[Any], Seq[Int]] =
-      SeqExtractor(Seq(
+      SeqExtractor(
         intExtractorAtIndex(0),
         intExtractorAtIndex(1),
         intExtractorAtIndex(2).map(_ * 2)
-      )).asOption
+      ).asOption
 
     seqExtractor.extractHeadOption(Nil) should be(None)
     seqExtractor.extractHeadOption(seqRows) should be(Some(None))

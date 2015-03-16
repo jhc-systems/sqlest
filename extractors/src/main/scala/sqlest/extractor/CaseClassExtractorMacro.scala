@@ -163,7 +163,7 @@ case class CaseClassExtractorMacro(c: Context) {
     val treeNames = paramNames.map(name => q"$name")
     if (applyMethod.isVarargs) {
       val varargsBaseType = paramTypes.last match { case TypeRef(_, _, typ :: Nil) => typ }
-      treeNames.init :+ q"sqlest.extractor.SeqExtractor[$typeOfRow, $varargsBaseType](${paramNames.last}.toSeq)"
+      treeNames.init :+ q"sqlest.extractor.SeqExtractor[$typeOfRow, $varargsBaseType](${paramNames.last}.toSeq: _*)"
     } else treeNames
   }
 

@@ -134,7 +134,7 @@ case class MappedExtractor[Row, A, B](inner: Extractor[Row, A], func: A => B) ex
 /**
  * An extractor that aggregates results from a seq of extractors into a seq.
  */
-case class SeqExtractor[Row, A](extractors: Seq[Extractor[Row, A]]) extends Extractor[Row, Seq[A]] with SimpleExtractor[Row, Seq[A]] with SingleRowExtractor[Row, Seq[A]] {
+case class SeqExtractor[Row, A](extractors: Extractor[Row, A]*) extends Extractor[Row, Seq[A]] with SimpleExtractor[Row, Seq[A]] with SingleRowExtractor[Row, Seq[A]] {
   type Accumulator = Seq[Any]
 
   def initialize(row: Row): Accumulator = extractors.map(_.initialize(row))
