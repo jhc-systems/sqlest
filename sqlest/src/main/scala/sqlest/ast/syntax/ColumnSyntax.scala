@@ -153,6 +153,8 @@ trait ColumnSyntax {
         case (leftColumnType, rightColumnType) if leftColumnType == rightColumnType => (left, right)
         case (leftColumnType: MappedColumnType[_, _], rightColumnType: MappedColumnType[_, _]) if leftColumnType.baseColumnType == rightColumnType.baseColumnType => (left, right)
         case (leftColumnType: MappedColumnType[_, _], rightColumnType: MappedColumnType[_, _]) => throw new AssertionError(s"Cannot compare 2 different MappedColumns: $leftColumnType and $rightColumnType")
+        case (sqlest.TrimmedStringColumnType, StringColumnType) => (left, right)
+        case (StringColumnType, sqlest.TrimmedStringColumnType) => (left, right)
         case (leftColumnType: MappedColumnType[_, _], _) => (left, mapLiteralColumn(leftColumnType, equivalence.leftOption, right))
         case (_, rightColumnType: MappedColumnType[_, _]) => (mapLiteralColumn(rightColumnType, equivalence.rightOption, left), right)
         case (_, _) => (left, right)
