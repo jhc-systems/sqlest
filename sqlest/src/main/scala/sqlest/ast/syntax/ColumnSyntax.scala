@@ -149,11 +149,16 @@ trait ColumnSyntax {
           case _ => mappedColumnType.write(value.asInstanceOf[A])
         }
 
-      (left.columnType, right.columnType) match {
+      def nonOptionColumnType(columnType: ColumnType[_]) = columnType match {
+        case optionColumnType: OptionColumnType[_, _] => optionColumnType.innerColumnType
+        case _ => columnType
+      }
+
+      (nonOptionColumnType(left.columnType), nonOptionColumnType(right.columnType)) match {
         case (leftColumnType, rightColumnType) if leftColumnType == rightColumnType => (left, right)
         case (leftColumnType: MappedColumnType[_, _], rightColumnType: MappedColumnType[_, _]) if leftColumnType.baseColumnType == rightColumnType.baseColumnType => (left, right)
         case (leftColumnType: MappedColumnType[_, _], rightColumnType: MappedColumnType[_, _]) => throw new AssertionError(s"Cannot compare 2 different MappedColumns: $leftColumnType and $rightColumnType")
-        case (sqlest.TrimmedStringColumnType, StringColumnType) => (left, right)
+        case (sqlest.TrimmedStringColumnType, StringColumnType) => (left, right) // Allow trimmed and non trimmed strings to be compared
         case (StringColumnType, sqlest.TrimmedStringColumnType) => (left, right)
         case (leftColumnType: MappedColumnType[_, _], _) => (left, mapLiteralColumn(leftColumnType, equivalence.leftOption, right))
         case (_, rightColumnType: MappedColumnType[_, _]) => (mapLiteralColumn(rightColumnType, equivalence.rightOption, left), right)

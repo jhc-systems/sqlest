@@ -39,6 +39,7 @@ class ColumnSpec extends FlatSpec with Matchers {
   class TableOne(alias: Option[String]) extends Table("one", alias) {
     val col1 = column[Int]("col1")
     val col2 = column[String]("col2")
+    val col2Trimmed = column[String]("col2")(TrimmedStringColumnType)
     val col3 = column[Int]("col3")(MappedColumnType[Int, String](_.map(_.toInt), _.toString))
     val col4 = column[Double]("col1")
     val col5 = column[Option[String]]("col5")(OptionColumnType(""))
@@ -102,6 +103,18 @@ class ColumnSpec extends FlatSpec with Matchers {
     (TableOne.col7 in List(WrappedInt(0), WrappedInt(1))) should equal(InfixFunctionColumn[Boolean]("in", TableOne.col7, ScalarFunctionColumn[WrappedInt]("", Seq(WrappedInt(0).constant, WrappedInt(1).constant))))
   }
 
+  "StringColumnType and TrimmedStringColumnType" should "allow comparison operations" in {
+    TableOne.col2 === TableOne.col2Trimmed
+    (TableOne.col2 === TableOne.col2Trimmed) should equal(InfixFunctionColumn[Boolean]("=", TableOne.col2, TableOne.col2Trimmed))
+    (TableOne.col2 =!= TableOne.col2Trimmed) should equal(InfixFunctionColumn[Boolean]("<>", TableOne.col2, TableOne.col2Trimmed))
+    (TableOne.col2 < TableOne.col2Trimmed) should equal(InfixFunctionColumn[Boolean]("<", TableOne.col2, TableOne.col2Trimmed))
+    (TableOne.col2 <= TableOne.col2Trimmed) should equal(InfixFunctionColumn[Boolean]("<=", TableOne.col2, TableOne.col2Trimmed))
+    (TableOne.col2 > TableOne.col2Trimmed) should equal(InfixFunctionColumn[Boolean](">", TableOne.col2, TableOne.col2Trimmed))
+    (TableOne.col2 >= TableOne.col2Trimmed) should equal(InfixFunctionColumn[Boolean](">=", TableOne.col2, TableOne.col2Trimmed))
+    (TableOne.col2.in(TableOne.col2, TableOne.col2Trimmed)) should equal(InfixFunctionColumn[Boolean]("in", TableOne.col2, ScalarFunctionColumn[Size]("", Seq(TableOne.col2, TableOne.col2Trimmed))))
+    (TableOne.col2Trimmed in List("a", "b")) should equal(InfixFunctionColumn[Boolean]("in", TableOne.col2Trimmed, ScalarFunctionColumn[Size]("", Seq("a".constant, "b".constant))))
+  }
+
   "column comparisons" should "fail for a mapped and an unmapped column" in {
     intercept[AssertionError] {
       TableOne.col1 > TableOne.col3
@@ -119,6 +132,8 @@ class ColumnSpec extends FlatSpec with Matchers {
   "optional mapped columns" should "work with non option comparisons correctly" in {
     TableOne.col2 === "abc"
     TableOne.col2 === Some("abc")
+    TableOne.col2Trimmed === "abc"
+    TableOne.col2Trimmed === Some("abc")
     TableOne.col5 === "abc"
     TableOne.col5 === Some("abc")
   }

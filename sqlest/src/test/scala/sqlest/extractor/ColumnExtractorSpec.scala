@@ -68,7 +68,7 @@ class ColumnExtractorSpec extends FlatSpec with Matchers {
 
     extractor.extractAll(testResultSet) should equal(List(
       (Some(WrappedString("test")), Some(WrappedInt(5)), Some(new DateTime(2015, 1, 1, 0, 0))),
-      (Some(WrappedString("test")), None, Some(new DateTime(2100, 1, 1, 0, 0))),
+      (Some(WrappedString(" test")), None, Some(new DateTime(2100, 1, 1, 0, 0))),
       (None, None, None)
     ))
   }

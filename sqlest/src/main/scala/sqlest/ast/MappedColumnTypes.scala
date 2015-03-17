@@ -35,10 +35,17 @@ trait MappedColumnTypes
 }
 
 trait StringMappedColumnTypes {
+  /* Right trims any strings returned from the database */
   case object TrimmedStringColumnType extends MappedColumnType[String, String] {
     val baseColumnType = StringColumnType
-    def read(database: Option[String]) = database.map(_.trim)
+    def read(database: Option[String]) = database.map(rightTrim)
     def write(value: String) = value
+
+    private def rightTrim(s: String): String = {
+      var i = s.length - 1
+      while (i >= 0 && Character.isWhitespace(s.charAt(i))) i = i - 1
+      s.substring(0, i + 1)
+    }
   }
 }
 

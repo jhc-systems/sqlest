@@ -92,7 +92,7 @@ class MappedColumnTypeSpec extends FlatSpec with Matchers with MappedColumnTypes
 
     val blankIsNoneTrimmedColumn = OptionColumnType("")(TrimmedStringColumnType)
     blankIsNoneTrimmedColumn.read(Some("")) should be(Some(None))
-    blankIsNoneTrimmedColumn.read(Some("  Test   ")) should be(Some(Some("Test")))
+    blankIsNoneTrimmedColumn.read(Some("  Test   ")) should be(Some(Some("  Test")))
     blankIsNoneTrimmedColumn.write(Some("Test")) should be("Test")
     blankIsNoneTrimmedColumn.write(None) should be("")
 
