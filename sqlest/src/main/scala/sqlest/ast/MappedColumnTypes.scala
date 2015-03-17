@@ -16,7 +16,7 @@
 
 package sqlest.ast
 
-import org.joda.time.DateTime
+import org.joda.time.LocalDate
 
 /** Standard set of MappedColumnTypes for various column types: */
 trait MappedColumnTypes
@@ -24,7 +24,7 @@ trait MappedColumnTypes
     with BooleanMappedColumnTypes
     with EnumerationMappedColumnTypes
     with NumericMappedColumnTypes
-    with DateTimeMappedColumnTypes
+    with LocalDateMappedColumnTypes
     with OptionColumnTypes {
 
   // Expose the ColumnType types to custom Sqlest builds that use this trait:
@@ -35,10 +35,17 @@ trait MappedColumnTypes
 }
 
 trait StringMappedColumnTypes {
+  /* Right trims any strings returned from the database */
   case object TrimmedStringColumnType extends MappedColumnType[String, String] {
     val baseColumnType = StringColumnType
-    def read(database: Option[String]) = database.map(_.trim)
+    def read(database: Option[String]) = database.map(rightTrim)
     def write(value: String) = value
+
+    private def rightTrim(s: String): String = {
+      var i = s.length - 1
+      while (i >= 0 && Character.isWhitespace(s.charAt(i))) i = i - 1
+      s.substring(0, i + 1)
+    }
   }
 }
 
@@ -106,8 +113,8 @@ trait NumericMappedColumnTypes {
   }
 }
 
-trait DateTimeMappedColumnTypes {
-  case object YyyyMmDdColumnType extends MappedColumnType[DateTime, Int] {
+trait LocalDateMappedColumnTypes {
+  case object YyyyMmDdColumnType extends MappedColumnType[LocalDate, Int] {
     val baseColumnType = IntColumnType
 
     def read(database: Option[Int]) = database.map { database =>
@@ -115,10 +122,10 @@ trait DateTimeMappedColumnTypes {
       val month = (database % 10000) / 100
       val day = database % 100
 
-      new DateTime(year, month, day, 0, 0)
+      new LocalDate(year, month, day)
     }
 
-    def write(value: DateTime) =
+    def write(value: LocalDate) =
       value.getYear * 10000 + value.getMonthOfYear * 100 + value.getDayOfMonth
   }
 }

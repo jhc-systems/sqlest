@@ -16,7 +16,7 @@
 
 package sqlest.extractor
 
-import org.joda.time.DateTime
+import org.joda.time.{ DateTime, LocalDate }
 import org.scalatest._
 import org.scalatest.matchers._
 import sqlest._
@@ -36,9 +36,10 @@ class ColumnExtractorSpec extends FlatSpec with Matchers {
   case class MixedTypeParamClass[A](s: String, a: A)
 
   "columns" should "extract the column type" in {
+    val timestamp = new java.sql.Timestamp(new java.util.Date().getTime)
     val date = new java.sql.Date(new java.util.Date().getTime)
     def results = TestResultSet(TableFive.columns)(
-      Seq(1, 10000000000L, 3.14, new java.math.BigDecimal("2.818"), true, "Hello mars", date, Array[Byte](1, 127))
+      Seq(1, 10000000000L, 3.14, new java.math.BigDecimal("2.818"), true, "Hello mars", timestamp, date, Array[Byte](1, 127))
     )
 
     TableFive.intCol.extractHeadOption(results) should be(Some(1))
@@ -47,12 +48,13 @@ class ColumnExtractorSpec extends FlatSpec with Matchers {
     TableFive.bigDecimalCol.extractHeadOption(results) should be(Some(BigDecimal(2.818)))
     TableFive.booleanColumn.extractHeadOption(results) should be(Some(true))
     TableFive.stringColumn.extractHeadOption(results) should be(Some("Hello mars"))
-    TableFive.dateTimeCol.extractHeadOption(results) should be(Some(new DateTime(date)))
+    TableFive.dateTimeCol.extractHeadOption(results) should be(Some(new DateTime(timestamp)))
+    TableFive.localDateCol.extractHeadOption(results) should be(Some(new LocalDate(date)))
     TableFive.byteArrayCol.extractHeadOption(results).map(_.toList) should be(Some(Array[Byte](1, 127).toList))
   }
 
   "mapped column extractor" should "extract mapped value" in {
-    val extractor = extractTuple(TableSix.trimmedString, TableSix.zeroIsNoneWrappedInt, TableSix.zeroIsNoneDateTime)
+    val extractor = extractTuple(TableSix.trimmedString, TableSix.zeroIsNoneWrappedInt, TableSix.zeroIsNoneLocalDate)
 
     def testResultSet = TestResultSet(TableSix.columns)(
       Seq("test", 5, 20150101),
@@ -61,12 +63,12 @@ class ColumnExtractorSpec extends FlatSpec with Matchers {
     )
 
     extractor.extractHeadOption(testResultSet) should equal(Some(
-      (Some(WrappedString("test")), Some(WrappedInt(5)), Some(new DateTime(2015, 1, 1, 0, 0)))
+      (Some(WrappedString("test")), Some(WrappedInt(5)), Some(new LocalDate(2015, 1, 1)))
     ))
 
     extractor.extractAll(testResultSet) should equal(List(
-      (Some(WrappedString("test")), Some(WrappedInt(5)), Some(new DateTime(2015, 1, 1, 0, 0))),
-      (Some(WrappedString("test")), None, Some(new DateTime(2100, 1, 1, 0, 0))),
+      (Some(WrappedString("test")), Some(WrappedInt(5)), Some(new LocalDate(2015, 1, 1))),
+      (Some(WrappedString(" test")), None, Some(new LocalDate(2100, 1, 1))),
       (None, None, None)
     ))
   }
@@ -260,7 +262,7 @@ class ColumnExtractorSpec extends FlatSpec with Matchers {
 
   "non option extractors" should "throw exceptions when extracting nulls" in {
     def results = TestResultSet(TableFive.columns)(
-      Seq(null, null, null, null, null, null, null, null)
+      Seq(null, null, null, null, null, null, null, null, null)
     )
 
     intercept[NullPointerException] {
@@ -269,6 +271,10 @@ class ColumnExtractorSpec extends FlatSpec with Matchers {
 
     intercept[NullPointerException] {
       TableFive.dateTimeCol.extractHeadOption(results)
+    }
+
+    intercept[NullPointerException] {
+      TableFive.localDateCol.extractHeadOption(results)
     }
 
     intercept[NullPointerException] {

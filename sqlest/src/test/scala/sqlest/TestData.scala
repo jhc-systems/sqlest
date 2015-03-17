@@ -17,7 +17,7 @@
 package sqlest
 
 import java.sql.ResultSet
-import org.joda.time.DateTime
+import org.joda.time.{ DateTime, LocalDate }
 import sqlest.extractor.TestResultSet
 import sqlest.executor.ResultSetIterable
 
@@ -57,9 +57,10 @@ object TestData {
     val booleanColumn = column[Boolean]("booleanColumn")
     val stringColumn = column[String]("stringColumn")
     val dateTimeCol = column[DateTime]("dateTimeCol")
+    val localDateCol = column[LocalDate]("localDateCol")
     val byteArrayCol = column[Array[Byte]]("byteArrayCol")
 
-    def columns = List(intCol, longCol, doubleCol, bigDecimalCol, booleanColumn, stringColumn, dateTimeCol, byteArrayCol)
+    def columns = List(intCol, longCol, doubleCol, bigDecimalCol, booleanColumn, stringColumn, dateTimeCol, localDateCol, byteArrayCol)
   }
   object TableFive extends TableFive(None)
 
@@ -70,8 +71,8 @@ object TestData {
     implicit val tsct = TrimmedStringColumnType
     val trimmedString = column[Option[WrappedString]]("trimmedString")(BlankIsNoneColumnType)
     val zeroIsNoneWrappedInt = column[Option[WrappedInt]]("zeroIsNoneWrappedInt")(ZeroIsNoneColumnType[WrappedInt, Int])
-    val zeroIsNoneDateTime = column[Option[DateTime]]("zeroIsNoneDateTime")(ZeroIsNoneColumnType(YyyyMmDdColumnType))
-    def columns = List(trimmedString, zeroIsNoneWrappedInt, zeroIsNoneDateTime)
+    val zeroIsNoneLocalDate = column[Option[LocalDate]]("zeroIsNoneDateTime")(ZeroIsNoneColumnType(YyyyMmDdColumnType))
+    def columns = List(trimmedString, zeroIsNoneWrappedInt, zeroIsNoneLocalDate)
   }
   object TableSix extends TableSix(None)
 

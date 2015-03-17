@@ -16,7 +16,7 @@
 
 package sqlest.ast
 
-import org.joda.time.DateTime
+import org.joda.time.LocalDate
 import org.scalatest._
 import org.scalatest.matchers._
 
@@ -77,10 +77,10 @@ class MappedColumnTypeSpec extends FlatSpec with Matchers with MappedColumnTypes
   }
 
   "YyyyMmDdColumnType" should "convert integers to date times" in {
-    YyyyMmDdColumnType.write(new DateTime(1999, 12, 31, 0, 0)) should be(19991231)
-    YyyyMmDdColumnType.write(new DateTime(2000, 1, 1, 0, 0)) should be(20000101)
-    YyyyMmDdColumnType.read(Some(19991231)) should be(Some(new DateTime(1999, 12, 31, 0, 0)))
-    YyyyMmDdColumnType.read(Some(20000101)) should be(Some(new DateTime(2000, 1, 1, 0, 0)))
+    YyyyMmDdColumnType.write(new LocalDate(1999, 12, 31)) should be(19991231)
+    YyyyMmDdColumnType.write(new LocalDate(2000, 1, 1)) should be(20000101)
+    YyyyMmDdColumnType.read(Some(19991231)) should be(Some(new LocalDate(1999, 12, 31)))
+    YyyyMmDdColumnType.read(Some(20000101)) should be(Some(new LocalDate(2000, 1, 1)))
   }
 
   "MappedColumnType.compose" should "compose read and write operations" in {
@@ -92,15 +92,15 @@ class MappedColumnTypeSpec extends FlatSpec with Matchers with MappedColumnTypes
 
     val blankIsNoneTrimmedColumn = OptionColumnType("")(TrimmedStringColumnType)
     blankIsNoneTrimmedColumn.read(Some("")) should be(Some(None))
-    blankIsNoneTrimmedColumn.read(Some("  Test   ")) should be(Some(Some("Test")))
+    blankIsNoneTrimmedColumn.read(Some("  Test   ")) should be(Some(Some("  Test")))
     blankIsNoneTrimmedColumn.write(Some("Test")) should be("Test")
     blankIsNoneTrimmedColumn.write(None) should be("")
 
     val chainedComposedMappedColumn =
       YyyyMmDdColumnType.compose(
         MappedBooleanColumnType(
-          new DateTime(1999, 12, 31, 0, 0),
-          new DateTime(2000, 1, 1, 0, 0)
+          new LocalDate(1999, 12, 31),
+          new LocalDate(2000, 1, 1)
         ).compose(
             MappedColumnType[Option[Int], Boolean](
               db => if (db) Some(1) else None,

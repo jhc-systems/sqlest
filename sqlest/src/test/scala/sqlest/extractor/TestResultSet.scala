@@ -64,6 +64,9 @@ case class TestResultSet(columns: Seq[AliasedColumn[_]])(rows: Seq[Any]*) extend
   override def getDate(columnName: String) =
     get[java.sql.Date](columnName, null)
 
+  override def getTimestamp(columnName: String) =
+    get[java.sql.Timestamp](columnName, null)
+
   override def next() = {
     currentRow += 1
     currentRow < rows.length

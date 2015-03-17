@@ -16,7 +16,7 @@
 
 package sqlest.ast
 
-import org.joda.time.DateTime
+import org.joda.time.{ DateTime, LocalDate }
 import scala.language.experimental.macros
 import scala.reflect.macros.whitebox.Context
 
@@ -51,6 +51,7 @@ case object BigDecimalColumnType extends NumericColumnType[BigDecimal]
 case object BooleanColumnType extends NonNumericColumnType[Boolean]
 case object StringColumnType extends NonNumericColumnType[String]
 case object DateTimeColumnType extends NonNumericColumnType[DateTime]
+case object LocalDateColumnType extends NonNumericColumnType[LocalDate]
 case object ByteArrayColumnType extends NonNumericColumnType[Array[Byte]]
 
 /**
@@ -58,7 +59,7 @@ case object ByteArrayColumnType extends NonNumericColumnType[Array[Byte]]
  *
  * For every `OptionColumnType` there is an underlying `BaseColumnType`.
  */
-case class OptionColumnType[A, B](nullValue: B, isNull: B => Boolean)(implicit innerColumnType: ColumnType.Aux[A, B]) extends ColumnType[Option[A]] {
+case class OptionColumnType[A, B](nullValue: B, isNull: B => Boolean)(implicit val innerColumnType: ColumnType.Aux[A, B]) extends ColumnType[Option[A]] {
   type Database = B
   val baseColumnType: BaseColumnType[B] = innerColumnType match {
     case baseColumnType: ColumnType[A] with BaseColumnType[B] => baseColumnType
@@ -74,6 +75,8 @@ case class OptionColumnType[A, B](nullValue: B, isNull: B => Boolean)(implicit i
   def write(value: Option[A]): Database =
     if (value.isEmpty) nullValue
     else innerColumnType.write(value.get)
+
+  override def toString = s"OptionColumnType($nullValue, $isNull)($innerColumnType)"
 }
 
 object OptionColumnType {
@@ -138,6 +141,7 @@ object ColumnType {
   implicit val bigDecimalColumnType = BigDecimalColumnType
   implicit val stringColumnType = StringColumnType
   implicit val dateTimeColumnType = DateTimeColumnType
+  implicit val localDateColumnType = LocalDateColumnType
   implicit val byteArrayColumnType = ByteArrayColumnType
   implicit def apply[A, B]: MappedColumnType[A, B] = macro MaterializeColumnTypeMacro.materializeImpl[A, B]
 
