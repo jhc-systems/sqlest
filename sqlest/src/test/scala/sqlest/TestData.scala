@@ -71,8 +71,8 @@ object TestData {
     implicit val tsct = TrimmedStringColumnType
     val trimmedString = column[Option[WrappedString]]("trimmedString")(BlankIsNoneColumnType)
     val zeroIsNoneWrappedInt = column[Option[WrappedInt]]("zeroIsNoneWrappedInt")(ZeroIsNoneColumnType[WrappedInt, Int])
-    val zeroIsNoneDateTime = column[Option[DateTime]]("zeroIsNoneDateTime")(ZeroIsNoneColumnType(YyyyMmDdColumnType))
-    def columns = List(trimmedString, zeroIsNoneWrappedInt, zeroIsNoneDateTime)
+    val zeroIsNoneLocalDate = column[Option[LocalDate]]("zeroIsNoneDateTime")(ZeroIsNoneColumnType(YyyyMmDdColumnType))
+    def columns = List(trimmedString, zeroIsNoneWrappedInt, zeroIsNoneLocalDate)
   }
   object TableSix extends TableSix(None)
 

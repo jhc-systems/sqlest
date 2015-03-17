@@ -54,7 +54,7 @@ class ColumnExtractorSpec extends FlatSpec with Matchers {
   }
 
   "mapped column extractor" should "extract mapped value" in {
-    val extractor = extractTuple(TableSix.trimmedString, TableSix.zeroIsNoneWrappedInt, TableSix.zeroIsNoneDateTime)
+    val extractor = extractTuple(TableSix.trimmedString, TableSix.zeroIsNoneWrappedInt, TableSix.zeroIsNoneLocalDate)
 
     def testResultSet = TestResultSet(TableSix.columns)(
       Seq("test", 5, 20150101),
@@ -63,12 +63,12 @@ class ColumnExtractorSpec extends FlatSpec with Matchers {
     )
 
     extractor.extractHeadOption(testResultSet) should equal(Some(
-      (Some(WrappedString("test")), Some(WrappedInt(5)), Some(new DateTime(2015, 1, 1, 0, 0)))
+      (Some(WrappedString("test")), Some(WrappedInt(5)), Some(new LocalDate(2015, 1, 1)))
     ))
 
     extractor.extractAll(testResultSet) should equal(List(
-      (Some(WrappedString("test")), Some(WrappedInt(5)), Some(new DateTime(2015, 1, 1, 0, 0))),
-      (Some(WrappedString(" test")), None, Some(new DateTime(2100, 1, 1, 0, 0))),
+      (Some(WrappedString("test")), Some(WrappedInt(5)), Some(new LocalDate(2015, 1, 1))),
+      (Some(WrappedString(" test")), None, Some(new LocalDate(2100, 1, 1))),
       (None, None, None)
     ))
   }
