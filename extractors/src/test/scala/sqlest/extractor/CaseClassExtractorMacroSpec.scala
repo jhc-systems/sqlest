@@ -17,7 +17,7 @@
 package sqlest.extractor
 
 import org.scalatest._
-import org.scalatest.matchers._
+import shapeless.test.illTyped
 
 // TODO: The CaseClassExtractorMacro macro has issues with path-dependent types.
 // We don't use path dependent types in our production codebase, so we've
@@ -195,40 +195,40 @@ class CaseClassExtractorMacroSpec extends FlatSpec with Matchers with ExtractorS
     nestedExtractor.findCellExtractor("two.c") should equal(None)
   }
 
-  // TODO: Implement this test with illTyped:
   "extract[A]" should "fail if there are too few arguments" in {
-    pending
-    // extract[One](
-    //   a = intExtractor
-    // )
+    illTyped("""
+      extract[One](
+       a = intExtractor
+      )
+              """)
   }
 
-  // TODO: Implement this test with illTyped:
   it should "fail if there are too many arguments" in {
-    pending
-    // extract[One](
-    //   a = intExtractor,
-    //   b = intExtractor,
-    //   c = intExtractor
-    // )
+    illTyped("""
+        extract[One](
+          a = intExtractor,
+          b = intExtractor,
+          c = intExtractor
+        )
+              """)
   }
 
-  // TODO: Implement this test with illTyped:
   it should "fail on the wrong types of arguments" in {
-    pending
-    // extract[One](
-    //   a = stringExtractor,
-    //   b = intExtractor
-    // )
+    illTyped("""
+     extract[One](
+       a = stringExtractor,
+       b = intExtractor
+     )
+              """)
   }
 
-  // TODO: Implement this test with illTyped:
   it should "fail on the wrong argument names" in {
-    pending
-    // extract[One](
-    //   b = intExtractor,
-    //   a = stringExtractor
-    // )
+    illTyped("""
+     extract[One](
+       b = intExtractor,
+       a = stringExtractor
+     )
+              """)
   }
 
 }

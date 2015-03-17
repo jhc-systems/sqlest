@@ -47,7 +47,8 @@ object SqlestBuild extends Build {
         "org.scala-lang" % "scala-reflect" % scalaVersion.value,
         "joda-time" % "joda-time" % "2.3",
         "org.joda" % "joda-convert" % "1.6",
-        "org.scalatest" %% "scalatest" % "2.2.1" % "test"
+        "org.scalatest" %% "scalatest" % "2.2.1" % "test",
+        "com.chuusai" %% "shapeless" % "2.1.0" % "test"
       )
     )
   )
