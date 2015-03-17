@@ -101,31 +101,16 @@ object MappedColumnType {
    */
   def apply[A, B: BaseColumnType](r: B => A, w: A => B)(implicit innerColumnType: ColumnType.Aux[B, B]) = new MappedColumnType[A, B] {
     val baseColumnType = implicitly[BaseColumnType[B]]
-    def read(database: Option[Database]) = r.lift(innerColumnType.read(database))
+    def read(database: Option[Database]) = innerColumnType.read(database).map(r)
     def write(value: A) = innerColumnType.write(w(value))
   }
 
   implicit class MappedColumnTypeOps[B, C: BaseColumnType](baseColumnType: ColumnType.Aux[B, C]) {
     def compose[A](outerColumnType: ColumnType.Aux[A, B]): MappedColumnType[A, C] = {
-      val baseRead = (baseColumnType.read _).unlift
-      val mappedRead = (outerColumnType.read _).unlift
       MappedColumnType(
-        (database: C) => mappedRead(baseRead(database)),
+        (database: C) => outerColumnType.read(baseColumnType.read(Some(database))).get,
         (value: A) => baseColumnType.write(outerColumnType.write(value))
       )
-    }
-  }
-
-  implicit class LiftableOps[A, B](func: A => B) {
-    def lift: Option[A] => Option[B] = {
-      case Some(a) => Some(func(a))
-      case _ => None
-    }
-  }
-
-  implicit class UnliftableOps[A, B](func: Option[A] => Option[B]) {
-    def unlift: A => B = {
-      case a => func(Some(a)).get
     }
   }
 }
