@@ -40,7 +40,7 @@ class ColumnSpec extends FlatSpec with Matchers {
     val col1 = column[Int]("col1")
     val col2 = column[String]("col2")
     val col2Trimmed = column[String]("col2")(TrimmedStringColumnType)
-    val col3 = column[Int]("col3")(MappedColumnType[Int, String](_.map(_.toInt), _.toString))
+    val col3 = column[Int]("col3")(MappedColumnType[Int, String](_.toInt, _.toString))
     val col4 = column[Double]("col1")
     val col5 = column[Option[String]]("col5")(OptionColumnType(""))
     val col6 = column[Size]("col6")
