@@ -198,37 +198,68 @@ class CaseClassExtractorMacroSpec extends FlatSpec with Matchers with ExtractorS
   "extract[A]" should "fail if there are too few arguments" in {
     illTyped("""
       extract[One](
-       a = intExtractor
+        a = intExtractor
       )
               """)
   }
 
   it should "fail if there are too many arguments" in {
     illTyped("""
-        extract[One](
-          a = intExtractor,
-          b = intExtractor,
-          c = intExtractor
-        )
+      extract[One](
+        a = intExtractor,
+        b = intExtractor,
+        c = intExtractor
+      )
               """)
   }
 
   it should "fail on the wrong types of arguments" in {
     illTyped("""
-     extract[One](
-       a = stringExtractor,
-       b = intExtractor
-     )
+      extract[One](
+        a = stringExtractor,
+        b = intExtractor
+      )
               """)
   }
 
   it should "fail on the wrong argument names" in {
     illTyped("""
-     extract[One](
-       b = intExtractor,
-       a = stringExtractor
-     )
+      extract[One](
+        b = intExtractor,
+        a = stringExtractor
+      )
               """)
   }
 
+  it should "either fail to compile or complete successfully on a second call to extract" in {
+    import scala.language.reflectiveCalls
+
+    val twoExtractor = extract[Two](
+      a = stringExtractor,
+      b = shapeExtractor
+    )
+
+    val badNestedExtractor = extract[AggregateOneTwo](
+      one = extract[One](
+        a = intExtractor,
+        b = stringExtractor
+      ),
+      two = extract(twoExtractor)
+    )
+
+    badNestedExtractor.extractHeadOption(tupleRows) should equal(Some(
+      AggregateOneTwo(One(1, "a"), Two("a", Circle))
+    ))
+
+    /* TODO: make the following test pass
+    illTyped("""
+      extract[AggregateOneTwo](
+        one = extract[One](
+          a = intExtractor,
+          b = stringExtractor
+        ),
+        two = extract(twoExtractor)
+      )
+      """) */
+  }
 }
