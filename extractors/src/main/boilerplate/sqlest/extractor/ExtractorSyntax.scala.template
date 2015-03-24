@@ -25,7 +25,7 @@ trait ExtractorSyntax[Row] {
   // However the extended return type is included to overcome bugs in:
   //   - Scala compiler does not add `apply` sugar after macro expansion but it works with Dynamic
   //   - Intellij does not macro expand whitebox macros to determine the actual return type but it does understand the return type of `applyDynamic` and `applyDynamicNamed`
-  def extract[A]: Dynamic { def applyDynamic(method: String)(args: Any*): Extractor[Row, A] with SimpleExtractor[Row, A]; def applyDynamicNamed(method: String)(namedArgs: (String, Any)*): Extractor[Row, A] with SimpleExtractor[Row, A] } = 
+  def extract[A]: Dynamic { def applyDynamic(method: String)(args: Any*): Extractor[Row, A] with SimpleExtractor[Row, A]; def applyDynamicNamed(method: String)(namedArgs: (String, Any)*): Extractor[Row, A] with SimpleExtractor[Row, A] ; def apply(extractor: Extractor[Row, A] with SimpleExtractor[Row, A]): Extractor[Row, A] with SimpleExtractor[Row, A]} = 
     macro CaseClassExtractorMacro.apply[Row, A]
 
 [2..22#  implicit def extractTuple[Row, [#A1#]](t: Tuple1[[#Extractor[Row, A1]#]]) =

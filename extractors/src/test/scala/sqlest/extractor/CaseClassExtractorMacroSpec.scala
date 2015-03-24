@@ -231,7 +231,7 @@ class CaseClassExtractorMacroSpec extends FlatSpec with Matchers with ExtractorS
               """)
   }
 
-  it should "either fail to compile or complete successfully on a second call to extract" in {
+  it should "complete successfully on a second call to extract" in {
     import scala.language.reflectiveCalls
 
     val twoExtractor = extract[Two](
