@@ -40,6 +40,7 @@ package object sqlest
     // sqlest.extractor
     with ExtractorSyntax[ResultSet]
     with ColumnExtractorSyntax
+    with ColumnExtractorSetters
     // sqlest.executor
     with ExecutorSyntax {
   type Table = sqlest.ast.Table

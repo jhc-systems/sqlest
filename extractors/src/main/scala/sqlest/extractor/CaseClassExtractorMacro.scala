@@ -36,11 +36,14 @@ case class CaseClassExtractorMacro(c: Context) {
     val companion = typeOfA.typeSymbol.companion
 
     // Locate the `apply` methods of the case class we're constructing:
-    val applyMethods = findApplyMethods(companion.typeSignature)
+    val applyMethods = findMethods("apply", companion.typeSignature)
     if (applyMethods.isEmpty) c.abort(c.enclosingPosition, s"No apply method found for ${companion.name.toString}")
+    val unapplyMethod =
+      findMethods("unapply", companion.typeSignature).headOption
+        .orElse(findMethods("unapplySeq", companion.typeSignature).headOption)
 
     // Construct extractor methods for this case class corresponding to each apply method
-    val liftedApplyMethods = applyMethods.map(liftApplyMethod(_, typeOfRow, typeOfA, typeArgs, companion))
+    val liftedApplyMethods = applyMethods.map(liftApplyMethod(_, unapplyMethod, typeOfRow, typeOfA, typeArgs, companion))
 
     // import scala.language.dynamics to avoid having to do so at the call site
     q"""
@@ -54,8 +57,8 @@ case class CaseClassExtractorMacro(c: Context) {
     """
   }
 
-  def findApplyMethods(companionType: Type): List[MethodSymbol] = {
-    val applyMethods = companionType.member(TermName("apply")) match {
+  def findMethods(methodName: String, companionType: Type): List[MethodSymbol] = {
+    val applyMethods = companionType.member(TermName(methodName)) match {
       case method: MethodSymbol => List(method)
       case termSymbol: TermSymbol => termSymbol.alternatives.collect { case method: MethodSymbol => method }
       case _ => Nil
@@ -63,7 +66,7 @@ case class CaseClassExtractorMacro(c: Context) {
     applyMethods.filter(_.paramLists.length == 1)
   }
 
-  def liftApplyMethod(applyMethod: MethodSymbol, typeOfRow: Type, typeOfA: Type, typeArgs: List[Type], companion: Symbol) = {
+  def liftApplyMethod[A](applyMethod: MethodSymbol, unapplyMethod: Option[MethodSymbol], typeOfRow: Type, typeOfA: Type, typeArgs: List[Type], companion: Symbol) = {
     // Extract useful information about the parameter list for the `apply` method
     val caseClassParamNames = extractMappedParams(applyMethod, _.name)
     val caseClassParamTypes = extractMappedParams(applyMethod, _.typeSignature)
@@ -85,12 +88,18 @@ case class CaseClassExtractorMacro(c: Context) {
     val tupleExtractor = productExtractorType(extractMappedParams(applyMethod).length)
     val tupleExtractorParams = buildExtractorParams(applyMethod, typeOfRow, caseClassParamNames, appliedTypeArgTypes)
 
+    val unapply = unapplyMethod match {
+      case Some(unapplyMethod) => q"Some($companion.$unapplyMethod)"
+      case None => q"None"
+    }
+
     q"""
       def apply(..$applyParams) = new sqlest.extractor.MappedExtractor[$typeOfRow, $tupleType, $typeOfA](
         new $tupleExtractor(..$tupleExtractorParams) with sqlest.extractor.ProductExtractorNames {
           val innerExtractorNames = List(..$caseClassParamStrings)
         },
-        (arg: $tupleType) => $companion.$applyMethod(..$tupleAccessors)
+        (arg: $tupleType) => $companion.$applyMethod(..$tupleAccessors),
+        $unapply
       )
     """
   }

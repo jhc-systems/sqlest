@@ -121,7 +121,7 @@ trait ProductExtractorNames {
 /**
  * An extractor that behaves as `inner` but pipes its `emitted` values through `func`.
  */
-case class MappedExtractor[Row, A, B](inner: Extractor[Row, A], func: A => B) extends Extractor[Row, B] with SimpleExtractor[Row, B] with SingleRowExtractor[Row, B] {
+case class MappedExtractor[Row, A, B](inner: Extractor[Row, A], func: A => B, unapplyMethod: Option[B => Option[Any]] = None) extends Extractor[Row, B] with SimpleExtractor[Row, B] with SingleRowExtractor[Row, B] {
   type Accumulator = inner.Accumulator
 
   def initialize(row: Row) = inner.initialize(row)

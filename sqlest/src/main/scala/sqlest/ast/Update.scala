@@ -20,7 +20,10 @@ import sqlest.ast.syntax._
 
 /** An update statement. */
 case class Update(table: Table, set: Seq[Setter[_, _]], where: Option[Column[Boolean]] = None) extends Command with ColumnSyntax {
-  def set(setters: Setter[_, _]*) =
+  def set(setters: Setter[_, _]*): Update =
+    this.copy(set = this.set ++ setters)
+
+  def set(setters: => Seq[Setter[_, _]]): Update =
     this.copy(set = this.set ++ setters)
 
   def where(expr: Column[Boolean]): Update =
