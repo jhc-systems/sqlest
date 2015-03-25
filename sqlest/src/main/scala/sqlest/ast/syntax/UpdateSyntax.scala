@@ -26,6 +26,9 @@ trait UpdateSyntax {
 case class UpdateSetterBuilder(table: Table) {
   def set(setters: Setter[_, _]*): UpdateWhereBuilder =
     UpdateWhereBuilder(this.table, setters)
+
+  def set(setters: => Seq[Setter[_, _]]): UpdateWhereBuilder =
+    UpdateWhereBuilder(this.table, setters)
 }
 
 case class UpdateWhereBuilder(table: Table, setters: Seq[Setter[_, _]]) {

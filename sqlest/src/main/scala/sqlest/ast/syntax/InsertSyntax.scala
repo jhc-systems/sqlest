@@ -32,13 +32,24 @@ class InsertBuilder(into: Table) {
   def values(setters: Setter[_, _]*) =
     InsertValues(into, Seq(setters))
 
+  def values(setters: => Seq[Setter[_, _]]) =
+    InsertValues(into, Seq(setters))
+
   def set(setters: Setter[_, _]*) =
+    InsertValues(into, Seq(setters))
+
+  def set(setters: => Seq[Setter[_, _]]) =
     InsertValues(into, Seq(setters))
 }
 
 /** Helper class to prevent users writing `insert.into(...).columns(...)` without `.values(...)` */
 class InsertColumnsBuilder(into: Table, columns: Seq[TableColumn[_]]) {
   def values(setters: Setter[_, _]*) = {
+    if (columns != setters.map(_.column)) throw new AssertionError(s"Cannot insert value to the columns declared")
+    InsertValues(into, Seq(setters))
+  }
+
+  def values(setters: => Seq[Setter[_, _]]) = {
     if (columns != setters.map(_.column)) throw new AssertionError(s"Cannot insert value to the columns declared")
     InsertValues(into, Seq(setters))
   }
