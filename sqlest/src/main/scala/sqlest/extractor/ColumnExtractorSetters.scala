@@ -21,6 +21,9 @@ import sqlest.ast._
 
 trait ColumnExtractorSetters {
   implicit class ExtractorSetters[A](extractor: Extractor[ResultSet, A]) {
+    def settersFor(values: Seq[A]): List[List[Setter[_, _]]] =
+      values.map(extractor.settersFor).toList
+
     def settersFor(value: A): List[Setter[_, _]] = {
       extractor match {
         case tableColumn: TableColumn[a] => List(Setter(tableColumn, LiteralColumn(value.asInstanceOf[a])(tableColumn.columnType))(ColumnTypeEquivalence(false, false)))
@@ -29,11 +32,10 @@ trait ColumnExtractorSetters {
           val values = unapplyMethod(value).get
           innerExtractor.settersFor(values)
 
-        case productExtractor: ProductExtractor[ResultSet, _] =>
-          val values = value match {
-            case _: Seq[_] => List(value) // Will only happen if an outer MappedExtractor unapplyMethod returns a single value
-            case value: Product => value.productIterator.toList
-          }
+        case productExtractor: ProductExtractor[ResultSet, a] =>
+          val values =
+            if (productExtractor.innerExtractors.size == 1) List(value)
+            else value.asInstanceOf[a].productIterator.toList
 
           productExtractor.innerExtractors.zip(values).flatMap {
             case (extractor: Extractor[ResultSet, a], value) => extractor.settersFor(value.asInstanceOf[a])

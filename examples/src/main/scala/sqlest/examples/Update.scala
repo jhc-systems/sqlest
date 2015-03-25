@@ -36,7 +36,6 @@ object UpdateExamples extends App with DatabaseExample {
       .set(fruitExtractor.settersFor(newGrape))
       .where(FruitTable.id === newGrape.id)
 
-
   database.withTransaction {
     // running execute on the update statement returns the number of lines changed (ie updated)
     val newNumberUpdated = newUpdateStatement.execute

@@ -122,4 +122,14 @@ class ColumnExtractorSettersSpec extends FlatSpec with Matchers {
       Setter(FirstTable.col2, "two")
     ))
   }
+
+  it should "work for lists of values" in {
+    oneExtractor.settersFor(List(One(1, "one"), One(2, "two"))) should be(List(List(
+      Setter(FirstTable.col1, 1),
+      Setter(FirstTable.col2, "one")
+    ), List(
+      Setter(FirstTable.col1, 2),
+      Setter(FirstTable.col2, "two")
+    )))
+  }
 }

@@ -29,7 +29,7 @@ case class InsertValues(into: Table, setterLists: Seq[Seq[Setter[_, _]]]) extend
       InsertValues(into, setterLists :+ newRecordSetters)
     }
 
-    def set(newRecordSetters: => Seq[Setter[_, _]]) = {
+    def set(newRecordSetters: Seq[Setter[_, _]])(implicit d: DummyImplicit) = {
       if (columns != newRecordSetters.map(_.column)) throw new AssertionError(s"Must set the same columns as previous insert rows")
       InsertValues(into, setterLists :+ newRecordSetters)
     }
@@ -40,9 +40,14 @@ case class InsertValues(into: Table, setterLists: Seq[Seq[Setter[_, _]]]) extend
     InsertValues(into, setterLists :+ setters)
   }
 
-  def values(setters: => Seq[Setter[_, _]]) = {
+  def values(setters: Seq[Setter[_, _]])(implicit d: DummyImplicit) = {
     if (columns != setters.map(_.column)) throw new AssertionError(s"Cannot insert value to the columns declared")
     InsertValues(into, setterLists :+ setters)
+  }
+
+  def values(setterLists: Seq[Seq[Setter[_, _]]])(implicit d1: DummyImplicit, d2: DummyImplicit) = {
+    if (!setterLists.forall(columns == _.map(_.column))) throw new AssertionError(s"Cannot insert value to the columns declared")
+    InsertValues(into, setterLists)
   }
 }
 
