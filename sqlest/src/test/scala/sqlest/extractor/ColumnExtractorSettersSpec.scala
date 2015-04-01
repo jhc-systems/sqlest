@@ -104,6 +104,20 @@ class ColumnExtractorSettersSpec extends FlatSpec with Matchers {
     ))
   }
 
+  it should "return setters for option extractors only for Some" in {
+    aggregateOneTwoExtractor.settersFor(AggregateOneTwo(Some(One(1, "one")), Two(Some("two"), None))) should be(List(
+      Setter(FirstTable.col1, 1),
+      Setter(FirstTable.col2, "one"),
+      Setter(FirstTable.col3, Some("two")),
+      Setter(FirstTable.col4, Option.empty[Int])
+    ))
+
+    aggregateOneTwoExtractor.settersFor(AggregateOneTwo(None, Two(Some("two"), None))) should be(List(
+      Setter(FirstTable.col3, Some("two")),
+      Setter(FirstTable.col4, Option.empty[Int])
+    ))
+  }
+
   it should "return setters for case class extractors with varargs parameters" in {
     extract[VarargsParams](FirstTable.col1, FirstTable.col5).settersFor(VarargsParams(1, 3, 5)) should be(List(
       Setter(FirstTable.col1, 1),
@@ -121,6 +135,20 @@ class ColumnExtractorSettersSpec extends FlatSpec with Matchers {
       Setter(FirstTable.col1, 1),
       Setter(FirstTable.col2, "two")
     ))
+  }
+
+  it should "fail throw an exception when used with other extractors" in {
+    intercept[Exception] {
+      oneExtractor.groupBy(FirstTable.col1).settersFor(List(One(1, "one")))
+    }
+
+    intercept[Exception] {
+      extractTuple(FirstTable.col1, FirstTable.col2.asList).settersFor((1, Nil))
+    }
+
+    intercept[Exception] {
+      extractTuple(FirstTable.col1, FirstTable.col2).map(_.toString ++ _).settersFor("bad")
+    }
   }
 
   it should "work for lists of values" in {
