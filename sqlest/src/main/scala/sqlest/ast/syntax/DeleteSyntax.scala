@@ -29,5 +29,6 @@ class DeleteBuilder(from: Table) {
   def where(where: Column[Boolean]) =
     Delete(from = from, where = Some(where))
 
-  def allRows = Delete(from = from, where = None)
+  /** Creates an delete statement with no where clause */
+  def deleteAll = Delete(from = from, where = None)
 }

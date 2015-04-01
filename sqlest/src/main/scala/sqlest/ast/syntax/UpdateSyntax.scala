@@ -34,4 +34,7 @@ case class UpdateSetterBuilder(table: Table) {
 case class UpdateWhereBuilder(table: Table, setters: Seq[Setter[_, _]]) {
   def where(expr: Column[Boolean]): Update =
     Update(table = this.table, set = setters, where = Some(expr))
+
+  /** Creates an update statement with no where clause */
+  def updateAll = Update(table = this.table, set = setters, where = None)
 }
