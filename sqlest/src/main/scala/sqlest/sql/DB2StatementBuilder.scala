@@ -95,6 +95,15 @@ trait DB2StatementBuilder extends base.StatementBuilder {
     s"with subquery as ($subquery) select $what from subquery where $bounds"
   }
 
+  override def columnSql(column: Column[_]): String =
+    column match {
+      case literalColumn: LiteralColumn[_] if literalColumn.columnType == BooleanColumnType =>
+        if (literalColumn.value == true) "(? = ?)" else "(? <> ?)"
+      case constantColumn: ConstantColumn[_] if constantColumn.columnType == BooleanColumnType =>
+        if (constantColumn.value == true) "(0 = 0)" else "(0 <> 0)"
+      case _ => super.columnSql(column)
+    }
+
   override def selectArgs(select: Select[_, _ <: Relation]): List[LiteralColumn[_]] = {
     val offset = select.offset getOrElse 0L
     if (offset > 0L) {
@@ -122,6 +131,11 @@ trait DB2StatementBuilder extends base.StatementBuilder {
       .getOrElse(List(LiteralColumn[Long](offset + 1)))
 
     subqueryArgs ++ boundsArgs
+  }
+
+  override def columnArgs(column: Column[_]): List[LiteralColumn[_]] = column match {
+    case column: LiteralColumn[_] if column.columnType == BooleanColumnType => List(LiteralColumn(0), LiteralColumn(0))
+    case _ => super.columnArgs(column)
   }
 }
 

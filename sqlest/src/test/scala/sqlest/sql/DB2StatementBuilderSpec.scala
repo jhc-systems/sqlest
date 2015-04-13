@@ -219,4 +219,58 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
     )
   }
 
+  "boolean columns" should "produce the right sql" in {
+    sql {
+      select(MyTable.col1)
+        .from(MyTable)
+        .where(true)
+    } should equal(
+      s"""
+       |select mytable.col1 as mytable_col1
+       |from mytable
+       |where (? = ?)
+       """.formatSql,
+      List(0, 0)
+    )
+
+    sql {
+      select(MyTable.col1)
+        .from(MyTable)
+        .where(false)
+    } should equal(
+      s"""
+       |select mytable.col1 as mytable_col1
+       |from mytable
+       |where (? <> ?)
+       """.formatSql,
+      List(0, 0)
+    )
+
+    sql {
+      select(MyTable.col1)
+        .from(MyTable)
+        .where(true.constant)
+    } should equal(
+      s"""
+       |select mytable.col1 as mytable_col1
+       |from mytable
+       |where (0 = 0)
+       """.formatSql,
+      Nil
+    )
+
+    sql {
+      select(MyTable.col1)
+        .from(MyTable)
+        .where(false.constant)
+    } should equal(
+      s"""
+       |select mytable.col1 as mytable_col1
+       |from mytable
+       |where (0 <> 0)
+       """.formatSql,
+      Nil
+    )
+  }
+
 }
