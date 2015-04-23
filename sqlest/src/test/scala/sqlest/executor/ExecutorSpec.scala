@@ -29,6 +29,7 @@ class ExecutorSpec extends FlatSpec with Matchers {
   val selectStatement = select(TableOne.col1, TableOne.col2).from(TableOne)
   val updateStatement = update(TableOne).set(TableOne.col1 -> 123).where(TableOne.col2 === "12")
   val insertStatement = insert.into(TableOne).set(TableOne.col1 -> 123)
+  val optionInsertStatement = insert.into(TableThree).values(TableThree.col3 -> Option[Int](1), TableThree.col4 -> Option[String](null))
   val deleteStatement = delete.from(TableOne).where(TableOne.col2 === "12")
 
   val extractor = extract[One](
@@ -133,6 +134,15 @@ class ExecutorSpec extends FlatSpec with Matchers {
 
     testDatabase.withTransaction {
       deleteStatement.execute
+    }
+  }
+
+  "an insert with optional values" should "execute correctly" in {
+    // Ensure the same database is used throughout this test
+    implicit val testDatabase = TestDatabase(testResultSet)
+
+    testDatabase.withTransaction {
+      optionInsertStatement.execute
     }
   }
 }
