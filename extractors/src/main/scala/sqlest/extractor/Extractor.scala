@@ -245,4 +245,8 @@ object Extractor {
   implicit class ExtractorOps(extractor: Extractor[_, _]) {
     def findCellExtractor(path: String) = ExtractorFinder(extractor, path)
   }
+
+  implicit class OptionExtractorOps[Row, A](optionExtractor: Extractor[Row, Option[A]]) {
+    def asNonOption = MappedExtractor(optionExtractor, (_: Option[A]).get, Some((value: A) => Some(value)))
+  }
 }

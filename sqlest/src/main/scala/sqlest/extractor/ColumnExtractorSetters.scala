@@ -44,7 +44,15 @@ trait ColumnExtractorSetters {
         case optionExtractor: OptionExtractor[ResultSet, a] =>
           value.asInstanceOf[Option[a]] match {
             case Some(value) => optionExtractor.inner.settersFor(value)
-            case None => Nil
+            case None =>
+              optionExtractor.columns.filter {
+                _.columnType match {
+                  case option: ColumnType[_] with OptionColumnType[_, _] => true
+                  case _ => false
+                }
+              }.collect {
+                case tableColumn: TableColumn[b] => Setter(tableColumn, LiteralColumn(None.asInstanceOf[b])(tableColumn.columnType))(ColumnTypeEquivalence(false, false))
+              }
           }
 
         case seqExtractor: SeqExtractor[ResultSet, a] =>

@@ -86,6 +86,37 @@ class ColumnExtractorSettersSpec extends FlatSpec with Matchers {
     ))
   }
 
+  it should "return setters for extractors using asNonOption" in {
+    val oneNonOptionExtractor = extract[One](
+      a = FirstTable.col4.asNonOption,
+      b = FirstTable.col3.asNonOption
+    )
+
+    oneNonOptionExtractor.settersFor(One(1, "one")) should be(List(
+      Setter(FirstTable.col4, 1),
+      Setter(FirstTable.col3, "one")
+    ))
+
+    val aggregateOneNonOptionTwoExtractor = extract[AggregateOneTwo](
+      one = oneNonOptionExtractor.asOption,
+      two = twoExtractor
+    )
+
+    aggregateOneNonOptionTwoExtractor.settersFor(AggregateOneTwo(None, Two(Some("two"), None))) should be(List(
+      Setter(FirstTable.col4, Option.empty[Int]),
+      Setter(FirstTable.col3, Option.empty[String]),
+      Setter(FirstTable.col3, Some("two")),
+      Setter(FirstTable.col4, Option.empty[Int])
+    ))
+
+    aggregateOneNonOptionTwoExtractor.settersFor(AggregateOneTwo(Some(One(1, "one")), Two(Some("two"), None))) should be(List(
+      Setter(FirstTable.col4, 1),
+      Setter(FirstTable.col3, "one"),
+      Setter(FirstTable.col3, Some("two")),
+      Setter(FirstTable.col4, Option.empty[Int])
+    ))
+  }
+
   it should "return setters for class extractors with multiple apply methods and an unapply method" in {
     extract[Multiple](FirstTable.col1, FirstTable.col5).settersFor(Multiple(1)) should be(List(
       Setter(FirstTable.col1, 1),
