@@ -215,4 +215,12 @@ trait BaseStatementBuilder {
   }
 
   def selectArgs(select: Select[_, _ <: Relation]): List[LiteralColumn[_]]
+
+  def setterArgs[A, B](setter: Setter[A, B]): List[LiteralColumn[_]] = setter match {
+    case Setter(tableColumn, column: ConstantColumn[B]) =>
+      List(LiteralColumn(column.value.asInstanceOf[A])(tableColumn.columnType))
+    case Setter(tableColumn, column) => columnArgs(column).map {
+      case LiteralColumn(value) => LiteralColumn(value.asInstanceOf[A])(tableColumn.columnType)
+    }
+  }
 }

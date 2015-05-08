@@ -45,8 +45,5 @@ trait InsertStatementBuilder extends BaseStatementBuilder {
   }
 
   def insertValuesArgs(setterLists: Seq[Seq[Setter[_, _]]]): List[LiteralColumn[_]] =
-    setterLists.flatten.toList.map(_.value) flatMap {
-      case column: ConstantColumn[_] => List(LiteralColumn(column.value)(column.columnType))
-      case column => columnArgs(column)
-    }
+    setterLists.flatten.toList.flatMap(setterArgs(_))
 }

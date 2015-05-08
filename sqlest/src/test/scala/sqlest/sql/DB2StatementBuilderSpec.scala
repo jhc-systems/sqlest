@@ -259,18 +259,26 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
       Nil
     )
 
-    sql {
-      select(MyTable.col1)
-        .from(MyTable)
-        .where(false.constant)
-    } should equal(
-      s"""
-       |select mytable.col1 as mytable_col1
-       |from mytable
-       |where (0 <> 0)
-       """.formatSql,
-      Nil
-    )
+  }
+
+  "inserting or updating boolean columns" should "throw an exception" in {
+    intercept[AssertionError] {
+      sql {
+        insert
+          .into(TableFive)
+          .columns(TableFive.col1, TableFive.col2)
+          .values(TableFive.col1 -> "a", TableFive.col2 -> true)
+          .values(TableFive.col1 -> "b", TableFive.col2 -> false)
+      }
+    }
+
+    intercept[AssertionError] {
+      sql {
+        update(TableFive)
+          .set(TableFive.col1 -> "a", TableFive.col2 -> true)
+          .updateAll
+      }
+    }
   }
 
 }
