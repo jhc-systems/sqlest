@@ -31,11 +31,16 @@ class ExecutorSpec extends FlatSpec with Matchers {
   val updateStatement = update(TableOne).set(TableOne.col1 -> 123).where(TableOne.col2 === "12")
   val insertStatement = insert.into(TableOne).set(TableOne.col1 -> 123)
   val optionInsertStatement = insert.into(TableThree).values(TableThree.col3 -> Option[Int](1), TableThree.col4 -> Option[String](null))
-  val mappedOptionInsertStatement = {
+  val mappedOptionInsertStatement1 = {
     insert
       .into(TableSix)
       .columns(TableSix.trimmedString)
       .values(Setter(TableSix.trimmedString, LiteralColumn(Some(WrappedString("a")): Option[WrappedString])))
+  }
+  val mappedOptionInsertStatement2 = {
+    insert
+      .into(TableSix)
+      .columns(TableSix.trimmedString)
       .values(Setter(TableSix.trimmedString, LiteralColumn(None: Option[WrappedString])))
   }
   val deleteStatement = delete.from(TableOne).where(TableOne.col2 === "12")
@@ -146,7 +151,6 @@ class ExecutorSpec extends FlatSpec with Matchers {
   }
 
   "an insert with optional values" should "execute correctly" in {
-    // Ensure the same database is used throughout this test
     implicit val testDatabase = TestDatabase(testResultSet)
 
     testDatabase.withTransaction {
@@ -154,11 +158,58 @@ class ExecutorSpec extends FlatSpec with Matchers {
     }
   }
 
+  it should "generate raw SQL correctly" in {
+    implicit val testDatabase = TestDatabase(testResultSet)
+
+    testDatabase.statementBuilder.generateRawSql(optionInsertStatement) should equal(
+      "insert into three (col3, col4) values (1, null)"
+    )
+
+  }
+
+  it should "set parameters correctly" in {
+    implicit val testDatabase = TestDatabase(testResultSet)
+
+    testDatabase.withTransaction {
+      optionInsertStatement.execute
+    }
+
+    testDatabase.preparedStatement.get.parameters shouldBe Map(1 -> 1, 2 -> null)
+  }
+
   "an insert with mapped optional values" should "execute correctly" in {
     implicit val testDatabase = TestDatabase(testResultSet)
 
     testDatabase.withTransaction {
-      mappedOptionInsertStatement.execute
+      mappedOptionInsertStatement1.execute
     }
+  }
+
+  it should "generate raw SQL correctly" in {
+    implicit val testDatabase = TestDatabase(testResultSet)
+
+    testDatabase.statementBuilder.generateRawSql(mappedOptionInsertStatement1) should equal(
+      "insert into six (trimmedString) values ('a')"
+    )
+
+    testDatabase.statementBuilder.generateRawSql(mappedOptionInsertStatement2) should equal(
+      "insert into six (trimmedString) values ('')"
+    )
+  }
+
+  it should "set parameters correctly" in {
+    implicit val testDatabase = TestDatabase(testResultSet)
+
+    testDatabase.withTransaction {
+      mappedOptionInsertStatement1.execute
+    }
+
+    testDatabase.preparedStatement.get.parameters shouldBe Map(1 -> "a")
+
+    testDatabase.withTransaction {
+      mappedOptionInsertStatement2.execute
+    }
+
+    testDatabase.preparedStatement.get.parameters shouldBe Map(1 -> "")
   }
 }

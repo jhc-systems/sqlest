@@ -259,9 +259,22 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
       Nil
     )
 
+    sql {
+      select(MyTable.col1)
+        .from(MyTable)
+        .where(false.constant)
+    } should equal(
+      s"""
+       |select mytable.col1 as mytable_col1
+       |from mytable
+       |where (0 <> 0)
+       """.formatSql,
+      Nil
+    )
+
   }
 
-  "inserting or updating boolean columns" should "throw an exception" in {
+  "inserting or updating unmapped boolean columns" should "throw an exception on DB2" in {
     intercept[AssertionError] {
       sql {
         insert

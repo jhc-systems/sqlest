@@ -156,9 +156,11 @@ trait BaseStatementBuilder {
     case DateTimeColumnType => value.toString
     case LocalDateColumnType => value.toString
     case ByteArrayColumnType => javax.xml.bind.DatatypeConverter.printHexBinary(value.asInstanceOf[Array[Byte]])
-    case optionType: OptionColumnType[_, _] =>
-      val option = value.asInstanceOf[Option[_]]
-      if (option.isEmpty) "null" else constantSql(optionType.baseColumnType.asInstanceOf[ColumnType[Any]], option.get)
+    case optionType: OptionColumnType[_, _] => value.asInstanceOf[Option[_]] match {
+      case setNullOpt if setNullOpt.isEmpty && optionType.nullValue == null => "null"
+      case nullValueOpt if nullValueOpt.isEmpty => constantSql(optionType.baseColumnType.asInstanceOf[ColumnType[Any]], optionType.nullValue)
+      case definedOpt => constantSql(optionType.innerColumnType.asInstanceOf[ColumnType[Any]], definedOpt.get)
+    }
     case mappedType: MappedColumnType[A, _] => constantSql(mappedType.baseColumnType, mappedType.write(value.asInstanceOf[A]))
   }
 
