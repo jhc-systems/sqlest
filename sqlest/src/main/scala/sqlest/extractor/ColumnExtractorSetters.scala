@@ -55,6 +55,9 @@ trait ColumnExtractorSetters {
               }
           }
 
+        case nonOptionExtractor: NonOptionExtractor[ResultSet, a] =>
+          nonOptionExtractor.inner.settersFor(Option(value))
+
         case seqExtractor: SeqExtractor[ResultSet, a] =>
           val values = value.asInstanceOf[Seq[a]]
           seqExtractor.extractors.zip(values).flatMap {

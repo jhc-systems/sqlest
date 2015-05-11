@@ -168,6 +168,15 @@ case class OptionExtractor[Row, A](inner: Extractor[Row, A]) extends Extractor[R
   def emit(accumulator: inner.Accumulator) = Some(inner.emit(accumulator))
 }
 
+case class NonOptionExtractor[Row, A](inner: Extractor[Row, Option[A]]) extends Extractor[Row, A] with SimpleExtractor[Row, A] with SingleRowExtractor[Row, A] {
+  type Accumulator = inner.Accumulator
+
+  def initialize(row: Row) = inner.initialize(row)
+
+  def accumulate(accumulator: inner.Accumulator, row: Row) = inner.accumulate(accumulator, row)
+
+  def emit(accumulator: inner.Accumulator) = inner.emit(accumulator).get
+}
 /**
  * An extractor that accumulates results from rows into a list.
  */
@@ -247,6 +256,6 @@ object Extractor {
   }
 
   implicit class OptionExtractorOps[Row, A](optionExtractor: Extractor[Row, Option[A]]) {
-    def asNonOption = MappedExtractor(optionExtractor, (_: Option[A]).get, Some((value: A) => Some(value)))
+    def asNonOption = NonOptionExtractor(optionExtractor)
   }
 }

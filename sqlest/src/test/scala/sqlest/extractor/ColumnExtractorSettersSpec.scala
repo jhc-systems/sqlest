@@ -93,8 +93,8 @@ class ColumnExtractorSettersSpec extends FlatSpec with Matchers {
     )
 
     oneNonOptionExtractor.settersFor(One(1, "one")) should be(List(
-      Setter(FirstTable.col4, 1),
-      Setter(FirstTable.col3, "one")
+      Setter(FirstTable.col4, Some(1)),
+      Setter(FirstTable.col3, Some("one"))
     ))
 
     val aggregateOneNonOptionTwoExtractor = extract[AggregateOneTwo](
@@ -110,8 +110,8 @@ class ColumnExtractorSettersSpec extends FlatSpec with Matchers {
     ))
 
     aggregateOneNonOptionTwoExtractor.settersFor(AggregateOneTwo(Some(One(1, "one")), Two(Some("two"), None))) should be(List(
-      Setter(FirstTable.col4, 1),
-      Setter(FirstTable.col3, "one"),
+      Setter(FirstTable.col4, Some(1)),
+      Setter(FirstTable.col3, Some("one")),
       Setter(FirstTable.col3, Some("two")),
       Setter(FirstTable.col4, Option.empty[Int])
     ))
