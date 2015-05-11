@@ -168,6 +168,11 @@ case class OptionExtractor[Row, A](inner: Extractor[Row, A]) extends Extractor[R
   def emit(accumulator: inner.Accumulator) = Some(inner.emit(accumulator))
 }
 
+/**
+ * An extractor that unwraps an OptionExtractor
+ *
+ * This means that null values can be returned from this extractor and so it later must be wrapped in an OptionExtractor
+ */
 case class NonOptionExtractor[Row, A](inner: Extractor[Row, Option[A]]) extends Extractor[Row, A] with SimpleExtractor[Row, A] with SingleRowExtractor[Row, A] {
   type Accumulator = inner.Accumulator
 
@@ -177,6 +182,7 @@ case class NonOptionExtractor[Row, A](inner: Extractor[Row, Option[A]]) extends 
 
   def emit(accumulator: inner.Accumulator) = inner.emit(accumulator).get
 }
+
 /**
  * An extractor that accumulates results from rows into a list.
  */
