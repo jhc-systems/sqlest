@@ -156,9 +156,11 @@ trait BaseStatementBuilder {
     case DateTimeColumnType => value.toString
     case LocalDateColumnType => value.toString
     case ByteArrayColumnType => javax.xml.bind.DatatypeConverter.printHexBinary(value.asInstanceOf[Array[Byte]])
-    case optionType: OptionColumnType[_, _] =>
-      val option = value.asInstanceOf[Option[_]]
-      if (option.isEmpty) "null" else constantSql(optionType.baseColumnType.asInstanceOf[ColumnType[Any]], option.get)
+    case optionType: OptionColumnType[_, _] => value.asInstanceOf[Option[_]] match {
+      case setNullOpt if setNullOpt.isEmpty && optionType.nullValue == null => "null"
+      case nullValueOpt if nullValueOpt.isEmpty => constantSql(optionType.baseColumnType.asInstanceOf[ColumnType[Any]], optionType.nullValue)
+      case definedOpt => constantSql(optionType.innerColumnType.asInstanceOf[ColumnType[Any]], definedOpt.get)
+    }
     case mappedType: MappedColumnType[A, _] => constantSql(mappedType.baseColumnType, mappedType.write(value.asInstanceOf[A]))
   }
 
@@ -215,4 +217,12 @@ trait BaseStatementBuilder {
   }
 
   def selectArgs(select: Select[_, _ <: Relation]): List[LiteralColumn[_]]
+
+  def setterArgs[A, B](setter: Setter[A, B]): List[LiteralColumn[_]] = setter match {
+    case Setter(tableColumn, column: ConstantColumn[B]) =>
+      List(LiteralColumn(column.value.asInstanceOf[A])(tableColumn.columnType))
+    case Setter(tableColumn, column) => columnArgs(column).map {
+      case LiteralColumn(value) => LiteralColumn(value.asInstanceOf[A])(tableColumn.columnType)
+    }
+  }
 }

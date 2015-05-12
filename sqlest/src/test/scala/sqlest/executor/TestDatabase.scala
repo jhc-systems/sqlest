@@ -20,6 +20,8 @@ import java.sql.ResultSet
 import sqlest._
 
 case class TestDatabase(resultSet: ResultSet) extends Database {
+  var preparedStatement: Option[AbstractPreparedStatement] = None
+
   def statementBuilder: StatementBuilder = sqlest.sql.H2StatementBuilder
 
   def getConnection = new AbstractConnection {
@@ -27,10 +29,14 @@ case class TestDatabase(resultSet: ResultSet) extends Database {
     override def commit = {}
     override def rollback = {}
     override def setAutoCommit(autoCommit: Boolean) = {}
-    override def prepareStatement(sql: String) = new AbstractPreparedStatement {
-      override def executeQuery() = resultSet
-      override def executeUpdate() = 0
-      override def executeBatch() = Array()
+    override def prepareStatement(sql: String) = {
+      val statement = new AbstractPreparedStatement {
+        override def executeQuery() = resultSet
+        override def executeUpdate() = 0
+        override def executeBatch() = Array()
+      }
+      preparedStatement = Some(statement)
+      statement
     }
   }
 }

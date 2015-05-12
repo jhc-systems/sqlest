@@ -44,7 +44,7 @@ trait UpdateStatementBuilder extends BaseStatementBuilder {
       updateWhereArgs(update.where)
 
   def updateSetArgs(setters: Seq[Setter[_, _]]): List[LiteralColumn[_]] =
-    setters.toList flatMap (setter => columnArgs(setter.value))
+    setters.toList.flatMap(setterArgs(_))
 
   def updateWhereArgs(where: Option[Column[Boolean]]): List[LiteralColumn[_]] =
     where map columnArgs getOrElse Nil

@@ -19,6 +19,7 @@ package sqlest.executor
 import java.sql.PreparedStatement
 
 trait AbstractPreparedStatement extends PreparedStatement {
+  val parameters = collection.mutable.Map[Int, Any]()
   // Prepared statment methods
   def addBatch(): Unit = {}
   def clearParameters(): Unit = {}
@@ -28,54 +29,54 @@ trait AbstractPreparedStatement extends PreparedStatement {
   def getMetaData(): java.sql.ResultSetMetaData = ???
   def getParameterMetaData(): java.sql.ParameterMetaData = ???
   def isWrapperFor(x$1: Class[_]): Boolean = ???
-  def setArray(x$1: Int, x$2: java.sql.Array): Unit = {}
-  def setAsciiStream(x$1: Int, x$2: java.io.InputStream): Unit = {}
-  def setAsciiStream(x$1: Int, x$2: java.io.InputStream, x$3: Long): Unit = {}
-  def setAsciiStream(x$1: Int, x$2: java.io.InputStream, x$3: Int): Unit = {}
-  def setBigDecimal(x$1: Int, x$2: java.math.BigDecimal): Unit = {}
-  def setBinaryStream(x$1: Int, x$2: java.io.InputStream): Unit = {}
-  def setBinaryStream(x$1: Int, x$2: java.io.InputStream, x$3: Long): Unit = {}
-  def setBinaryStream(x$1: Int, x$2: java.io.InputStream, x$3: Int): Unit = {}
-  def setBlob(x$1: Int, x$2: java.io.InputStream): Unit = {}
-  def setBlob(x$1: Int, x$2: java.io.InputStream, x$3: Long): Unit = {}
-  def setBlob(x$1: Int, x$2: java.sql.Blob): Unit = {}
-  def setBoolean(x$1: Int, x$2: Boolean): Unit = {}
-  def setByte(x$1: Int, x$2: Byte): Unit = {}
-  def setBytes(x$1: Int, x$2: Array[Byte]): Unit = {}
-  def setCharacterStream(x$1: Int, x$2: java.io.Reader): Unit = {}
-  def setCharacterStream(x$1: Int, x$2: java.io.Reader, x$3: Long): Unit = {}
-  def setCharacterStream(x$1: Int, x$2: java.io.Reader, x$3: Int): Unit = {}
-  def setClob(x$1: Int, x$2: java.io.Reader): Unit = {}
-  def setClob(x$1: Int, x$2: java.io.Reader, x$3: Long): Unit = {}
-  def setClob(x$1: Int, x$2: java.sql.Clob): Unit = {}
-  def setDate(x$1: Int, x$2: java.sql.Date, x$3: java.util.Calendar): Unit = {}
-  def setDate(x$1: Int, x$2: java.sql.Date): Unit = {}
-  def setDouble(x$1: Int, x$2: Double): Unit = {}
-  def setFloat(x$1: Int, x$2: Float): Unit = {}
-  def setInt(x$1: Int, x$2: Int): Unit = {}
-  def setLong(x$1: Int, x$2: Long): Unit = {}
-  def setNCharacterStream(x$1: Int, x$2: java.io.Reader): Unit = {}
-  def setNCharacterStream(x$1: Int, x$2: java.io.Reader, x$3: Long): Unit = {}
-  def setNClob(x$1: Int, x$2: java.io.Reader): Unit = {}
-  def setNClob(x$1: Int, x$2: java.io.Reader, x$3: Long): Unit = {}
-  def setNClob(x$1: Int, x$2: java.sql.NClob): Unit = {}
-  def setNString(x$1: Int, x$2: String): Unit = {}
-  def setNull(x$1: Int, x$2: Int, x$3: String): Unit = {}
-  def setNull(x$1: Int, x$2: Int): Unit = {}
-  def setObject(x$1: Int, x$2: Any, x$3: Int, x$4: Int): Unit = {}
-  def setObject(x$1: Int, x$2: Any): Unit = {}
-  def setObject(x$1: Int, x$2: Any, x$3: Int): Unit = {}
-  def setRef(x$1: Int, x$2: java.sql.Ref): Unit = {}
-  def setRowId(x$1: Int, x$2: java.sql.RowId): Unit = {}
-  def setSQLXML(x$1: Int, x$2: java.sql.SQLXML): Unit = {}
-  def setShort(x$1: Int, x$2: Short): Unit = {}
-  def setString(x$1: Int, x$2: String): Unit = {}
-  def setTime(x$1: Int, x$2: java.sql.Time, x$3: java.util.Calendar): Unit = {}
-  def setTime(x$1: Int, x$2: java.sql.Time): Unit = {}
-  def setTimestamp(x$1: Int, x$2: java.sql.Timestamp, x$3: java.util.Calendar): Unit = {}
-  def setTimestamp(x$1: Int, x$2: java.sql.Timestamp): Unit = {}
-  def setURL(x$1: Int, x$2: java.net.URL): Unit = {}
-  def setUnicodeStream(x$1: Int, x$2: java.io.InputStream, x$3: Int): Unit = {}
+  def setArray(x$1: Int, x$2: java.sql.Array): Unit = { parameters(x$1) = x$2 }
+  def setAsciiStream(x$1: Int, x$2: java.io.InputStream): Unit = { parameters(x$1) = x$2 }
+  def setAsciiStream(x$1: Int, x$2: java.io.InputStream, x$3: Long): Unit = { parameters(x$1) = x$2 }
+  def setAsciiStream(x$1: Int, x$2: java.io.InputStream, x$3: Int): Unit = { parameters(x$1) = x$2 }
+  def setBigDecimal(x$1: Int, x$2: java.math.BigDecimal): Unit = { parameters(x$1) = x$2 }
+  def setBinaryStream(x$1: Int, x$2: java.io.InputStream): Unit = { parameters(x$1) = x$2 }
+  def setBinaryStream(x$1: Int, x$2: java.io.InputStream, x$3: Long): Unit = { parameters(x$1) = x$2 }
+  def setBinaryStream(x$1: Int, x$2: java.io.InputStream, x$3: Int): Unit = { parameters(x$1) = x$2 }
+  def setBlob(x$1: Int, x$2: java.io.InputStream): Unit = { parameters(x$1) = x$2 }
+  def setBlob(x$1: Int, x$2: java.io.InputStream, x$3: Long): Unit = { parameters(x$1) = x$2 }
+  def setBlob(x$1: Int, x$2: java.sql.Blob): Unit = { parameters(x$1) = x$2 }
+  def setBoolean(x$1: Int, x$2: Boolean): Unit = { parameters(x$1) = x$2 }
+  def setByte(x$1: Int, x$2: Byte): Unit = { parameters(x$1) = x$2 }
+  def setBytes(x$1: Int, x$2: Array[Byte]): Unit = { parameters(x$1) = x$2 }
+  def setCharacterStream(x$1: Int, x$2: java.io.Reader): Unit = { parameters(x$1) = x$2 }
+  def setCharacterStream(x$1: Int, x$2: java.io.Reader, x$3: Long): Unit = { parameters(x$1) = x$2 }
+  def setCharacterStream(x$1: Int, x$2: java.io.Reader, x$3: Int): Unit = { parameters(x$1) = x$2 }
+  def setClob(x$1: Int, x$2: java.io.Reader): Unit = { parameters(x$1) = x$2 }
+  def setClob(x$1: Int, x$2: java.io.Reader, x$3: Long): Unit = { parameters(x$1) = x$2 }
+  def setClob(x$1: Int, x$2: java.sql.Clob): Unit = { parameters(x$1) = x$2 }
+  def setDate(x$1: Int, x$2: java.sql.Date, x$3: java.util.Calendar): Unit = { parameters(x$1) = x$2 }
+  def setDate(x$1: Int, x$2: java.sql.Date): Unit = { parameters(x$1) = x$2 }
+  def setDouble(x$1: Int, x$2: Double): Unit = { parameters(x$1) = x$2 }
+  def setFloat(x$1: Int, x$2: Float): Unit = { parameters(x$1) = x$2 }
+  def setInt(x$1: Int, x$2: Int): Unit = { parameters(x$1) = x$2 }
+  def setLong(x$1: Int, x$2: Long): Unit = { parameters(x$1) = x$2 }
+  def setNCharacterStream(x$1: Int, x$2: java.io.Reader): Unit = { parameters(x$1) = x$2 }
+  def setNCharacterStream(x$1: Int, x$2: java.io.Reader, x$3: Long): Unit = { parameters(x$1) = x$2 }
+  def setNClob(x$1: Int, x$2: java.io.Reader): Unit = { parameters(x$1) = x$2 }
+  def setNClob(x$1: Int, x$2: java.io.Reader, x$3: Long): Unit = { parameters(x$1) = x$2 }
+  def setNClob(x$1: Int, x$2: java.sql.NClob): Unit = { parameters(x$1) = x$2 }
+  def setNString(x$1: Int, x$2: String): Unit = { parameters(x$1) = x$2 }
+  def setNull(x$1: Int, x$2: Int, x$3: String): Unit = { parameters(x$1) = null }
+  def setNull(x$1: Int, x$2: Int): Unit = { parameters(x$1) = null }
+  def setObject(x$1: Int, x$2: Any, x$3: Int, x$4: Int): Unit = { parameters(x$1) = x$2 }
+  def setObject(x$1: Int, x$2: Any): Unit = { parameters(x$1) = x$2 }
+  def setObject(x$1: Int, x$2: Any, x$3: Int): Unit = { parameters(x$1) = x$2 }
+  def setRef(x$1: Int, x$2: java.sql.Ref): Unit = { parameters(x$1) = x$2 }
+  def setRowId(x$1: Int, x$2: java.sql.RowId): Unit = { parameters(x$1) = x$2 }
+  def setSQLXML(x$1: Int, x$2: java.sql.SQLXML): Unit = { parameters(x$1) = x$2 }
+  def setShort(x$1: Int, x$2: Short): Unit = { parameters(x$1) = x$2 }
+  def setString(x$1: Int, x$2: String): Unit = { parameters(x$1) = x$2 }
+  def setTime(x$1: Int, x$2: java.sql.Time, x$3: java.util.Calendar): Unit = { parameters(x$1) = x$2 }
+  def setTime(x$1: Int, x$2: java.sql.Time): Unit = { parameters(x$1) = x$2 }
+  def setTimestamp(x$1: Int, x$2: java.sql.Timestamp, x$3: java.util.Calendar): Unit = { parameters(x$1) = x$2 }
+  def setTimestamp(x$1: Int, x$2: java.sql.Timestamp): Unit = { parameters(x$1) = x$2 }
+  def setURL(x$1: Int, x$2: java.net.URL): Unit = { parameters(x$1) = x$2 }
+  def setUnicodeStream(x$1: Int, x$2: java.io.InputStream, x$3: Int): Unit = { parameters(x$1) = x$2 }
   def unwrap[T](x$1: Class[T]): T = ???
 
   // Statement methods

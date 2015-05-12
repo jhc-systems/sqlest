@@ -107,10 +107,15 @@ trait StatementBuilder extends BaseStatementBuilder
     case ByteArrayColumnType => statement.setBytes(index, value.asInstanceOf[Array[Byte]])
     case DateTimeColumnType => statement.setTimestamp(index, new JdbcTimestamp(value.asInstanceOf[DateTime].getMillis))
     case LocalDateColumnType => statement.setDate(index, new JdbcDate(value.asInstanceOf[LocalDate].toDate.getTime))
-    case optionType: OptionColumnType[_, _] =>
-      val option = value.asInstanceOf[Option[_]]
-      if (option.isEmpty) statement.setNull(index, jdbcType(optionType.baseColumnType)) else setParameter(statement, index, optionType.baseColumnType, option.get)
     case mappedType: MappedColumnType[A, _] => setParameter(statement, index, mappedType.baseColumnType, mappedType.write(value.asInstanceOf[A]))
+    case optionType: OptionColumnType[_, _] => value.asInstanceOf[Option[_]] match {
+      case setNullOpt if setNullOpt.isEmpty && optionType.nullValue == null =>
+        statement.setNull(index, jdbcType(optionType.baseColumnType))
+      case nullValueOpt if nullValueOpt.isEmpty =>
+        setParameter(statement, index, optionType.baseColumnType, optionType.nullValue)
+      case definedOpt =>
+        setParameter(statement, index, optionType.innerColumnType, definedOpt.get)
+    }
   }
 
   private def jdbcType[A](columnType: ColumnType[A]): Int = columnType match {

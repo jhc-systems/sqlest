@@ -74,6 +74,12 @@ trait BaseStatementBuilderSpec extends FlatSpec with Matchers {
   }
   object TableFour extends TableFour(None)
 
+  class TableFive(alias: Option[String]) extends Table("five", alias) {
+    val col1 = column[String]("col1")
+    val col2 = column[Boolean]("col2")
+  }
+  object TableFive extends TableFive(None)
+
   class TestTableFunction(alias: Option[String]) extends TableFunction2[String, String]("testTableFunction", alias) {
     val col5 = column[String]("col5")
     val col6 = column[String]("col6")

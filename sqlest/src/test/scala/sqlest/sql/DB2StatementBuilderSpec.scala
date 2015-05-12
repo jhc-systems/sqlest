@@ -271,6 +271,27 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
        """.formatSql,
       Nil
     )
+
+  }
+
+  "inserting or updating unmapped boolean columns" should "throw an exception on DB2" in {
+    intercept[AssertionError] {
+      sql {
+        insert
+          .into(TableFive)
+          .columns(TableFive.col1, TableFive.col2)
+          .values(TableFive.col1 -> "a", TableFive.col2 -> true)
+          .values(TableFive.col1 -> "b", TableFive.col2 -> false)
+      }
+    }
+
+    intercept[AssertionError] {
+      sql {
+        update(TableFive)
+          .set(TableFive.col1 -> "a", TableFive.col2 -> true)
+          .updateAll
+      }
+    }
   }
 
 }

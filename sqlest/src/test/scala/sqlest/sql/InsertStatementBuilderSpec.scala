@@ -19,7 +19,7 @@ package sqlest.sql
 import org.scalatest._
 import org.scalatest.matchers._
 import sqlest._
-import sqlest.ast._
+import sqlest.ast.{ Setter, LiteralColumn }
 
 class InsertStatementBuilderSpec extends BaseStatementBuilderSpec {
   implicit def statementBuilder = new base.StatementBuilder {}
@@ -77,6 +77,24 @@ class InsertStatementBuilderSpec extends BaseStatementBuilderSpec {
        |values (?, ?)
        """.formatSql,
       List("a", "b", "c", "d")
+    )
+  }
+
+  "boolean columns" should "produce the right sql" in {
+    sql {
+      insert
+        .into(TableFive)
+        .columns(TableFive.col1, TableFive.col2)
+        .values(TableFive.col1 -> "a", TableFive.col2 -> true)
+        .values(TableFive.col1 -> "b", TableFive.col2 -> false)
+    } should equal(
+      s"""
+      |insert
+      |into five
+      |(col1, col2)
+      |values (?, ?)
+    """.formatSql,
+      List("a", true, "b", false)
     )
   }
 

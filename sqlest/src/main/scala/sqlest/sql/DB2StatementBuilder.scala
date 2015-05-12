@@ -137,6 +137,14 @@ trait DB2StatementBuilder extends base.StatementBuilder {
     case column: LiteralColumn[_] if column.columnType == BooleanColumnType => List(LiteralColumn(0), LiteralColumn(0))
     case _ => super.columnArgs(column)
   }
+
+  override def setterArgs[A, B](setter: Setter[A, B]): List[LiteralColumn[_]] = setter match {
+    case Setter(tableColumn, column: ConstantColumn[B]) =>
+      List(LiteralColumn(column.value.asInstanceOf[A])(tableColumn.columnType))
+    case Setter(_, column) if column.columnType == BooleanColumnType =>
+      throw new AssertionError("DB2 does not support Boolean data types")
+    case _ => super.setterArgs(setter)
+  }
 }
 
 object DB2StatementBuilder extends DB2StatementBuilder
