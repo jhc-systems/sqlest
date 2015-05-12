@@ -138,6 +138,9 @@ select
 
 ## Contributors
 - [David Gregory](https://github.com/DavidGregory084)
+- [Hamish Dickson](https://github.com/hamishdickson)
+- [Drew Kutchar](https://github.com/kutchar)
+- [David Sarginson](https://github.com/ShaolinSarg)
 
 ## Acknowledgements
 - [Dean Chapman](https://github.com/p14n) - author of Sqler which inspired sqlest
