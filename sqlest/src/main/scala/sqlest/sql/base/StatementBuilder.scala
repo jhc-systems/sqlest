@@ -59,7 +59,7 @@ trait StatementBuilder extends BaseStatementBuilder
       .mkString
   }
 
-  private[sqlest] def sql(operation: Operation): String = operation match {
+  def sql(operation: Operation): String = operation match {
     case select: Select[_, _] => selectSql(select)
     case insert: Insert => insertSql(insert)
     case update: Update => updateSql(update)
@@ -67,7 +67,7 @@ trait StatementBuilder extends BaseStatementBuilder
     case other => sys.error("Unsupported operation type: " + other)
   }
 
-  private[sqlest] def parameters(operation: Operation): List[LiteralColumn[_]] = operation match {
+  def parameters(operation: Operation): List[LiteralColumn[_]] = operation match {
     case select: Select[_, _] => selectArgs(select)
     case insert: Insert => insertArgs(insert)
     case update: Update => updateArgs(update)
