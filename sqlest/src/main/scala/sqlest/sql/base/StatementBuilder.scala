@@ -16,50 +16,30 @@
 
 package sqlest.sql.base
 
-import java.sql.{ Connection, Date => JdbcDate, PreparedStatement, Timestamp => JdbcTimestamp, Types => JdbcTypes, SQLException }
-import org.joda.time.{ DateTime, LocalDate }
 import sqlest.ast._
-import sqlest.util._
 
 trait StatementBuilder extends BaseStatementBuilder
     with SelectStatementBuilder
     with InsertStatementBuilder
     with UpdateStatementBuilder
-    with DeleteStatementBuilder
-    with Logging {
+    with DeleteStatementBuilder {
 
-  def apply(connection: Connection, operation: Operation) =
-    prepareStatement(connection, operation)
-
-  def prepareStatement(connection: Connection, operation: Operation) = {
+  def apply(operation: Operation) = {
     val preprocessedOperation = preprocess(operation)
-    val querySql = sql(preprocessedOperation)
-    val queryParameters = parameters(preprocessedOperation)
-    try {
-      logger.debug(s"Preparing statement: $querySql - $queryParameters")
-      val statement = connection.prepareStatement(querySql)
-
-      setParameters(preprocessedOperation, statement, queryParameters)
-
-      statement
-    } catch {
-      case exn: SQLException =>
-        logger.error(s"Error preparing statement: $querySql - $queryParameters")
-        throw exn
-    }
+    (preprocessedOperation, sql(preprocessedOperation), argumentLists(preprocessedOperation))
   }
 
   def generateRawSql(operation: Operation): String = {
     val preprocessedOperation = preprocess(operation)
     val querySql = sql(preprocessedOperation).split("\\?")
-    val queryParameters = parameters(preprocessedOperation).map(parameter => constantSql(parameter.columnType.asInstanceOf[ColumnType[Any]], parameter.value))
+    val queryArguments = argumentLists(preprocessedOperation).flatten.map(argument => constantSql(argument.columnType.asInstanceOf[ColumnType[Any]], argument.value))
 
-    querySql.zipAll(queryParameters, "", "")
-      .map { case (sql, parameter) => sql + parameter }
+    querySql.zipAll(queryArguments, "", "")
+      .map { case (sql, argument) => sql + argument }
       .mkString
   }
 
-  def sql(operation: Operation): String = operation match {
+  private def sql(operation: Operation): String = operation match {
     case select: Select[_, _] => selectSql(select)
     case insert: Insert => insertSql(insert)
     case update: Update => updateSql(update)
@@ -67,69 +47,12 @@ trait StatementBuilder extends BaseStatementBuilder
     case other => sys.error("Unsupported operation type: " + other)
   }
 
-  def parameters(operation: Operation): List[LiteralColumn[_]] = operation match {
-    case select: Select[_, _] => selectArgs(select)
+  private def argumentLists(operation: Operation): List[List[LiteralColumn[_]]] = operation match {
+    case select: Select[_, _] => List(selectArgs(select))
     case insert: Insert => insertArgs(insert)
-    case update: Update => updateArgs(update)
-    case delete: Delete => deleteArgs(delete)
+    case update: Update => List(updateArgs(update))
+    case delete: Delete => List(deleteArgs(delete))
     case other => sys.error("Unsupported operation type: " + other)
-  }
-
-  private def setParameters(operation: Operation, statement: PreparedStatement, parameters: List[LiteralColumn[_]]) = {
-
-    def innerSetParameters(parameters: List[LiteralColumn[_]]) = {
-      var index = 0
-      parameters foreach { parameter =>
-        index = index + 1 // prepared statement parameter indices are 1-based
-        setParameter(statement, index, parameter.columnType, parameter.value)
-      }
-    }
-
-    operation match {
-      case insert: InsertValues => parameters.grouped(insert.columns.size).foreach {
-        params =>
-          innerSetParameters(params)
-          statement.addBatch
-      }
-      case _ =>
-        innerSetParameters(parameters)
-        statement.addBatch
-    }
-  }
-
-  private def setParameter[A](statement: PreparedStatement, index: Int, columnType: ColumnType[A], value: Any): Unit = columnType match {
-    case BooleanColumnType => statement.setBoolean(index, value.asInstanceOf[Boolean])
-    case IntColumnType => statement.setInt(index, value.asInstanceOf[Int])
-    case LongColumnType => statement.setLong(index, value.asInstanceOf[Long])
-    case DoubleColumnType => statement.setDouble(index, value.asInstanceOf[Double])
-    case BigDecimalColumnType => statement.setBigDecimal(index, value.asInstanceOf[BigDecimal].bigDecimal)
-    case StringColumnType => statement.setString(index, value.asInstanceOf[String])
-    case ByteArrayColumnType => statement.setBytes(index, value.asInstanceOf[Array[Byte]])
-    case DateTimeColumnType => statement.setTimestamp(index, new JdbcTimestamp(value.asInstanceOf[DateTime].getMillis))
-    case LocalDateColumnType => statement.setDate(index, new JdbcDate(value.asInstanceOf[LocalDate].toDate.getTime))
-    case mappedType: MappedColumnType[A, _] => setParameter(statement, index, mappedType.baseColumnType, mappedType.write(value.asInstanceOf[A]))
-    case optionType: OptionColumnType[_, _] => value.asInstanceOf[Option[_]] match {
-      case setNullOpt if setNullOpt.isEmpty && optionType.nullValue == null =>
-        statement.setNull(index, jdbcType(optionType.baseColumnType))
-      case nullValueOpt if nullValueOpt.isEmpty =>
-        setParameter(statement, index, optionType.baseColumnType, optionType.nullValue)
-      case definedOpt =>
-        setParameter(statement, index, optionType.innerColumnType, definedOpt.get)
-    }
-  }
-
-  private def jdbcType[A](columnType: ColumnType[A]): Int = columnType match {
-    case BooleanColumnType => JdbcTypes.BOOLEAN
-    case IntColumnType => JdbcTypes.INTEGER
-    case LongColumnType => JdbcTypes.INTEGER
-    case DoubleColumnType => JdbcTypes.DOUBLE
-    case BigDecimalColumnType => JdbcTypes.DECIMAL
-    case StringColumnType => JdbcTypes.CHAR
-    case ByteArrayColumnType => JdbcTypes.BINARY
-    case DateTimeColumnType => JdbcTypes.TIMESTAMP
-    case LocalDateColumnType => JdbcTypes.DATE
-    case optionType: OptionColumnType[_, _] => jdbcType(optionType.baseColumnType)
-    case mappedType: MappedColumnType[_, _] => jdbcType(mappedType.baseColumnType)
   }
 
 }

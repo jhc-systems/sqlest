@@ -6,6 +6,14 @@ case class Fruit(name: String, juiciness: Int)
 case class Smoothy(description: String, fruits: List[Fruit])
 
 object ExtractorExamples extends App with DatabaseExample {
+
+  import org.apache.log4j.{ ConsoleAppender, PropertyConfigurator, SimpleLayout }
+  val p = new java.util.Properties
+  p.setProperty("log4j.rootLogger", "DEBUG,mylog")
+  p.setProperty("log4j.appender.mylog", classOf[ConsoleAppender].getName)
+  p.setProperty("log4j.appender.mylog.layout", classOf[SimpleLayout].getName)
+  PropertyConfigurator.configure(p)
+
   InsertExamples.insertAll
 
   val fruits =

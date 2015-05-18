@@ -45,15 +45,15 @@ trait ExecutorSyntax extends QuerySyntax {
   }
 
   implicit class InsertExecutorOps(insert: Insert) {
-    def execute(implicit database: Database): Int = database.executeInsert(insert)
+    def execute(implicit database: Database): Int = database.executeCommand(insert)
   }
 
   implicit class UpdateExecutorOps(update: Update) {
-    def execute(implicit database: Database): Int = database.executeUpdate(update)
+    def execute(implicit database: Database): Int = database.executeCommand(update)
   }
 
   implicit class DeleteExecutorOps(delete: Delete) {
-    def execute(implicit database: Database): Int = database.executeDelete(delete)
+    def execute(implicit database: Database): Int = database.executeCommand(delete)
   }
 
   implicit class BatchExecutorOps(batchCommands: Seq[Command]) {

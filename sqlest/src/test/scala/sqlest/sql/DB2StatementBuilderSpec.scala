@@ -39,7 +39,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
        |where (mytable.col1 = ?)
        |fetch first 10 rows only
        """.formatSql,
-      List(123)
+      List(List(123))
     )
   }
 
@@ -59,7 +59,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
        |from subquery
        |where rownum >= ?
        """.formatSql,
-      List(123, 2 * 10 + 1)
+      List(List(123, 2 * 10 + 1))
     )
   }
 
@@ -79,7 +79,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
        |from subquery
        |where rownum between ? and ?
        """.formatSql,
-      List(123, 2 * 10 + 1, 2 * 10 + 10)
+      List(List(123, 2 * 10 + 1, 2 * 10 + 10))
     )
   }
 
@@ -100,7 +100,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
        |from subquery
        |where rownum between ? and ?
        """.formatSql,
-      List(123, 2 * 10 + 1, 2 * 10 + 10)
+      List(List(123, 2 * 10 + 1, 2 * 10 + 10))
     )
   }
 
@@ -121,7 +121,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
        |from subquery
        |where rownum between ? and ?
        """.formatSql,
-      List(2, 4, 13, 14, 5, 6, 7, 8, 9, 10, 11, 12, 15 * 16 + 1, 15 * 16 + 16)
+      List(List(2, 4, 13, 14, 5, 6, 7, 8, 9, 10, 11, 12, 15 * 16 + 1, 15 * 16 + 16))
     )
   }
 
@@ -134,7 +134,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
        |select three.col3 as three_col3, three.col4 as three_col4, testTableFunction.col5 as testTableFunction_col5, testTableFunction.col6 as testTableFunction_col6
        |from three cross join table(testTableFunction(three.col3, cast(? as varchar(256)))) as testTableFunction
        """.formatSql,
-      List("abc")
+      List(List("abc"))
     )
   }
 
@@ -151,7 +151,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
        |where (mytable.col1 > ?)
        |group by rollup(mytable.col1, mytable.col2)
        """.formatSql,
-      List(123)
+      List(List(123))
     )
   }
 
@@ -168,7 +168,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
        |where (mytable.col1 > ?)
        |group by mytable.col1, cube((mytable.col1, mytable.col2), mytable.col2)
        """.formatSql,
-      List(123)
+      List(List(123))
     )
   }
 
@@ -185,7 +185,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
        |where (mytable.col1 > ?)
        |group by grouping sets(mytable.col1, cube((mytable.col1, mytable.col2), mytable.col2), rollup(mytable.col2)), mytable.col2
        """.formatSql,
-      List(123)
+      List(List(123))
     )
   }
 
@@ -202,7 +202,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
        |where (mytable.col1 > ?)
        |group by grouping sets(mytable.col1, ())
        """.formatSql,
-      List(123)
+      List(List(123))
     )
   }
 
@@ -215,7 +215,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
        |select three.col3 as three_col3, three.col4 as three_col4, testFunction(three.col3, cast(? as varchar(256))) as testFunction
        |from three
        """.formatSql,
-      List("abc")
+      List(List("abc"))
     )
   }
 
@@ -230,7 +230,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
        |from mytable
        |where (? = ?)
        """.formatSql,
-      List(0, 0)
+      List(List(0, 0))
     )
 
     sql {
@@ -243,7 +243,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
        |from mytable
        |where (? <> ?)
        """.formatSql,
-      List(0, 0)
+      List(List(0, 0))
     )
 
     sql {
@@ -256,7 +256,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
        |from mytable
        |where (0 = 0)
        """.formatSql,
-      Nil
+      List(Nil)
     )
 
     sql {
@@ -269,7 +269,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
        |from mytable
        |where (0 <> 0)
        """.formatSql,
-      Nil
+      List(Nil)
     )
 
   }

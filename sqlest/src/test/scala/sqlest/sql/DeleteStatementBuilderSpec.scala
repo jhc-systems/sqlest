@@ -35,7 +35,7 @@ class DeleteStatementBuilderSpec extends BaseStatementBuilderSpec {
        |from one
        |where ((? = ?) and (? <> ?))
        """.formatSql,
-      List(1, 2, 3, 4)
+      List(List(1, 2, 3, 4))
     )
   }
 }

@@ -35,7 +35,7 @@ class H2StatementBuilderSpec extends BaseStatementBuilderSpec {
        |from mytable
        |where (mytable.col1 between ? and ?)
        """.formatSql,
-      List(123, 234)
+      List(List(123, 234))
     )
   }
 
@@ -50,7 +50,7 @@ class H2StatementBuilderSpec extends BaseStatementBuilderSpec {
        |from mytable
        |where (mytable.col1 in (?, 234, ?))
        """.formatSql,
-      List(123, 345)
+      List(List(123, 345))
     )
   }
 
@@ -65,7 +65,7 @@ class H2StatementBuilderSpec extends BaseStatementBuilderSpec {
        |from mytable
        |where (mytable.col1 in (123, 234, 345))
        """.formatSql,
-      List()
+      List(List())
     )
   }
 
@@ -82,7 +82,7 @@ class H2StatementBuilderSpec extends BaseStatementBuilderSpec {
        |where (mytable.col1 = ?)
        |limit ?
        """.formatSql,
-      List(123, 10)
+      List(List(123, 10))
     )
   }
 
@@ -97,7 +97,7 @@ class H2StatementBuilderSpec extends BaseStatementBuilderSpec {
        |from mytable
        |offset ?
        """.formatSql,
-      List(20)
+      List(List(20))
     )
   }
 
@@ -115,7 +115,7 @@ class H2StatementBuilderSpec extends BaseStatementBuilderSpec {
        |limit ?
        |offset ?
        """.formatSql,
-      List(123, 10, 20)
+      List(List(123, 10, 20))
     )
   }
 
@@ -132,7 +132,7 @@ class H2StatementBuilderSpec extends BaseStatementBuilderSpec {
        |where (mytable.col1 > ?)
        |group by mytable.col1, mytable.col2
        """.formatSql,
-      List(123)
+      List(List(123))
     )
   }
 
@@ -161,7 +161,7 @@ class H2StatementBuilderSpec extends BaseStatementBuilderSpec {
        |limit ?
        |offset ?
        """.formatSql,
-      List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 15 * 16)
+      List(List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 15 * 16))
     )
   }
 
@@ -176,7 +176,7 @@ class H2StatementBuilderSpec extends BaseStatementBuilderSpec {
        |from three
        |where (three.col3 = ?)
        """.formatSql,
-      List("abc")
+      List(List("abc"))
     )
   }
 }

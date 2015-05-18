@@ -38,7 +38,7 @@ class UpdateStatementBuilderSpec extends BaseStatementBuilderSpec {
        |set col1 = ?, col2 = ?
        |where ((? = ?) and (? = ?))
        """.formatSql,
-      List("a", "b", "c", "d", "e", "f")
+      List(List("a", "b", "c", "d", "e", "f"))
     )
   }
 }

@@ -39,7 +39,7 @@ class InsertStatementBuilderSpec extends BaseStatementBuilderSpec {
        |(col1, col2)
        |values (?, ?)
        """.formatSql,
-      List("a", "b")
+      List(List("a", "b"))
     )
   }
 
@@ -58,7 +58,7 @@ class InsertStatementBuilderSpec extends BaseStatementBuilderSpec {
        |(col1, col2)
        |values (?, ?)
        """.formatSql,
-      List("a", "b")
+      List(List("a", "b"))
     )
   }
 
@@ -76,7 +76,7 @@ class InsertStatementBuilderSpec extends BaseStatementBuilderSpec {
        |(col1, col2)
        |values (?, ?)
        """.formatSql,
-      List("a", "b", "c", "d")
+      List(List("a", "b"), List("c", "d"))
     )
   }
 
@@ -94,7 +94,7 @@ class InsertStatementBuilderSpec extends BaseStatementBuilderSpec {
       |(col1, col2)
       |values (?, ?)
     """.formatSql,
-      List("a", true, "b", false)
+      List(List("a", true), List("b", false))
     )
   }
 
@@ -118,7 +118,7 @@ class InsertStatementBuilderSpec extends BaseStatementBuilderSpec {
        |(col1, col2)
        |values (?, ?)
        """.formatSql,
-      List("a", "b", "c", "d")
+      List(List("a", "b"), List("c", "d"))
     )
   }
 
@@ -137,7 +137,7 @@ class InsertStatementBuilderSpec extends BaseStatementBuilderSpec {
        |(col1)
        |select one.col1 as one_col1, one.col2 as one_col2 from one where (one.col2 = ?)
        """.formatSql,
-      List("abc")
+      List(List("abc"))
     )
   }
 }

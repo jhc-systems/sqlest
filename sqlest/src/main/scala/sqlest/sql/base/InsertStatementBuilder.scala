@@ -39,11 +39,8 @@ trait InsertStatementBuilder extends BaseStatementBuilder {
 
   // -------------------------------------------------
 
-  def insertArgs(insert: Insert): List[LiteralColumn[_]] = insert match {
-    case InsertValues(_, setterLists) => insertValuesArgs(setterLists)
-    case InsertFromSelect(_, _, select) => selectStatementBuilder.selectArgs(select)
+  def insertArgs(insert: Insert): List[List[LiteralColumn[_]]] = insert match {
+    case InsertValues(_, setterLists) => setterLists.map(_.toList.flatMap(setterArgs(_))).toList
+    case InsertFromSelect(_, _, select) => List(selectStatementBuilder.selectArgs(select))
   }
-
-  def insertValuesArgs(setterLists: Seq[Seq[Setter[_, _]]]): List[LiteralColumn[_]] =
-    setterLists.flatten.toList.flatMap(setterArgs(_))
 }

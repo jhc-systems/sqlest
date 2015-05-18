@@ -27,7 +27,7 @@ object InsertExamples extends App with DatabaseExample {
   )
 
   // We can get the setters for a case class using the extractor
-  val ingredients = List(Ingredient(1, 1), Ingredient(1, 3))
+  lazy val ingredients = List(Ingredient(1, 1), Ingredient(1, 3))
   lazy val ingredientsTableInsertStatement =
     insert
       .into(IngredientsTable)
@@ -36,7 +36,7 @@ object InsertExamples extends App with DatabaseExample {
       .values(extractor.settersFor(ingredients(1)))
 
   // This also works for lists of the case class
-  val moreIngredients = List(Ingredient(2, 4), Ingredient(2, 3))
+  lazy val moreIngredients = List(Ingredient(2, 4), Ingredient(2, 3))
   lazy val moreIngredientsInsertStatement =
     insert
       .into(IngredientsTable)
