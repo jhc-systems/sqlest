@@ -91,7 +91,7 @@ class ColumnSpec extends FlatSpec with Matchers {
     (TableOne.col6 > Small.constant[Size]) should equal(InfixFunctionColumn[Boolean](">", TableOne.col6, Small.constant[Size]))
     (TableOne.col6 >= Small.constant[Size]) should equal(InfixFunctionColumn[Boolean](">=", TableOne.col6, Small.constant[Size]))
     (TableOne.col6.in(Small.constant[Size], Medium.constant[Size])) should equal(InfixFunctionColumn[Boolean]("in", TableOne.col6, ScalarFunctionColumn[Size]("", Seq(Small.constant[Size], Medium.constant[Size]))))
-    (TableOne.col6 in List[Size](Small, Medium)) should equal(InfixFunctionColumn[Boolean]("in", TableOne.col6, ScalarFunctionColumn[Size]("", Seq(Small.constant[Size], Medium.constant[Size]))))
+    (TableOne.col6 in List[Size](Small, Medium)) should equal(InfixFunctionColumn[Boolean]("in", TableOne.col6, ScalarFunctionColumn[Size]("", Seq(Small.column[Size], Medium.column[Size]))))
 
     (TableOne.col7 === WrappedInt(3).constant) should equal(InfixFunctionColumn[Boolean]("=", TableOne.col7, WrappedInt(3).constant))
     (TableOne.col7 =!= WrappedInt(3).constant) should equal(InfixFunctionColumn[Boolean]("<>", TableOne.col7, WrappedInt(3).constant))
@@ -100,7 +100,7 @@ class ColumnSpec extends FlatSpec with Matchers {
     (TableOne.col7 > WrappedInt(3).constant) should equal(InfixFunctionColumn[Boolean](">", TableOne.col7, WrappedInt(3).constant))
     (TableOne.col7 >= WrappedInt(3).constant) should equal(InfixFunctionColumn[Boolean](">=", TableOne.col7, WrappedInt(3).constant))
     (TableOne.col7.in(WrappedInt(0).constant, WrappedInt(1).constant)) should equal(InfixFunctionColumn[Boolean]("in", TableOne.col7, ScalarFunctionColumn[WrappedInt]("", Seq(WrappedInt(0).constant, WrappedInt(1).constant))))
-    (TableOne.col7 in List(WrappedInt(0), WrappedInt(1))) should equal(InfixFunctionColumn[Boolean]("in", TableOne.col7, ScalarFunctionColumn[WrappedInt]("", Seq(WrappedInt(0).constant, WrappedInt(1).constant))))
+    (TableOne.col7 in List(WrappedInt(0), WrappedInt(1))) should equal(InfixFunctionColumn[Boolean]("in", TableOne.col7, ScalarFunctionColumn[WrappedInt]("", Seq(WrappedInt(0).column, WrappedInt(1).column))))
   }
 
   "StringColumnType and TrimmedStringColumnType" should "allow comparison operations" in {
@@ -112,7 +112,7 @@ class ColumnSpec extends FlatSpec with Matchers {
     (TableOne.col2 > TableOne.col2Trimmed) should equal(InfixFunctionColumn[Boolean](">", TableOne.col2, TableOne.col2Trimmed))
     (TableOne.col2 >= TableOne.col2Trimmed) should equal(InfixFunctionColumn[Boolean](">=", TableOne.col2, TableOne.col2Trimmed))
     (TableOne.col2.in(TableOne.col2, TableOne.col2Trimmed)) should equal(InfixFunctionColumn[Boolean]("in", TableOne.col2, ScalarFunctionColumn[Size]("", Seq(TableOne.col2, TableOne.col2Trimmed))))
-    (TableOne.col2Trimmed in List("a", "b")) should equal(InfixFunctionColumn[Boolean]("in", TableOne.col2Trimmed, ScalarFunctionColumn[Size]("", Seq("a".constant, "b".constant))))
+    (TableOne.col2Trimmed in List("a", "b")) should equal(InfixFunctionColumn[Boolean]("in", TableOne.col2Trimmed, ScalarFunctionColumn[Size]("", Seq("a".column, "b".column))))
   }
 
   "column comparisons" should "fail for a mapped and an unmapped column" in {

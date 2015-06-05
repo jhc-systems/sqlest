@@ -129,8 +129,8 @@ trait ColumnSyntax {
       InfixFunctionColumn[Boolean]("in", left, ScalarFunctionColumn("", mappedValues))
     }
 
-    def in[B](values: List[B])(implicit rightType: ColumnType[B], equivalence: ColumnTypeEquivalence[A, B]): Column[Boolean] =
-      in(values.map(_.constant): _*)
+    def in[B](values: Seq[B])(implicit rightType: ColumnType[B], equivalence: ColumnTypeEquivalence[A, B]): Column[Boolean] =
+      in(values.map(_.column): _*)
 
     // TODO - Is it possible to make this a macro in order to report illegal comparisons at compile time?
     private def mapLiterals(left: Column[_], right: Column[_], equivalence: ColumnTypeEquivalence[_, _]): (Column[_], Column[_]) = {

@@ -63,9 +63,9 @@ class H2StatementBuilderSpec extends BaseStatementBuilderSpec {
       s"""
        |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
        |from mytable
-       |where (mytable.col1 in (123, 234, 345))
+       |where (mytable.col1 in (?, ?, ?))
        """.formatSql,
-      List(List())
+      List(List(123, 234, 345))
     )
   }
 
