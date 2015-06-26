@@ -22,9 +22,11 @@ import sqlest._
 import sqlest.ast._
 
 class CaseSyntaxSpec extends FlatSpec with Matchers {
+  val zeroIsNoneColumnType = ZeroIsNoneColumnType[Int, Int]
   class MyTable(alias: Option[String]) extends Table("mytable", alias) {
     val col1 = column[Int]("col1")
     val col2 = column[String]("col2")
+    val col3 = column[Option[Int]]("col2")(zeroIsNoneColumnType)
   }
   object MyTable extends MyTable(None)
 
@@ -108,5 +110,14 @@ class CaseSyntaxSpec extends FlatSpec with Matchers {
     decode(MyTable.col1).when(1, 2).when(2, 3).otherwise(4) should be(
       CaseColumnElseColumn(MyTable.col1, List(LiteralColumn(1) -> LiteralColumn(2), LiteralColumn(2) -> LiteralColumn(3)), LiteralColumn(4))
     )
+  }
+
+  "case statements" should "have columnType of the result column" in {
+    `case`(when(MyTable.col1 === 1, MyTable.col3)).columnType should be(zeroIsNoneColumnType)
+    `case`().when(MyTable.col1 === 1, MyTable.col3).columnType should be(zeroIsNoneColumnType)
+    `case`(MyTable.col1).when(1, MyTable.col3).columnType should be(zeroIsNoneColumnType)
+    decode(when(MyTable.col1 === 1, MyTable.col3)).columnType should be(zeroIsNoneColumnType)
+    decode().when(MyTable.col1 === 1, MyTable.col3).columnType should be(zeroIsNoneColumnType)
+    decode(MyTable.col1).when(1, MyTable.col3).columnType should be(zeroIsNoneColumnType)
   }
 }

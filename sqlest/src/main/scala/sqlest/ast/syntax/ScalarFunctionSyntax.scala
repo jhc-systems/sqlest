@@ -22,8 +22,8 @@ trait ScalarFunctionSyntax extends ScalarFunctions {
   val trim = ScalarFunction1[String, String]("trim")
   val substring = ScalarFunction3[String, Int, Int, String]("substring")
 
-  def coalesce[A: ColumnType](columns: Column[A]*) = ScalarFunctionColumn[A]("coalesce", columns)
+  def coalesce[A](columns: Column[A]*) = ScalarFunctionColumn[A]("coalesce", columns)(columns.head.columnType)
 
-  def connectByRoot[A: ColumnType](column: Column[A]) = ScalarFunctionColumn[A]("connect_by_root", Seq(column))
-  def prior[A: ColumnType](column: Column[A]) = ScalarFunctionColumn[A]("prior", Seq(column))
+  def connectByRoot[A](column: Column[A]) = ScalarFunctionColumn[A]("connect_by_root", Seq(column))(column.columnType)
+  def prior[A](column: Column[A]) = ScalarFunctionColumn[A]("prior", Seq(column))(column.columnType)
 }

@@ -54,7 +54,7 @@ class ColumnExtractorSpec extends FlatSpec with Matchers {
   }
 
   "mapped column extractor" should "extract mapped value" in {
-    val extractor = extractTuple(TableSix.trimmedString, TableSix.zeroIsNoneWrappedInt, TableSix.zeroIsNoneLocalDate, TableSix.localDateFromDateTime)
+    val extractor = extractTuple(TableSix.trimmedString, TableSix.zeroIsNoneWrappedInt, TableSix.zeroIsNoneLocalDate, coalesce(TableSix.localDateFromDateTime).as(TableSix.localDateFromDateTime.columnAlias))
 
     val timestamp = new java.sql.Timestamp(new java.util.Date().getTime)
     val date = new java.sql.Date(new java.util.Date().getTime)

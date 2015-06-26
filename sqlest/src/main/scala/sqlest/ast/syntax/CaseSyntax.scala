@@ -25,11 +25,11 @@ trait CaseSyntax {
   def `case`[A](column: Column[A]) = CaseColumnBuilder(column)
   def decode[A](column: Column[A]) = CaseColumnBuilder(column)
 
-  def `case`[A](whens: When[A]*)(implicit columnType: ColumnType[A]) =
-    CaseWhenColumn(whens.toList)
+  def `case`[A](whens: When[A]*) =
+    CaseWhenColumn(whens.toList)(whens.head.result.columnType)
 
-  def decode[A](whens: When[A]*)(implicit columnType: ColumnType[A]) =
-    CaseWhenColumn(whens.toList)
+  def decode[A](whens: When[A]*) =
+    CaseWhenColumn(whens.toList)(whens.head.result.columnType)
 
   def when[A](condition: Column[Boolean], result: Column[A]) =
     When(condition, result)
@@ -64,11 +64,11 @@ trait CaseSyntax {
 }
 
 object CaseBuilder {
-  def when[A](condition: Column[Boolean], result: Column[A])(implicit columnType: ColumnType[A]) =
-    CaseWhenColumn[A](List(When(condition, result)))
+  def when[A](condition: Column[Boolean], result: Column[A]) =
+    CaseWhenColumn[A](List(When(condition, result)))(result.columnType)
 }
 
 case class CaseColumnBuilder[B](column: Column[B]) {
-  def when[C, A](value: Column[C], result: Column[A])(implicit columnType: ColumnType[A], equivalence: ColumnTypeEquivalence[B, C]) =
-    CaseColumnColumn[A, B](column, List((value, result)))
+  def when[C, A](value: Column[C], result: Column[A])(implicit equivalence: ColumnTypeEquivalence[B, C]) =
+    CaseColumnColumn[A, B](column, List((value, result)))(result.columnType)
 }
