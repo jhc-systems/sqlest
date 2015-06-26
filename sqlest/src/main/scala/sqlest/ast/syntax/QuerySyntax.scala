@@ -16,7 +16,7 @@
 
 package sqlest.ast.syntax
 
-import sqlest.ast.{ Relation, Select }
+import sqlest.ast.{ Lateral, Relation, Select }
 
 trait QuerySyntax {
   object select extends SelectSyntax
@@ -25,4 +25,5 @@ trait QuerySyntax {
   object delete extends DeleteSyntax
 
   implicit def selectOps[A, R <: Relation](select: Select[A, R]) = SelectOps(select)
+  def lateral[A, R <: Relation](select: Select[A, R]) = Lateral(select)
 }

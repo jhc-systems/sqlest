@@ -89,6 +89,7 @@ object ColumnOperations {
       case OuterJoin(left, right, condition) => OuterJoin(left.mapColumns(f, selectFunction), right.mapColumns(f, selectFunction), condition.mapColumns(f, selectFunction))
       case CrossJoin(left, right) => CrossJoin(left.mapColumns(f, selectFunction), right.mapColumns(f, selectFunction))
       case select: Select[_, _] => selectFunction(select)
+      case Lateral(select: Select[_, _]) => Lateral(selectFunction(select))
     }
   }
 

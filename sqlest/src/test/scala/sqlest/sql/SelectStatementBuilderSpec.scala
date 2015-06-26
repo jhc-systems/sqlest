@@ -430,17 +430,19 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
 
     sql {
       select(MyTable.col1, MyTable.col2)
-        .from(
-          select(MyTable.col1, MyTable.col2)
-            .from(
-              select(MyTable.col1, MyTable.col2)
-                .from(MyTable).as("subselect2")).as("subselect1"))
+        .from(MyTable)
+        .crossJoin(
+          lateral(
+            select(MyTable.col1, MyTable.col2).from(
+              select(MyTable.col1, MyTable.col2).from(MyTable).as("subselect2")
+            ).as("subselect1")))
     } should equal(
       s"""
        |select mytable_col1, mytable_col2
-       |from
+       |from mytable 
+       |cross join lateral 
        |  (select mytable_col1, mytable_col2
-       |   from
+       |    from
        |    (select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
        |     from mytable) as subselect2) as subselect1
        """.formatSql,

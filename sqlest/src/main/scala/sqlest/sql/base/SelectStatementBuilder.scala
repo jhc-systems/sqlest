@@ -83,6 +83,7 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
     case OuterJoin(left, right, condition) => joinSql(left) + " full outer join " + joinSql(right) + " on " + columnSql(condition)
     case CrossJoin(left, right) => joinSql(left) + " cross join " + joinSql(right)
     case select: Select[_, _] => subselectSql(select)
+    case Lateral(select: Select[_, _]) => "lateral " + subselectSql(select)
   }
 
   def subselectSql(select: Select[_, _ <: Relation]) = {
@@ -155,5 +156,6 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
     case OuterJoin(left, right, condition) => joinArgs(left) ++ joinArgs(right) ++ columnArgs(condition)
     case CrossJoin(left, right) => joinArgs(left) ++ joinArgs(right)
     case select: Select[_, _] => selectArgs(select)
+    case Lateral(select: Select[_, _]) => selectArgs(select)
   }
 }

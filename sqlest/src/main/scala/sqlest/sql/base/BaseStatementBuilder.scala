@@ -57,6 +57,7 @@ trait BaseStatementBuilder {
     case _: TableFunctionApplication[_] => Nil
     case join: Join[_, _] => findSubselects(join.left) ++ findSubselects(join.right)
     case select: Select[_, _] => List(select) ++ findSubselects(select.from)
+    case Lateral(select: Select[_, _]) => List(select) ++ findSubselects(select.from)
   }
 
   def columnAliasListSql(columns: Seq[Column[_]]): String =

@@ -124,6 +124,9 @@ case class OuterJoin[R1 <: Relation, R2 <: Relation](left: R1, right: R2, condit
 /** An outer join between two tables. */
 case class CrossJoin[R1 <: Relation, R2 <: Relation](left: R1, right: R2) extends Join[R1, R2]
 
+/** Allows use on Lateral in join conditions */
+case class Lateral[A, R <: Relation](select: Select[A, R]) extends Relation
+
 /** A select statement or subselect. */
 case class Select[A, R <: Relation](
     cols: A,
