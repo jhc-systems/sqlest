@@ -54,22 +54,24 @@ class ColumnExtractorSpec extends FlatSpec with Matchers {
   }
 
   "mapped column extractor" should "extract mapped value" in {
-    val extractor = extractTuple(TableSix.trimmedString, TableSix.zeroIsNoneWrappedInt, TableSix.zeroIsNoneLocalDate)
+    val extractor = extractTuple(TableSix.trimmedString, TableSix.zeroIsNoneWrappedInt, TableSix.zeroIsNoneLocalDate, TableSix.localDateFromDateTime)
 
+    val timestamp = new java.sql.Timestamp(new java.util.Date().getTime)
+    val date = new java.sql.Date(new java.util.Date().getTime)
     def testResultSet = TestResultSet(TableSix.columns)(
-      Seq("test", 5, 20150101),
-      Seq(" test ", 0, 21000101),
-      Seq("   ", 0, 0)
+      Seq("test", 5, 20150101, timestamp),
+      Seq(" test ", 0, 21000101, timestamp),
+      Seq("   ", 0, 0, timestamp)
     )
 
     extractor.extractHeadOption(testResultSet) should equal(Some(
-      (Some(WrappedString("test")), Some(WrappedInt(5)), Some(new LocalDate(2015, 1, 1)))
+      (Some(WrappedString("test")), Some(WrappedInt(5)), Some(new LocalDate(2015, 1, 1)), new LocalDate(date))
     ))
 
     extractor.extractAll(testResultSet) should equal(List(
-      (Some(WrappedString("test")), Some(WrappedInt(5)), Some(new LocalDate(2015, 1, 1))),
-      (Some(WrappedString(" test")), None, Some(new LocalDate(2100, 1, 1))),
-      (None, None, None)
+      (Some(WrappedString("test")), Some(WrappedInt(5)), Some(new LocalDate(2015, 1, 1)), new LocalDate(date)),
+      (Some(WrappedString(" test")), None, Some(new LocalDate(2100, 1, 1)), new LocalDate(date)),
+      (None, None, None, new LocalDate(date))
     ))
   }
 
