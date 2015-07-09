@@ -37,6 +37,7 @@ sealed trait Extractor[Row, A] {
     t.getOrElse(throw new NullPointerException("Tried to extract a null value without an OptionExtractor"))
 
   def map[B](func: A => B) = MappedExtractor(this, func)
+  def map[B](func: A => B, unapplyFunc: B => Option[Any]) = MappedExtractor(this, func, Some(unapplyFunc))
   def asOption = OptionExtractor(this)
 }
 
