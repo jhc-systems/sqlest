@@ -168,7 +168,7 @@ class ColumnExtractorSettersSpec extends FlatSpec with Matchers {
     ))
   }
 
-  it should "fail throw an exception when used with other extractors" in {
+  it should "throw an exception when used with extractors that don't supply an unapply method" in {
     intercept[Exception] {
       oneExtractor.groupBy(FirstTable.col1).settersFor(List(One(1, "one")))
     }
@@ -180,6 +180,16 @@ class ColumnExtractorSettersSpec extends FlatSpec with Matchers {
     intercept[Exception] {
       extractTuple(FirstTable.col1, FirstTable.col2).map(_.toString ++ _).settersFor("bad")
     }
+  }
+
+  it should "return setters for mapped extractors that supply an unapply method" in {
+    extractTuple(FirstTable.col1, FirstTable.col2).map(
+      { case (a: Int, b: String) => One(a, b) },
+      (one: One) => Some((one.a, one.b))
+    ).settersFor(One(1, "two")) should be(List(
+        Setter(FirstTable.col1, 1),
+        Setter(FirstTable.col2, "two")
+      ))
   }
 
   it should "work for lists of values" in {

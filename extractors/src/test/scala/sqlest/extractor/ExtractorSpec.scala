@@ -141,6 +141,10 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
     ))
   }
 
+  it should "receive an unapply method as an optional argument to map" in {
+    stringExtractorAtIndex(1).map(_.reverse, (s: String) => Some(s.reverse))
+  }
+
   it should "throw a NullPointerException if any of the inner extractors extracted a null value" in {
     val seqRows = List(Seq(0, null), Seq(2, "bye"), Seq(4, "level"))
 
