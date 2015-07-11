@@ -216,18 +216,30 @@ case class GroupedExtractor[Row, A, B](inner: Extractor[Row, A], groupBy: Extrac
   type SingleResult = A
   type Accumulator = ListMap[B, inner.Accumulator]
 
-  def initialize(row: Row) =
-    ListMap(checkNullValueAndGet(groupBy.emit(groupBy.initialize(row))) -> inner.initialize(row))
+  def initialize(row: Row) = {
+    val groupByKey = groupBy.emit(groupBy.initialize(row))
+    val accumulator =
+      for { key <- groupByKey }
+        yield ListMap(key -> inner.initialize(row))
+
+    accumulator getOrElse ListMap()
+  }
 
   def accumulate(accumulator: ListMap[B, inner.Accumulator], row: Row) = {
-    val groupByKey = checkNullValueAndGet(groupBy.emit(groupBy.initialize(row)))
+    val groupByKey = groupBy.emit(groupBy.initialize(row))
 
-    val newInnerAccumulator = accumulator.get(groupByKey) match {
+    val newInnerAccumulator = for { key <- groupByKey }
+      yield accumulator.get(key) match {
       case Some(innerAccumulator) => inner.accumulate(innerAccumulator, row)
       case None => inner.initialize(row)
     }
 
-    accumulator + (groupByKey -> newInnerAccumulator)
+    val newOuterAccumulator = for {
+      key <- groupByKey
+      acc <- newInnerAccumulator
+    } yield accumulator + (key -> acc)
+
+    newOuterAccumulator getOrElse accumulator
   }
 
   def emit(accumulator: ListMap[B, inner.Accumulator]) = Some(accumulator.values.map(inner.emit).toList.map(checkNullValueAndGet))
