@@ -16,6 +16,7 @@
 
 package sqlest.executor
 
+import org.joda.time.LocalDate
 import org.scalatest._
 import org.scalatest.matchers._
 import sqlest._
@@ -42,6 +43,11 @@ class ExecutorSpec extends FlatSpec with Matchers {
       .into(TableSix)
       .columns(TableSix.trimmedString)
       .values(Setter(TableSix.trimmedString, LiteralColumn(None: Option[WrappedString])))
+  }
+  val mappedOptionSelectStatement = {
+    select(TableSix.zeroIsNoneLocalDate)
+      .from(TableSix)
+      .where(TableSix.zeroIsNoneLocalDate === Option.empty[LocalDate])
   }
   val deleteStatement = delete.from(TableOne).where(TableOne.col2 === "12")
 
@@ -194,6 +200,10 @@ class ExecutorSpec extends FlatSpec with Matchers {
 
     testDatabase.statementBuilder.generateRawSql(mappedOptionInsertStatement2) should equal(
       "insert into six (trimmedString) values ('')"
+    )
+
+    testDatabase.statementBuilder.generateRawSql(mappedOptionSelectStatement) should equal(
+      "select six.zeroIsNoneDateTime as six_zeroIsNoneDateTime from six where (six.zeroIsNoneDateTime = 0)"
     )
   }
 

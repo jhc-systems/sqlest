@@ -135,17 +135,18 @@ trait ColumnSyntax {
     // TODO - Is it possible to make this a macro in order to report illegal comparisons at compile time?
     private def mapLiterals(left: Column[_], right: Column[_], equivalence: ColumnTypeEquivalence[_, _]): (Column[_], Column[_]) = {
 
-      def mapLiteralColumn(mappedColumnType: MappedColumnType[_, _], isOption: Boolean, column: Column[_]): Column[_] =
+      def mapLiteralColumn(mappedColumnType: MappedColumnType[_, _], optionColumnType: Option[OptionColumnType[_, _]], column: Column[_]): Column[_] =
         column match {
-          case LiteralColumn(value) => LiteralColumn(mappedValue(mappedColumnType, isOption, column, value))(mappedColumnType.baseColumnType.asInstanceOf[ColumnType[Any]])
-          case ConstantColumn(value) => ConstantColumn(mappedValue(mappedColumnType, isOption, column, value))(mappedColumnType.baseColumnType.asInstanceOf[ColumnType[Any]])
+          case LiteralColumn(value) => LiteralColumn(mappedValue(mappedColumnType, optionColumnType, column, value))(mappedColumnType.baseColumnType.asInstanceOf[ColumnType[Any]])
+          case ConstantColumn(value) => ConstantColumn(mappedValue(mappedColumnType, optionColumnType, column, value))(mappedColumnType.baseColumnType.asInstanceOf[ColumnType[Any]])
           case _ => throw new AssertionError(s"Cannot compare $left and $right with column types ${left.columnType} and ${right.columnType}")
         }
 
-      def mappedValue[A](mappedColumnType: MappedColumnType[A, _], isOption: Boolean, column: Column[_], value: Any): Any =
-        (isOption, column.columnType) match {
-          case (true, _: BaseColumnType[_]) => mappedColumnType.write(Some(value).asInstanceOf[A])
-          case (false, _: OptionColumnType[_, _]) => mappedColumnType.write(value.asInstanceOf[Option[_]].get.asInstanceOf[A])
+      def mappedValue[A, B](mappedColumnType: MappedColumnType[A, B], optionColumnType: Option[OptionColumnType[_, _]], column: Column[_], value: Any): Any =
+        (optionColumnType, column.columnType) match {
+          case (Some(_), _: BaseColumnType[_]) => mappedColumnType.write(Some(value).asInstanceOf[A])
+          case (Some(optionType), _: OptionColumnType[_, _]) => optionType.write(value.asInstanceOf[Option[Nothing]]).asInstanceOf[B]
+          case (None, _: OptionColumnType[_, _]) => mappedColumnType.write(value.asInstanceOf[Option[_]].get.asInstanceOf[A])
           case _ => mappedColumnType.write(value.asInstanceOf[A])
         }
 
@@ -154,14 +155,19 @@ trait ColumnSyntax {
         case _ => columnType
       }
 
+      def optionColumnType(columnType: ColumnType[_]) = columnType match {
+        case optionColumnType: OptionColumnType[_, _] => Some(optionColumnType)
+        case _ => None
+      }
+
       (nonOptionColumnType(left.columnType), nonOptionColumnType(right.columnType)) match {
         case (leftColumnType, rightColumnType) if leftColumnType == rightColumnType => (left, right)
         case (leftColumnType: MappedColumnType[_, _], rightColumnType: MappedColumnType[_, _]) if leftColumnType.baseColumnType == rightColumnType.baseColumnType => (left, right)
         case (leftColumnType: MappedColumnType[_, _], rightColumnType: MappedColumnType[_, _]) => throw new AssertionError(s"Cannot compare 2 different MappedColumns: $leftColumnType and $rightColumnType")
         case (sqlest.TrimmedStringColumnType, StringColumnType) => (left, right) // Allow trimmed and non trimmed strings to be compared
         case (StringColumnType, sqlest.TrimmedStringColumnType) => (left, right)
-        case (leftColumnType: MappedColumnType[_, _], _) => (left, mapLiteralColumn(leftColumnType, equivalence.leftOption, right))
-        case (_, rightColumnType: MappedColumnType[_, _]) => (mapLiteralColumn(rightColumnType, equivalence.rightOption, left), right)
+        case (leftColumnType: MappedColumnType[_, _], _) => (left, mapLiteralColumn(leftColumnType, optionColumnType(left.columnType), right))
+        case (_, rightColumnType: MappedColumnType[_, _]) => (mapLiteralColumn(rightColumnType, optionColumnType(right.columnType), left), right)
         case (_, _) => (left, right)
       }
     }
