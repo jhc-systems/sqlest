@@ -44,10 +44,15 @@ class ExecutorSpec extends FlatSpec with Matchers {
       .columns(TableSix.trimmedString)
       .values(Setter(TableSix.trimmedString, LiteralColumn(None: Option[WrappedString])))
   }
-  val mappedOptionSelectStatement = {
+  val mappedOptionSelectStatement1 = {
     select(TableSix.zeroIsNoneLocalDate)
       .from(TableSix)
       .where(TableSix.zeroIsNoneLocalDate === Option.empty[LocalDate])
+  }
+  val mappedOptionSelectStatement2 = {
+    select(TableSix.zeroIsNoneLocalDate)
+      .from(TableSix)
+      .where(TableSix.zeroIsNoneLocalDate === Some(new LocalDate(2015, 1, 1)))
   }
   val deleteStatement = delete.from(TableOne).where(TableOne.col2 === "12")
 
@@ -202,8 +207,12 @@ class ExecutorSpec extends FlatSpec with Matchers {
       "insert into six (trimmedString) values ('')"
     )
 
-    testDatabase.statementBuilder.generateRawSql(mappedOptionSelectStatement) should equal(
+    testDatabase.statementBuilder.generateRawSql(mappedOptionSelectStatement1) should equal(
       "select six.zeroIsNoneDateTime as six_zeroIsNoneDateTime from six where (six.zeroIsNoneDateTime = 0)"
+    )
+
+    testDatabase.statementBuilder.generateRawSql(mappedOptionSelectStatement2) should equal(
+      "select six.zeroIsNoneDateTime as six_zeroIsNoneDateTime from six where (six.zeroIsNoneDateTime = 20150101)"
     )
   }
 
