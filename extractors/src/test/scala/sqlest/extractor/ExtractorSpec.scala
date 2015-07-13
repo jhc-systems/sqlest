@@ -410,4 +410,26 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
       groupedExtractor.extractAll(seqRows)
     }
   }
+
+  it should "return an empty list if the group by value is null" in {
+    val seqNullRows = List(Seq(null, null, null, null), Seq(null, null, null, null))
+    val seqRows = List(Seq(0, "first", null, null), Seq(0, "second", null, null), Seq(1, "third", 10, "innerThird"), Seq(1, "fourth", 10, "innerFourth"))
+    val groupedExtractor: GroupedExtractor[Seq[Any], (Int, List[String], List[(Int, List[String])]), Int] =
+      extractTuple(
+        intExtractorAtIndex(0),
+        stringExtractorAtIndex(1).asList,
+        extractTuple(
+          intExtractorAtIndex(2),
+          stringExtractorAtIndex(3).asList
+        ).groupBy(intExtractorAtIndex(2))
+      ).groupBy(intExtractorAtIndex(0))
+
+    groupedExtractor.extractHeadOption(Nil) should be(None)
+    groupedExtractor.extractHeadOption(seqNullRows) should be(None)
+    groupedExtractor.extractHeadOption(seqRows) should be(Some(0, List("first", "second"), Nil))
+    groupedExtractor.extractAll(seqRows) should be(List(
+      (0, List("first", "second"), Nil),
+      (1, List("third", "fourth"), List((10, List("innerThird", "innerFourth"))))
+    ))
+  }
 }
