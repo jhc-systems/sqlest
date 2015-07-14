@@ -165,7 +165,7 @@ trait Database extends Logging {
           result
         }
       } catch {
-        case e: SQLException =>
+        case e: Throwable =>
           connection.rollback
           throw e
       }
