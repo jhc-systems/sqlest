@@ -24,7 +24,7 @@ resolvers ++= Seq(
 and the following library dependency
 ```scala
 libraryDependencies ++= Seq(
-  "uk.co.jhc" %% "sqlest-extractors" % "0.6.7"
+  "uk.co.jhc" %% "sqlest-extractors" % "0.6.11"
 )
 ```
 
