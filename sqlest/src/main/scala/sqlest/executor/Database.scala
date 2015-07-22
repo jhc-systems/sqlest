@@ -72,7 +72,7 @@ trait Session extends Logging {
     }
   }
 
-  private[sqlest] def executeSelect[A](select: Select[_, _])(extractor: ResultSet => A): A =
+  def executeSelect[A](select: Select[_, _])(extractor: ResultSet => A): A =
     withConnection { connection =>
       val (preprocessedSelect, sql, argumentLists) = database.statementBuilder(select)
       try {
@@ -199,7 +199,7 @@ case class Transaction(database: Database) extends Session {
       } catch { case e: SQLException => }
     }
 
-  private[sqlest] def executeCommand(command: Command): Int =
+  def executeCommand(command: Command): Int =
     withConnection { connection =>
       val (preprocessedCommand, sql, argumentLists) = database.statementBuilder(command)
       val startTime = new DateTime
@@ -222,7 +222,7 @@ case class Transaction(database: Database) extends Session {
       }
     }
 
-  private[sqlest] def executeBatch(batchCommands: Seq[Command]): List[Int] =
+  def executeBatch(batchCommands: Seq[Command]): List[Int] =
     withConnection { connection =>
       val statement = connection.createStatement
       try {

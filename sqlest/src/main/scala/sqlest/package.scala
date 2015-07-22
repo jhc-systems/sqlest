@@ -50,5 +50,8 @@ package object sqlest
   type Database = sqlest.executor.Database
   val Database = sqlest.executor.Database
 
+  type Session = sqlest.executor.Session
+  type Transaction = sqlest.executor.Transaction
+
   type Extractor[A] = sqlest.extractor.Extractor[ResultSet, A]
 }
