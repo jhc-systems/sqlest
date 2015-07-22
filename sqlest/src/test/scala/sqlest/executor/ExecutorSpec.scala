@@ -126,11 +126,7 @@ class ExecutorSpec extends FlatSpec with Matchers {
     // Ensure the same database is used throughout this test
     implicit val testDatabase = TestDatabase(testResultSet)
 
-    intercept[AssertionError] {
-      updateStatement.execute
-    }
-
-    testDatabase.withTransaction {
+    testDatabase.withTransaction { implicit transaction =>
       updateStatement.execute
     }
   }
@@ -139,11 +135,7 @@ class ExecutorSpec extends FlatSpec with Matchers {
     // Ensure the same database is used throughout this test
     implicit val testDatabase = TestDatabase(testResultSet)
 
-    intercept[AssertionError] {
-      insertStatement.execute
-    }
-
-    testDatabase.withTransaction {
+    testDatabase.withTransaction { implicit transaction =>
       insertStatement.execute
     }
   }
@@ -152,11 +144,7 @@ class ExecutorSpec extends FlatSpec with Matchers {
     // Ensure the same database is used throughout this test
     implicit val testDatabase = TestDatabase(testResultSet)
 
-    intercept[AssertionError] {
-      deleteStatement.execute
-    }
-
-    testDatabase.withTransaction {
+    testDatabase.withTransaction { implicit transaction =>
       deleteStatement.execute
     }
   }
@@ -164,7 +152,7 @@ class ExecutorSpec extends FlatSpec with Matchers {
   "an insert with optional values" should "execute correctly" in {
     implicit val testDatabase = TestDatabase(testResultSet)
 
-    testDatabase.withTransaction {
+    testDatabase.withTransaction { implicit transaction =>
       optionInsertStatement.execute
     }
   }
@@ -181,7 +169,7 @@ class ExecutorSpec extends FlatSpec with Matchers {
   it should "set parameters correctly" in {
     implicit val testDatabase = TestDatabase(testResultSet)
 
-    testDatabase.withTransaction {
+    testDatabase.withTransaction { implicit transaction =>
       optionInsertStatement.execute
     }
 
@@ -191,7 +179,7 @@ class ExecutorSpec extends FlatSpec with Matchers {
   "an insert with mapped optional values" should "execute correctly" in {
     implicit val testDatabase = TestDatabase(testResultSet)
 
-    testDatabase.withTransaction {
+    testDatabase.withTransaction { implicit transaction =>
       mappedOptionInsertStatement1.execute
     }
   }
@@ -219,16 +207,25 @@ class ExecutorSpec extends FlatSpec with Matchers {
   it should "set parameters correctly" in {
     implicit val testDatabase = TestDatabase(testResultSet)
 
-    testDatabase.withTransaction {
+    testDatabase.withTransaction { implicit transaction =>
       mappedOptionInsertStatement1.execute
     }
 
     testDatabase.preparedStatement.get.parameters shouldBe Map(1 -> "a")
 
-    testDatabase.withTransaction {
+    testDatabase.withTransaction { implicit transaction =>
       mappedOptionInsertStatement2.execute
     }
 
     testDatabase.preparedStatement.get.parameters shouldBe Map(1 -> "")
+  }
+
+  it should "compile with both implicit database and transaction for a select" in {
+    implicit val testDatabase = TestDatabase(testResultSet)
+
+    testDatabase.withTransaction { implicit transaction =>
+      selectStatement.fetchAll
+      insertStatement.execute
+    }
   }
 }
