@@ -43,7 +43,7 @@ trait DatabaseExample {
   """)
 
   def executeRawSql(sql: String) =
-    database.executeWithConnection { connection =>
+    database.withConnection { connection =>
       try {
         connection.createStatement.execute(sql)
       } catch {

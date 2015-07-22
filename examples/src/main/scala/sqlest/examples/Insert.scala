@@ -43,14 +43,7 @@ object InsertExamples extends App with DatabaseExample {
       .columns(IngredientsTable.smoothyId, IngredientsTable.fruitId)
       .values(extractor.settersFor(moreIngredients))
 
-  // Write operations must be run in a transaction
-  try {
-    fruitTableInsertStatement.execute
-  } catch {
-    case e: AssertionError => println(e.getMessage)
-  }
-
-  database.withTransaction {
+  database.withTransaction { implicit transaction =>
     val fruitTableNumberInsert = fruitTableInsertStatement.execute
     println(fruitTableNumberInsert)
 
@@ -64,7 +57,7 @@ object InsertExamples extends App with DatabaseExample {
     println(moreIngredientsNumberInsert)
   }
 
-  def insertAll = database.withTransaction {
+  def insertAll = database.withTransaction { implicit transaction =>
     fruitTableInsertStatement.execute
     smoothyTableInsertStatement.execute
     ingredientsTableInsertStatement.execute

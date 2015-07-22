@@ -46,32 +46,11 @@ trait Database {
   private[sqlest] def statementBuilder: StatementBuilder
   private[sqlest] def connectionDescription: Option[Connection => String] = None
 
-  def executeWithConnection[A](f: Connection => A): A =
-    withSession { session =>
-      f(session.connection)
-    }
+  def withConnection[A](f: Connection => A): A =
+    Session(this).withConnection(f)
 
-  def withSession[A](f: Session => A): A = {
-    val session = Session(this)
-    try {
-      f(session)
-    } finally {
-      try {
-        session.close
-      } catch { case e: SQLException => }
-    }
-  }
-
-  def withTransaction[A](f: Transaction => A): A = {
-    val transaction = Transaction(this)
-    try {
-      transaction.withTransaction(f)
-    } finally {
-      try {
-        transaction.close
-      } catch { case e: SQLException => }
-    }
-  }
+  def withTransaction[A](f: Transaction => A): A =
+    Transaction(this).run(f)
 }
 
 object Session {
@@ -81,45 +60,49 @@ object Session {
 
 trait Session extends Logging {
   protected def database: Database
-  private var open = false
 
-  private[sqlest] def close = if (open) connection.close
-
-  private[sqlest] lazy val connection = {
-    open = true
-    database.getConnection
-  }
-
-  def executeSelect[A](select: Select[_, _])(extractor: ResultSet => A): A = {
-    val (preprocessedSelect, sql, argumentLists) = database.statementBuilder(select)
+  def withConnection[A](f: Connection => A): A = {
+    val connection = database.getConnection
     try {
-      val startTime = new DateTime
-      val preparedStatement = prepareStatement(preprocessedSelect, sql, argumentLists)
+      f(connection)
+    } finally {
       try {
-        val resultSet = preparedStatement.executeQuery
-        try {
-          val result = extractor(resultSet)
-          val endTime = new DateTime
-          logger.info(s"Ran sql in ${endTime.getMillis - startTime.getMillis}ms: ${logDetails(sql, argumentLists)}")
-          result
-        } finally {
-          try {
-            if (resultSet != null) resultSet.close
-          } catch { case e: SQLException => }
-        }
-      } finally {
-        try {
-          if (preparedStatement != null) preparedStatement.close
-        } catch { case e: SQLException => }
-      }
-    } catch {
-      case e: Throwable =>
-        logger.error(s"Exception running sql: ${logDetails(sql, argumentLists)}", e)
-        throw e
+        connection.close
+      } catch { case e: SQLException => }
     }
   }
 
-  protected def prepareStatement(operation: Operation, sql: String, argumentLists: List[List[LiteralColumn[_]]]) = {
+  private[sqlest] def executeSelect[A](select: Select[_, _])(extractor: ResultSet => A): A =
+    withConnection { connection =>
+      val (preprocessedSelect, sql, argumentLists) = database.statementBuilder(select)
+      try {
+        val startTime = new DateTime
+        val preparedStatement = prepareStatement(connection, preprocessedSelect, sql, argumentLists)
+        try {
+          val resultSet = preparedStatement.executeQuery
+          try {
+            val result = extractor(resultSet)
+            val endTime = new DateTime
+            logger.info(s"Ran sql in ${endTime.getMillis - startTime.getMillis}ms: ${logDetails(connection, sql, argumentLists)}")
+            result
+          } finally {
+            try {
+              if (resultSet != null) resultSet.close
+            } catch { case e: SQLException => }
+          }
+        } finally {
+          try {
+            if (preparedStatement != null) preparedStatement.close
+          } catch { case e: SQLException => }
+        }
+      } catch {
+        case e: Throwable =>
+          logger.error(s"Exception running sql: ${logDetails(connection, sql, argumentLists)}", e)
+          throw e
+      }
+    }
+
+  protected def prepareStatement(connection: Connection, operation: Operation, sql: String, argumentLists: List[List[LiteralColumn[_]]]) = {
     val statement = connection.prepareStatement(sql)
     setArguments(operation, statement, argumentLists)
     statement
@@ -176,7 +159,7 @@ trait Session extends Logging {
     case mappedType: MappedColumnType[_, _] => jdbcType(mappedType.baseColumnType)
   }
 
-  protected def logDetails(sql: String, argumentLists: List[List[LiteralColumn[_]]]) = {
+  protected def logDetails(connection: Connection, sql: String, argumentLists: List[List[LiteralColumn[_]]]) = {
     val connectionLog = database.connectionDescription.map(connectionDescription => s", connection [${connectionDescription(connection)}]").getOrElse("")
     val argumentsLog =
       if (argumentLists.size == 1) argumentLists.head.map(_.value).mkString(", ")
@@ -189,57 +172,71 @@ trait Session extends Logging {
 case class Transaction(database: Database) extends Session {
   private var shouldRollback = false
   def rollback = shouldRollback = true
+  private lazy val connection = database.getConnection
 
-  def withTransaction[A](f: Transaction => A): A = {
-    connection.setAutoCommit(false)
-    try {
-      var success = false
-      try {
-        val result = f(this)
-        if (shouldRollback) connection.rollback
-        else connection.commit
-        success = true
-        result
-      } finally if (!success) connection.rollback
-    } finally connection.setAutoCommit(true)
-  }
+  // Run all sql in the same connection in a transaction
+  override def withConnection[A](f: Connection => A): A =
+    f(connection)
 
-  def executeCommand(command: Command): Int = {
-    val (preprocessedCommand, sql, argumentLists) = database.statementBuilder(command)
-    val startTime = new DateTime
+  private[sqlest] def run[A](f: Transaction => A): A =
     try {
-      val preparedStatement = prepareStatement(preprocessedCommand, sql, argumentLists)
+      connection.setAutoCommit(false)
       try {
-        val result = preparedStatement.executeBatch.sum
-        val endTime = new DateTime
-        logger.info(s"Ran sql in ${endTime.getMillis - startTime.getMillis}ms: ${logDetails(sql, argumentLists)}")
-        result
-      } finally {
+        var success = false
         try {
-          if (preparedStatement != null) preparedStatement.close
-        } catch { case e: SQLException => }
+          val result = f(this)
+          if (shouldRollback) connection.rollback
+          else connection.commit
+          success = true
+          result
+        } finally if (!success) connection.rollback
+      } finally {
+        connection.setAutoCommit(true)
       }
-    } catch {
-      case e: Throwable =>
-        logger.error(s"Exception running sql: ${logDetails(sql, argumentLists)}", e)
-        throw e
-    }
-  }
-
-  def executeBatch(batchCommands: Seq[Command]): List[Int] = {
-    val statement = connection.createStatement
-    try {
-      batchCommands foreach { command =>
-        val commandSql = database.statementBuilder.generateRawSql(command)
-        logger.debug(s"Adding batch operation: $commandSql")
-        statement.addBatch(commandSql)
-      }
-
-      statement.executeBatch.toList
     } finally {
       try {
-        if (statement != null) statement.close
+        connection.close
       } catch { case e: SQLException => }
     }
-  }
+
+  private[sqlest] def executeCommand(command: Command): Int =
+    withConnection { connection =>
+      val (preprocessedCommand, sql, argumentLists) = database.statementBuilder(command)
+      val startTime = new DateTime
+      try {
+        val preparedStatement = prepareStatement(connection, preprocessedCommand, sql, argumentLists)
+        try {
+          val result = preparedStatement.executeBatch.sum
+          val endTime = new DateTime
+          logger.info(s"Ran sql in ${endTime.getMillis - startTime.getMillis}ms: ${logDetails(connection, sql, argumentLists)}")
+          result
+        } finally {
+          try {
+            if (preparedStatement != null) preparedStatement.close
+          } catch { case e: SQLException => }
+        }
+      } catch {
+        case e: Throwable =>
+          logger.error(s"Exception running sql: ${logDetails(connection, sql, argumentLists)}", e)
+          throw e
+      }
+    }
+
+  private[sqlest] def executeBatch(batchCommands: Seq[Command]): List[Int] =
+    withConnection { connection =>
+      val statement = connection.createStatement
+      try {
+        batchCommands foreach { command =>
+          val commandSql = database.statementBuilder.generateRawSql(command)
+          logger.debug(s"Adding batch operation: $commandSql")
+          statement.addBatch(commandSql)
+        }
+
+        statement.executeBatch.toList
+      } finally {
+        try {
+          if (statement != null) statement.close
+        } catch { case e: SQLException => }
+      }
+    }
 }

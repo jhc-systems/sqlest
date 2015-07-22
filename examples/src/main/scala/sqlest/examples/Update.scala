@@ -10,14 +10,7 @@ object UpdateExamples extends App with DatabaseExample {
       .set(FruitTable.juiciness -> 9)
       .where(FruitTable.name === "Banana")
 
-  // Write operations must be run in a transaction - the below will throw an exception
-  try {
-    updateStatement.execute
-  } catch {
-    case e: AssertionError => println(e.getMessage)
-  }
-
-  database.withTransaction {
+  database.withTransaction { implicit transaction =>
     // running execute on the update statement returns the number of lines changed (ie updated)
     val numberUpdated = updateStatement.execute
     println(numberUpdated)
@@ -36,7 +29,7 @@ object UpdateExamples extends App with DatabaseExample {
       .set(fruitExtractor.settersFor(newGrape))
       .where(FruitTable.id === newGrape.id)
 
-  database.withTransaction {
+  database.withTransaction { implicit transaction =>
     // running execute on the update statement returns the number of lines changed (ie updated)
     val newNumberUpdated = newUpdateStatement.execute
     println(newNumberUpdated)
