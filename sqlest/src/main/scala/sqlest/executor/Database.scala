@@ -49,17 +49,19 @@ trait Database {
   def withConnection[A](f: Connection => A): A =
     Session(this).withConnection(f)
 
+  def withSession[A](f: Session => A): A =
+    f(Session(this))
+
   def withTransaction[A](f: Transaction => A): A =
     Transaction(this).run(f)
 }
 
 object Session {
-  def apply(db: Database) = new Session { val database = db }
-  implicit def dbToSession(implicit database: Database) = Session(database)
+  def apply(database: Database) = new Session(database)
+  implicit def databaseToSession(implicit database: Database) = Session(database)
 }
 
-trait Session extends Logging {
-  protected def database: Database
+class Session(database: Database) extends Logging {
 
   def withConnection[A](f: Connection => A): A = {
     val connection = database.getConnection
@@ -169,7 +171,7 @@ trait Session extends Logging {
   }
 }
 
-case class Transaction(database: Database) extends Session {
+case class Transaction(database: Database) extends Session(database) {
   private var shouldRollback = false
   def rollback = shouldRollback = true
   private lazy val connection = database.getConnection
