@@ -176,7 +176,7 @@ class H2StatementBuilderSpec extends BaseStatementBuilderSpec {
        |from three
        |where (three.col3 = ?)
        """.formatSql,
-      List(List("abc"))
+      List(List(Some("abc")))
     )
   }
 }

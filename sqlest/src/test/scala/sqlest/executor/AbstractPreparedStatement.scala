@@ -19,6 +19,7 @@ package sqlest.executor
 import java.sql.PreparedStatement
 
 trait AbstractPreparedStatement extends PreparedStatement {
+  def sql: String
   val parameters = collection.mutable.Map[Int, Any]()
   // Prepared statment methods
   def addBatch(): Unit = {}

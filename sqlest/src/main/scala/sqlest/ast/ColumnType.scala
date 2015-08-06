@@ -76,6 +76,7 @@ case class OptionColumnType[A, B](nullValue: B, isNull: B => Boolean)(implicit v
     if (value.isEmpty) nullValue
     else innerColumnType.write(value.get)
 
+  def hasNullNullValue = nullValue == null
   override def toString = s"OptionColumnType($nullValue, $isNull)($innerColumnType)"
 }
 
@@ -128,7 +129,7 @@ object ColumnType {
   implicit val dateTimeColumnType = DateTimeColumnType
   implicit val localDateColumnType = LocalDateColumnType
   implicit val byteArrayColumnType = ByteArrayColumnType
-  implicit def apply[A, B]: MappedColumnType[A, B] = macro MaterializeColumnTypeMacro.materializeImpl[A, B]
+  implicit def materialize[A, B]: MappedColumnType[A, B] = macro MaterializeColumnTypeMacro.materializeImpl[A, B]
 
   implicit def optionType[A, B](implicit base: ColumnType.Aux[A, B]) = OptionColumnType[A, B](base)
 
@@ -149,7 +150,13 @@ case class MaterializeColumnTypeMacro(c: Context) {
     val applyMethod = findMethod(companion.typeSignature, "apply", typeOfA)
     val unapplyMethod = findMethod(companion.typeSignature, "unapply", typeOfA)
     val typeOfB = applyMethod.paramLists.head.head.asTerm.typeSignature
-    q"MappedColumnType[$typeOfA, $typeOfB]($companion.$applyMethod, $companion.$unapplyMethod(_).get)"
+    val registryKey = typeOfA.toString
+    val registryLocation = q"_root_.sqlest.ast.MaterializeColumnTypeMacro"
+    val materializeMappedColumnType = q"MappedColumnType[$typeOfA, $typeOfB]($companion.$applyMethod, $companion.$unapplyMethod(_).get)"
+    q"""
+      if (!$registryLocation.registry.contains($registryKey)) $registryLocation.safeAddToRegistry($registryKey, $materializeMappedColumnType)
+      $registryLocation.registry($registryKey).asInstanceOf[MappedColumnType[$typeOfA, $typeOfB]]
+    """
   }
 
   def findMethod(companionType: Type, name: String, typeOfA: Type) = {
@@ -163,5 +170,12 @@ case class MaterializeColumnTypeMacro(c: Context) {
 
     if (singleParamApplyMethods.length == 1) singleParamApplyMethods.head
     else c.abort(c.enclosingPosition, s"No matching $name method found on $typeOfA")
+  }
+}
+
+object MaterializeColumnTypeMacro {
+  val registry = scala.collection.mutable.Map[String, MappedColumnType[_, _]]()
+  def safeAddToRegistry(key: String, columnType: MappedColumnType[_, _]): Unit = registry.synchronized {
+    if (!registry.contains(key)) registry += (key -> columnType)
   }
 }

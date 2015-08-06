@@ -56,6 +56,7 @@ trait BooleanMappedColumnTypes {
   }
 
   val BooleanYNColumnType = MappedBooleanColumnType("Y", "N")
+  val Boolean10ColumnType = MappedBooleanColumnType(1, 0)
 }
 
 trait EnumerationMappedColumnTypes {

@@ -18,6 +18,7 @@ package sqlest.ast.syntax
 
 import org.scalatest._
 import org.scalatest.matchers._
+import shapeless.test.illTyped
 import sqlest._
 import sqlest.ast._
 
@@ -33,11 +34,8 @@ class UpdateSyntaxSpec extends FlatSpec with Matchers {
     update(MyTable).set(MyTable.col1 -> LiteralColumn(1)) should not be a[Update]
   }
 
-  // TODO
-  // "update" should "not compile with wrong value type in the setter" in {
-  //   illTyped("""
-  //     update(MyTable).set(MyTable.col1 -> "1")
-  //   """)
-  // }
+  "update" should "not compile with wrong value type in the setter" in {
+    illTyped("update(MyTable).set(MyTable.col1 -> true)")
+  }
 
 }

@@ -16,4 +16,17 @@
 
 package sqlest.ast
 
-case class Setter[A, B](column: TableColumn[A], value: Column[B])(implicit val columnEquivalence: ColumnTypeEquivalence[A, B])
+class Setter[A, B] private[sqlest] (val column: TableColumn[A], val value: Column[B]) {
+  override def equals(other: Any) = other match {
+    case Setter(otherColumn, otherValue) if column == otherColumn && value == otherValue => true
+    case _ => false
+  }
+}
+
+object Setter {
+  def apply[A, B](column: TableColumn[A], value: Column[B])(implicit columnEquivalence: ColumnTypeEquivalence[A, B]) = {
+    new Setter(column, ColumnTypeEquivalence.alignColumnTypes(column, value)._2)
+  }
+
+  def unapply[A, B](setter: Setter[A, B]) = Some(setter.column, setter.value)
+}

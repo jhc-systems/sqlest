@@ -26,7 +26,7 @@ trait ColumnExtractorSetters {
 
     def settersFor(value: A): List[Setter[_, _]] = {
       extractor match {
-        case tableColumn: TableColumn[a] => List(Setter(tableColumn, LiteralColumn(value.asInstanceOf[a])(tableColumn.columnType))(ColumnTypeEquivalence(false, false)))
+        case tableColumn: TableColumn[a] => List(new Setter(tableColumn, LiteralColumn(value.asInstanceOf[a])(tableColumn.columnType)))
 
         case MappedExtractor(innerExtractor, _, Some(unapplyMethod)) =>
           val values = unapplyMethod(value).get
@@ -51,7 +51,7 @@ trait ColumnExtractorSetters {
                   case _ => false
                 }
               }.collect {
-                case tableColumn: TableColumn[b] => Setter(tableColumn, LiteralColumn(None.asInstanceOf[b])(tableColumn.columnType))(ColumnTypeEquivalence(false, false))
+                case tableColumn: TableColumn[b] => new Setter(tableColumn, LiteralColumn(None.asInstanceOf[b])(tableColumn.columnType))
               }
           }
 

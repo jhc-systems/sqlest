@@ -18,6 +18,7 @@ package sqlest.ast
 
 import org.scalatest._
 import org.scalatest.matchers._
+import shapeless.test.illTyped
 import sqlest._
 
 class ColumnSpec extends FlatSpec with Matchers {
@@ -75,12 +76,12 @@ class ColumnSpec extends FlatSpec with Matchers {
     expr1.parameter2.columnType should equal(TableOne.col1.columnType)
 
     val expr2 = (TableOne.col3 === 1)
-    expr2 should equal(InfixFunctionColumn[Boolean]("=", TableOne.col3, "1"))
-    expr2.parameter2.columnType should equal(TableOne.col2.columnType)
+    expr2 should equal(InfixFunctionColumn[Boolean]("=", TableOne.col3, 1))
+    expr2.parameter2.columnType should equal(TableOne.col3.columnType)
 
     val expr3 = (TableOne.col5 === "Hi!")
-    expr3 should equal(InfixFunctionColumn[Boolean]("=", TableOne.col5, "Hi!"))
-    expr3.parameter2.columnType should equal(TableOne.col2.columnType)
+    expr3 should equal(InfixFunctionColumn[Boolean]("=", TableOne.col5, Some("Hi!")))
+    expr3.parameter2.columnType should equal(TableOne.col5.columnType)
   }
 
   "mapped column types" should "allow comparison operations" in {
@@ -144,10 +145,8 @@ class ColumnSpec extends FlatSpec with Matchers {
     }
   }
 
-  // it should "not allow === to apply to different base types" in {
-  //   illTyped("""
-  //     literalColumn(1) === "2"
-  //   """)
-  // }
+  it should "not allow === to apply to different base types" in {
+    illTyped("literalColumn(1) === true")
+  }
 
 }

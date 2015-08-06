@@ -29,8 +29,9 @@ case class TestDatabase(resultSet: ResultSet) extends Database {
     override def commit = {}
     override def rollback = {}
     override def setAutoCommit(autoCommit: Boolean) = {}
-    override def prepareStatement(sql: String) = {
+    override def prepareStatement(inSql: String) = {
       val statement = new AbstractPreparedStatement {
+        val sql = inSql
         override def executeQuery() = resultSet
         override def executeUpdate() = 0
         override def executeBatch() = Array()

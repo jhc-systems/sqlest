@@ -123,71 +123,53 @@ class ExecutorSpec extends FlatSpec with Matchers {
   }
 
   "an update" should "require a transaction to run" in {
-    // Ensure the same database is used throughout this test
-    implicit val testDatabase = TestDatabase(testResultSet)
-
-    testDatabase.withTransaction { implicit transaction =>
+    TestDatabase(testResultSet).withTransaction { implicit transaction =>
       updateStatement.execute
     }
   }
 
   "an insert" should "require a transaction to run" in {
-    // Ensure the same database is used throughout this test
-    implicit val testDatabase = TestDatabase(testResultSet)
-
-    testDatabase.withTransaction { implicit transaction =>
+    TestDatabase(testResultSet).withTransaction { implicit transaction =>
       insertStatement.execute
     }
   }
 
   "a delete" should "require a transaction to run" in {
-    // Ensure the same database is used throughout this test
-    implicit val testDatabase = TestDatabase(testResultSet)
-
-    testDatabase.withTransaction { implicit transaction =>
+    TestDatabase(testResultSet).withTransaction { implicit transaction =>
       deleteStatement.execute
     }
   }
 
   "an insert with optional values" should "execute correctly" in {
-    implicit val testDatabase = TestDatabase(testResultSet)
-
-    testDatabase.withTransaction { implicit transaction =>
+    TestDatabase(testResultSet).withTransaction { implicit transaction =>
       optionInsertStatement.execute
     }
   }
 
   it should "generate raw SQL correctly" in {
-    implicit val testDatabase = TestDatabase(testResultSet)
-
-    testDatabase.statementBuilder.generateRawSql(optionInsertStatement) should equal(
+    TestDatabase(testResultSet).statementBuilder.generateRawSql(optionInsertStatement) should equal(
       "insert into three (col3, col4) values (1, null)"
     )
-
   }
 
   it should "set parameters correctly" in {
-    implicit val testDatabase = TestDatabase(testResultSet)
-
+    val testDatabase = TestDatabase(testResultSet)
     testDatabase.withTransaction { implicit transaction =>
       optionInsertStatement.execute
     }
 
+    testDatabase.preparedStatement.get.sql shouldBe "insert into three (col3, col4) values (?, ?)"
     testDatabase.preparedStatement.get.parameters shouldBe Map(1 -> 1, 2 -> null)
   }
 
   "an insert with mapped optional values" should "execute correctly" in {
-    implicit val testDatabase = TestDatabase(testResultSet)
-
-    testDatabase.withTransaction { implicit transaction =>
+    TestDatabase(testResultSet).withTransaction { implicit transaction =>
       mappedOptionInsertStatement1.execute
     }
   }
 
   it should "generate raw SQL correctly" in {
-    implicit val testDatabase = TestDatabase(testResultSet)
-
-    testDatabase.statementBuilder.generateRawSql(mappedOptionInsertStatement1) should equal(
+    TestDatabase(testResultSet).statementBuilder.generateRawSql(mappedOptionInsertStatement1) should equal(
       "insert into six (trimmedString) values ('a')"
     )
 
@@ -205,25 +187,25 @@ class ExecutorSpec extends FlatSpec with Matchers {
   }
 
   it should "set parameters correctly" in {
-    implicit val testDatabase = TestDatabase(testResultSet)
+    val testDatabase = TestDatabase(testResultSet)
 
     testDatabase.withTransaction { implicit transaction =>
       mappedOptionInsertStatement1.execute
     }
 
+    testDatabase.preparedStatement.get.sql shouldBe "insert into six (trimmedString) values (?)"
     testDatabase.preparedStatement.get.parameters shouldBe Map(1 -> "a")
 
     testDatabase.withTransaction { implicit transaction =>
       mappedOptionInsertStatement2.execute
     }
 
+    testDatabase.preparedStatement.get.sql shouldBe "insert into six (trimmedString) values (?)"
     testDatabase.preparedStatement.get.parameters shouldBe Map(1 -> "")
   }
 
   it should "compile with both implicit database and transaction for a select" in {
-    implicit val testDatabase = TestDatabase(testResultSet)
-
-    testDatabase.withTransaction { implicit transaction =>
+    TestDatabase(testResultSet).withTransaction { implicit transaction =>
       selectStatement.fetchAll
       insertStatement.execute
     }

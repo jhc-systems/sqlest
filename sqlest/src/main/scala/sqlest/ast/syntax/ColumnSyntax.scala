@@ -22,11 +22,15 @@ trait ColumnSyntax {
   implicit def literalColumn[A](value: A)(implicit columnType: ColumnType[A]): Column[A] =
     LiteralColumn[A](value)
 
-  implicit def literalColumn[A](value: Some[A])(implicit columnType: ColumnType.Aux[A, A]): Column[Option[A]] =
+  implicit def literalColumn[A](value: Some[A])(implicit columnType: ColumnType[Option[A]]): Column[Option[A]] =
     LiteralColumn[Option[A]](value)
 
   implicit class LiteralColumnOps[A](left: A) {
     def column[B >: A](implicit columnType: ColumnType[B]) = LiteralColumn[B](left)
+  }
+
+  implicit class SomeLiteralColumnOps[A](left: Some[A]) {
+    def column[B >: A](implicit columnType: ColumnType[Option[B]]) = LiteralColumn[Option[B]](left)
   }
 
   /**
@@ -36,6 +40,10 @@ trait ColumnSyntax {
    */
   implicit class ConstantColumnOps[A](value: A) {
     def constant[B >: A](implicit columnType: ColumnType[B]) = ConstantColumn[B](value)
+  }
+
+  implicit class SomeConstantColumnOps[A](value: Some[A]) {
+    def constant[B >: A](implicit columnType: ColumnType[Option[B]]) = ConstantColumn[Option[B]](value)
   }
 
   /**
@@ -69,9 +77,26 @@ trait ColumnSyntax {
   implicit def SelectColumnOps[A](select: Select[AliasedColumn[A], _ <: Relation]) =
     SelectColumn(select)(select.cols.columnType)
 
-  implicit class NullableColumnsOps[A](left: Column[A]) {
-    def isNull = PostfixFunctionColumn[Boolean]("is null", left)
-    def isNotNull = PostfixFunctionColumn[Boolean]("is not null", left)
+  implicit class NullableColumnsOps[A](column: Column[Option[A]]) {
+    private implicit val columnType: OptionColumnType[A, _] = column.columnType match {
+      case optionColumnType: OptionColumnType[A, _] => optionColumnType
+      case _ => throw new AssertionError("Only OptionColumnType should be used for Option columns")
+    }
+    private implicit def equivalence = new ColumnTypeEquivalence[A, A] {}
+
+    def isNull = {
+      val columnIsNull = PostfixFunctionColumn[Boolean]("is null", column)
+
+      if (columnType.hasNullNullValue) columnIsNull
+      else columnIsNull || column === Option.empty[A].constant
+    }
+
+    def isNotNull = {
+      val columnIsNotNull = PostfixFunctionColumn[Boolean]("is not null", column)
+
+      if (columnType.hasNullNullValue) columnIsNotNull
+      else columnIsNotNull && column =!= Option.empty[A].constant
+    }
   }
 
   implicit class AliasedOptionColumnsOps[A](left: AliasedColumn[A]) {
@@ -86,91 +111,51 @@ trait ColumnSyntax {
     implicit val leftType: ColumnType[A] = left.columnType
 
     def ===[B](right: Column[B])(implicit equivalence: ColumnTypeEquivalence[A, B]) = {
-      val (mappedLeft, mappedRight) = mapLiterals(left, right, equivalence)
+      val (mappedLeft, mappedRight) = ColumnTypeEquivalence.alignColumnTypes(left, right)
       InfixFunctionColumn[Boolean]("=", mappedLeft, mappedRight)
     }
 
     def =!=[B](right: Column[B])(implicit equivalence: ColumnTypeEquivalence[A, B]) = {
-      val (mappedLeft, mappedRight) = mapLiterals(left, right, equivalence)
+      val (mappedLeft, mappedRight) = ColumnTypeEquivalence.alignColumnTypes(left, right)
       InfixFunctionColumn[Boolean]("<>", mappedLeft, mappedRight)
     }
 
     def >[B](right: Column[B])(implicit equivalence: ColumnTypeEquivalence[A, B]) = {
-      val (mappedLeft, mappedRight) = mapLiterals(left, right, equivalence)
+      val (mappedLeft, mappedRight) = ColumnTypeEquivalence.alignColumnTypes(left, right)
       InfixFunctionColumn[Boolean](">", mappedLeft, mappedRight)
     }
 
     def <[B](right: Column[B])(implicit equivalence: ColumnTypeEquivalence[A, B]) = {
-      val (mappedLeft, mappedRight) = mapLiterals(left, right, equivalence)
+      val (mappedLeft, mappedRight) = ColumnTypeEquivalence.alignColumnTypes(left, right)
       InfixFunctionColumn[Boolean]("<", mappedLeft, mappedRight)
     }
 
     def >=[B](right: Column[B])(implicit equivalence: ColumnTypeEquivalence[A, B]) = {
-      val (mappedLeft, mappedRight) = mapLiterals(left, right, equivalence)
+      val (mappedLeft, mappedRight) = ColumnTypeEquivalence.alignColumnTypes(left, right)
       InfixFunctionColumn[Boolean](">=", mappedLeft, mappedRight)
     }
 
     def <=[B](right: Column[B])(implicit equivalence: ColumnTypeEquivalence[A, B]) = {
-      val (mappedLeft, mappedRight) = mapLiterals(left, right, equivalence)
+      val (mappedLeft, mappedRight) = ColumnTypeEquivalence.alignColumnTypes(left, right)
       InfixFunctionColumn[Boolean]("<=", mappedLeft, mappedRight)
     }
 
     def between[B, C](lower: Column[B], upper: Column[C])(implicit lowerEquivalence: ColumnTypeEquivalence[A, B], upperEquivalence: ColumnTypeEquivalence[A, C]) = {
-      val (mappedLeftLower, mappedLower) = mapLiterals(left, lower, lowerEquivalence)
-      val (mappedLeftUpper, mappedUpper) = mapLiterals(left, upper, upperEquivalence)
-      if (mappedLeftLower == mappedLeftUpper)
+      val (mappedLeftLower, mappedLower) = ColumnTypeEquivalence.alignColumnTypes(left, lower)(lowerEquivalence)
+      val (mappedLeftUpper, mappedUpper) = ColumnTypeEquivalence.alignColumnTypes(left, upper)(upperEquivalence)
+      if (mappedLeftLower.columnType == mappedLeftUpper.columnType)
         DoubleInfixFunctionColumn[Boolean]("between", "and", left, mappedLower, mappedUpper)
       else
         throw new AssertionError("Cannot use between with different MappedColumns for lower and upper")
     }
 
     def in[B](values: Column[B]*)(implicit equivalence: ColumnTypeEquivalence[A, B]) = {
-      val mappedValues = values.map(value => mapLiterals(left, value, equivalence)._2)
+      val mappedValues = values.map(value => ColumnTypeEquivalence.alignColumnTypes(left, value)._2)
       InfixFunctionColumn[Boolean]("in", left, ScalarFunctionColumn("", mappedValues))
     }
 
     def in[B](values: Seq[B])(implicit rightType: ColumnType[B], equivalence: ColumnTypeEquivalence[A, B]): Column[Boolean] =
       in(values.map(_.column): _*)
-
-    // TODO - Is it possible to make this a macro in order to report illegal comparisons at compile time?
-    private def mapLiterals(left: Column[_], right: Column[_], equivalence: ColumnTypeEquivalence[_, _]): (Column[_], Column[_]) = {
-
-      def mapLiteralColumn(mappedColumnType: MappedColumnType[_, _], optionColumnType: Option[OptionColumnType[_, _]], column: Column[_]): Column[_] =
-        column match {
-          case LiteralColumn(value) => LiteralColumn(mappedValue(mappedColumnType, optionColumnType, column, value))(mappedColumnType.baseColumnType.asInstanceOf[ColumnType[Any]])
-          case ConstantColumn(value) => ConstantColumn(mappedValue(mappedColumnType, optionColumnType, column, value))(mappedColumnType.baseColumnType.asInstanceOf[ColumnType[Any]])
-          case _ => throw new AssertionError(s"Cannot compare $left and $right with column types ${left.columnType} and ${right.columnType}")
-        }
-
-      def mappedValue[A, B](mappedColumnType: MappedColumnType[A, B], optionColumnType: Option[OptionColumnType[_, _]], column: Column[_], value: Any): Any =
-        (optionColumnType, column.columnType) match {
-          case (Some(_), _: BaseColumnType[_]) => mappedColumnType.write(Some(value).asInstanceOf[A])
-          case (Some(optionType), _: OptionColumnType[_, _]) => optionType.write(value.asInstanceOf[Option[Nothing]]).asInstanceOf[B]
-          case (None, _: OptionColumnType[_, _]) => mappedColumnType.write(value.asInstanceOf[Option[_]].get.asInstanceOf[A])
-          case _ => mappedColumnType.write(value.asInstanceOf[A])
-        }
-
-      def nonOptionColumnType(columnType: ColumnType[_]) = columnType match {
-        case optionColumnType: OptionColumnType[_, _] => optionColumnType.innerColumnType
-        case _ => columnType
-      }
-
-      def optionColumnType(columnType: ColumnType[_]) = columnType match {
-        case optionColumnType: OptionColumnType[_, _] => Some(optionColumnType)
-        case _ => None
-      }
-
-      (nonOptionColumnType(left.columnType), nonOptionColumnType(right.columnType)) match {
-        case (leftColumnType, rightColumnType) if leftColumnType == rightColumnType => (left, right)
-        case (leftColumnType: MappedColumnType[_, _], rightColumnType: MappedColumnType[_, _]) if leftColumnType.baseColumnType == rightColumnType.baseColumnType => (left, right)
-        case (leftColumnType: MappedColumnType[_, _], rightColumnType: MappedColumnType[_, _]) => throw new AssertionError(s"Cannot compare 2 different MappedColumns: $leftColumnType and $rightColumnType")
-        case (sqlest.TrimmedStringColumnType, StringColumnType) => (left, right) // Allow trimmed and non trimmed strings to be compared
-        case (StringColumnType, sqlest.TrimmedStringColumnType) => (left, right)
-        case (leftColumnType: MappedColumnType[_, _], _) => (left, mapLiteralColumn(leftColumnType, optionColumnType(left.columnType), right))
-        case (_, rightColumnType: MappedColumnType[_, _]) => (mapLiteralColumn(rightColumnType, optionColumnType(right.columnType), left), right)
-        case (_, _) => (left, right)
-      }
-    }
   }
 
   implicit class BooleanColumnOps[A](left: Column[A])(implicit equivalence: ColumnTypeEquivalence[Boolean, A]) {

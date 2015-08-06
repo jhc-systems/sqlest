@@ -138,12 +138,12 @@ class Session(database: Database) extends Logging {
     case LocalDateColumnType => statement.setDate(index, new JdbcDate(value.asInstanceOf[LocalDate].toDate.getTime))
     case mappedType: MappedColumnType[A, _] => setArgument(statement, index, mappedType.baseColumnType, mappedType.write(value.asInstanceOf[A]))
     case optionType: OptionColumnType[_, _] => value.asInstanceOf[Option[_]] match {
-      case setNullOpt if setNullOpt.isEmpty && optionType.nullValue == null =>
+      case None if optionType.hasNullNullValue =>
         statement.setNull(index, jdbcType(optionType.baseColumnType))
-      case nullValueOpt if nullValueOpt.isEmpty =>
+      case None =>
         setArgument(statement, index, optionType.baseColumnType, optionType.nullValue)
-      case definedOpt =>
-        setArgument(statement, index, optionType.innerColumnType, definedOpt.get)
+      case Some(inner) =>
+        setArgument(statement, index, optionType.innerColumnType, inner)
     }
   }
 

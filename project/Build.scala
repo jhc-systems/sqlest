@@ -31,7 +31,8 @@ object SqlestBuild extends Build {
 
       libraryDependencies ++= Seq(
         "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
-        "org.scalatest" %% "scalatest" % "2.2.1" % "test"
+        "org.scalatest" %% "scalatest" % "2.2.1" % "test",
+        "com.chuusai" %% "shapeless" % "2.1.0" % "test"
       )
     )
   ).dependsOn(extractors)

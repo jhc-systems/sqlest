@@ -26,29 +26,81 @@ package sqlest.ast
  *
  * The second requirement is that different numeric column types should be comparable
  */
-case class ColumnTypeEquivalence[A, B](leftOption: Boolean, rightOption: Boolean)
+
+trait ColumnTypeEquivalence[A, B]
 
 object ColumnTypeEquivalence extends LowPriorityImplicits {
-  implicit def mappedColumnTypeEquivalence[A, B](implicit left: MappedColumnType[A, B], right: MappedColumnType[A, B]) =
-    ColumnTypeEquivalence[A, A](false, false)
-
   implicit def leftOptionColumnTypeEquivalence[A, B](implicit left: ColumnType[Option[A]], right: ColumnType[B], columnTypeEquivalence: ColumnTypeEquivalence[A, B]) =
-    ColumnTypeEquivalence[Option[A], B](true, false)
+    new ColumnTypeEquivalence[Option[A], B] {}
 
   implicit def rightOptionColumnTypeEquivalence[A, B](implicit left: ColumnType[A], right: ColumnType[Option[B]], columnTypeEquivalence: ColumnTypeEquivalence[A, B]) =
-    ColumnTypeEquivalence[A, Option[B]](false, true)
+    new ColumnTypeEquivalence[A, Option[B]] {}
 
   implicit def bothOptionColumnTypeEquivalence[A, B](implicit left: ColumnType[Option[A]], right: ColumnType[Option[B]], columnTypeEquivalence: ColumnTypeEquivalence[A, B]) =
-    ColumnTypeEquivalence[Option[A], Option[B]](true, true)
+    new ColumnTypeEquivalence[Option[A], Option[B]] {}
+
+  /**
+   * This function performs 2 functions on a combination of a database column and a literal/constant column
+   *   1. Sets the column type on the literal column to that of the database column so it correctly written
+   *   2. Wraps/unwraps Option literals so they are the same as the database column
+   *
+   * For 2 database columns it checks to see if the underlying columnTypes are compatible. Ideally this would
+   * be taken care of by the ColumnTypeEquivalence typeclass but unfortunately there often isn't enough information
+   * available at compile time
+   */
+  def alignColumnTypes[A, B](left: Column[A], right: Column[B])(implicit equivalence: ColumnTypeEquivalence[A, B]): (Column[_], Column[_]) = {
+    def isLiteral(column: Column[_]): Boolean = column match {
+      case _: LiteralColumn[_] => true
+      case _: ConstantColumn[_] => true
+      case _ => false
+    }
+
+    def convertLiteral[C, L](columnType: ColumnType[C], literal: Column[L]): Column[_] =
+      literal match {
+        case LiteralColumn(value) => LiteralColumn[C](alignOptionLiteral(columnType, value).asInstanceOf[C])(columnType)
+        case ConstantColumn(value) => ConstantColumn[C](alignOptionLiteral(columnType, value).asInstanceOf[C])(columnType)
+        case _ => sys.error("")
+      }
+
+    def alignOptionLiteral[C, L](columnType: ColumnType[C], value: L): Any = (columnType, value) match {
+      case (_: OptionColumnType[_, _], _: Option[_]) => value
+      case (_: OptionColumnType[_, _], _) => Some(value)
+      case (_, Some(inner)) => inner
+      case (_, None) => throw new AssertionError("Cannot compare a non-Option column to None")
+      case _ => value
+    }
+
+    def checkCompatible[A, B](left: ColumnType[A], right: ColumnType[B]): Unit = {
+      def fail = throw new AssertionError(s"Incompatible column comparison - $left, $right")
+
+      (left, right) match {
+        case (leftOption: OptionColumnType[_, _], rightOption: OptionColumnType[_, _]) if (leftOption != rightOption) => fail
+        case (leftOption: OptionColumnType[_, _], right) => checkCompatible(leftOption.innerColumnType, right)
+        case (left, rightOption: OptionColumnType[_, _]) => checkCompatible(left, rightOption.innerColumnType)
+        case (_: NumericColumnType[_], _: NumericColumnType[_]) =>
+        case (StringColumnType, sqlest.TrimmedStringColumnType) =>
+        case (sqlest.TrimmedStringColumnType, StringColumnType) =>
+        case (left, right) if left != right => fail
+        case _ =>
+      }
+    }
+
+    (isLiteral(left), isLiteral(right)) match {
+      case (true, true) => (left, right)
+      case (false, true) => (left, convertLiteral(left.columnType, right))
+      case (true, false) => (convertLiteral(right.columnType, left), right)
+      case (false, false) =>
+        checkCompatible(left.columnType, right.columnType)
+        (left, right)
+    }
+  }
 }
 
 trait LowPriorityImplicits {
-  // It's possible mappedColumnTypeEquivalence to clash with these, if for example TrimmedStringColumnType
-  // has been implicitly put in scope. Make these lower priority
-
-  implicit def nonNumericEquivalence[A](implicit left: NonNumericColumnType[A], right: NonNumericColumnType[A]) =
-    ColumnTypeEquivalence[A, A](false, false)
+  // The implicit *OptionColumnTypeEquivalences will clash with this, ensure this is lower priority so options are correctly handled
+  implicit def nonNumericEquivalence[A, B](implicit left: ColumnType[A] { type Database = B }, right: ColumnType[A] { type Database = B }) =
+    new ColumnTypeEquivalence[A, A] {}
 
   implicit def numericEquivalence[A, B](implicit left: NumericColumnType[A], right: NumericColumnType[B]) =
-    ColumnTypeEquivalence[A, B](false, false)
+    new ColumnTypeEquivalence[A, B] {}
 }

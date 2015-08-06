@@ -118,6 +118,6 @@ object ColumnOperations {
 
   implicit class SetterOps[A, B](setter: Setter[A, B]) {
     def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_, _ <: Relation] => Select[_, _ <: Relation]): Setter[A, B] =
-      setter.copy(setter.column.mapColumns(f, selectFunction).asInstanceOf[TableColumn[A]], setter.value.mapColumns(f, selectFunction))(setter.columnEquivalence)
+      new Setter[A, B](setter.column.mapColumns(f, selectFunction).asInstanceOf[TableColumn[A]], setter.value.mapColumns(f, selectFunction).asInstanceOf[Column[B]])
   }
 }
