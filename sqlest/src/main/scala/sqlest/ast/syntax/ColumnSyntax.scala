@@ -77,25 +77,27 @@ trait ColumnSyntax {
   implicit def SelectColumnOps[A](select: Select[AliasedColumn[A], _ <: Relation]) =
     SelectColumn(select)(select.cols.columnType)
 
-  implicit class NullableColumnsOps[A](column: Column[Option[A]]) {
-    private implicit val columnType: OptionColumnType[A, _] = column.columnType match {
-      case optionColumnType: OptionColumnType[A, _] => optionColumnType
-      case _ => throw new AssertionError("Only OptionColumnType should be used for Option columns")
-    }
-    private implicit def equivalence = new ColumnTypeEquivalence[A, A] {}
-
+  implicit class NullableColumnsOps[A](column: Column[A]) {
     def isNull = {
       val columnIsNull = PostfixFunctionColumn[Boolean]("is null", column)
 
-      if (columnType.hasNullNullValue) columnIsNull
-      else columnIsNull || column === Option.empty[A].constant
+      column.columnType match {
+        case optionColumnType: OptionColumnType[A, _] if !optionColumnType.hasNullNullValue =>
+          columnIsNull || InfixFunctionColumn[Boolean]("=", column, ConstantColumn[A](None.asInstanceOf[A])(optionColumnType))
+        case _ =>
+          columnIsNull
+      }
     }
 
     def isNotNull = {
       val columnIsNotNull = PostfixFunctionColumn[Boolean]("is not null", column)
 
-      if (columnType.hasNullNullValue) columnIsNotNull
-      else columnIsNotNull && column =!= Option.empty[A].constant
+      column.columnType match {
+        case optionColumnType: OptionColumnType[A, _] if !optionColumnType.hasNullNullValue =>
+          columnIsNotNull && InfixFunctionColumn[Boolean]("<>", column, ConstantColumn[A](None.asInstanceOf[A])(optionColumnType))
+        case _ =>
+          columnIsNotNull
+      }
     }
   }
 
