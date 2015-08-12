@@ -76,8 +76,8 @@ object ColumnOperations {
       case caseWhenElseColumn: CaseWhenElseColumn[A] => f(CaseWhenElseColumn(caseWhenElseColumn.whens.map(_.mapColumns(f, selectFunction)), caseWhenElseColumn.`else`.mapColumns(f, selectFunction).asInstanceOf[Column[A]])(caseWhenElseColumn.columnType)).asInstanceOf[Column[A]]
       case caseColumnColumn: CaseColumnColumn[_, _] => f(CaseColumnColumn(caseColumnColumn.column.mapColumns(f, selectFunction), caseColumnColumn.mappings.map(mapping => (mapping._1.mapColumns(f, selectFunction), mapping._2.mapColumns(f, selectFunction))))(caseColumnColumn.columnType)).asInstanceOf[Column[A]]
       case caseColumnElseColumn: CaseColumnElseColumn[_, _] => f(CaseColumnElseColumn(caseColumnElseColumn.column.mapColumns(f, selectFunction), caseColumnElseColumn.mappings.map(mapping => (mapping._1.mapColumns(f, selectFunction), mapping._2.mapColumns(f, selectFunction))), caseColumnElseColumn.`else`.mapColumns(f, selectFunction))(caseColumnElseColumn.columnType)).asInstanceOf[Column[A]]
-      case existsColumn: ExistsColumn => ExistsColumn(existsColumn.select.mapColumns(f, selectFunction)).asInstanceOf[Column[A]]
-      case notExistsColumn: NotExistsColumn => NotExistsColumn(notExistsColumn.select.mapColumns(f, selectFunction)).asInstanceOf[Column[A]]
+      case existsColumn: ExistsColumn => f(ExistsColumn(existsColumn.select.mapColumns(f, selectFunction))).asInstanceOf[Column[A]]
+      case notExistsColumn: NotExistsColumn => f(NotExistsColumn(notExistsColumn.select.mapColumns(f, selectFunction))).asInstanceOf[Column[A]]
     }
   }
 
