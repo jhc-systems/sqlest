@@ -112,8 +112,14 @@ sealed trait Join[R1 <: Relation, R2 <: Relation] extends Relation {
 /** A left join between two tables. */
 case class LeftJoin[R1 <: Relation, R2 <: Relation](left: R1, right: R2, condition: Column[Boolean]) extends Join[R1, R2]
 
+/** A left exception join (DB2-only) between two tables. */
+case class LeftExceptionJoin[R1 <: Relation, R2 <: Relation](left: R1, right: R2, condition: Column[Boolean]) extends Join[R1, R2]
+
 /** A right join between two tables. */
 case class RightJoin[R1 <: Relation, R2 <: Relation](left: R1, right: R2, condition: Column[Boolean]) extends Join[R1, R2]
+
+/** A right exception join (DB2-only) between two tables. */
+case class RightExceptionJoin[R1 <: Relation, R2 <: Relation](left: R1, right: R2, condition: Column[Boolean]) extends Join[R1, R2]
 
 /** An inner join between two tables. */
 case class InnerJoin[R1 <: Relation, R2 <: Relation](left: R1, right: R2, condition: Column[Boolean]) extends Join[R1, R2]

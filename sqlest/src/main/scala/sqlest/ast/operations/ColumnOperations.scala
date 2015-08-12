@@ -84,7 +84,9 @@ object ColumnOperations {
       case table: Table => table
       case TableFunctionApplication(tableName, aliasedAs, parameterColumns, tableFunction) => TableFunctionApplication(tableName, aliasedAs, parameterColumns.map(_.mapColumns(f, selectFunction)), tableFunction)
       case LeftJoin(left, right, condition) => LeftJoin(left.mapColumns(f, selectFunction), right.mapColumns(f, selectFunction), condition.mapColumns(f, selectFunction))
+      case LeftExceptionJoin(left, right, condition) => LeftExceptionJoin(left.mapColumns(f, selectFunction), right.mapColumns(f, selectFunction), condition.mapColumns(f, selectFunction))
       case RightJoin(left, right, condition) => RightJoin(left.mapColumns(f, selectFunction), right.mapColumns(f, selectFunction), condition.mapColumns(f, selectFunction))
+      case RightExceptionJoin(left, right, condition) => RightExceptionJoin(left.mapColumns(f, selectFunction), right.mapColumns(f, selectFunction), condition.mapColumns(f, selectFunction))
       case InnerJoin(left, right, condition) => InnerJoin(left.mapColumns(f, selectFunction), right.mapColumns(f, selectFunction), condition.mapColumns(f, selectFunction))
       case OuterJoin(left, right, condition) => OuterJoin(left.mapColumns(f, selectFunction), right.mapColumns(f, selectFunction), condition.mapColumns(f, selectFunction))
       case CrossJoin(left, right) => CrossJoin(left.mapColumns(f, selectFunction), right.mapColumns(f, selectFunction))

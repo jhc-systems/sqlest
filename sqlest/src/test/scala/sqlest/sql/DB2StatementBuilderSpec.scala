@@ -294,4 +294,19 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
     }
   }
 
+  "exception joins" should "produce the right sql" in {
+    sql {
+      select(TableOne.col1, TableOne.col2, TableTwo.col2, TableTwo.col3, TableThree.col3, TableThree.col4)
+        .from(TableOne)
+        .leftExceptionJoin(TableTwo).on(TableOne.col2 === TableTwo.col2)
+        .rightExceptionJoin(TableThree).on(TableTwo.col3 === TableThree.col3)
+    } should equal(
+      s"""
+       |select one.col1 as one_col1, one.col2 as one_col2, two.col2 as two_col2, two.col3 as two_col3, three.col3 as three_col3, three.col4 as three_col4
+       |from one left exception join two on (one.col2 = two.col2) right exception join three on (two.col3 = three.col3)
+       """.formatSql,
+      List(Nil)
+    )
+  }
+
 }

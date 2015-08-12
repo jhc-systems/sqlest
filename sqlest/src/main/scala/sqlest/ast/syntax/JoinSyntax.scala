@@ -42,9 +42,19 @@ trait JoinSyntax {
         left.from(left.from.leftJoin(right).on(condition))
     }
 
+    def leftExceptionJoin[R2 <: Relation](right: R2) = new SelectJoinBuilder[A, R1, R2] {
+      def on(condition: Column[Boolean]) =
+        left.from(left.from.leftExceptionJoin(right).on(condition))
+    }
+
     def rightJoin[R2 <: Relation](right: R2) = new SelectJoinBuilder[A, R1, R2] {
       def on(condition: Column[Boolean]) =
         left.from(left.from.rightJoin(right).on(condition))
+    }
+
+    def rightExceptionJoin[R2 <: Relation](right: R2) = new SelectJoinBuilder[A, R1, R2] {
+      def on(condition: Column[Boolean]) =
+        left.from(left.from.rightExceptionJoin(right).on(condition))
     }
 
     def outerJoin[R2 <: Relation](right: R2) = new SelectJoinBuilder[A, R1, R2] {
@@ -92,9 +102,19 @@ trait JoinSyntax {
         LeftJoin(left, right, condition)
     }
 
+    def leftExceptionJoin[R2 <: Relation](right: R2) = new JoinBuilder[R1, R2] {
+      def on(condition: Column[Boolean]) =
+        LeftExceptionJoin(left, right, condition)
+    }
+
     def rightJoin[R2 <: Relation](right: R2) = new JoinBuilder[R1, R2] {
       def on(condition: Column[Boolean]) =
         RightJoin(left, right, condition)
+    }
+
+    def rightExceptionJoin[R2 <: Relation](right: R2) = new JoinBuilder[R1, R2] {
+      def on(condition: Column[Boolean]) =
+        RightExceptionJoin(left, right, condition)
     }
 
     def outerJoin[R2 <: Relation](right: R2) = new JoinBuilder[R1, R2] {

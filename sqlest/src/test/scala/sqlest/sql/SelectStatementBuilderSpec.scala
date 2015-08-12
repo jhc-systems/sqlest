@@ -491,4 +491,24 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
       List(Nil)
     )
   }
+
+  "exception joins" should "not be supported outside DB2" in {
+    intercept[UnsupportedOperationException] {
+      sql {
+        select(TableOne.col1, TableOne.col2, TableTwo.col2, TableTwo.col3, TableThree.col3, TableThree.col4)
+          .from(TableOne)
+          .leftExceptionJoin(TableTwo).on(TableOne.col2 === TableTwo.col2)
+          .innerJoin(TableThree).on(TableTwo.col3 === TableThree.col3)
+      }
+    }
+
+    intercept[UnsupportedOperationException] {
+      sql {
+        select(TableOne.col1, TableOne.col2, TableTwo.col2, TableTwo.col3, TableThree.col3, TableThree.col4)
+          .from(TableOne)
+          .rightExceptionJoin(TableTwo).on(TableOne.col2 === TableTwo.col2)
+          .innerJoin(TableThree).on(TableTwo.col3 === TableThree.col3)
+      }
+    }
+  }
 }
