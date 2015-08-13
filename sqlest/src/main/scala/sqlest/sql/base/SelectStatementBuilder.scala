@@ -78,7 +78,9 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
     case table: Table if table.tableName != table.tableAlias => identifierSql(table.tableName) + " as " + identifierSql(table.tableAlias)
     case tableFunctionApplication: TableFunctionApplication[_] => functionSql(tableFunctionApplication.tableName, tableFunctionApplication.parameterColumns) + " as " + identifierSql(tableFunctionApplication.tableAlias)
     case LeftJoin(left, right, condition) => joinSql(left) + " left join " + joinSql(right) + " on " + columnSql(condition)
+    case LeftExceptionJoin(left, right, condition) => throw new UnsupportedOperationException
     case RightJoin(left, right, condition) => joinSql(left) + " right join " + joinSql(right) + " on " + columnSql(condition)
+    case RightExceptionJoin(left, right, condition) => throw new UnsupportedOperationException
     case InnerJoin(left, right, condition) => joinSql(left) + " inner join " + joinSql(right) + " on " + columnSql(condition)
     case OuterJoin(left, right, condition) => joinSql(left) + " full outer join " + joinSql(right) + " on " + columnSql(condition)
     case CrossJoin(left, right) => joinSql(left) + " cross join " + joinSql(right)
@@ -151,7 +153,9 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
     case table: Table => Nil
     case tableFunctionApplication: TableFunctionApplication[_] => tableFunctionApplication.parameterColumns.toList.flatMap(columnArgs)
     case LeftJoin(left, right, condition) => joinArgs(left) ++ joinArgs(right) ++ columnArgs(condition)
+    case LeftExceptionJoin(left, right, condition) => joinArgs(left) ++ joinArgs(right) ++ columnArgs(condition)
     case RightJoin(left, right, condition) => joinArgs(left) ++ joinArgs(right) ++ columnArgs(condition)
+    case RightExceptionJoin(left, right, condition) => joinArgs(left) ++ joinArgs(right) ++ columnArgs(condition)
     case InnerJoin(left, right, condition) => joinArgs(left) ++ joinArgs(right) ++ columnArgs(condition)
     case OuterJoin(left, right, condition) => joinArgs(left) ++ joinArgs(right) ++ columnArgs(condition)
     case CrossJoin(left, right) => joinArgs(left) ++ joinArgs(right)
