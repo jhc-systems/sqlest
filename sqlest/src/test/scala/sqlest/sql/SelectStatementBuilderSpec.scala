@@ -448,6 +448,48 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
        """.formatSql,
       List(Nil)
     )
+
+    sql {
+      select(MyTable.col1, MyTable.col2)
+        .from(MyTable)
+        .where(
+          exists(
+            select(MyTable.col1, MyTable.col2).from(
+              select(MyTable.col1, MyTable.col2).from(MyTable).as("subselect2")
+            ).as("subselect1")))
+    } should equal(
+      s"""
+       |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
+       |from mytable 
+       |where exists 
+       |  (select mytable_col1, mytable_col2
+       |    from
+       |    (select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
+       |     from mytable) as subselect2)
+       """.formatSql,
+      List(Nil)
+    )
+
+    sql {
+      select(MyTable.col1, MyTable.col2)
+        .from(MyTable)
+        .where(
+          notExists(
+            select(MyTable.col1, MyTable.col2).from(
+              select(MyTable.col1, MyTable.col2).from(MyTable).as("subselect2")
+            ).as("subselect1")))
+    } should equal(
+      s"""
+       |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
+       |from mytable 
+       |where not exists 
+       |  (select mytable_col1, mytable_col2
+       |    from
+       |    (select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
+       |     from mytable) as subselect2)
+       """.formatSql,
+      List(Nil)
+    )
   }
 
   "olap functions" should "produce the right sql" in {

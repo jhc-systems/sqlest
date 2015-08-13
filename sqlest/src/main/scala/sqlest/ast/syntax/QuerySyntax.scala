@@ -16,7 +16,7 @@
 
 package sqlest.ast.syntax
 
-import sqlest.ast.{ Lateral, Relation, Select }
+import sqlest.ast.{ Lateral, Relation, Select, ExistsColumn, NotExistsColumn }
 
 trait QuerySyntax {
   object select extends SelectSyntax
@@ -26,4 +26,7 @@ trait QuerySyntax {
 
   implicit def selectOps[A, R <: Relation](select: Select[A, R]) = SelectOps(select)
   def lateral[A, R <: Relation](select: Select[A, R]) = Lateral(select)
+  def exists[A, R <: Relation](select: Select[A, R]) = ExistsColumn(select)
+  def notExists[A, R <: Relation](select: Select[A, R]) = NotExistsColumn(select)
+
 }

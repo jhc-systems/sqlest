@@ -61,6 +61,12 @@ case class WindowFunctionColumn(partitionByColumns: Seq[Column[_]], orderBy: Seq
 /** A column containing a select statement which selects only a single column */
 case class SelectColumn[A](select: Select[AliasedColumn[A], _ <: Relation])(implicit val columnType: ColumnType[A]) extends Column[A]
 
+/** A column which is false if the select statement within it returns no rows */
+case class ExistsColumn(select: Select[_, _ <: Relation]) extends Column[Boolean] { val columnType = BooleanColumnType }
+
+/** A column which is true if the select statement within it returns no rows */
+case class NotExistsColumn(select: Select[_, _ <: Relation]) extends Column[Boolean] { val columnType = BooleanColumnType }
+
 /**
  * A ScalarFunctionColumn should not be created by the user directly.
  * Instead it will be returned as a result of applying a ScalarFunctionN (where N is a number)
