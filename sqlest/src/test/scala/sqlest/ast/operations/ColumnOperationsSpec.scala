@@ -32,4 +32,26 @@ class ColumnOperationsSpec extends FlatSpec with Matchers {
     TableOne.col1.mapColumns(identity, identity) should be(TableOne.col1)
   }
 
+  "select.mapColumns" should "map f over all internal columns" in {
+    val tableOneSelect =
+      select.from(TableOne)
+        .where(exists(
+          select(TableOne.col1)
+            .from(TableOne)
+        ))
+
+    tableOneSelect.mapColumns(
+      identity,
+      _.where(TableOne.col1 =!= 2.constant)
+    ) should be(
+        select
+          .from(TableOne)
+          .where(exists(
+            select(TableOne.col1)
+              .from(TableOne)
+              .where(TableOne.col1 =!= 2.constant)
+          ))
+      )
+  }
+
 }
