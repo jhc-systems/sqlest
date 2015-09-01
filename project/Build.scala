@@ -1,10 +1,12 @@
 import sbt._
 import sbt.Keys._
 
+import com.typesafe.sbt.pgp.PgpKeys
 import com.typesafe.sbt.SbtGit.GitKeys.gitRemoteRepo
 import com.typesafe.sbt.SbtGhPages
 import com.typesafe.sbt.SbtScalariform
 import com.typesafe.sbt.SbtSite
+import sbtrelease.ReleasePlugin.autoImport._
 import spray.boilerplate.BoilerplatePlugin._
 import xerial.sbt.Sonatype._
 
@@ -26,7 +28,7 @@ object SqlestBuild extends Build {
     id = "sqlest",
     base = file("sqlest"),
 
-    settings = commonSettings ++ publishingSettings ++ scaladocSettings ++ Boilerplate.settings ++ Seq(
+    settings = commonSettings ++ scaladocSettings ++ Boilerplate.settings ++ Seq(
       moduleName := "sqlest",
 
       libraryDependencies ++= Seq(
@@ -41,7 +43,7 @@ object SqlestBuild extends Build {
     id = "extractors",
     base = file("extractors"),
 
-    settings = commonSettings ++ publishingSettings ++ scaladocSettings ++ Boilerplate.settings ++ Seq(
+    settings = commonSettings ++ scaladocSettings ++ Boilerplate.settings ++ Seq(
       moduleName := "sqlest-extractors",
 
       libraryDependencies ++= Seq(
@@ -66,9 +68,8 @@ object SqlestBuild extends Build {
     )
   ).dependsOn(sqlest)
 
-  def commonSettings = SbtScalariform.scalariformSettings ++ Seq(
+  def commonSettings = SbtScalariform.scalariformSettings ++ publishingSettings ++ Seq(
     organization := "uk.co.jhc",
-    version := "0.7.0-SNAPSHOT",
     scalaVersion := "2.11.6",
     scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-language:implicitConversions", "-language:existentials")
   )
@@ -79,6 +80,7 @@ object SqlestBuild extends Build {
 
   def publishingSettings = sonatypeSettings ++ Seq(
     // Publishing - http://www.scala-sbt.org/0.13/docs/Using-Sonatype.html
+    releasePublishArtifactsAction := PgpKeys.publishSigned.value,
     publishMavenStyle := true,
     publishTo := {
       val nexus = "https://oss.sonatype.org/"
