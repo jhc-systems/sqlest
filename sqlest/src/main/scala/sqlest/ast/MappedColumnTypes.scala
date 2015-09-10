@@ -135,6 +135,12 @@ trait LocalDateMappedColumnTypes {
     def read(database: Option[DateTime]) = database.map(_.toLocalDate)
     def write(value: LocalDate) = value.toDateTimeAtStartOfDay
   }
+
+  case object DateTimeFromLocalDateColumnType extends MappedColumnType[DateTime, LocalDate] {
+    val baseColumnType = LocalDateColumnType
+    def read(database: Option[LocalDate]) = database.map(_.toDateTimeAtStartOfDay)
+    def write(value: DateTime) = value.toLocalDate
+  }
 }
 
 trait OptionColumnTypes {

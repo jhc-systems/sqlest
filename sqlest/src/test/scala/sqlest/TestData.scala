@@ -73,7 +73,8 @@ object TestData {
     val zeroIsNoneWrappedInt = column[Option[WrappedInt]]("zeroIsNoneWrappedInt")(ZeroIsNoneColumnType[WrappedInt, Int])
     val zeroIsNoneLocalDate = column[Option[LocalDate]]("zeroIsNoneDateTime")(ZeroIsNoneColumnType(YyyyMmDdColumnType))
     val localDateFromDateTime = column[LocalDate]("localDateFromDateTime")(LocalDateFromDateTimeColumnType)
-    def columns = List(trimmedString, zeroIsNoneWrappedInt, zeroIsNoneLocalDate, localDateFromDateTime)
+    val dateTimeFromLocalDate = column[DateTime]("dateTimeFromLocalDate")(DateTimeFromLocalDateColumnType)
+    def columns = List(trimmedString, zeroIsNoneWrappedInt, zeroIsNoneLocalDate, localDateFromDateTime, dateTimeFromLocalDate)
   }
   object TableSix extends TableSix(None)
 
