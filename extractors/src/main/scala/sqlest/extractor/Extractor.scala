@@ -38,6 +38,7 @@ sealed trait Extractor[Row, A] {
 
   def map[B](func: A => B) = MappedExtractor(this, func)
   def map[B](func: A => B, unapplyFunc: B => Option[Any]) = MappedExtractor(this, func, Some(unapplyFunc))
+  def choose[B <: D, C <: D, D](pred: A => Boolean)(l: Extractor[Row, B], r: Extractor[Row, C]) = ChoiceExtractor(this, pred, l, r)
   def asOption = OptionExtractor(this)
 }
 
@@ -130,6 +131,32 @@ case class MappedExtractor[Row, A, B](inner: Extractor[Row, A], func: A => B, un
   def accumulate(accumulator: inner.Accumulator, row: Row) = inner.accumulate(accumulator, row)
 
   def emit(accumulator: inner.Accumulator) = inner.emit(accumulator).map(func)
+}
+
+case class ChoiceExtractor[Row, A, B <: D, C <: D, D](inner: Extractor[Row, A], pred: A => Boolean, left: Extractor[Row, B], right: Extractor[Row, C]) extends Extractor[Row, D] with SimpleExtractor[Row, D] with SingleRowExtractor[Row, D] {
+  type Accumulator = Option[(inner.Accumulator, Option[D])]
+
+  private def runChoice(a: A, row: Row): Option[D] = Either.cond(pred(a), runLeft(row), runRight(row)).merge
+  private def runLeft(row: Row): Option[D] = left.emit(left.initialize(row))
+  private def runRight(row: Row): Option[D] = right.emit(right.initialize(row))
+
+  def initialize(row: Row) = {
+    val innerAcc = inner.initialize(row)
+
+    inner.emit(innerAcc) map { a =>
+      (innerAcc, runChoice(a, row))
+    }
+  }
+
+  def accumulate(accumulator: Accumulator, row: Row) = {
+    for {
+      (inAcc, _) <- accumulator
+      outAcc = inner.accumulate(inAcc, row)
+      a <- inner.emit(outAcc)
+    } yield (outAcc, runChoice(a, row))
+  }
+
+  def emit(accumulator: Accumulator) = accumulator.map { case (inner, choice) => choice }.flatten
 }
 
 /**

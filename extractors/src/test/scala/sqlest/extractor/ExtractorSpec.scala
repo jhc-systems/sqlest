@@ -104,6 +104,17 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
     }
   }
 
+  "ChoiceExtractor" should "extract using left when the predicate is true and right when it is false" in {
+    val seqRows = List(Seq(0, "a"), Seq(1, "b"), Seq(2, "c"), Seq(4, "e"), Seq(5, "f"), Seq(7, "h"))
+    val addIntExtractor = intExtractorAtIndex(0).map(_ + 2)
+    val multIntExtractor = intExtractorAtIndex(0).map(_ * 2)
+    val choiceExtractor = intExtractorAtIndex(0).choose(_ % 2 == 0)(addIntExtractor, multIntExtractor)
+
+    choiceExtractor.extractHeadOption(Nil) should be(None)
+    choiceExtractor.extractHeadOption(seqRows) should be(Some(2))
+    choiceExtractor.extractAll(seqRows) should be(List(2, 2, 4, 6, 10, 14))
+  }
+
   "TupleExtractors" should "extract values from all extractors and return them in a tuple" in {
     val seqRows = List(Seq(0, "hello"), Seq(2, "bye"), Seq(4, "level"))
     val tuple3Extractor: Tuple3Extractor[Seq[Any], Int, String, Boolean] =
