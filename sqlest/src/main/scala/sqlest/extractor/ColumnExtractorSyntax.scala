@@ -40,6 +40,7 @@ trait ColumnExtractorSyntax {
         case SeqExtractor(extractors) => extractors.flatMap(_.columns).toList
         case ListMultiRowExtractor(innerExtractor) => innerExtractor.columns
         case GroupedExtractor(innerExtractor, groupByExtractor) => innerExtractor.columns ++ groupByExtractor.columns
+        case exception: ExceptionExtractor[_, _] => Nil
       }
     }
   }

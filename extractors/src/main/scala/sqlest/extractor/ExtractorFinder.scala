@@ -60,6 +60,7 @@ object ExtractorFinder {
       case NonOptionExtractor(inner) => apply(inner, path)
       case ListMultiRowExtractor(inner) => apply(inner, path)
       case GroupedExtractor(inner, _) => apply(inner, path)
+      case exceptionExtractor: ExceptionExtractor[_, _] => None
     }
 
   def findByName(productExtractorNames: ProductExtractor[_, _] with ProductExtractorNames, name: String): Option[Extractor[_, _]] =

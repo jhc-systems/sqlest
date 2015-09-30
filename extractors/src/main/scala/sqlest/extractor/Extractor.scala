@@ -38,7 +38,23 @@ sealed trait Extractor[Row, A] {
 
   def map[B](func: A => B) = MappedExtractor(this, func)
   def map[B](func: A => B, unapplyFunc: B => Option[Any]) = MappedExtractor(this, func, Some(unapplyFunc))
-  def choose[B <: D, C <: D, D](pred: A => Boolean)(l: Extractor[Row, B], r: Extractor[Row, C]) = ChoiceExtractor(this, pred, l, r)
+
+  def cond[B](choices: (A => Boolean, Extractor[Row, B])*): Extractor[Row, B] = {
+    if (choices.isEmpty)
+      new ExceptionExtractor(throw new MatchError("ChoiceExtractor has no matching case"))
+    else {
+      val (pred, extractor) = choices.head
+      val rest = choices.tail
+      choose(pred)(extractor, cond(rest: _*))
+    }
+  }
+
+  def switch[B](choices: (A, Extractor[Row, B])*): Extractor[Row, B] =
+    cond(choices.map { case (a, extractor) => ((x: A) => x == a, extractor) }: _*)
+
+  def choose[B <: D, C <: D, D](pred: A => Boolean)(l: Extractor[Row, B], r: Extractor[Row, C]) =
+    ChoiceExtractor(this, pred, l, r)
+
   def asOption = OptionExtractor(this)
 }
 
@@ -76,6 +92,13 @@ trait SimpleExtractor[Row, A] {
 trait SingleRowExtractor[Row, A] {
   this: Extractor[Row, A] =>
   def asList = ListMultiRowExtractor(this)
+}
+
+class ExceptionExtractor[Row, A](value: => RuntimeException) extends Extractor[Row, A] with SimpleExtractor[Row, A] with SingleRowExtractor[Row, A] {
+  type Accumulator = A
+  def initialize(row: Row) = value.asInstanceOf[A]
+  def accumulate(accumulator: A, row: Row) = value.asInstanceOf[A]
+  def emit(accumulator: A) = Some(accumulator)
 }
 
 /**

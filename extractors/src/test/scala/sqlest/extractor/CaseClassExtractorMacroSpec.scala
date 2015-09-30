@@ -266,6 +266,7 @@ class CaseClassExtractorMacroSpec extends FlatSpec with Matchers with ExtractorS
   sealed trait Extracted
   case class LeftExtracted(i: Int, s: String) extends Extracted
   case class RightExtracted(i: Int, s: String) extends Extracted
+  case class BothExtracted(i: Int, s: String) extends Extracted
   it should "work with ChoiceExtractor to extract case classes based upon a predicate" in {
     val choiceExtractor = extractTuple(shapeExtractor, intExtractor, stringExtractor).choose(_._1 == Tetrahedron)(
       extract[LeftExtracted](
@@ -284,6 +285,37 @@ class CaseClassExtractorMacroSpec extends FlatSpec with Matchers with ExtractorS
       RightExtracted(1, "a"),
       LeftExtracted(3, "c"),
       RightExtracted(-1, "e")
+    ))
+  }
+
+  it should "extract from a list of choices when .switch is used" in {
+    val leftExtractor = extract[LeftExtracted](
+      intExtractor,
+      stringExtractor
+    ).map { a => a: Extracted }
+
+    val rightExtractor = extract[RightExtracted](
+      intExtractor,
+      stringExtractor
+    ).map { a => a: Extracted }
+
+    val bothExtractor = extract[BothExtracted](
+      intExtractor,
+      stringExtractor
+    ).map { a => a: Extracted }
+
+    val choiceExtractor = extractTuple(shapeExtractor, intExtractor, stringExtractor).switch(
+      (Circle, 1, "a") -> leftExtractor,
+      (Tetrahedron, 3, "c") -> rightExtractor,
+      (Plane, -1, "e") -> bothExtractor
+    )
+
+    choiceExtractor.extractHeadOption(tupleRows) should equal(Some(LeftExtracted(1, "a")))
+
+    choiceExtractor.extractAll(tupleRows) should equal(List(
+      LeftExtracted(1, "a"),
+      RightExtracted(3, "c"),
+      BothExtracted(-1, "e")
     ))
   }
 }
