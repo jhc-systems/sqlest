@@ -39,32 +39,20 @@ sealed trait Extractor[Row, A] {
   def map[B](func: A => B) = MappedExtractor(this, func)
   def map[B](func: A => B, unapplyFunc: B => Option[Any]) = MappedExtractor(this, func, Some(unapplyFunc))
 
-  def cond[B1 <:C, C](choice1: (A => Boolean, Extractor[Row, B1])): Extractor[Row, C] = {
-    val (pred, extractor1) = choice1
-    choose(pred)(extractor1, new ExceptionExtractor(throw new MatchError("ChoiceExtractor has no matching case")))
-  }
-
 [2..22#  def cond[[#B1 <: C#], C]([#choice1: (A => Boolean, Extractor[Row, B1])#]): Extractor[Row, C] = {
-    val (pred, extractor##1) = choice##1
-    choose(pred)(extractor##1, cond([2..#choice1#]))
+    ChoiceExtractor1(this, [#choice1#])
   }#
 
 ]
 
-  def switch[B1 <:C, C](choice1: (A, Extractor[Row, B1])): Extractor[Row, C] = {
-    val (a, extractor1) = choice1
-    choose(_ == a)(extractor1, new ExceptionExtractor(throw new MatchError("ChoiceExtractor has no matching case")))
-  }
-
 [2..22#  def switch[[#B1 <: C#], C]([#choice1: (A, Extractor[Row, B1])#]): Extractor[Row, C] = {
-    val (a, extractor##1) = choice##1
-    choose(_ == a)(extractor##1, switch([2..#choice1#]))
+    ChoiceExtractor1(this, [#((a: A) => a == choice1._##1, choice1._##2)#])
   }#
 
 ]
 
   def choose[B <: D, C <: D, D](pred: A => Boolean)(l: Extractor[Row, B], r: Extractor[Row, C]) =
-    ChoiceExtractor(this, pred, l, r)
+    ChoiceExtractor2(this, (pred, l), ((a: A) => true, r))
 
   def asOption = OptionExtractor(this)
 }
@@ -167,30 +155,40 @@ case class MappedExtractor[Row, A, B](inner: Extractor[Row, A], func: A => B, un
   def emit(accumulator: inner.Accumulator) = inner.emit(accumulator).map(func)
 }
 
-case class ChoiceExtractor[Row, A, B <: D, C <: D, D](inner: Extractor[Row, A], pred: A => Boolean, left: Extractor[Row, B], right: Extractor[Row, C]) extends Extractor[Row, D] with SimpleExtractor[Row, D] with SingleRowExtractor[Row, D] {
-  type Accumulator = Option[(inner.Accumulator, Option[D])]
+trait ChoiceExtractor[Row, A, B <: Product, C] extends Extractor[Row, C] with SimpleExtractor[Row, C] with SingleRowExtractor[Row, C] {
+  type Accumulator = Option[(inner.Accumulator, Option[C])]
 
-  private def runChoice(a: A, row: Row): Option[D] = if (pred(a)) runLeft(row) else runRight(row)
-  private def runLeft(row: Row): Option[D] = left.emit(left.initialize(row))
-  private def runRight(row: Row): Option[D] = right.emit(right.initialize(row))
+  val inner: Extractor[Row, A]
+  val predicates: List[(A => Boolean, Int)]
+  val extractors: B
+
+  private def selectExtractor[C1 <: C](row: Row, a: A): Extractor[Row, C1] = {
+    predicates
+      .find { case (p, i) => p(a) }
+      .map { case (p, i) => extractors.productElement(i).asInstanceOf[Extractor[Row, C1]] }
+      .getOrElse { new ExceptionExtractor(throw new MatchError("ChoiceExtractor has no matching case")) }
+  }
+
+  private def runChoice(row: Row, a: A): Option[C] = {
+    val choice = selectExtractor(row, a)
+    choice.emit(choice.initialize(row))
+  }  
 
   def initialize(row: Row) = {
     val innerAcc = inner.initialize(row)
-
-    inner.emit(innerAcc) map { a =>
-      (innerAcc, runChoice(a, row))
-    }
+    inner.emit(innerAcc).map { a => (innerAcc, runChoice(row, a)) }
   }
 
   def accumulate(accumulator: Accumulator, row: Row) = {
     for {
-      (inAcc, _) <- accumulator
-      outAcc = inner.accumulate(inAcc, row)
-      a <- inner.emit(outAcc)
-    } yield (outAcc, runChoice(a, row))
+      (prevAcc, _) <- accumulator
+      nextAcc = inner.accumulate(prevAcc, row)
+      a <- inner.emit(nextAcc)
+    } yield (nextAcc, runChoice(row, a))
   }
 
-  def emit(accumulator: Accumulator) = accumulator.map { case (inner, choice) => choice }.flatten
+  def emit(accumulator: Accumulator) = 
+    accumulator.map { case (inner, choice) => choice }.flatten
 }
 
 /**
