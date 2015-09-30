@@ -152,4 +152,50 @@ class ExtractorFinderSpec extends FlatSpec with Matchers {
     extractor.findCellExtractor("a") should equal(None)
     extractor.findCellExtractor("") should equal(None)
   }
+
+  sealed trait Combination
+  case class OneAndTwo(oneTwoOne: One, oneTwoTwo: Two) extends Combination
+  case class OneAndThree(oneThreeOne: One, oneThreeThree: Three) extends Combination
+  case class TwoAndThree(twoThreeTwo: Two, twoThreeThree: Three) extends Combination
+  it should "find a cell extractor in a choice extractor" in {
+    val extractor = extractTuple(TableOne.col1, TableTwo.col2).switch(
+      (1, "a") -> extract[OneAndTwo](
+        oneTwoOne = extract[One](
+          a = TableOne.col1,
+          b = TableOne.col2
+        ),
+        oneTwoTwo = extract[Two](
+          a = TableTwo.col2,
+          b = TableTwo.col3
+        )
+      ),
+      (2, "b") -> extract[OneAndThree](
+        oneThreeOne = extract[One](
+          a = TableOne.col1,
+          b = TableOne.col2
+        ),
+        oneThreeThree = extract[Three](
+          a = TableThree.col3,
+          b = TableThree.col4
+        )
+      ),
+      (3, "c") -> extract[TwoAndThree](
+        twoThreeTwo = extract[Two](
+          a = TableTwo.col2,
+          b = TableTwo.col3
+        ),
+        twoThreeThree = extract[Three](
+          a = TableThree.col3,
+          b = TableThree.col4
+        )
+      )
+    )
+
+    extractor.findCellExtractor("oneTwoOne.a") should equal(Some(TableOne.col1))
+    extractor.findCellExtractor("twoThreeTwo.b") should equal(Some(TableTwo.col3))
+    extractor.findCellExtractor("oneTwoOne.c") should equal(None)
+    extractor.findCellExtractor("twoThreeOne.a") should equal(None)
+    extractor.findCellExtractor("one") should equal(None)
+    extractor.findCellExtractor("a") should equal(None)
+  }
 }

@@ -262,4 +262,80 @@ class CaseClassExtractorMacroSpec extends FlatSpec with Matchers with ExtractorS
       )
       """) */
   }
+
+  sealed trait Extracted
+  case class LeftExtracted(i: Int, s: String) extends Extracted
+  case class RightExtracted(i: Int, s: String) extends Extracted
+  case class BothExtracted(i: Int, s: String) extends Extracted
+  it should "work with ChoiceExtractor to extract case classes based upon a predicate" in {
+    val choiceExtractor = extractTuple(shapeExtractor, intExtractor, stringExtractor).choose(_._1 == Tetrahedron)(
+      extract[LeftExtracted](
+        intExtractor,
+        stringExtractor
+      ),
+      extract[RightExtracted](
+        intExtractor,
+        stringExtractor
+      )
+    )
+
+    choiceExtractor.extractHeadOption(tupleRows) should equal(Some(RightExtracted(1, "a")))
+
+    choiceExtractor.extractAll(tupleRows) should equal(List(
+      RightExtracted(1, "a"),
+      LeftExtracted(3, "c"),
+      RightExtracted(-1, "e")
+    ))
+  }
+
+  val leftExtractor = extract[LeftExtracted](
+    intExtractor,
+    stringExtractor
+  )
+
+  val rightExtractor = extract[RightExtracted](
+    intExtractor,
+    stringExtractor
+  )
+
+  val bothExtractor = extract[BothExtracted](
+    intExtractor,
+    stringExtractor
+  )
+
+  it should "extract from a list of choices when .switch is used" in {
+    val choiceExtractor = extractTuple(shapeExtractor, intExtractor, stringExtractor).switch(
+      (Circle, 1, "a") -> leftExtractor,
+      (Tetrahedron, 3, "c") -> rightExtractor,
+      (Plane, -1, "e") -> bothExtractor
+    )
+
+    choiceExtractor.extractHeadOption(tupleRows) should equal(Some(LeftExtracted(1, "a")))
+
+    choiceExtractor.extractAll(tupleRows) should equal(List(
+      LeftExtracted(1, "a"),
+      RightExtracted(3, "c"),
+      BothExtracted(-1, "e")
+    ))
+  }
+
+  it should "extract from a list of choices using predicate functions when .cond is used" in {
+    val lessThanZero = (t: (Shape, Int, String)) => t._2 < 0
+    val greaterThanA = (t: (Shape, Int, String)) => t._3 > "a"
+    val fallBack = (t: (Shape, Int, String)) => true
+
+    val choiceExtractor = extractTuple(shapeExtractor, intExtractor, stringExtractor).cond(
+      lessThanZero -> leftExtractor,
+      greaterThanA -> rightExtractor,
+      fallBack -> bothExtractor
+    )
+
+    choiceExtractor.extractHeadOption(tupleRows) should equal(Some(BothExtracted(1, "a")))
+
+    choiceExtractor.extractAll(tupleRows) should equal(List(
+      BothExtracted(1, "a"),
+      RightExtracted(3, "c"),
+      LeftExtracted(-1, "e")
+    ))
+  }
 }

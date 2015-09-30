@@ -19,7 +19,7 @@ package sqlest.extractor
 import org.joda.time.DateTime
 import scala.collection.immutable.{ Queue, ListMap }
 
-sealed trait Extractor[Row, A] {
+sealed trait Extractor[Row, A] extends ChoiceExtractorSyntax[Row, A] {
   type Accumulator
 
   type SingleResult
@@ -38,6 +38,7 @@ sealed trait Extractor[Row, A] {
 
   def map[B](func: A => B) = MappedExtractor(this, func)
   def map[B](func: A => B, unapplyFunc: B => Option[Any]) = MappedExtractor(this, func, Some(unapplyFunc))
+
   def asOption = OptionExtractor(this)
 }
 
@@ -130,6 +131,59 @@ case class MappedExtractor[Row, A, B](inner: Extractor[Row, A], func: A => B, un
   def accumulate(accumulator: inner.Accumulator, row: Row) = inner.accumulate(accumulator, row)
 
   def emit(accumulator: inner.Accumulator) = inner.emit(accumulator).map(func)
+}
+
+trait ChoiceExtractor[Row, A, B] extends Extractor[Row, B] with SimpleExtractor[Row, B] with SingleRowExtractor[Row, B] {
+  type Accumulator = (inner.Accumulator, Option[B])
+
+  val inner: Extractor[Row, A]
+  val extractors: List[Extractor[Row, _]]
+
+  protected def selectExtractor[B1 <: B](row: Row, a: A): Extractor[Row, B1]
+
+  protected def runChoice(row: Row, a: A): Option[B] = {
+    val choice = selectExtractor(row, a)
+    choice.emit(choice.initialize(row))
+  }
+
+  def initialize(row: Row) = {
+    val innerAcc = inner.initialize(row)
+    val choiceAcc = inner.emit(innerAcc).flatMap { a => runChoice(row, a) }
+    (innerAcc, choiceAcc)
+  }
+
+  def accumulate(accumulator: Accumulator, row: Row) = {
+    val (prevAcc, _) = accumulator
+    val nextAcc = inner.accumulate(prevAcc, row)
+    val choiceAcc = inner.emit(nextAcc).flatMap { a => runChoice(row, a) }
+    (nextAcc, choiceAcc)
+  }
+
+  def emit(accumulator: Accumulator) = accumulator match {
+    case (innerAcc, choiceAcc) => choiceAcc
+  }
+}
+
+trait CondExtractor[Row, A, B] extends ChoiceExtractor[Row, A, B] {
+  protected val predicates: List[(A => Boolean, Int)]
+
+  protected def selectExtractor[B1 <: B](row: Row, a: A): Extractor[Row, B1] = {
+    predicates
+      .find { case (p, i) => p(a) }
+      .map { case (p, i) => extractors(i).asInstanceOf[Extractor[Row, B1]] }
+      .getOrElse { throw new MatchError(s"CondExtractor has no matching predicate for $a") }
+  }
+}
+
+trait SwitchExtractor[Row, A, B] extends ChoiceExtractor[Row, A, B] {
+  protected val values: List[(A, Int)]
+
+  protected def selectExtractor[B1 <: B](row: Row, a: A): Extractor[Row, B1] = {
+    values
+      .find { case (v, i) => v == a }
+      .map { case (v, i) => extractors(i).asInstanceOf[Extractor[Row, B1]] }
+      .getOrElse { throw new MatchError(s"SwitchExtractor has no matching value for $a") }
+  }
 }
 
 /**

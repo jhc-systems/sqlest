@@ -17,6 +17,7 @@
 package sqlest.extractor
 
 import java.sql.ResultSet
+import scala.util.Try
 import sqlest.ast._
 
 trait ColumnExtractorSetters {
@@ -63,6 +64,18 @@ trait ColumnExtractorSetters {
           seqExtractor.extractors.zip(values).flatMap {
             case (extractor, value) => extractor.settersFor(value)
           }.toList
+
+        case choiceExtractor: ChoiceExtractor[ResultSet, a, b] =>
+          val setterLists = choiceExtractor.extractors.map {
+            case extractor: Extractor[ResultSet, c] =>
+              Try { extractor.settersFor(value.asInstanceOf[c]) }.toOption
+          } collect {
+            case Some(setters) => setters
+          }
+
+          if (setterLists.length > 1) throw new Exception("Cannot use settersFor when there are ambiguous choices in a ChoiceExtractor")
+          else if (setterLists.isEmpty) throw new Exception("Cannot use settersFor when there are no matching choices in a ChoiceExtractor")
+          else setterLists.head
 
         case ConstantExtractor(_) => Nil
         case _: MappedExtractor[ResultSet, _, _] => throw new Exception(s"Cannot use settersFor with a MappedExtractor without an unapplyMethod - $extractor")

@@ -201,4 +201,114 @@ class ColumnExtractorSettersSpec extends FlatSpec with Matchers {
       Setter(FirstTable.col2, "two")
     )))
   }
+
+  sealed trait Extracted
+  case class LeftExtracted(i: Int, s: String, o: Option[String]) extends Extracted
+  case class RightExtracted(i: Int, s: String, o: Option[Int]) extends Extracted
+  case class BothExtracted(i: Int, s: String, o1: Option[String], o2: Option[Int]) extends Extracted
+
+  val leftExtractor = extract[LeftExtracted](
+    i = FirstTable.col1,
+    s = FirstTable.col2,
+    o = FirstTable.col3
+  )
+  val rightExtractor = extract[RightExtracted](
+    i = FirstTable.col1,
+    s = FirstTable.col2,
+    o = FirstTable.col4
+  )
+  val bothExtractor = extract[BothExtracted](
+    i = FirstTable.col1,
+    s = FirstTable.col2,
+    o1 = FirstTable.col3,
+    o2 = FirstTable.col4
+  )
+
+  trait Name { def name: String }
+  object Name {
+    def apply(name: String) = {
+      val theName = name
+      new Name { val name = theName }
+    }
+    def unapply(name: Name) = Some(name.name)
+  }
+  case class NameAndAddress(name: String, address: String) extends Name
+
+  it should "return setters for SwitchExtractors" in {
+    val choiceExtractor = extractTuple(FirstTable.col1, FirstTable.col2).switch(
+      (1, "a") -> leftExtractor,
+      (3, "c") -> rightExtractor,
+      (-1, "e") -> bothExtractor
+    )
+
+    choiceExtractor.settersFor(RightExtracted(3, "c", Some(1))) should be(List(
+      Setter(FirstTable.col1, 3),
+      Setter(FirstTable.col2, "c"),
+      Setter(FirstTable.col4, Some(1))
+    ))
+
+    choiceExtractor.settersFor(BothExtracted(-1, "e", Some("a"), None)) should be(List(
+      Setter(FirstTable.col1, -1),
+      Setter(FirstTable.col2, "e"),
+      Setter(FirstTable.col3, Some("a")),
+      Setter(FirstTable.col4, Option.empty[Int])
+    ))
+  }
+
+  it should "return setters for CondExtractors" in {
+    val lessThanZero = (t: (Int, String)) => t._1 < 0
+    val greaterThanA = (t: (Int, String)) => t._2 > "a"
+    val fallBack = (t: (Int, String)) => true
+
+    val choiceExtractor = extractTuple(FirstTable.col1, FirstTable.col2).cond(
+      lessThanZero -> leftExtractor,
+      greaterThanA -> rightExtractor,
+      fallBack -> bothExtractor
+    )
+
+    choiceExtractor.settersFor(LeftExtracted(-1, "e", Some("a"))) should be(List(
+      Setter(FirstTable.col1, -1),
+      Setter(FirstTable.col2, "e"),
+      Setter(FirstTable.col3, Some("a"))
+    ))
+
+    choiceExtractor.settersFor(BothExtracted(45, "a", Some("f"), Some(12))) should be(List(
+      Setter(FirstTable.col1, 45),
+      Setter(FirstTable.col2, "a"),
+      Setter(FirstTable.col3, Some("f")),
+      Setter(FirstTable.col4, Some(12))
+    ))
+  }
+
+  it should "throw an exception when there are ambiguous choices in a ChoiceExtractor" in {
+    val nameExtractor = extract[Name](
+      name = FirstTable.col2
+    )
+
+    val nameAndAddressExtractor = extract[NameAndAddress](
+      name = FirstTable.col2,
+      address = FirstTable.col2
+    )
+
+    val brokeExtractor = FirstTable.col1.switch(
+      1 -> nameExtractor,
+      2 -> nameAndAddressExtractor
+    )
+
+    intercept[Exception] {
+      brokeExtractor.settersFor(NameAndAddress("Dennis Borland", "16 Essex Road London"))
+    }
+  }
+
+  it should "throw an exception when there no matching choices in a ChoiceExtractor" in {
+    val choiceExtractor = extractTuple(FirstTable.col1, FirstTable.col2).switch(
+      (1, "a") -> leftExtractor,
+      (3, "c") -> rightExtractor
+    )
+
+    intercept[Exception] {
+      choiceExtractor.settersFor(BothExtracted(-1, "e", Some("a"), None))
+    }
+  }
+
 }

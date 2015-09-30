@@ -33,6 +33,7 @@ trait ColumnExtractorSyntax {
         case column: AliasedColumn[_] => List(column)
         case _: CellExtractor[_, _] => Nil
         case productExtractor: ProductExtractor[_, _] => productExtractor.innerExtractors.flatMap(_.columns)
+        case choiceExtractor: ChoiceExtractor[_, _, _] => (choiceExtractor.inner :: choiceExtractor.extractors).flatMap(_.columns)
         case MappedExtractor(innerExtractor, _, _) => innerExtractor.columns
         case OptionExtractor(innerExtractor) => innerExtractor.columns
         case NonOptionExtractor(innerExtractor) => innerExtractor.columns
