@@ -170,7 +170,7 @@ case class MappedExtractor[Row, A, B](inner: Extractor[Row, A], func: A => B, un
 case class ChoiceExtractor[Row, A, B <: D, C <: D, D](inner: Extractor[Row, A], pred: A => Boolean, left: Extractor[Row, B], right: Extractor[Row, C]) extends Extractor[Row, D] with SimpleExtractor[Row, D] with SingleRowExtractor[Row, D] {
   type Accumulator = Option[(inner.Accumulator, Option[D])]
 
-  private def runChoice(a: A, row: Row): Option[D] = Either.cond(pred(a), runLeft(row), runRight(row)).merge
+  private def runChoice(a: A, row: Row): Option[D] = if (pred(a)) runLeft(row) else runRight(row)
   private def runLeft(row: Row): Option[D] = left.emit(left.initialize(row))
   private def runRight(row: Row): Option[D] = right.emit(right.initialize(row))
 
