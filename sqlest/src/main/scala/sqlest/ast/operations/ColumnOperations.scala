@@ -69,6 +69,7 @@ object ColumnOperations {
       case windowFunctionColumn: WindowFunctionColumn => f(WindowFunctionColumn(windowFunctionColumn.partitionByColumns.map(_.mapColumns(f, selectFunction)), windowFunctionColumn.orderBy.map(_.mapColumns(f, selectFunction)))).asInstanceOf[Column[A]]
       case selectColumn: SelectColumn[A] => SelectColumn(selectFunction(selectColumn.select).asInstanceOf[Select[AliasedColumn[A], _ <: Relation]])(selectColumn.columnType).asInstanceOf[Column[A]]
       case scalarFunctionColumn: ScalarFunctionColumn[A] => f(ScalarFunctionColumn(scalarFunctionColumn.name, scalarFunctionColumn.parameters.map(_.mapColumns(f, selectFunction)))(scalarFunctionColumn.columnType)).asInstanceOf[Column[A]]
+      case keywordFunctionColumn: KeywordFunctionColumn[A] => f(KeywordFunctionColumn(keywordFunctionColumn.name)(keywordFunctionColumn.columnType)).asInstanceOf[Column[A]]
       case tableColumn: TableColumn[A] => f(tableColumn).asInstanceOf[Column[A]]
       case aliasColumn: AliasColumn[A] => f(AliasColumn(aliasColumn.column.mapColumns(f, selectFunction), aliasColumn.columnAlias)(aliasColumn.columnType)).asInstanceOf[Column[A]]
       case referenceColumn: ReferenceColumn[A] => f(referenceColumn).asInstanceOf[Column[A]]

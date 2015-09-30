@@ -75,6 +75,11 @@ case class NotExistsColumn(select: Select[_, _ <: Relation]) extends Column[Bool
 case class ScalarFunctionColumn[A](name: String, parameters: Seq[Column[_]])(implicit val columnType: ColumnType[A]) extends Column[A]
 
 /**
+ * A KeywordFunctionColumn represents a
+ */
+case class KeywordFunctionColumn[A](name: String)(implicit val columnType: ColumnType[A]) extends Column[A]
+
+/**
  * A column that has an alias associated with it.
  *
  * The columns selected by a relation must all have aliases.
