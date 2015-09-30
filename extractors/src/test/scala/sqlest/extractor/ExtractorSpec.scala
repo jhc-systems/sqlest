@@ -131,7 +131,7 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
     ).extractAll(seqRows) should be(List(2, 3, 4, 6, 7, 14))
   }
 
-  it should "throw an exception when extracting a case that is not specified" in {
+  it should "throw an exception when extracting a case that is not specified with .switch" in {
     val seqRows = List(Seq(0, "a"), Seq(1, "b"), Seq(2, "c"), Seq(4, "e"), Seq(5, "f"), Seq(7, "h"))
     val addIntExtractor = intExtractorAtIndex(0).map(_ + 2)
     val multIntExtractor = intExtractorAtIndex(0).map(_ * 2)
@@ -141,6 +141,42 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
       intExtractorAtIndex(0).switch(
         0 -> addIntExtractor,
         1 -> multIntExtractor
+      ).extractAll(seqRows)
+    }
+  }
+
+  it should "extract from a list of choices using predicates when .cond is used" in {
+    val seqRows = List(Seq(0, "a"), Seq(1, "b"), Seq(3, "c"), Seq(4, "e"), Seq(5, "f"), Seq(7, "h"))
+    val addIntExtractor = intExtractorAtIndex(0).map(_ + 2)
+    val multIntExtractor = intExtractorAtIndex(0).map(_ * 2)
+    val squareIntExtractor = intExtractorAtIndex(0).map(Math.pow(_, 2))
+    val choiceExtractor = intExtractorAtIndex(0).choose(_ % 2 == 0)(addIntExtractor, multIntExtractor)
+
+    val greaterThanFour = (i: Int) => i > 4
+    val divisibleByThree = (i: Int) => i % 3 == 0
+    val fallBack = (i: Int) => true
+
+    intExtractorAtIndex(0).cond(
+      greaterThanFour -> addIntExtractor,
+      divisibleByThree -> squareIntExtractor,
+      fallBack -> multIntExtractor
+    ).extractAll(seqRows) should be(List(0, 2, 9, 8, 7, 9))
+  }
+
+  it should "throw an exception when extracting a case that is not specified with .cond" in {
+    val seqRows = List(Seq(0, "a"), Seq(1, "b"), Seq(3, "c"), Seq(4, "e"), Seq(5, "f"), Seq(7, "h"))
+    val addIntExtractor = intExtractorAtIndex(0).map(_ + 2)
+    val multIntExtractor = intExtractorAtIndex(0).map(_ * 2)
+    val squareIntExtractor = intExtractorAtIndex(0).map(Math.pow(_, 2))
+    val choiceExtractor = intExtractorAtIndex(0).choose(_ % 2 == 0)(addIntExtractor, multIntExtractor)
+
+    val greaterThanFour = (i: Int) => i > 4
+    val divisibleByThree = (i: Int) => i % 3 == 0
+
+    intercept[MatchError] {
+      intExtractorAtIndex(0).cond(
+        greaterThanFour -> addIntExtractor,
+        divisibleByThree -> squareIntExtractor
       ).extractAll(seqRows)
     }
   }

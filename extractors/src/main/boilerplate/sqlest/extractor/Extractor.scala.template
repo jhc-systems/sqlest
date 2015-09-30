@@ -39,18 +39,29 @@ sealed trait Extractor[Row, A] {
   def map[B](func: A => B) = MappedExtractor(this, func)
   def map[B](func: A => B, unapplyFunc: B => Option[Any]) = MappedExtractor(this, func, Some(unapplyFunc))
 
-  def cond[B](choices: (A => Boolean, Extractor[Row, B])*): Extractor[Row, B] = {
-    if (choices.isEmpty)
-      new ExceptionExtractor(throw new MatchError("ChoiceExtractor has no matching case"))
-    else {
-      val (pred, extractor) = choices.head
-      val rest = choices.tail
-      choose(pred)(extractor, cond(rest: _*))
-    }
+  def cond[B1 <:C, C](choice1: (A => Boolean, Extractor[Row, B1])): Extractor[Row, C] = {
+    val (pred, extractor1) = choice1
+    choose(pred)(extractor1, new ExceptionExtractor(throw new MatchError("ChoiceExtractor has no matching case")))
   }
 
-  def switch[B](choices: (A, Extractor[Row, B])*): Extractor[Row, B] =
-    cond(choices.map { case (a, extractor) => ((x: A) => x == a, extractor) }: _*)
+[2..22#  def cond[[#B1 <: C#], C]([#choice1: (A => Boolean, Extractor[Row, B1])#]): Extractor[Row, C] = {
+    val (pred, extractor##1) = choice##1
+    choose(pred)(extractor##1, cond([2..#choice1#]))
+  }#
+
+]
+
+  def switch[B1 <:C, C](choice1: (A, Extractor[Row, B1])): Extractor[Row, C] = {
+    val (a, extractor1) = choice1
+    choose(_ == a)(extractor1, new ExceptionExtractor(throw new MatchError("ChoiceExtractor has no matching case")))
+  }
+
+[2..22#  def switch[[#B1 <: C#], C]([#choice1: (A, Extractor[Row, B1])#]): Extractor[Row, C] = {
+    val (a, extractor##1) = choice##1
+    choose(_ == a)(extractor##1, switch([2..#choice1#]))
+  }#
+
+]
 
   def choose[B <: D, C <: D, D](pred: A => Boolean)(l: Extractor[Row, B], r: Extractor[Row, C]) =
     ChoiceExtractor(this, pred, l, r)

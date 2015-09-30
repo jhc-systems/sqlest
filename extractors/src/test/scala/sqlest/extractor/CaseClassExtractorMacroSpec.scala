@@ -288,22 +288,22 @@ class CaseClassExtractorMacroSpec extends FlatSpec with Matchers with ExtractorS
     ))
   }
 
+  val leftExtractor = extract[LeftExtracted](
+    intExtractor,
+    stringExtractor
+  )
+
+  val rightExtractor = extract[RightExtracted](
+    intExtractor,
+    stringExtractor
+  )
+
+  val bothExtractor = extract[BothExtracted](
+    intExtractor,
+    stringExtractor
+  )
+
   it should "extract from a list of choices when .switch is used" in {
-    val leftExtractor = extract[LeftExtracted](
-      intExtractor,
-      stringExtractor
-    ).map { a => a: Extracted }
-
-    val rightExtractor = extract[RightExtracted](
-      intExtractor,
-      stringExtractor
-    ).map { a => a: Extracted }
-
-    val bothExtractor = extract[BothExtracted](
-      intExtractor,
-      stringExtractor
-    ).map { a => a: Extracted }
-
     val choiceExtractor = extractTuple(shapeExtractor, intExtractor, stringExtractor).switch(
       (Circle, 1, "a") -> leftExtractor,
       (Tetrahedron, 3, "c") -> rightExtractor,
@@ -316,6 +316,26 @@ class CaseClassExtractorMacroSpec extends FlatSpec with Matchers with ExtractorS
       LeftExtracted(1, "a"),
       RightExtracted(3, "c"),
       BothExtracted(-1, "e")
+    ))
+  }
+
+  it should "extract from a list of choices using predicate functions when .cond is used" in {
+    val lessThanZero = (t: (Shape, Int, String)) => t._2 < 0
+    val greaterThanA = (t: (Shape, Int, String)) => t._3 > "a"
+    val fallBack = (t: (Shape, Int, String)) => true
+
+    val choiceExtractor = extractTuple(shapeExtractor, intExtractor, stringExtractor).cond(
+      lessThanZero -> leftExtractor,
+      greaterThanA -> rightExtractor,
+      fallBack -> bothExtractor
+    )
+
+    choiceExtractor.extractHeadOption(tupleRows) should equal(Some(BothExtracted(1, "a")))
+
+    choiceExtractor.extractAll(tupleRows) should equal(List(
+      BothExtracted(1, "a"),
+      RightExtracted(3, "c"),
+      LeftExtracted(-1, "e")
     ))
   }
 }
