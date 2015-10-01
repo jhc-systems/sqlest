@@ -26,4 +26,5 @@ trait ScalarFunctionSyntax extends ScalarFunctions {
 
   def connectByRoot[A](column: Column[A]) = ScalarFunctionColumn[A]("connect_by_root", Seq(column))(column.columnType)
   def prior[A](column: Column[A]) = ScalarFunctionColumn[A]("prior", Seq(column))(column.columnType)
+  val level = KeywordFunction[Int]("level")
 }

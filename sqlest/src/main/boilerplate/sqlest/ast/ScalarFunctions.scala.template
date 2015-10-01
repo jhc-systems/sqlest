@@ -18,22 +18,32 @@ package sqlest.ast
 
 trait ScalarFunctions {
 
+  def KeywordFunction[R: ColumnType](name: String) = KeywordFunctionColumn[R](name).as(name)
+
+  abstract class ScalarFunctionColumn0[R: ColumnType] {
+    def apply(): AliasedColumn[R]
+  }
+
+  def ScalarFunction0[R: ColumnType](name: String) = new ScalarFunctionColumn0[R] {
+    def apply() = ScalarFunctionColumn[R](name, Nil).as(name)
+  }
+
   abstract class ScalarFunctionColumnN[A, R: ColumnType] {
-    def apply(columns: Column[A]*): ScalarFunctionColumn[R]
+    def apply(columns: Column[A]*): AliasedColumn[R]
   }
 
   def ScalarFunctionN[A, R: ColumnType](name: String) = new ScalarFunctionColumnN[A, R] {
     def apply(columns: Column[A]*) =
-      ScalarFunctionColumn[R](name, columns)
+      ScalarFunctionColumn[R](name, columns).as(name)
   }
 
 [#  abstract class ScalarFunctionColumn1[[#A1#], R: ColumnType] {
-    def apply[[#B1#]]([#column1: Column[B1]#])(implicit [#column1Equivalence: ColumnTypeEquivalence[A1, B1]#]): ScalarFunctionColumn[R]
+    def apply[[#B1#]]([#column1: Column[B1]#])(implicit [#column1Equivalence: ColumnTypeEquivalence[A1, B1]#]): AliasedColumn[R]
   }
 
   def ScalarFunction1[[#A1#], R: ColumnType](name: String) = new ScalarFunctionColumn1[[#A1#], R] {
     def apply[[#B1#]]([#column1: Column[B1]#])(implicit [#column1Equivalence: ColumnTypeEquivalence[A1, B1]#]) =
-      ScalarFunctionColumn[R](name, Seq([#column1#]))
+      ScalarFunctionColumn[R](name, Seq([#column1#])).as(name)
   }#
 
 ]

@@ -90,6 +90,7 @@ trait BaseStatementBuilder {
       case NotExistsColumn(select) => "not exists (" + selectSql(aliasColumnsFromSubselects(select).asInstanceOf[Select[_, _ <: Relation]]) + ")"
       case WindowFunctionColumn(partitionByColumns, orders) => windowFunctionSql(partitionByColumns, orders)
       case column: ScalarFunctionColumn[_] => functionSql(column.name, column.parameters)
+      case column: KeywordFunctionColumn[_] => column.name
       case column: TableColumn[_] => identifierSql(column.tableAlias) + "." + identifierSql(column.columnName)
       case column: AliasColumn[_] => columnSql(column.column)
       case column: ReferenceColumn[_] => column.columnAlias
@@ -204,6 +205,7 @@ trait BaseStatementBuilder {
     case PostfixFunctionColumn(_, a) => columnArgs(a)
     case DoubleInfixFunctionColumn(_, _, a, b, c) => columnArgs(a) ++ columnArgs(b) ++ columnArgs(c)
     case ScalarFunctionColumn(_, parameters) => parameters.toList flatMap columnArgs
+    case column: KeywordFunctionColumn[_] => Nil
     case WindowFunctionColumn(columns, orders) => columns.toList.flatMap(columnArgs) ++ orders.toList.flatMap(order => columnArgs(order.column))
     case SelectColumn(select) => selectArgs(select)
     case ExistsColumn(select) => selectArgs(select)

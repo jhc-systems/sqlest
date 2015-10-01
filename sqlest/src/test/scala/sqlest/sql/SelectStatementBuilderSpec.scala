@@ -16,6 +16,7 @@
 
 package sqlest.sql
 
+import org.joda.time.LocalDate
 import org.scalatest._
 import org.scalatest.matchers._
 import sqlest._
@@ -326,6 +327,20 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
        |from three
        """.formatSql,
       List(List("abc"))
+    )
+  }
+
+  "select zero-arg scalar function and keyword function" should "produce the right sql" in {
+    val date = ScalarFunction0[LocalDate]("date")
+    sql {
+      select(level, date())
+        .from(TableThree)
+    } should equal(
+      s"""
+       |select level as level, date() as date
+       |from three
+       """.formatSql,
+      List(Nil)
     )
   }
 
