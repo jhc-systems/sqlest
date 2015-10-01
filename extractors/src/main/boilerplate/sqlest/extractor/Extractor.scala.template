@@ -156,7 +156,7 @@ case class MappedExtractor[Row, A, B](inner: Extractor[Row, A], func: A => B, un
 }
 
 trait ChoiceExtractor[Row, A, B <: Product, C] extends Extractor[Row, C] with SimpleExtractor[Row, C] with SingleRowExtractor[Row, C] {
-  type Accumulator = Option[(inner.Accumulator, Option[C])]
+  type Accumulator = (inner.Accumulator, Option[C])
 
   val inner: Extractor[Row, A]
   val predicates: List[(A => Boolean, Int)]
@@ -176,19 +176,20 @@ trait ChoiceExtractor[Row, A, B <: Product, C] extends Extractor[Row, C] with Si
 
   def initialize(row: Row) = {
     val innerAcc = inner.initialize(row)
-    inner.emit(innerAcc).map { a => (innerAcc, runChoice(row, a)) }
+    val choiceAcc = inner.emit(innerAcc).flatMap { a => runChoice(row, a) }
+    (innerAcc, choiceAcc)
   }
 
   def accumulate(accumulator: Accumulator, row: Row) = {
-    for {
-      (prevAcc, _) <- accumulator
-      nextAcc = inner.accumulate(prevAcc, row)
-      a <- inner.emit(nextAcc)
-    } yield (nextAcc, runChoice(row, a))
+    val (prevAcc, _) = accumulator
+    val nextAcc = inner.accumulate(prevAcc, row)
+    val choiceAcc = inner.emit(nextAcc).flatMap { a => runChoice(row, a) }
+    (nextAcc, choiceAcc)
   }
 
-  def emit(accumulator: Accumulator) = 
-    accumulator.map { case (inner, choice) => choice }.flatten
+  def emit(accumulator: Accumulator) = accumulator match {
+    case (innerAcc, choiceAcc) => choiceAcc
+  }
 }
 
 /**
