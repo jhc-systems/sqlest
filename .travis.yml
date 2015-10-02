@@ -3,6 +3,9 @@ language: scala
 scala:
   - 2.11.6
 
+script:
+  - sbt clean compile tut test
+
 after_success:
   - '[[ $TRAVIS_BRANCH == "master" ]] && sbt publish'
 

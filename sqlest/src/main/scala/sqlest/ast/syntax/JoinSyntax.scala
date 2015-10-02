@@ -60,7 +60,8 @@ trait JoinSyntax {
     def outerJoin[R2 <: Relation](right: R2) = new SelectJoinBuilder[A, R1, R2] {
       def on(condition: Column[Boolean]): Select[A, Join[R1, R2]] =
         left.from(
-          left.from.outerJoin(right).on(condition))
+          left.from.outerJoin(right).on(condition)
+        )
     }
 
     def crossJoin(right: Relation) = left.from(left.from.crossJoin(right))

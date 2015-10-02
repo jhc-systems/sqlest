@@ -8,6 +8,7 @@ import com.typesafe.sbt.SbtScalariform
 import com.typesafe.sbt.SbtSite
 import sbtrelease.ReleasePlugin.autoImport._
 import spray.boilerplate.BoilerplatePlugin._
+import tut.Plugin._
 import xerial.sbt.Sonatype._
 
 object SqlestBuild extends Build {
@@ -28,13 +29,18 @@ object SqlestBuild extends Build {
     id = "sqlest",
     base = file("sqlest"),
 
-    settings = commonSettings ++ scaladocSettings ++ Boilerplate.settings ++ Seq(
+    settings = commonSettings ++ scaladocSettings ++ tutSettings ++ Boilerplate.settings ++ Seq(
       moduleName := "sqlest",
+
+      tutSourceDirectory := file("docs") / "sqlest",
+      tutTargetDirectory := file("."),
+      tutNameFilter := """README.md""".r,
 
       libraryDependencies ++= Seq(
         "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
         "org.scalatest" %% "scalatest" % "2.2.1" % "test",
-        "com.chuusai" %% "shapeless" % "2.1.0" % "test"
+        "com.chuusai" %% "shapeless" % "2.1.0" % "test",
+        "com.h2database" % "h2" % "1.4.180" % "test"
       )
     )
   ).dependsOn(extractors)
@@ -43,15 +49,20 @@ object SqlestBuild extends Build {
     id = "extractors",
     base = file("extractors"),
 
-    settings = commonSettings ++ scaladocSettings ++ Boilerplate.settings ++ Seq(
+    settings = commonSettings ++ scaladocSettings ++ tutSettings ++ Boilerplate.settings ++ Seq(
       moduleName := "sqlest-extractors",
+
+      tutSourceDirectory := file("docs") / "extractors",
+      tutTargetDirectory := file("extractors"),
+      tutNameFilter := """README.md""".r,
 
       libraryDependencies ++= Seq(
         "org.scala-lang" % "scala-reflect" % scalaVersion.value,
         "joda-time" % "joda-time" % "2.3",
         "org.joda" % "joda-convert" % "1.6",
         "org.scalatest" %% "scalatest" % "2.2.1" % "test",
-        "com.chuusai" %% "shapeless" % "2.1.0" % "test"
+        "com.chuusai" %% "shapeless" % "2.1.0" % "test",
+        "com.h2database" % "h2" % "1.4.180" % "test"
       )
     )
   )
