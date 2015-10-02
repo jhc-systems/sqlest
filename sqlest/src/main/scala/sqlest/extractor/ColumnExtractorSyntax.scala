@@ -34,7 +34,7 @@ trait ColumnExtractorSyntax {
         case _: CellExtractor[_, _] => Nil
         case productExtractor: ProductExtractor[_, _] => productExtractor.innerExtractors.flatMap(_.columns)
         case MappedExtractor(innerExtractor, _, _) => innerExtractor.columns
-        case choiceExtractor: ChoiceExtractor[_, _, _, _] => choiceExtractor.inner.columns
+        case choiceExtractor: ChoiceExtractor[_, _, _] => choiceExtractor.inner.columns
         case OptionExtractor(innerExtractor) => innerExtractor.columns
         case NonOptionExtractor(innerExtractor) => innerExtractor.columns
         case SeqExtractor(extractors) => extractors.flatMap(_.columns).toList

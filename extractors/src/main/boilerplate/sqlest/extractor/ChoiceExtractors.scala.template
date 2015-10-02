@@ -16,8 +16,17 @@
 
 package sqlest.extractor
 
-[2..22#case class ChoiceExtractor1[Row, A, [#B1 <: C#], C](inner: Extractor[Row, A], [#choice1: (A => Boolean, Extractor[Row, B1])#]) extends ChoiceExtractor[Row, A, ([#Extractor[Row, B1]#]), C] {
-  val extractors = ([#choice1._##2#])
+import shapeless._
+import shapeless.ops._
+import shapeless.ops.hlist.{ ToTraversable, Tupler }
+
+[2..22#case class ChoiceExtractor1[Row, A, B, [#B1 <: B#]](inner: Extractor[Row, A], [#choice1: (A => Boolean, Extractor[Row, B1])#]) extends ChoiceExtractor[Row, A, B] {
+  type HListExtractors = [#Extractor[Row, B1]# :: ] :: HNil
+  type HListTuple = Tuple1[[#Extractor[Row, B1]#]]
+  val tupler = implicitly[Tupler.Aux[HListExtractors, HListTuple]]
+  val lister = implicitly[ToTraversable.Aux[HListExtractors, List, Extractor[Row, B]]]
+  val columnList = lister(extractors)
+  val extractors = [#choice1._##2# :: ] :: HNil
   val predicates = List([#choice1._##1#]).zipWithIndex
 }#
 

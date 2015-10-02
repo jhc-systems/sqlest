@@ -50,8 +50,8 @@ object SqlestBuild extends Build {
         "org.scala-lang" % "scala-reflect" % scalaVersion.value,
         "joda-time" % "joda-time" % "2.3",
         "org.joda" % "joda-convert" % "1.6",
-        "org.scalatest" %% "scalatest" % "2.2.1" % "test",
-        "com.chuusai" %% "shapeless" % "2.1.0" % "test"
+        "com.chuusai" %% "shapeless" % "2.2.5",
+        "org.scalatest" %% "scalatest" % "2.2.1" % "test"
       )
     )
   )
@@ -70,7 +70,7 @@ object SqlestBuild extends Build {
 
   def commonSettings = SbtScalariform.scalariformSettings ++ publishingSettings ++ Seq(
     organization := "uk.co.jhc",
-    scalaVersion := "2.11.6",
+    scalaVersion := "2.11.7",
     scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-language:implicitConversions", "-language:existentials")
   )
 

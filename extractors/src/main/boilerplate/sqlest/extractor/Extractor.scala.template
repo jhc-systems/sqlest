@@ -18,6 +18,9 @@ package sqlest.extractor
 
 import org.joda.time.DateTime
 import scala.collection.immutable.{ Queue, ListMap }
+import shapeless._
+import shapeless.ops._
+import shapeless.ops.hlist.Tupler
 
 sealed trait Extractor[Row, A] {
   type Accumulator
@@ -155,24 +158,31 @@ case class MappedExtractor[Row, A, B](inner: Extractor[Row, A], func: A => B, un
   def emit(accumulator: inner.Accumulator) = inner.emit(accumulator).map(func)
 }
 
-trait ChoiceExtractor[Row, A, B <: Product, C] extends Extractor[Row, C] with SimpleExtractor[Row, C] with SingleRowExtractor[Row, C] {
-  type Accumulator = (inner.Accumulator, Option[C])
+trait ChoiceExtractor[Row, A, B] extends Extractor[Row, B] with SimpleExtractor[Row, B] with SingleRowExtractor[Row, B] {
+  type Accumulator = (inner.Accumulator, Option[B])
+  type HListExtractors <: HList
+  type HListTuple <: Product
 
+  val tupler: Tupler.Aux[HListExtractors, HListTuple]
+  val lister: ToTraversable.Aux[HListExtractors, List, Extractor[Row, B]]
+
+  val columnList: List[Extractor[Row, B]]
   val inner: Extractor[Row, A]
   val predicates: List[(A => Boolean, Int)]
-  val extractors: B
+  val extractors: HListExtractors
 
-  private def selectExtractor[C1 <: C](row: Row, a: A): Extractor[Row, C1] = {
+  private def selectExtractor[B1 <: B](row: Row, a: A): Extractor[Row, B1] = {
+    val tupledExtractors = tupler(extractors)
     predicates
       .find { case (p, i) => p(a) }
-      .map { case (p, i) => extractors.productElement(i).asInstanceOf[Extractor[Row, C1]] }
+      .map { case (p, i) => tupledExtractors.productElement(i).asInstanceOf[Extractor[Row, B1]] }
       .getOrElse { new ExceptionExtractor(throw new MatchError("ChoiceExtractor has no matching case")) }
   }
 
-  private def runChoice(row: Row, a: A): Option[C] = {
+  private def runChoice(row: Row, a: A): Option[B] = {
     val choice = selectExtractor(row, a)
     choice.emit(choice.initialize(row))
-  }  
+  }
 
   def initialize(row: Row) = {
     val innerAcc = inner.initialize(row)
