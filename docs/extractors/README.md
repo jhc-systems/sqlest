@@ -40,7 +40,7 @@ To use sqlest-extractors:
 3. Mixin `ExtractorSyntax[Row]`
 
 ## Example - CSV
-```scala
+```tut:silent
 object CSVDefinitions {
   // Start with some type aliases for CSV data
   type CSVRow = List[String]
@@ -62,13 +62,13 @@ object CSVDefinitions {
 }
 ```
 
-```scala
+```tut:silent
 import CSVDefinitions._
 import sqlest.extractor.{ CellExtractor, ExtractorSyntax }
 ```
 
 Implement the CellExtractor trait for CSVRow that will read a String
-```scala
+```tut:silent
 case class StringExtractor(index: Int) extends CellExtractor[CSVRow, String] {
   def read(row: CSVRow): Option[String] = {
     val cellValue = row(index)
@@ -79,7 +79,7 @@ case class StringExtractor(index: Int) extends CellExtractor[CSVRow, String] {
 ```
 
 Implement the CellExtractor trait for CSVRow that will read a Int
-```scala
+```tut:silent
 case class IntExtractor(index: Int) extends CellExtractor[CSVRow, Int] {
   def read(row: CSVRow): Option[Int] = scala.util.Try(Integer.parseInt(row(index))).toOption
 }
@@ -87,7 +87,7 @@ case class IntExtractor(index: Int) extends CellExtractor[CSVRow, Int] {
 
 Extend the application with ExtractorSyntax for the row type.
 This provides the methods `extract`, `extractTuple` and `extractConstant`.
-```scala
+```tut:silent
 object CSVApp extends ExtractorSyntax[CSVRow] {
   // Create some cell extractors
   val nameExtractor = StringExtractor(0)
@@ -126,21 +126,15 @@ object CSVApp extends ExtractorSyntax[CSVRow] {
 ```
 
 `extractHeadOption` tries to read the first row. If there isn't one it returns None
-```scala
-scala> CSVApp.tupleHeadOption
-res0: Option[(String, Int, Option[Int], Option[String])] = Some((Anne,35,Some(1),Some(Old Kent Road)))
-
-scala> CSVApp.addressHeadOption
-res1: Option[CSVApp.Address] = Some(Address(1,Old Kent Road))
+```tut
+CSVApp.tupleHeadOption
+CSVApp.addressHeadOption
 ```
 
 `extractAll` reads all rows into a List
-```scala
-scala> CSVApp.tupleAll
-res2: List[(String, Int, Option[Int], Option[String])] = List((Anne,35,Some(1),Some(Old Kent Road)))
-
-scala> CSVApp.personAll
-res3: List[CSVApp.Person] = List(Person(Anne,35,Some(Address(1,Old Kent Road))))
+```tut
+CSVApp.tupleAll
+CSVApp.personAll
 ```
 
 ## More examples

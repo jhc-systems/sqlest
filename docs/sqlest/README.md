@@ -28,12 +28,12 @@ sqlest is available for Scala 2.11
 ## Examples
 ### Database Connection
 Before doing anything else a connection to a database must be available. This is encapsulated in the Database object which requires a DataSource and a StatementBuilder.
-```scala
+```tut:silent
 import sqlest._
 ```
 
 Configure a DataSource
-```scala
+```tut:silent
 val dataSource = {
   val dataSource = new org.h2.jdbcx.JdbcDataSource
   dataSource.setURL("jdbc:h2:~/test")
@@ -42,20 +42,70 @@ val dataSource = {
 ```
 
 Choose the StatementBuilder that is compatible with the database you are using.
-```scala
+```tut:silent
 val statementBuilder = sqlest.sql.H2StatementBuilder
 ```
 
 Use the DataSource and the StatementBuilder to create an implicit database.
 This database is used in all execute calls.
-```scala
+```tut:silent
 implicit val database = Database.withDataSource(dataSource, statementBuilder)
 ```
-
-
+```tut:invisible
+def executeRawSql(sql: String) =
+  database.withConnection { connection =>
+    try {
+      connection.createStatement.execute(sql)
+    } catch {
+      case e: Exception => println(e)// Ignore exception from dropping tables
+    }
+  }
+executeRawSql("drop table fruit")
+executeRawSql("""
+  create table fruit (
+    id int not null,
+    name varchar not null,
+    juiciness int not null
+  )
+""")
+executeRawSql("drop table smoothy")
+executeRawSql("""
+  create table smoothy (
+    id int not null,
+    description varchar not null
+  )
+""")
+executeRawSql("drop table ingredients")
+executeRawSql("""
+  create table ingredients (
+    smoothy_id int not null,
+    fruit_id int not null
+  )
+""")
+executeRawSql("""
+  insert into fruit(id, name, juiciness)
+  values(1, 'Watermelon', 10),
+        (2, 'Tomato', 9),
+        (3, 'Grape', 8),
+        (4, 'Banana', 4)
+""")
+executeRawSql("""
+  insert into smoothy(id, description)
+  values(1, 'Watermelon & grape smoothie'),
+        (2, 'Super banana smoothie'),
+        (3, 'Cranberry & raspberry smoothie')
+""")
+executeRawSql("""
+  insert into ingredients(smoothy_id, fruit_id)
+  values(1, 1),
+        (1, 3),
+        (2, 4),
+        (2, 3)
+""")
+```
 ### Table and column definitions
 A table definition consists of a table name and any columns that you want to use. A table can be created with an alias but it is standard to create an object that has no alias.
-```scala
+```tut:silent
 class FruitTable(alias: Option[String]) extends Table("fruit", alias) {
   val id = column[Int]("id")
   val name = column[String]("name")
@@ -78,14 +128,14 @@ object IngredientsTable extends IngredientsTable(None)
 
 ### Domain classes
 Let's define some domain classes that we want to populate from our database
-```scala
+```tut:silent
 case class Fruit(name: String, juiciness: Int)
 case class Smoothy(description: String, fruits: List[Fruit])
 ```
 
 ### Extractors
 Extractors are used to populate domain classes from ResultSets returned by running queries. They declaratively specify which parameter in a case class is populated by which column in a table
-```scala
+```tut:silent
 lazy val fruitExtractor = extract[Fruit](
   name = FruitTable.name,
   juiciness = FruitTable.juiciness
@@ -94,17 +144,16 @@ lazy val fruitExtractor = extract[Fruit](
 
 ### Querying
 Queries are written in sqlest the same way as they are written in SQL. The table and column definitions are used directly. Here is a query that will return the juiciest fruits
-```scala
-scala> select(FruitTable.name, FruitTable.juiciness).
-     |   from(FruitTable).
-     |   where(FruitTable.juiciness >= 8).
-     |   orderBy(FruitTable.juiciness.desc).
-     |   extractAll(fruitExtractor)    // fruitExtractor is defined below
-res11: List[fruitExtractor.SingleResult] = List(Fruit(Watermelon,10), Fruit(Tomato,9), Fruit(Grape,8))
+```tut
+select(FruitTable.name, FruitTable.juiciness).
+  from(FruitTable).
+  where(FruitTable.juiciness >= 8).
+  orderBy(FruitTable.juiciness.desc).
+  extractAll(fruitExtractor)    // fruitExtractor is defined below
 ```
 
 Extractors are designed for composition to allow nested case classes to be extracted, and multiple rows of the ResultSet to be combined into a single result
-```scala
+```tut:silent
 lazy val smoothyExtractor = extract[Smoothy](
   description = SmoothyTable.description,
   fruits = fruitExtractor.asList
@@ -112,14 +161,13 @@ lazy val smoothyExtractor = extract[Smoothy](
 ```
 
 This extractor can then be used to find out which fruits are used in a smoothy
-```scala
-scala> select.
-     |   from(SmoothyTable).
-     |   innerJoin(IngredientsTable).on(SmoothyTable.id === IngredientsTable.smoothyId).
-     |   innerJoin(FruitTable).on(IngredientsTable.fruitId === FruitTable.id).
-     |   where(SmoothyTable.description === "Super banana smoothie").
-     |   extractHead(smoothyExtractor)
-res12: smoothyExtractor.SingleResult = Smoothy(Super banana smoothie,List(Fruit(Banana,4), Fruit(Grape,8)))
+```tut
+select.
+  from(SmoothyTable).
+  innerJoin(IngredientsTable).on(SmoothyTable.id === IngredientsTable.smoothyId).
+  innerJoin(FruitTable).on(IngredientsTable.fruitId === FruitTable.id).
+  where(SmoothyTable.description === "Super banana smoothie").
+  extractHead(smoothyExtractor)
 ```
 
 ## Authors
