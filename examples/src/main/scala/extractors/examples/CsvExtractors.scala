@@ -53,7 +53,8 @@ object CSVExtractorExample extends App with ExtractorSyntax[CSVRow] {
       nameExtractor,
       ageExtractor,
       houseExtractor.asOption, // Handle the possibility that this cell can contain a null value
-      streetExtractor.asOption)
+      streetExtractor.asOption
+    )
 
   // `extractHeadOption` and `extractAll` must be passed an `Iterable[CSVRow]`
   // `List[CSVRow]` implements `Iterable[CSVRow]` so parsedCsv can be used directly
@@ -82,7 +83,8 @@ object CSVExtractorExample extends App with ExtractorSyntax[CSVRow] {
   val personExtractor = extract[Person](
     name = nameExtractor,
     age = ageExtractor,
-    address = addressExtractor.asOption) // If any value read by the addressExtractor is null, None will be returned
+    address = addressExtractor.asOption
+  ) // If any value read by the addressExtractor is null, None will be returned
 
   println(addressExtractor.extractHeadOption(parsedCsv))
   // => Some(Address(1, Old Kent Road))
