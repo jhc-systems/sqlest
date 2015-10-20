@@ -23,8 +23,6 @@ import sqlest._
 import sqlest.ast.syntax.UntypedReads
 
 class ColumnSpec extends FlatSpec with Matchers {
-  import UntypedReads.DefaultInstances._
-
   class TableOne(alias: Option[String]) extends Table("one", alias) {
     val intCol = column[Int]("intCol")
     val longCol = column[Long]("Col")

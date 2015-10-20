@@ -31,17 +31,16 @@ class UntypedColumnHelpers extends ColumnSyntax {
   }
 
   def infixExpression[A](op: String, left: Column[A], right: String, columnType: ColumnType[A])(implicit U: UntypedReads[A]): Option[InfixFunctionColumn[Boolean]] =
-    mappedArgument(right, columnType).map(r => InfixFunctionColumn[Boolean](op, left, LiteralColumn(r)(columnType.asInstanceOf[ColumnType[U.Read]])))
+    mappedArgument(right, columnType).map(r => InfixFunctionColumn[Boolean](op, left, LiteralColumn(r)(columnType.asInstanceOf[ColumnType[A]])))
 
   def likeExpression[A](left: Column[A], right: String, columnType: ColumnType[A], formatArgument: String => String)(implicit U: UntypedReads[A]): Option[InfixFunctionColumn[Boolean]] =
-    mappedArgument(formatArgument(right), columnType).map(r => InfixFunctionColumn[Boolean]("like", left, LiteralColumn(r)(columnType.asInstanceOf[ColumnType[U.Read]])))
+    mappedArgument(formatArgument(right), columnType).map(r => InfixFunctionColumn[Boolean]("like", left, LiteralColumn(r)(columnType.asInstanceOf[ColumnType[A]])))
 
   def likeEncode(str: String) =
     str.replaceAll("([%_^])", "^$1")
 }
 
 trait UntypedColumnSyntax {
-
   implicit class UntypedColumnOps[A](left: Column[A])(implicit U: UntypedReads[A]) {
     val helpers = new UntypedColumnHelpers
 
@@ -55,7 +54,7 @@ trait UntypedColumnSyntax {
     def untypedIn(right: List[String]) = {
       val mappedValues = right.map(value => helpers.mappedArgument(value, left.columnType))
       if (mappedValues.forall(_.isDefined)) {
-        val inColumns = mappedValues.flatten.map(value => LiteralColumn(value)(left.columnType.asInstanceOf[ColumnType[U.Read]]))
+        val inColumns = mappedValues.flatten.map(value => LiteralColumn(value)(left.columnType.asInstanceOf[ColumnType[A]]))
         Some(InfixFunctionColumn[Boolean]("in", left, ScalarFunctionColumn("", inColumns)(left.columnType)))
       } else
         None
