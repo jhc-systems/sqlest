@@ -20,8 +20,10 @@ import org.joda.time._
 import org.scalatest._
 import org.scalatest.matchers._
 import sqlest._
+import sqlest.ast.syntax.UntypedReads
 
 class ColumnSpec extends FlatSpec with Matchers {
+  import UntypedReads.DefaultInstances._
 
   class TableOne(alias: Option[String]) extends Table("one", alias) {
     val intCol = column[Int]("intCol")
@@ -32,6 +34,8 @@ class ColumnSpec extends FlatSpec with Matchers {
     val stringCol = column[String]("Col")
     val dateTimeCol = column[DateTime]("Col")
     val mappedCol = column[Int]("Col")(MappedColumnType[Int, String](_.toInt, _.toString))
+    val mappedStr = column[String]("Col")(MappedColumnType[String, Int](_.toString, _.toInt))
+    val optMappedCol = column[Option[Int]]("Col")(BlankIsNoneColumnType(MappedColumnType[Int, String](_.drop(3).toInt, s => "int" + s.toString)))
   }
 
   object TableOne extends TableOne(None)
@@ -44,8 +48,9 @@ class ColumnSpec extends FlatSpec with Matchers {
     (TableOne.booleanCol untypedEq "true") should equal(Some(TableOne.booleanCol === true))
     (TableOne.stringCol untypedEq "abc") should equal(Some(TableOne.stringCol === "abc"))
     (TableOne.dateTimeCol untypedEq "2014-01-01T09:00:00.000Z") should equal(Some(TableOne.dateTimeCol === new DateTime(2014, 1, 1, 9, 0, 0, 0)))
-    // TODO
-    // (TableOne.mappedCol untypedEq "2") should equal(Some(TableOne.mappedCol === 2))
+    (TableOne.mappedCol untypedEq "2") should equal(Some(TableOne.mappedCol === 2))
+    (TableOne.mappedStr untypedEq "2") should equal(Some(TableOne.mappedStr === "2"))
+    (TableOne.optMappedCol untypedEq "2") should equal(Some(TableOne.optMappedCol === Some(2)))
   }
 
   it should "handle comparison with an invalid string" in {
@@ -55,33 +60,46 @@ class ColumnSpec extends FlatSpec with Matchers {
     (TableOne.bigDecimalCol untypedEq "a") should equal(None)
     (TableOne.booleanCol untypedEq "a") should equal(None)
     (TableOne.dateTimeCol untypedEq "a") should equal(None)
-    // TODO
-    // (TableOne.mappedCol untypedEq "a") should equal(None)
+    (TableOne.mappedCol untypedEq "a") should equal(None)
+    (TableOne.mappedStr untypedEq "a") should equal(None)
+    (TableOne.optMappedCol untypedEq "a") should equal(None)
   }
 
   "untypedNe" should "allow comparison with a valid string" in {
     (TableOne.intCol untypedNe "1") should equal(Some(TableOne.intCol =!= 1))
+    (TableOne.mappedStr untypedNe "1") should equal(Some(TableOne.mappedStr =!= "1"))
+    (TableOne.mappedStr untypedNe "a") should equal(None)
   }
 
   "untypedLt" should "allow comparison with a valid string" in {
     (TableOne.intCol untypedLt "1") should equal(Some(TableOne.intCol < 1))
+    (TableOne.mappedStr untypedLt "1") should equal(Some(TableOne.mappedStr < "1"))
+    (TableOne.mappedStr untypedLt "a") should equal(None)
   }
 
   "untypedGt" should "allow comparison with a valid string" in {
     (TableOne.intCol untypedGt "1") should equal(Some(TableOne.intCol > 1))
+    (TableOne.mappedStr untypedGt "1") should equal(Some(TableOne.mappedStr > "1"))
+    (TableOne.mappedStr untypedGt "a") should equal(None)
   }
 
   "untypedLte" should "allow comparison with a valid string" in {
     (TableOne.intCol untypedLte "1") should equal(Some(TableOne.intCol <= 1))
+    (TableOne.mappedStr untypedLte "1") should equal(Some(TableOne.mappedStr <= "1"))
+    (TableOne.mappedStr untypedLte "a") should equal(None)
   }
 
   "untypedGte" should "allow comparison with a valid string" in {
     (TableOne.intCol untypedGte "1") should equal(Some(TableOne.intCol >= 1))
+    (TableOne.mappedStr untypedGte "1") should equal(Some(TableOne.mappedStr >= "1"))
+    (TableOne.mappedStr untypedGte "a") should equal(None)
   }
 
   "untypedIn" should "allow comparison with a valid list of strings" in {
     (TableOne.intCol untypedIn List("A", "2", "3")) should equal(None)
     (TableOne.intCol untypedIn List("1", "2", "3")) should equal(Some(TableOne.intCol in (1, 2, 3)))
+    (TableOne.mappedStr untypedIn List("A", "2", "3")) should equal(None)
+    (TableOne.mappedStr untypedIn List("1", "2", "3")) should equal(Some(TableOne.mappedStr in ("1", "2", "3")))
   }
 
   "untypedStartsWith" should "allow comparison with a string" in {
@@ -95,6 +113,9 @@ class ColumnSpec extends FlatSpec with Matchers {
     (TableOne.bigDecimalCol untypedStartsWith "1") should equal(None)
     (TableOne.booleanCol untypedStartsWith "true") should equal(None)
     (TableOne.dateTimeCol untypedStartsWith "2014-01-01T09:00:00.000Z") should equal(None)
+    (TableOne.mappedCol untypedStartsWith "1") should equal(None)
+    (TableOne.mappedStr untypedStartsWith "1") should equal(None)
+    (TableOne.optMappedCol untypedStartsWith "1") should equal(None)
   }
 
   "untypedContains" should "allow comparison with a string" in {
@@ -108,5 +129,8 @@ class ColumnSpec extends FlatSpec with Matchers {
     (TableOne.bigDecimalCol untypedContains "1") should equal(None)
     (TableOne.booleanCol untypedContains "true") should equal(None)
     (TableOne.dateTimeCol untypedContains "2014-01-01T09:00:00.000Z") should equal(None)
+    (TableOne.mappedCol untypedContains "1") should equal(None)
+    (TableOne.mappedStr untypedContains "1") should equal(None)
+    (TableOne.optMappedCol untypedContains "1") should equal(None)
   }
 }

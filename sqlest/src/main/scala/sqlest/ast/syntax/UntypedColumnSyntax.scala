@@ -16,74 +16,33 @@
 
 package sqlest.ast.syntax
 
-import org.joda.time.{ DateTime, LocalDate }
-import scala.reflect.runtime.{ universe => ru }
 import scala.util.Try
 import sqlest.ast._
 import sqlest.ast.syntax._
-import sqlest.util.Iso8601
 
 class UntypedColumnHelpers extends ColumnSyntax {
-  def stringArgument(arg: String) = Some(arg)
-  def intArgument(arg: String) = Try(arg.toInt).toOption
-  def longArgument(arg: String) = Try(arg.toLong).toOption
-  def doubleArgument(arg: String) = Try(arg.toDouble).toOption
-  def booleanArgument(arg: String) = arg.trim.toLowerCase match {
-    case "true" => Some(true)
-    case "false" => Some(false)
-    case _ => None
-  }
-  def bigDecimalArgument(arg: String) = Try(BigDecimal(arg)).toOption
-  def dateTimeArgument(arg: String) = Iso8601.unapply(arg)
-  def localDateArgument(arg: String) = Iso8601.unapply(arg).map(new LocalDate(_))
-  def byteArrayArgument(arg: String) = Try(javax.xml.bind.DatatypeConverter.parseHexBinary(arg)).toOption
-  def mappedArgument[A](arg: String, columnType: ColumnType[A]): Option[A] = (columnType match {
-    case IntColumnType => intArgument(arg)
-    case LongColumnType => longArgument(arg)
-    case DoubleColumnType => doubleArgument(arg)
-    case BigDecimalColumnType => bigDecimalArgument(arg)
-    case BooleanColumnType => booleanArgument(arg)
-    case StringColumnType => stringArgument(arg)
-    case sqlest.TrimmedStringColumnType => stringArgument(arg)
-    case DateTimeColumnType => dateTimeArgument(arg)
-    case LocalDateColumnType => localDateArgument(arg)
-    case ByteArrayColumnType => byteArrayArgument(arg)
-    case _ => sys.error(s"Untyped operators are not implemented for non-standard mapped types: $columnType")
-  }).asInstanceOf[Option[A]]
+  def mappedArgument[A](arg: String, columnType: ColumnType[A])(implicit U: UntypedReads[A]) = columnType match {
+    case mappedColumnType: MappedColumnType[A, _] => for {
+      r <- U.reads(arg)
+      _ <- Try(mappedColumnType.write(r.asInstanceOf[A])).toOption
+    } yield r
 
-  def infixExpression[A](op: String, left: Column[A], right: String, columnType: ColumnType[_]): Option[InfixFunctionColumn[Boolean]] = columnType match {
-    case IntColumnType => intArgument(right).map(right => InfixFunctionColumn[Boolean](op, left, right))
-    case LongColumnType => longArgument(right).map(right => InfixFunctionColumn[Boolean](op, left, right))
-    case DoubleColumnType => doubleArgument(right).map(right => InfixFunctionColumn[Boolean](op, left, right))
-    case BigDecimalColumnType => bigDecimalArgument(right).map(right => InfixFunctionColumn[Boolean](op, left, right))
-    case BooleanColumnType => booleanArgument(right).map(right => InfixFunctionColumn[Boolean](op, left, right))
-    case StringColumnType => stringArgument(right).map(right => InfixFunctionColumn[Boolean](op, left, right))
-    case sqlest.TrimmedStringColumnType => stringArgument(right).map(right => InfixFunctionColumn[Boolean](op, left, right))
-    case DateTimeColumnType => dateTimeArgument(right).map(right => InfixFunctionColumn[Boolean](op, left, right))
-    case LocalDateColumnType => localDateArgument(right).map(right => InfixFunctionColumn[Boolean](op, left, right))
-    case ByteArrayColumnType => byteArrayArgument(right).map(right => InfixFunctionColumn[Boolean](op, left, right))
-    case optionColumnType: OptionColumnType[_, _] => infixExpression(op, left, right, optionColumnType.baseColumnType)
-    case mappedColumnType: MappedColumnType[_, _] =>
-      mappedArgument(right, mappedColumnType).map { right =>
-        val mappedRight = mappedColumnType.write(right)
-        InfixFunctionColumn[Boolean](op, left, LiteralColumn(mappedRight)(mappedColumnType.baseColumnType))
-      }
+    case _ => U.reads(arg)
   }
 
-  def likeExpression(left: Column[_], right: String, columnType: ColumnType[_], formatArgument: String => String): Option[InfixFunctionColumn[Boolean]] = columnType match {
-    case StringColumnType => stringArgument(right).map(right => InfixFunctionColumn[Boolean]("like", left, formatArgument(right)))
-    case sqlest.TrimmedStringColumnType => stringArgument(right).map(right => InfixFunctionColumn[Boolean]("like", left, formatArgument(right)))
-    case optionColumnType: OptionColumnType[_, _] => likeExpression(left, right, optionColumnType.baseColumnType, formatArgument)
-    case _ => None
-  }
+  def infixExpression[A](op: String, left: Column[A], right: String, columnType: ColumnType[A])(implicit U: UntypedReads[A]): Option[InfixFunctionColumn[Boolean]] =
+    mappedArgument(right, columnType).map(r => InfixFunctionColumn[Boolean](op, left, LiteralColumn(r)(columnType.asInstanceOf[ColumnType[U.Read]])))
+
+  def likeExpression[A](left: Column[A], right: String, columnType: ColumnType[A], formatArgument: String => String)(implicit U: UntypedReads[A]): Option[InfixFunctionColumn[Boolean]] =
+    mappedArgument(formatArgument(right), columnType).map(r => InfixFunctionColumn[Boolean]("like", left, LiteralColumn(r)(columnType.asInstanceOf[ColumnType[U.Read]])))
 
   def likeEncode(str: String) =
     str.replaceAll("([%_^])", "^$1")
-
 }
 
 trait UntypedColumnSyntax {
-  implicit class UntypedColumnOps(left: Column[_]) {
+
+  implicit class UntypedColumnOps[A](left: Column[A])(implicit U: UntypedReads[A]) {
     val helpers = new UntypedColumnHelpers
 
     def untypedEq(right: String) = helpers.infixExpression("=", left, right, left.columnType)
@@ -96,7 +55,7 @@ trait UntypedColumnSyntax {
     def untypedIn(right: List[String]) = {
       val mappedValues = right.map(value => helpers.mappedArgument(value, left.columnType))
       if (mappedValues.forall(_.isDefined)) {
-        val inColumns = mappedValues.flatten.map(value => LiteralColumn(value)(left.columnType.asInstanceOf[ColumnType[Any]]))
+        val inColumns = mappedValues.flatten.map(value => LiteralColumn(value)(left.columnType.asInstanceOf[ColumnType[U.Read]]))
         Some(InfixFunctionColumn[Boolean]("in", left, ScalarFunctionColumn("", inColumns)(left.columnType)))
       } else
         None
