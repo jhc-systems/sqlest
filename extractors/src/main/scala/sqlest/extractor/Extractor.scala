@@ -165,7 +165,7 @@ trait ChoiceExtractor[Row, A, B] extends Extractor[Row, B] with SimpleExtractor[
 }
 
 trait CondExtractor[Row, A, B] extends ChoiceExtractor[Row, A, B] {
-  protected val predicates: List[(A => Boolean, Int)]
+  val predicates: List[(A => Boolean, Int)]
 
   protected def selectExtractor[B1 <: B](row: Row, a: A): Extractor[Row, B1] = {
     predicates
@@ -176,7 +176,7 @@ trait CondExtractor[Row, A, B] extends ChoiceExtractor[Row, A, B] {
 }
 
 trait SwitchExtractor[Row, A, B] extends ChoiceExtractor[Row, A, B] {
-  protected val values: List[(A, Int)]
+  val values: List[(A, Int)]
 
   protected def selectExtractor[B1 <: B](row: Row, a: A): Extractor[Row, B1] = {
     values

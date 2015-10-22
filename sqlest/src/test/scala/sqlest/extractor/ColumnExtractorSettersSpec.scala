@@ -255,31 +255,6 @@ class ColumnExtractorSettersSpec extends FlatSpec with Matchers {
     ))
   }
 
-  it should "return setters for CondExtractors" in {
-    val lessThanZero = (t: (Int, String)) => t._1 < 0
-    val greaterThanA = (t: (Int, String)) => t._2 > "a"
-    val fallBack = (t: (Int, String)) => true
-
-    val choiceExtractor = extractTuple(FirstTable.col1, FirstTable.col2).cond(
-      lessThanZero -> leftExtractor,
-      greaterThanA -> rightExtractor,
-      fallBack -> bothExtractor
-    )
-
-    choiceExtractor.settersFor(LeftExtracted(-1, "e", Some("a"))) should be(List(
-      Setter(FirstTable.col1, -1),
-      Setter(FirstTable.col2, "e"),
-      Setter(FirstTable.col3, Some("a"))
-    ))
-
-    choiceExtractor.settersFor(BothExtracted(45, "a", Some("f"), Some(12))) should be(List(
-      Setter(FirstTable.col1, 45),
-      Setter(FirstTable.col2, "a"),
-      Setter(FirstTable.col3, Some("f")),
-      Setter(FirstTable.col4, Some(12))
-    ))
-  }
-
   it should "throw an exception when there are ambiguous choices in a ChoiceExtractor" in {
     val nameExtractor = extract[Name](
       name = FirstTable.col2
@@ -308,6 +283,22 @@ class ColumnExtractorSettersSpec extends FlatSpec with Matchers {
 
     intercept[Exception] {
       choiceExtractor.settersFor(BothExtracted(-1, "e", Some("a"), None))
+    }
+  }
+
+  it should "throw an exception when used with a CondExtractor" in {
+    val lessThanZero = (t: (Int, String)) => t._1 < 0
+    val greaterThanA = (t: (Int, String)) => t._2 > "a"
+    val fallBack = (t: (Int, String)) => true
+
+    val choiceExtractor = extractTuple(FirstTable.col1, FirstTable.col2).cond(
+      lessThanZero -> leftExtractor,
+      greaterThanA -> rightExtractor,
+      fallBack -> bothExtractor
+    )
+
+    intercept[Exception] {
+      choiceExtractor.settersFor(LeftExtracted(-1, "e", Some("a")))
     }
   }
 
