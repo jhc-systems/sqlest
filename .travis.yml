@@ -1,12 +1,16 @@
 language: scala
 
+before_install:
+  - pip install --user codecov
+
 scala:
   - 2.11.6
 
 script:
-  - sbt clean compile tut test
+  - sbt clean compile tut coverage test
 
 after_success:
+  - codecov
   - '[[ $TRAVIS_BRANCH == "master" ]] && sbt publish'
 
 sudo: false

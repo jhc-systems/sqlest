@@ -7,6 +7,7 @@ import com.typesafe.sbt.SbtGhPages
 import com.typesafe.sbt.SbtScalariform
 import com.typesafe.sbt.SbtSite
 import sbtrelease.ReleasePlugin.autoImport._
+import scoverage.ScoverageKeys._
 import spray.boilerplate.BoilerplatePlugin._
 import tut.Plugin._
 import xerial.sbt.Sonatype._
@@ -82,7 +83,9 @@ object SqlestBuild extends Build {
   def commonSettings = SbtScalariform.scalariformSettings ++ publishingSettings ++ Seq(
     organization := "uk.co.jhc",
     scalaVersion := "2.11.6",
-    scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-language:implicitConversions", "-language:existentials")
+    scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-language:implicitConversions", "-language:existentials"),
+
+    coverageExcludedPackages := "sqlest.examples"
   )
 
   def scaladocSettings = SbtSite.site.settings ++ SbtSite.site.includeScaladoc() ++ SbtGhPages.ghpages.settings ++ Seq(
