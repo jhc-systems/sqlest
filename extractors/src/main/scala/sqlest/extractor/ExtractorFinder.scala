@@ -54,6 +54,12 @@ object ExtractorFinder {
           case _ => None
         }
 
+      case choice: ChoiceExtractor[_, _, _] =>
+        (choice.inner :: choice.extractors)
+          .map(apply(_, path))
+          .find(_.isDefined)
+          .flatten
+
       case MappedExtractor(inner, _, _) => apply(inner, path)
       case OptionExtractor(inner) => apply(inner, path)
       case NonOptionExtractor(inner) => apply(inner, path)

@@ -17,6 +17,7 @@
 package sqlest.extractor
 
 import java.sql.ResultSet
+import scala.util.Try
 import sqlest.ast._
 
 trait ColumnExtractorSetters {
@@ -64,10 +65,28 @@ trait ColumnExtractorSetters {
             case (extractor, value) => extractor.settersFor(value)
           }.toList
 
+        case switchExtractor: SwitchExtractor[ResultSet, a, b] =>
+          val setterLists = switchExtractor.extractors.zipWithIndex.map {
+            case (extractor: Extractor[ResultSet, c], index) =>
+              Try { (extractor.settersFor(value.asInstanceOf[c]), index) }.toOption
+          } collect {
+            case Some((setters, index)) => (setters, index)
+          }
+
+          val innerExtractor = switchExtractor.inner
+          val values = switchExtractor.values.map { case (value, index) => value }
+
+          if (setterLists.length > 1) throw new Exception("Cannot use settersFor when there are ambiguous choices in a ChoiceExtractor")
+          else if (setterLists.isEmpty) throw new Exception("Cannot use settersFor when there are no matching choices in a ChoiceExtractor")
+          else setterLists.head match {
+            case (setters, index) => (innerExtractor.settersFor(values(index)).toSet ++ setters).toList
+          }
+
         case ConstantExtractor(_) => Nil
         case _: MappedExtractor[ResultSet, _, _] => throw new Exception(s"Cannot use settersFor with a MappedExtractor without an unapplyMethod - $extractor")
         case _: ListMultiRowExtractor[ResultSet, _] => throw new Exception("Cannot use settersFor with a ListMultiRowExtractor")
         case _: GroupedExtractor[ResultSet, _, _] => throw new Exception("Cannot use settersFor with a GroupedExtractor")
+        case _: CondExtractor[ResultSet, _, _] => throw new Exception("Cannot use settersFor with a CondExtractor")
         case _ => throw new Exception(s"Cannot use settersFor with $extractor")
       }
     }
