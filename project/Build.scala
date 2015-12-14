@@ -40,7 +40,7 @@ object SqlestBuild extends Build {
       libraryDependencies ++= Seq(
         "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
         "org.scalatest" %% "scalatest" % "2.2.1" % "test",
-        "com.chuusai" %% "shapeless" % "2.1.0" % "test",
+        "com.chuusai" %% "shapeless" % "2.2.5" % "test",
         "com.h2database" % "h2" % "1.4.180" % "test"
       )
     )
@@ -62,7 +62,7 @@ object SqlestBuild extends Build {
         "joda-time" % "joda-time" % "2.3",
         "org.joda" % "joda-convert" % "1.6",
         "org.scalatest" %% "scalatest" % "2.2.1" % "test",
-        "com.chuusai" %% "shapeless" % "2.1.0" % "test",
+        "com.chuusai" %% "shapeless" % "2.2.5" % "test",
         "com.h2database" % "h2" % "1.4.180" % "test"
       )
     )
@@ -82,7 +82,8 @@ object SqlestBuild extends Build {
 
   def commonSettings = SbtScalariform.scalariformSettings ++ publishingSettings ++ Seq(
     organization := "uk.co.jhc",
-    scalaVersion := "2.11.6",
+    scalaVersion := "2.11.7",
+    crossScalaVersions := Seq("2.11.7", "2.12.0-M3"),
     scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-language:implicitConversions", "-language:existentials"),
 
     coverageExcludedPackages := "sqlest.examples"
