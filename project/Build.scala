@@ -5,8 +5,10 @@ import com.typesafe.sbt.pgp.PgpKeys
 import com.typesafe.sbt.SbtGit.GitKeys.gitRemoteRepo
 import com.typesafe.sbt.SbtGhPages
 import com.typesafe.sbt.SbtScalariform
+import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 import com.typesafe.sbt.SbtSite
 import sbtrelease.ReleasePlugin.autoImport._
+import scalariform.formatter.preferences._
 import scoverage.ScoverageKeys._
 import spray.boilerplate.BoilerplatePlugin._
 import tut.Plugin._
@@ -84,8 +86,9 @@ object SqlestBuild extends Build {
     organization := "uk.co.jhc",
     scalaVersion := "2.11.6",
     scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-language:implicitConversions", "-language:existentials"),
-
-    coverageExcludedPackages := "sqlest.examples"
+    coverageExcludedPackages := "sqlest.examples",
+    ScalariformKeys.preferences := ScalariformKeys.preferences.value
+      .setPreference(PreserveDanglingCloseParenthesis, true)
   )
 
   def scaladocSettings = SbtSite.site.settings ++ SbtSite.site.includeScaladoc() ++ SbtGhPages.ghpages.settings ++ Seq(
