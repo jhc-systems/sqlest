@@ -173,7 +173,7 @@ trait ColumnSyntax {
     def /[B](right: Column[B])(implicit equivalence: ColumnTypeEquivalence[A, B]) = InfixFunctionColumn[Double]("/", left, right)
   }
 
-  implicit class StringColumnOps[A](left: Column[A])(implicit equivalence: ColumnTypeEquivalence[String, A]) {
+  implicit class StringColumnOps[A](left: Column[A])(implicit equivalence: ColumnTypeEquivalence[String, A], columnType: ColumnType[String]) {
     def ++[B](right: Column[B])(implicit equivalence: ColumnTypeEquivalence[A, B]) = InfixFunctionColumn[String]("||", left, right)
     def like[B](right: Column[B])(implicit equivalence: ColumnTypeEquivalence[A, B]) = InfixFunctionColumn[Boolean]("like", left, right)
   }
