@@ -17,6 +17,7 @@
 package sqlest.executor
 
 import sqlest.ast._
+
 import sqlest.sql.base._
 import sqlest.util.Logging
 
@@ -104,8 +105,12 @@ class Session(database: Database) extends Logging {
       }
     }
 
-  protected def prepareStatement(connection: Connection, operation: Operation, sql: String, argumentLists: List[List[LiteralColumn[_]]]) = {
-    val statement = connection.prepareStatement(sql)
+  protected def prepareStatement(connection: Connection, operation: Operation, sql: String, argumentLists: List[List[LiteralColumn[_]]]): PreparedStatement = {
+    prepareStatement(connection, operation, sql, argumentLists, false)
+  }
+
+  protected def prepareStatement(connection: Connection, operation: Operation, sql: String, argumentLists: List[List[LiteralColumn[_]]], returnKeys: Boolean): PreparedStatement = {
+    val statement = if (returnKeys) connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS) else connection.prepareStatement(sql)
     setArguments(operation, statement, argumentLists)
     statement
   }
@@ -171,7 +176,7 @@ class Session(database: Database) extends Logging {
   }
 }
 
-case class Transaction(database: Database) extends Session(database) {
+case class Transaction(database: Database) extends Session(database) with sqlest.extractor.ExtractorSyntax[ResultSet] {
   private var shouldRollback = false
   def rollback = shouldRollback = true
   private lazy val connection = database.getConnection
@@ -212,6 +217,38 @@ case class Transaction(database: Database) extends Session(database) {
           val endTime = new DateTime
           logger.info(s"Ran sql in ${endTime.getMillis - startTime.getMillis}ms: ${logDetails(connection, sql, argumentLists)}")
           result
+        } finally {
+          try {
+            if (preparedStatement != null) preparedStatement.close
+          } catch { case e: SQLException => }
+        }
+      } catch {
+        case e: Throwable =>
+          logger.error(s"Exception running sql: ${logDetails(connection, sql, argumentLists)}", e)
+          throw e
+      }
+    }
+
+  def executeCommandReturningKeys[T](command: Command)(implicit columnType: ColumnType[T]): RowCountAndKeys[T] =
+    withConnection { connection =>
+      val (preprocessedCommand, sql, argumentLists) = database.statementBuilder(command)
+      val startTime = new DateTime
+      try {
+        val preparedStatement = prepareStatement(connection, preprocessedCommand, sql, argumentLists)
+        try {
+          val keys = List[T]()
+          val result = preparedStatement.executeUpdate
+          val rs = preparedStatement.getGeneratedKeys
+          val extractor = extract[RowCountAndKeys[T]](
+            rowsUpdated = extractConstant[Int](result),
+            keys = IndexedColumn(1)
+          )
+          val countAndKeys = extractor.extractHeadOption(List(rs))
+          val endTime = new DateTime
+          logger.info(s"Ran sql in ${endTime.getMillis - startTime.getMillis}ms: ${logDetails(connection, sql, argumentLists)}")
+          countAndKeys.getOrElse {
+            throw new SQLException("No generated keys found")
+          }
         } finally {
           try {
             if (preparedStatement != null) preparedStatement.close

@@ -134,6 +134,16 @@ class ExecutorSpec extends FlatSpec with Matchers {
     }
   }
 
+  it should "return the generated keys" in {
+    TestDatabase(testResultSet).withTransaction { implicit transaction =>
+      val rowCountAndKeys: RowCountAndKeys[String] = insertStatement.executeReturningKeys[String]
+      rowCountAndKeys should equal(new RowCountAndKeys[String](
+        rowsUpdated = 1,
+        keys = List("1")
+      ))
+    }
+  }
+
   "a delete" should "require a transaction to run" in {
     TestDatabase(testResultSet).withTransaction { implicit transaction =>
       deleteStatement.execute
