@@ -20,6 +20,7 @@ import java.sql.ResultSet
 import org.joda.time.{ DateTime, LocalDate }
 import sqlest.extractor.TestResultSet
 import sqlest.executor.ResultSetIterable
+import sqlest.extractor.AbstractResultSet
 
 object TestData {
   class TableOne(alias: Option[String]) extends Table("one", alias) {
@@ -93,6 +94,12 @@ object TestData {
       Seq(3, "c", "d", 4, 9, null),
       Seq(-1, "e", "f", 6, null, null)
     )
+  }
+
+  def keyResultSet = new AbstractResultSet() {
+    override def getString(index: Int): String = "34"
+    override def getInt(index: Int): Int = 46
+    override def wasNull(): Boolean = false
   }
 
   implicit def resultSetIterable(resultSet: ResultSet) = ResultSetIterable(resultSet)

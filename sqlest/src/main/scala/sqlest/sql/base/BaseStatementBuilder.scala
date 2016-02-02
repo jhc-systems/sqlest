@@ -93,6 +93,7 @@ trait BaseStatementBuilder {
       case column: KeywordFunctionColumn[_] => column.name
       case column: TableColumn[_] => identifierSql(column.tableAlias) + "." + identifierSql(column.columnName)
       case column: AliasColumn[_] => columnSql(column.column)
+      case columm: IndexedColumn[_] => ""
       case column: ReferenceColumn[_] => column.columnAlias
       case column: CaseWhenColumn[_] => caseSql(column.whens, None)
       case column: CaseWhenElseColumn[_] => caseSql(column.whens, Some(column.`else`))
@@ -213,6 +214,7 @@ trait BaseStatementBuilder {
     case column: TableColumn[_] => Nil
     case column: AliasColumn[_] => columnArgs(column.column)
     case column: ReferenceColumn[_] => Nil
+    case column: IndexedColumn[_] => Nil
     case column: CaseWhenColumn[_] =>
       column.whens.flatMap(when => columnArgs(when.condition) ++ columnArgs(when.result))
     case column: CaseWhenElseColumn[_] =>

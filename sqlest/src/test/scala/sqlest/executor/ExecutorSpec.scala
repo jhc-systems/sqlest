@@ -134,12 +134,22 @@ class ExecutorSpec extends FlatSpec with Matchers {
     }
   }
 
-  it should "return the generated keys" in {
-    TestDatabase(testResultSet).withTransaction { implicit transaction =>
-      val rowCountAndKeys: RowCountAndKeys[String] = insertStatement.executeReturningKeys[String]
+  it should "return the generated String key" in {
+    TestDatabase(testResultSet, Some(keyResultSet)).withTransaction { implicit transaction =>
+      val rowCountAndKeys: RowCountAndKeys[String] = insertStatement.executeReturningKeys
       rowCountAndKeys should equal(new RowCountAndKeys[String](
         rowsUpdated = 1,
-        keys = List("1")
+        keys = List("34")
+      ))
+    }
+  }
+
+  it should "return the generated Integer key" in {
+    TestDatabase(testResultSet, Some(keyResultSet)).withTransaction { implicit transaction =>
+      val rowCountAndKeys: RowCountAndKeys[Int] = insertStatement.executeReturningKeys
+      rowCountAndKeys should equal(new RowCountAndKeys[Int](
+        rowsUpdated = 1,
+        keys = List(46)
       ))
     }
   }

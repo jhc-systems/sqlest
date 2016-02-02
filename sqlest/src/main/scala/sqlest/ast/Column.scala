@@ -119,7 +119,13 @@ sealed trait AliasedColumn[A] extends Column[A] with CellExtractor[ResultSet, A]
 
 }
 
-case class IndexedColumn[A](index: Int) extends Column[A] with CellExtractor[ResultSet, A] {
+/**
+ * A column that has an index associated with it.
+ *
+ * This column is only for internal use when accessing generated keys
+ *
+ */
+case class IndexedColumn[A](index: Int)(implicit val columnType: ColumnType[A]) extends Column[A] with CellExtractor[ResultSet, A] {
 
   def read(resultSet: ResultSet) =
     columnType match {

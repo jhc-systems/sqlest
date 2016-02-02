@@ -46,17 +46,10 @@ trait ExecutorSyntax extends QuerySyntax {
 
   implicit class InsertExecutorOps(insert: Insert) {
     def execute(implicit transaction: Transaction): Int = transaction.executeCommand(insert)
-    def executeReturningKeys[T](
+    def executeReturningKeys[KeyT](
       implicit
-      transaction: Transaction
-    ): RowCountAndKeys[T] = transaction.executeCommandReturningKeys[T](insert)
-
-    /*
-    def executeReturningKeys[T: scala.reflect.ClassTag](
-      implicit
-      transaction: Transaction
-    ): RowCountAndKeys[T] = transaction.executeCommandReturningKeys(insert)
-*/
+      transaction: Transaction, columnType: ColumnType[KeyT]
+    ): RowCountAndKeys[KeyT] = transaction.executeCommandReturningKeys(insert)
   }
 
   implicit class UpdateExecutorOps(update: Update) {

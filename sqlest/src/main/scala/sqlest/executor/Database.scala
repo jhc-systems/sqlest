@@ -241,9 +241,9 @@ case class Transaction(database: Database) extends Session(database) with sqlest
           val rs = preparedStatement.getGeneratedKeys
           val extractor = extract[RowCountAndKeys[T]](
             rowsUpdated = extractConstant[Int](result),
-            keys = IndexedColumn(1)
+            keys = IndexedColumn[T](1).asList
           )
-          val countAndKeys = extractor.extractHeadOption(List(rs))
+          val countAndKeys = extractor.extractHeadOption(ResultSetIterator(rs))
           val endTime = new DateTime
           logger.info(s"Ran sql in ${endTime.getMillis - startTime.getMillis}ms: ${logDetails(connection, sql, argumentLists)}")
           countAndKeys.getOrElse {
