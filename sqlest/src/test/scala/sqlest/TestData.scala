@@ -97,9 +97,11 @@ object TestData {
   }
 
   def keyResultSet = new AbstractResultSet() {
+    var hasNext = false
     override def getString(index: Int): String = "34"
     override def getInt(index: Int): Int = 46
     override def wasNull(): Boolean = false
+    override def next(): Boolean = { hasNext = !hasNext; hasNext }
   }
 
   implicit def resultSetIterable(resultSet: ResultSet) = ResultSetIterable(resultSet)

@@ -243,7 +243,7 @@ case class Transaction(database: Database) extends Session(database) with sqlest
             rowsUpdated = extractConstant[Int](result),
             keys = IndexedColumn[T](1).asList
           )
-          val countAndKeys = extractor.extractHeadOption(ResultSetIterator(rs))
+          val countAndKeys = extractor.extractHeadOption(ResultSetIterable(rs))
           val endTime = new DateTime
           logger.info(s"Ran sql in ${endTime.getMillis - startTime.getMillis}ms: ${logDetails(connection, sql, argumentLists)}")
           countAndKeys.getOrElse {
