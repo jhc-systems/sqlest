@@ -49,7 +49,7 @@ trait ExecutorSyntax extends QuerySyntax {
     def executeReturningKeys[KeyT](
       implicit
       transaction: Transaction, columnType: ColumnType[KeyT]
-    ): RowCountAndKeys[KeyT] = transaction.executeCommandReturningKeys(insert)
+    ): List[KeyT] = transaction.executeInsertReturningKeys(insert)
   }
 
   implicit class UpdateExecutorOps(update: Update) {

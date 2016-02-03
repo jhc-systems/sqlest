@@ -72,7 +72,6 @@ object ColumnOperations {
       case keywordFunctionColumn: KeywordFunctionColumn[A] => f(KeywordFunctionColumn(keywordFunctionColumn.name)(keywordFunctionColumn.columnType)).asInstanceOf[Column[A]]
       case tableColumn: TableColumn[A] => f(tableColumn).asInstanceOf[Column[A]]
       case aliasColumn: AliasColumn[A] => f(AliasColumn(aliasColumn.column.mapColumns(f, selectFunction), aliasColumn.columnAlias)(aliasColumn.columnType)).asInstanceOf[Column[A]]
-      case indexedColumn: IndexedColumn[A] => f(IndexedColumn(indexedColumn.index)(indexedColumn.columnType)).asInstanceOf[Column[A]]
       case referenceColumn: ReferenceColumn[A] => f(referenceColumn).asInstanceOf[Column[A]]
       case caseWhenColumn: CaseWhenColumn[A] => f(CaseWhenColumn(caseWhenColumn.whens.map(_.mapColumns(f, selectFunction)))(caseWhenColumn.columnType)).asInstanceOf[Column[A]]
       case caseWhenElseColumn: CaseWhenElseColumn[A] => f(CaseWhenElseColumn(caseWhenElseColumn.whens.map(_.mapColumns(f, selectFunction)), caseWhenElseColumn.`else`.mapColumns(f, selectFunction).asInstanceOf[Column[A]])(caseWhenElseColumn.columnType)).asInstanceOf[Column[A]]

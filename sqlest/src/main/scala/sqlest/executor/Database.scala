@@ -25,6 +25,7 @@ import java.sql.{ Connection, Date => JdbcDate, DriverManager, ResultSet, Prepar
 import javax.sql.DataSource
 import org.joda.time.{ DateTime, LocalDate }
 import scala.util.DynamicVariable
+import sqlest.extractor.IndexedExtractor
 
 object Database {
   def withDataSource(dataSource: DataSource, builder: StatementBuilder): Database = new Database {
@@ -176,7 +177,7 @@ class Session(database: Database) extends Logging {
   }
 }
 
-case class Transaction(database: Database) extends Session(database) with sqlest.extractor.ExtractorSyntax[ResultSet] {
+case class Transaction(database: Database) extends Session(database) {
   private var shouldRollback = false
   def rollback = shouldRollback = true
   private lazy val connection = database.getConnection
@@ -229,26 +230,19 @@ case class Transaction(database: Database) extends Session(database) with sqlest
       }
     }
 
-  def executeCommandReturningKeys[T](command: Command)(implicit columnType: ColumnType[T]): RowCountAndKeys[T] =
+  def executeInsertReturningKeys[T](command: Insert)(implicit columnType: ColumnType[T]): List[T] =
     withConnection { connection =>
       val (preprocessedCommand, sql, argumentLists) = database.statementBuilder(command)
       val startTime = new DateTime
       try {
         val preparedStatement = prepareStatement(connection, preprocessedCommand, sql, argumentLists)
         try {
-          val keys = List[T]()
           val result = preparedStatement.executeUpdate
           val rs = preparedStatement.getGeneratedKeys
-          val extractor = extract[RowCountAndKeys[T]](
-            rowsUpdated = extractConstant[Int](result),
-            keys = IndexedColumn[T](1).asList
-          )
-          val countAndKeys = extractor.extractHeadOption(ResultSetIterable(rs))
+          val keys = IndexedExtractor[T](1).extractAll(ResultSetIterable(rs))
           val endTime = new DateTime
           logger.info(s"Ran sql in ${endTime.getMillis - startTime.getMillis}ms: ${logDetails(connection, sql, argumentLists)}")
-          countAndKeys.getOrElse {
-            throw new SQLException("No generated keys found")
-          }
+          keys
         } finally {
           try {
             if (preparedStatement != null) preparedStatement.close
