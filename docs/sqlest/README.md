@@ -4,7 +4,7 @@
 
 **sqlest-extractors** is a second library used for extracting case classes from table data. It is used within sqlest. Check out the [readme](extractors/README.md)
 
-[![Build Status](https://travis-ci.org/jhc-systems/sqlest.svg?branch=master)](https://travis-ci.org/jhc-systems/sqlest)
+[![Build Status](https://travis-ci.org/jhc-systems/sqlest.svg?branch=master)](https://travis-ci.org/jhc-systems/sqlest?branch=master) [![codecov.io](https://codecov.io/github/jhc-systems/sqlest/coverage.svg?branch=master)](https://codecov.io/github/jhc-systems/sqlest?branch=master)
 
 ## Using sqlest
 To use sqlest from an existing project add the following resolvers
@@ -19,7 +19,7 @@ resolvers ++= Seq(
 and the following library dependency
 ```scala
 libraryDependencies ++= Seq(
-  "uk.co.jhc" %% "sqlest" % "0.7.0"
+  "uk.co.jhc" %% "sqlest" % "0.7.2"
 )
 ```
 
