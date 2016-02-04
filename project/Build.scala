@@ -8,6 +8,7 @@ import com.typesafe.sbt.SbtScalariform
 import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 import com.typesafe.sbt.SbtSite
 import sbtrelease.ReleasePlugin.autoImport._
+import sbtrelease.ReleasePlugin.autoImport.ReleaseTransformations._
 import scalariform.formatter.preferences._
 import scoverage.ScoverageKeys._
 import spray.boilerplate.BoilerplatePlugin._
@@ -20,11 +21,8 @@ object SqlestBuild extends Build {
     id = "root",
     base = file("."),
     aggregate = Seq(sqlest, extractors, examples),
-    settings = commonSettings ++ Seq(
-      moduleName := "root",
-
-      publish := (),
-      publishLocal := ()
+    settings = commonSettings ++ noPublishSettings ++ Seq(
+      moduleName := "root"
     )
   )
 
@@ -74,31 +72,47 @@ object SqlestBuild extends Build {
     id = "examples",
     base = file("examples"),
 
-    settings = commonSettings ++ Seq(
-      libraryDependencies += "com.h2database" % "h2" % "1.4.180",
-
-      publish := (),
-      publishLocal := ()
+    settings = commonSettings ++ noPublishSettings ++ Seq(
+      libraryDependencies += "com.h2database" % "h2" % "1.4.180"
     )
   ).dependsOn(sqlest)
 
   def commonSettings = SbtScalariform.scalariformSettings ++ publishingSettings ++ Seq(
     organization := "uk.co.jhc",
     scalaVersion := "2.11.6",
-    scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-language:implicitConversions", "-language:existentials"),
+    scalacOptions ++= Seq(
+      "-deprecation",
+      "-encoding", "UTF-8",
+      "-feature",
+      "-language:existentials",
+      "-language:higherKinds",
+      "-language:implicitConversions",
+      "-unchecked",
+      "-Xfatal-warnings",
+      "-Yinline-warnings",
+      "-Ywarn-dead-code",
+      "-Xfuture"
+    ),
     coverageExcludedPackages := "sqlest.examples",
     ScalariformKeys.preferences := ScalariformKeys.preferences.value
-      .setPreference(PreserveDanglingCloseParenthesis, true)
+      .setPreference(DanglingCloseParenthesis, Preserve)
+  )
+
+  lazy val noPublishSettings = Seq(
+    publish := (),
+    publishLocal := (),
+    publishArtifact := false
   )
 
   def scaladocSettings = SbtSite.site.settings ++ SbtSite.site.includeScaladoc() ++ SbtGhPages.ghpages.settings ++ Seq(
     gitRemoteRepo := "git@github.com:jhc-systems/sqlest.git"
   )
 
-  def publishingSettings = sonatypeSettings ++ Seq(
+  def publishingSettings = sonatypeSettings ++ sonatypeReleaseProcess ++ Seq(
     // Publishing - http://www.scala-sbt.org/0.13/docs/Using-Sonatype.html
     releasePublishArtifactsAction := PgpKeys.publishSigned.value,
     publishMavenStyle := true,
+    publishArtifact in Test := false,
     publishTo := {
       val nexus = "https://oss.sonatype.org/"
       if (isSnapshot.value)
@@ -138,5 +152,22 @@ object SqlestBuild extends Build {
           <name>Brendan Maginnis</name>
         </developer>
       </developers>)
+  )
+
+  lazy val sonatypeReleaseProcess = Seq(
+    releaseProcess := Seq[ReleaseStep](
+      checkSnapshotDependencies,
+      inquireVersions,
+      runClean,
+      runTest,
+      setReleaseVersion,
+      commitReleaseVersion,
+      tagRelease,
+      ReleaseStep(action = Command.process("publishSigned", _)),
+      setNextVersion,
+      commitNextVersion,
+      ReleaseStep(action = Command.process("sonatypeReleaseAll", _)),
+      pushChanges
+    )
   )
 }
