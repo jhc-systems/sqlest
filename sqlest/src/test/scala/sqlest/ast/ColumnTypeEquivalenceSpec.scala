@@ -53,7 +53,51 @@ class ColumnTypeEquivalenceSpec extends FlatSpec with Matchers {
     val wrappedStringOptionColumn = column[Option[WrappedString]]("wrappedString")
   }
 
+  object LeftTable extends Table("left", None) {
+    // MappedColumnType
+    val leftMappedYNBooleanColumn = column[Boolean]("mappedYNBooleanColumn")(BooleanYNColumnType)
+    val leftMapped10BooleanColumn = column[Boolean]("mapped10BooleanColumn")(Boolean10ColumnType)
+    val leftWrappedStringColumn = column[WrappedString]("wrappedString")
+
+    // OptionColumns
+    // .. NonNumericColumnType
+    val leftStringOptionColumn = column[Option[String]]("stringColumn")
+    val leftBooleanOptionColumn = column[Option[Boolean]]("booleanColumn")
+
+    // .. NumericColumnType
+    val leftIntOptionColumn = column[Option[Int]]("intColumn")
+    val leftBigDecimalOptionColumn = column[Option[BigDecimal]]("bigDecimalColumn")
+
+    // .. MappedColumnType
+    val leftMappedYNBooleanOptionColumn = column[Option[Boolean]]("mappedYNBooleanColumn")(OptionColumnType(BooleanYNColumnType))
+    val leftMapped10BooleanOptionColumn = column[Option[Boolean]]("mapped10BooleanColumn")(OptionColumnType(Boolean10ColumnType))
+    val leftWrappedStringOptionColumn = column[Option[WrappedString]]("wrappedString")
+  }
+
+  object RightTable extends Table("right", None) {
+    // MappedColumnType
+    val rightMappedYNBooleanColumn = column[Boolean]("mappedYNBooleanColumn")(BooleanYNColumnType)
+    val rightMapped10BooleanColumn = column[Boolean]("mapped10BooleanColumn")(Boolean10ColumnType)
+    val rightWrappedStringColumn = column[WrappedString]("wrappedString")
+
+    // OptionColumns
+    // .. NonNumericColumnType
+    val rightStringOptionColumn = column[Option[String]]("stringColumn")
+    val rightBooleanOptionColumn = column[Option[Boolean]]("booleanColumn")
+
+    // .. NumericColumnType
+    val rightIntOptionColumn = column[Option[Int]]("intColumn")
+    val rightBigDecimalOptionColumn = column[Option[BigDecimal]]("bigDecimalColumn")
+
+    // .. MappedColumnType
+    val rightMappedYNBooleanOptionColumn = column[Option[Boolean]]("mappedYNBooleanColumn")(OptionColumnType(BooleanYNColumnType))
+    val rightMapped10BooleanOptionColumn = column[Option[Boolean]]("mapped10BooleanColumn")(OptionColumnType(Boolean10ColumnType))
+    val rightWrappedStringOptionColumn = column[Option[WrappedString]]("wrappedString")
+  }
+
   import TestTable._
+  import LeftTable._
+  import RightTable._
 
   "ColumnTypeEquivalence" should "allow the same NonNumericColumnTypes to be compared" in {
     stringColumn === "hello"
@@ -86,8 +130,11 @@ class ColumnTypeEquivalenceSpec extends FlatSpec with Matchers {
     wrappedStringColumn === WrappedString("wrapping paper")
 
     mappedYNBooleanColumn === mappedYNBooleanColumn
+    leftMappedYNBooleanColumn === rightMappedYNBooleanColumn
     mapped10BooleanColumn === mapped10BooleanColumn
+    leftMapped10BooleanColumn === rightMapped10BooleanColumn
     wrappedStringColumn === wrappedStringColumn
+    leftWrappedStringColumn === rightWrappedStringColumn
 
     illTyped("mappedYNBooleanColumn === \"Y\"")
     illTyped("mapped10BooleanColumn === 1")
@@ -176,10 +223,6 @@ class ColumnTypeEquivalenceSpec extends FlatSpec with Matchers {
     stringOptionColumn === stringOptionColumn
     booleanOptionColumn === booleanOptionColumn
     intOptionColumn === intOptionColumn
-    intOptionColumn === intOptionColumn
-    intOptionColumn === intOptionColumn
-    bigDecimalOptionColumn === bigDecimalOptionColumn
-    bigDecimalOptionColumn === bigDecimalOptionColumn
     bigDecimalOptionColumn === bigDecimalOptionColumn
     mappedYNBooleanOptionColumn === mappedYNBooleanOptionColumn
     mapped10BooleanOptionColumn === mapped10BooleanOptionColumn
@@ -191,6 +234,16 @@ class ColumnTypeEquivalenceSpec extends FlatSpec with Matchers {
     illTyped("mappedYNBooleanOptionColumn === Some(\"Y\")")
     illTyped("mapped10BooleanOptionColumn === Some(1)")
     illTyped("wrappedOptionString === Some(\"wrapped string\")")
+  }
+
+  it should "allow Option and Option types from different tables to be compared" in {
+    leftStringOptionColumn === rightStringOptionColumn
+    leftBooleanOptionColumn === rightBooleanOptionColumn
+    leftIntOptionColumn === rightIntOptionColumn
+    leftBigDecimalOptionColumn === rightBigDecimalOptionColumn
+    leftMappedYNBooleanOptionColumn === rightMappedYNBooleanOptionColumn
+    leftMapped10BooleanOptionColumn === rightMapped10BooleanOptionColumn
+    leftWrappedStringOptionColumn === rightWrappedStringOptionColumn
   }
 
   "ColumnTypeEquivalence.alignColumnTypes" should "set the column type on literals to the equivalent ColumnType" in {

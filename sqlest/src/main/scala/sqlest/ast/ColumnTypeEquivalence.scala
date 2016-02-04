@@ -74,9 +74,12 @@ object ColumnTypeEquivalence extends LowPriorityImplicits {
       def fail = throw new AssertionError(s"Incompatible column comparison - $left, $right")
 
       (left, right) match {
-        case (leftOption: OptionColumnType[_, _], rightOption: OptionColumnType[_, _]) if (leftOption != rightOption) => fail
-        case (leftOption: OptionColumnType[_, _], right) => checkCompatible(leftOption.innerColumnType, right)
-        case (left, rightOption: OptionColumnType[_, _]) => checkCompatible(left, rightOption.innerColumnType)
+        case (leftOption: OptionColumnType[_, _], rightOption: OptionColumnType[_, _]) =>
+          checkCompatible(leftOption.innerColumnType, rightOption.innerColumnType)
+        case (leftOption: OptionColumnType[_, _], right) =>
+          checkCompatible(leftOption.innerColumnType, right)
+        case (left, rightOption: OptionColumnType[_, _]) =>
+          checkCompatible(left, rightOption.innerColumnType)
         case (_: NumericColumnType[_], _: NumericColumnType[_]) =>
         case (StringColumnType, sqlest.TrimmedStringColumnType) =>
         case (sqlest.TrimmedStringColumnType, StringColumnType) =>
