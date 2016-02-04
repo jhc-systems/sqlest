@@ -24,7 +24,7 @@ resolvers ++= Seq(
 and the following library dependency
 ```scala
 libraryDependencies ++= Seq(
-  "uk.co.jhc" %% "sqlest-extractors" % "0.7.2"
+  "uk.co.jhc" %% "sqlest-extractors" % "0.7.3"
 )
 ```
 
@@ -137,10 +137,10 @@ res1: Option[CSVApp.Address] = Some(Address(1,Old Kent Road))
 `extractAll` reads all rows into a List
 ```scala
 scala> CSVApp.tupleAll
-res2: List[(String, Int, Option[Int], Option[String])] = List((Anne,35,Some(1),Some(Old Kent Road)))
+res2: List[(String, Int, Option[Int], Option[String])] = List((Anne,35,Some(1),Some(Old Kent Road)), (Bob,45,Some(2),Some(Whitechapel)), (Charlie,20,None,Some(Lost)))
 
 scala> CSVApp.personAll
-res3: List[CSVApp.Person] = List(Person(Anne,35,Some(Address(1,Old Kent Road))))
+res3: List[CSVApp.Person] = List(Person(Anne,35,Some(Address(1,Old Kent Road))), Person(Bob,45,Some(Address(2,Whitechapel))), Person(Charlie,20,None))
 ```
 
 ## More examples
