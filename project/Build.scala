@@ -166,7 +166,7 @@ object SqlestBuild extends Build {
       ReleaseStep(action = Command.process("publishSigned", _)),
       setNextVersion,
       commitNextVersion,
-      ReleaseStep(action = Command.process("sonatypeReleaseAll", _)),
+      ReleaseStep(action = Command.process("sonatypeRelease", _)),
       pushChanges
     )
   )
