@@ -19,7 +19,7 @@ package sqlest.executor
 import java.sql.ResultSet
 import sqlest._
 
-case class TestDatabase(resultSet: ResultSet) extends Database {
+case class TestDatabase(resultSet: ResultSet, keyResultSet: Option[ResultSet] = None) extends Database {
   var preparedStatement: Option[AbstractPreparedStatement] = None
 
   def statementBuilder: StatementBuilder = sqlest.sql.H2StatementBuilder
@@ -33,8 +33,11 @@ case class TestDatabase(resultSet: ResultSet) extends Database {
       val statement = new AbstractPreparedStatement {
         val sql = inSql
         override def executeQuery() = resultSet
-        override def executeUpdate() = 0
+        override def executeUpdate() = 1
         override def executeBatch() = Array()
+        override def getGeneratedKeys(): java.sql.ResultSet = {
+          keyResultSet.getOrElse(null)
+        }
       }
       preparedStatement = Some(statement)
       statement
