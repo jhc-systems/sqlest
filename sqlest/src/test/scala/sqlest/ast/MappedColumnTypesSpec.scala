@@ -62,6 +62,25 @@ class MappedColumnTypeSpec extends FlatSpec with Matchers with MappedColumnTypes
     }
   }
 
+  "EnumerationColumnType" should "accept a fallback value for reads using withDefault" in {
+    val AnimalColumnType = EnumerationColumnType(
+      Snake -> "S",
+      Gigantosaurus -> "G"
+    ).withDefault(Gigantosaurus)
+
+    AnimalColumnType.write(Snake) should be("S")
+    AnimalColumnType.write(Gigantosaurus) should be("G")
+
+    intercept[NoSuchElementException] {
+      AnimalColumnType.write(Troglodyte) should be("G")
+    }
+
+    AnimalColumnType.read(Some("S")) should be(Some(Snake))
+    AnimalColumnType.read(Some("G")) should be(Some(Gigantosaurus))
+
+    AnimalColumnType.read(Some("X")) should be(Some(Gigantosaurus))
+  }
+
   "OptionColumnType" should "convert zeroes in database to None" in {
     val zeroIsNoneIntColumnType = OptionColumnType[Int, Int](0)
     zeroIsNoneIntColumnType.write(Some(10)) should be(10)

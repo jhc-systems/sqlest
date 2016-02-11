@@ -60,8 +60,11 @@ trait BooleanMappedColumnTypes {
 }
 
 trait EnumerationMappedColumnTypes {
-  trait BaseEnumerationColumnType[ValueType, DatabaseType] extends MappedColumnType[ValueType, DatabaseType] {
+  trait BaseEnumerationColumnType[ValueType, DatabaseType] extends MappedColumnType[ValueType, DatabaseType] { self =>
+    type WithDefault <: BaseEnumerationColumnType[ValueType, DatabaseType]
+
     val mappings: Seq[(ValueType, DatabaseType)]
+    val default: Option[ValueType]
     val toDatabaseMappings = mappings.toMap
     val toValueMappings = mappings.map { case (value, database) => (database, value) }.toMap
 
@@ -69,6 +72,7 @@ trait EnumerationMappedColumnTypes {
       database.map { database =>
         toValueMappings
           .get(database)
+          .orElse(default)
           .getOrElse(throw new NoSuchElementException(s"Could not read database value $database in EnumerationColumn"))
       }
 
@@ -76,11 +80,25 @@ trait EnumerationMappedColumnTypes {
       toDatabaseMappings
         .get(value)
         .getOrElse(throw new NoSuchElementException(s"Could not write $value in EnumerationColumn"))
+
+    def withDefault(defaultValue: ValueType): WithDefault
   }
 
-  case class EnumerationColumnType[ValueType, DatabaseType](mappings: (ValueType, DatabaseType)*)(implicit val baseColumnType: BaseColumnType[DatabaseType]) extends BaseEnumerationColumnType[ValueType, DatabaseType]
+  case class EnumerationColumnType[ValueType, DatabaseType](mappings: (ValueType, DatabaseType)*)(implicit val baseColumnType: BaseColumnType[DatabaseType]) extends BaseEnumerationColumnType[ValueType, DatabaseType] {
+    type WithDefault = EnumerationColumnType[ValueType, DatabaseType]
+
+    val default: Option[ValueType] = None
+
+    def withDefault(defaultValue: ValueType) = new EnumerationColumnType(mappings: _*) {
+      override val default = Some(defaultValue)
+    }
+  }
 
   case class OrderedEnumerationColumnType[ValueType, DatabaseType](mappings: (ValueType, DatabaseType)*)(implicit val baseColumnType: BaseColumnType[DatabaseType]) extends BaseEnumerationColumnType[ValueType, DatabaseType] with OrderedColumnType {
+    type WithDefault = OrderedEnumerationColumnType[ValueType, DatabaseType]
+
+    val default: Option[ValueType] = None
+
     def orderColumn(column: Column[_]) = {
       val caseMappings =
         mappings
@@ -89,6 +107,10 @@ trait EnumerationMappedColumnTypes {
           .toList
 
       CaseColumnColumn(column, caseMappings)
+    }
+
+    def withDefault(defaultValue: ValueType) = new OrderedEnumerationColumnType(mappings: _*) {
+      override val default = Some(defaultValue)
     }
   }
 }
