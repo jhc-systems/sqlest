@@ -28,7 +28,7 @@ trait ColumnExtractorSyntax {
     }
 
     def columns: List[AliasedColumn[_]] = {
-      extractor match {
+      val extractorColumns = extractor match {
         case ConstantExtractor(_) => Nil
         case column: AliasedColumn[_] => List(column)
         case _: CellExtractor[_, _] => Nil
@@ -41,6 +41,8 @@ trait ColumnExtractorSyntax {
         case ListMultiRowExtractor(innerExtractor) => innerExtractor.columns
         case GroupedExtractor(innerExtractor, groupByExtractor) => innerExtractor.columns ++ groupByExtractor.columns
       }
+
+      extractorColumns.distinct
     }
   }
 }
