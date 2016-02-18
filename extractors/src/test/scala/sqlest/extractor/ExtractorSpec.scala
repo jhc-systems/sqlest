@@ -18,8 +18,16 @@ package sqlest.extractor
 
 import org.scalatest._
 import org.scalatest.matchers._
+import shapeless.test.illTyped
 
 class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]] {
+
+  sealed trait Superclass {
+    def a: Int
+    def b: String
+  }
+  case class Subclass(a: Int, b: String, c: Boolean) extends Superclass
+  case class NeedsSuper(sup: Superclass)
 
   def intExtractorAtIndex(index: Int) = new CellExtractor[Seq[Any], Int] {
     def read(seq: Seq[Any]) = Option(seq(index)).map(value => Integer.parseInt(value.toString))
@@ -102,6 +110,23 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
     intercept[NullPointerException] {
       mappedIntExtractor.extractAll(seqRows)
     }
+  }
+
+  it should "upcast safely with asA" in {
+    val seqRows = List(Seq(0, "hello"), Seq(2, "bye"), Seq(4, "level"))
+
+    val subExtractor = extract[Subclass](
+      a = intExtractorAtIndex(0),
+      b = stringExtractorAtIndex(1),
+      c = intExtractorAtIndex(0).map(_ % 2 == 0)
+    )
+
+    val upcastExtractor = subExtractor.asA[Superclass]
+    val supExtractor = extract[NeedsSuper](sup = upcastExtractor)
+
+    illTyped("""
+      extract[NeedsSuper](sup = subExtractor)
+     """)
   }
 
   "ChoiceExtractor" should "extract using left when the predicate is true and right when it is false" in {
