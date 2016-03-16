@@ -39,6 +39,8 @@ sealed trait Extractor[Row, A] extends ChoiceExtractorSyntax[Row, A] {
   def map[B](func: A => B) = MappedExtractor(this, func)
   def map[B](func: A => B, unapplyFunc: B => Option[Any]) = MappedExtractor(this, func, Some(unapplyFunc))
 
+  def asA[B >: A] = map(a => (a: B))
+
   def asOption = OptionExtractor(this)
 }
 
