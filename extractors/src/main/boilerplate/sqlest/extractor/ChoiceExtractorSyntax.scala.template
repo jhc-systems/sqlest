@@ -17,13 +17,13 @@
 package sqlest.extractor
 
 trait ChoiceExtractorSyntax[Row, A] { self: Extractor[Row, A] =>
-[2..22#  def cond[[#B1 <: B#], B]([#choice1: (A => Boolean, Extractor[Row, B1])#]): Extractor[Row, B] = {
+[2..22#  def cond[[#B1 <: B#], B]([#choice1: (A => Boolean, Extractor[Row, B1])#]) = {
     CondExtractor1(self, [#choice1#])
   }#
 
 ]
 
-[2..22#  def switch[[#B1 <: B#], B]([#choice1: (A, Extractor[Row, B1])#]): Extractor[Row, B] = {
+[2..22#  def switch[[#B1 <: B#], B]([#choice1: (A, Extractor[Row, B1])#]) = {
     SwitchExtractor1(self, [#choice1#])
   }#
 

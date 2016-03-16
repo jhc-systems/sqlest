@@ -135,10 +135,10 @@ lazy val sonatypeReleaseProcess = Seq(
     setReleaseVersion,
     commitReleaseVersion,
     tagRelease,
-    ReleaseStep(action = Command.process("publishSigned", _)),
+    publishArtifacts,
     setNextVersion,
     commitNextVersion,
-    ReleaseStep(action = Command.process("sonatypeRelease", _)),
+    ReleaseStep(action = Command.process("sonatypeReleaseAll", _)),
     pushChanges
   )
 )
