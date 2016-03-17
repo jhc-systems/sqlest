@@ -19,6 +19,9 @@ package sqlest.executor
 import java.sql.Connection
 
 trait AbstractConnection extends Connection {
+  var closed: Boolean
+  var committed: Boolean
+  var rolledBack: Boolean
   def abort(x$1: java.util.concurrent.Executor): Unit = ???
   def clearWarnings(): Unit = ???
   def close(): Unit = ???

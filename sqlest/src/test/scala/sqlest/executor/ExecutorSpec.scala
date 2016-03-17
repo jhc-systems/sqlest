@@ -19,9 +19,14 @@ package sqlest.executor
 import org.joda.time.LocalDate
 import org.scalatest._
 import org.scalatest.matchers._
+import scala.concurrent.{ Await, Future }
+import scala.concurrent.duration._
+import scala.util.Try
 import sqlest._
 import sqlest.ast.{ LiteralColumn, Setter }
 import sqlest.extractor.TestResultSet
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class ExecutorSpec extends FlatSpec with Matchers {
   import TestData._
@@ -122,10 +127,134 @@ class ExecutorSpec extends FlatSpec with Matchers {
     }
   }
 
+  "withConnection" should "close the connection on completion" in {
+    val database = TestDatabase(testResultSet)
+    database.withConnection { connection =>
+      connection.createStatement.execute("values(0)")
+    }
+    database.lastConnection.get.closed shouldBe true
+  }
+
+  it should "close the connection when an exception is thrown" in {
+    val database = TestDatabase(testResultSet)
+    intercept[Exception] {
+      database.withConnection { connection =>
+        throw new Exception("Catastrophic failure")
+      }
+    }
+    database.lastConnection.get.closed shouldBe true
+  }
+
   "an update" should "require a transaction to run" in {
     TestDatabase(testResultSet).withTransaction { implicit transaction =>
       updateStatement.execute
     }
+  }
+
+  it should "close the connection on completion" in {
+    val database = TestDatabase(testResultSet)
+    database.withTransaction { implicit transaction =>
+      updateStatement.execute
+    }
+    database.lastConnection.get.closed shouldBe true
+  }
+
+  it should "commit the transaction on success" in {
+    val database = TestDatabase(testResultSet)
+    database.withTransaction { implicit transaction =>
+      updateStatement.execute
+    }
+    database.lastConnection.get.committed shouldBe true
+  }
+
+  it should "roll back the transaction and close the connection on rollback" in {
+    val database = TestDatabase(testResultSet)
+    database.withTransaction { implicit transaction =>
+      val result = updateStatement.execute
+      transaction.rollback
+      result
+    }
+    database.lastConnection.get.closed shouldBe true
+    database.lastConnection.get.rolledBack shouldBe true
+    database.lastConnection.get.committed shouldBe false
+  }
+
+  it should "roll back the transaction and close the connection when an exception is thrown" in {
+    val database = TestDatabase(testResultSet)
+    intercept[Exception] {
+      database.withTransaction { implicit transaction =>
+        throw new Exception("Catastrophic error")
+      }
+    }
+    database.lastConnection.get.closed shouldBe true
+    database.lastConnection.get.rolledBack shouldBe true
+    database.lastConnection.get.committed shouldBe false
+  }
+
+  "an asynchronous update" should "require a transaction to run" in {
+    TestDatabase(testResultSet).withTransactionAsync { implicit transaction =>
+      Future(updateStatement.execute)
+    }
+  }
+
+  it should "close the connection on completion" in {
+    val database = TestDatabase(testResultSet)
+    val transaction = database.withTransactionAsync { implicit transaction =>
+      Future(updateStatement.execute)
+    }
+    val result = Try(Await.result(transaction, 20.seconds))
+    result shouldBe 'success
+    database.lastConnection.get.closed shouldBe true
+  }
+
+  it should "commit the transaction on success" in {
+    val database = TestDatabase(testResultSet)
+    val transaction = database.withTransactionAsync { implicit transaction =>
+      Future(updateStatement.execute)
+    }
+    val result = Try(Await.result(transaction, 20.seconds))
+    result shouldBe 'success
+    database.lastConnection.get.committed shouldBe true
+  }
+
+  it should "roll back the transaction and close the connection on rollback" in {
+    val database = TestDatabase(testResultSet)
+    val transaction = database.withTransactionAsync { implicit transaction =>
+      Future {
+        val result = updateStatement.execute
+        transaction.rollback
+        result
+      }
+    }
+    val result = Try(Await.result(transaction, 20.seconds))
+    result shouldBe 'success
+    database.lastConnection.get.closed shouldBe true
+    database.lastConnection.get.rolledBack shouldBe true
+    database.lastConnection.get.committed shouldBe false
+  }
+
+  it should "roll back the transaction and close the connection when an exception is thrown" in {
+    val database = TestDatabase(testResultSet)
+    val transaction = database.withTransactionAsync { implicit transaction =>
+      throw new Exception("Catastrophic error")
+    }
+    val result = Try(Await.result(transaction, 20.seconds))
+    result shouldBe 'failure
+    database.lastConnection.get.closed shouldBe true
+    database.lastConnection.get.rolledBack shouldBe true
+    database.lastConnection.get.committed shouldBe false
+  }
+
+  it should "roll back the transaction and close the connection when the Future fails" in {
+    val database = TestDatabase(testResultSet)
+    val transaction = database.withTransactionAsync { implicit transaction =>
+      Future(throw new Exception("Catastrophic error"))
+    }
+    val result = Try(Await.result(transaction, 20.seconds))
+    result shouldBe 'failure
+    database.lastConnection.get.closed shouldBe true
+    database.lastConnection.get.rolledBack shouldBe true
+    database.lastConnection.get.committed shouldBe false
   }
 
   "an insert" should "require a transaction to run" in {
@@ -134,7 +263,13 @@ class ExecutorSpec extends FlatSpec with Matchers {
     }
   }
 
-  it should "return the generated String key" in {
+  "an asynchronous insert" should "require a transaction to run" in {
+    TestDatabase(testResultSet).withTransactionAsync { implicit transaction =>
+      Future(insertStatement.execute)
+    }
+  }
+
+  "executeReturningKeys" should "return the generated String key" in {
     TestDatabase(testResultSet, Some(keyResultSet)).withTransaction { implicit transaction =>
       val keys: List[String] = insertStatement.executeReturningKeys[String]
       keys should equal(List[String]("34"))
@@ -151,6 +286,12 @@ class ExecutorSpec extends FlatSpec with Matchers {
   "a delete" should "require a transaction to run" in {
     TestDatabase(testResultSet).withTransaction { implicit transaction =>
       deleteStatement.execute
+    }
+  }
+
+  "an asynchronous delete" should "require a transaction to run" in {
+    TestDatabase(testResultSet).withTransactionAsync { implicit transaction =>
+      Future(deleteStatement.execute)
     }
   }
 

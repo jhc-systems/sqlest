@@ -21,27 +21,43 @@ import sqlest._
 
 case class TestDatabase(resultSet: ResultSet, keyResultSet: Option[ResultSet] = None) extends Database {
   var preparedStatement: Option[AbstractPreparedStatement] = None
+  var lastConnection: Option[AbstractConnection] = None
 
   def statementBuilder: StatementBuilder = sqlest.sql.H2StatementBuilder
 
-  def getConnection = new AbstractConnection {
-    override def close = {}
-    override def commit = {}
-    override def rollback = {}
-    override def setAutoCommit(autoCommit: Boolean) = {}
-    override def prepareStatement(inSql: String) = {
-      val statement = new AbstractPreparedStatement {
-        val sql = inSql
-        override def executeQuery() = resultSet
-        override def executeUpdate() = 1
-        override def executeBatch() = Array()
-        override def getGeneratedKeys(): java.sql.ResultSet = {
-          keyResultSet.getOrElse(null)
-        }
+  def getConnection = {
+    val connection = new AbstractConnection {
+      var closed = false
+      var committed = false
+      var rolledBack = false
+      override def close = { closed = true }
+      override def commit = { committed = true }
+      override def rollback = {
+        if (closed)
+          throw new Exception("Tried to roll back a closed connection")
+        else rolledBack = true
       }
-      preparedStatement = Some(statement)
-      statement
+      override def setAutoCommit(autoCommit: Boolean) = {}
+      override def createStatement() = new AbstractPreparedStatement {
+        val sql = null
+        override def execute(sql: String) = true
+      }
+      override def prepareStatement(inSql: String) = {
+        val statement = new AbstractPreparedStatement {
+          val sql = inSql
+          override def executeQuery() = resultSet
+          override def executeUpdate() = 1
+          override def executeBatch() = Array()
+          override def getGeneratedKeys(): java.sql.ResultSet = {
+            keyResultSet.getOrElse(null)
+          }
+        }
+        preparedStatement = Some(statement)
+        statement
+      }
     }
+    lastConnection = Some(connection)
+    connection
   }
 }
 

@@ -52,8 +52,6 @@ lazy val commonSettings = SbtScalariform.scalariformSettings ++ publishingSettin
     "-language:implicitConversions",
     "-unchecked",
     "-Xfatal-warnings",
-    "-Yinline-warnings",
-    "-Ywarn-dead-code",
     "-Xfuture"
   ),
   coverageExcludedPackages := "sqlest.examples",
