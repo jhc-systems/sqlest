@@ -24,7 +24,9 @@ import sqlest.util.Logging
 import java.sql.{ Connection, Date => JdbcDate, DriverManager, ResultSet, PreparedStatement, Statement, SQLException, Timestamp => JdbcTimestamp, Types => JdbcTypes }
 import javax.sql.DataSource
 import org.joda.time.{ DateTime, LocalDate }
-import scala.util.DynamicVariable
+import scala.concurrent.{ ExecutionContext, Future }
+import scala.util.{ DynamicVariable, Try, Success, Failure }
+import scala.util.control.NonFatal
 import sqlest.extractor.IndexedExtractor
 
 object Database {
@@ -56,6 +58,9 @@ trait Database {
 
   def withTransaction[A](f: Transaction => A): A =
     Transaction(this).run(f)
+
+  def withTransactionAsync[A](f: Transaction => Future[A])(implicit ec: ExecutionContext): Future[A] =
+    Transaction(this).runAsync(f)
 }
 
 object Session {
@@ -206,6 +211,54 @@ case class Transaction(database: Database) extends Session(database) {
         connection.close
       } catch { case e: SQLException => }
     }
+
+  private[sqlest] def runAsync[A](f: Transaction => Future[A])(implicit ec: ExecutionContext): Future[A] = {
+    val runResult = try {
+      connection.setAutoCommit(false)
+      val connectionResult = try {
+        var success = false
+
+        val functionResult = try {
+          val functionCall = f(this)
+          functionCall andThen {
+            case Success(_) =>
+              if (shouldRollback) connection.rollback
+              else connection.commit
+              success = true
+              functionCall
+            case Failure(_) =>
+              connection.rollback
+              functionCall
+          }
+        } catch {
+          case NonFatal(e) => Future.failed(e)
+        }
+
+        functionResult andThen {
+          case _ =>
+            if (!success) connection.rollback
+            functionResult
+        }
+      } catch {
+        case NonFatal(e) => Future.failed(e)
+      }
+
+      connectionResult andThen {
+        case _ =>
+          connection.setAutoCommit(true)
+          connectionResult
+      }
+    } catch {
+      case NonFatal(e) => Future.failed(e)
+    }
+    runResult andThen {
+      case _ =>
+        try {
+          connection.close
+        } catch { case e: SQLException => }
+        runResult
+    }
+  }
 
   def executeCommand(command: Command): Int =
     withConnection { connection =>
