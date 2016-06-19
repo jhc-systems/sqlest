@@ -38,8 +38,8 @@ trait StringMappedColumnTypes {
   /* Right trims any strings returned from the database */
   case object TrimmedStringColumnType extends MappedColumnType[String, String] {
     val baseColumnType = StringColumnType
-    def read(database: Option[String]) = database.map(rightTrim)
-    def write(value: String) = value
+    def mappedRead(database: String) = rightTrim(database)
+    def mappedWrite(value: String) = value
 
     private def rightTrim(s: String): String = {
       var i = s.length - 1
@@ -51,8 +51,8 @@ trait StringMappedColumnTypes {
 
 trait BooleanMappedColumnTypes {
   case class MappedBooleanColumnType[DatabaseType](trueValue: DatabaseType, falseValue: DatabaseType)(implicit val baseColumnType: BaseColumnType[DatabaseType]) extends MappedColumnType[Boolean, DatabaseType] {
-    def read(database: Option[DatabaseType]) = database.map(_ == trueValue)
-    def write(value: Boolean) = if (value) trueValue else falseValue
+    def mappedRead(database: DatabaseType) = database == trueValue
+    def mappedWrite(value: Boolean) = if (value) trueValue else falseValue
   }
 
   val BooleanYNColumnType = MappedBooleanColumnType("Y", "N")
@@ -68,15 +68,13 @@ trait EnumerationMappedColumnTypes {
     val toDatabaseMappings = mappings.toMap
     val toValueMappings = mappings.map { case (value, database) => (database, value) }.toMap
 
-    def read(database: Option[DatabaseType]) =
-      database.map { database =>
-        toValueMappings
-          .get(database)
-          .orElse(default)
-          .getOrElse(throw new NoSuchElementException(s"Could not read database value $database in EnumerationColumn"))
-      }
+    def mappedRead(database: DatabaseType) =
+      toValueMappings
+        .get(database)
+        .orElse(default)
+        .getOrElse(throw new NoSuchElementException(s"Could not read database value $database in EnumerationColumn"))
 
-    def write(value: ValueType) =
+    def mappedWrite(value: ValueType) =
       toDatabaseMappings
         .get(value)
         .getOrElse(throw new NoSuchElementException(s"Could not write $value in EnumerationColumn"))
@@ -119,20 +117,18 @@ trait NumericMappedColumnTypes {
   case object BigDecimalStringColumnType extends MappedColumnType[BigDecimal, String] {
     val baseColumnType = StringColumnType
 
-    def read(database: Option[String]) = {
-      database.map { database: String =>
-        val trimmed = database.trim
-        if (trimmed != "") {
-          if (trimmed.indexOf("/") == -1) {
-            BigDecimal(trimmed)
-          } else {
-            BigDecimal(0)
-          }
-        } else BigDecimal(0)
-      }
+    def mappedRead(database: String) = {
+      val trimmed = database.trim
+      if (trimmed != "") {
+        if (trimmed.indexOf("/") == -1) {
+          BigDecimal(trimmed)
+        } else {
+          BigDecimal(0)
+        }
+      } else BigDecimal(0)
     }
 
-    def write(value: BigDecimal) = value.toString
+    def mappedWrite(value: BigDecimal) = value.toString
   }
 }
 
@@ -140,7 +136,7 @@ trait LocalDateMappedColumnTypes {
   case object YyyyMmDdColumnType extends MappedColumnType[LocalDate, Int] {
     val baseColumnType = IntColumnType
 
-    def read(database: Option[Int]) = database.map { database =>
+    def mappedRead(database: Int) = {
       val year = database / 10000
       val month = (database % 10000) / 100
       val day = database % 100
@@ -148,20 +144,20 @@ trait LocalDateMappedColumnTypes {
       new LocalDate(year, month, day)
     }
 
-    def write(value: LocalDate) =
+    def mappedWrite(value: LocalDate) =
       value.getYear * 10000 + value.getMonthOfYear * 100 + value.getDayOfMonth
   }
 
   case object LocalDateFromDateTimeColumnType extends MappedColumnType[LocalDate, DateTime] {
     val baseColumnType = DateTimeColumnType
-    def read(database: Option[DateTime]) = database.map(_.toLocalDate)
-    def write(value: LocalDate) = value.toDateTimeAtStartOfDay
+    def mappedRead(database: DateTime) = database.toLocalDate
+    def mappedWrite(value: LocalDate) = value.toDateTimeAtStartOfDay
   }
 
   case object DateTimeFromLocalDateColumnType extends MappedColumnType[DateTime, LocalDate] {
     val baseColumnType = LocalDateColumnType
-    def read(database: Option[LocalDate]) = database.map(_.toDateTimeAtStartOfDay)
-    def write(value: DateTime) = value.toLocalDate
+    def mappedRead(database: LocalDate) = database.toDateTimeAtStartOfDay
+    def mappedWrite(value: DateTime) = value.toLocalDate
   }
 }
 
