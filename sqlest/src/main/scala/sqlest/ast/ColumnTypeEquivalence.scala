@@ -80,9 +80,13 @@ object ColumnTypeEquivalence extends LowPriorityImplicits {
           checkCompatible(leftOption.innerColumnType, right)
         case (left, rightOption: OptionColumnType[_, _]) =>
           checkCompatible(left, rightOption.innerColumnType)
+        case (leftMapped: MappedColumnType[_, _], rightMapped: MappedColumnType[_, _]) =>
+          checkCompatible(leftMapped.innerColumnType, rightMapped.innerColumnType)
+        case (leftMapped: MappedColumnType[_, _], right) =>
+          checkCompatible(leftMapped.innerColumnType, right)
+        case (left, rightMapped: MappedColumnType[_, _]) =>
+          checkCompatible(left, rightMapped.innerColumnType)
         case (_: NumericColumnType[_], _: NumericColumnType[_]) =>
-        case (StringColumnType, sqlest.TrimmedStringColumnType) =>
-        case (sqlest.TrimmedStringColumnType, StringColumnType) =>
         case (left, right) if left != right => fail
         case _ =>
       }
