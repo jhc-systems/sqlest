@@ -81,6 +81,15 @@ class MappedColumnTypeSpec extends FlatSpec with Matchers with MappedColumnTypes
     AnimalColumnType.read(Some("X")) should be(Some(Gigantosaurus))
   }
 
+  it should "use a globally specified implicit value for its base column type" in {
+    implicit val stringColumnType = TrimmedStringColumnType
+    val AnimalColumnType = EnumerationColumnType(
+      Snake -> "S",
+      Gigantosaurus -> "G"
+    )
+    AnimalColumnType.read(Some("S   ")) shouldBe Some(Snake)
+  }
+
   "OptionColumnType" should "convert zeroes in database to None" in {
     val zeroIsNoneIntColumnType = OptionColumnType[Int, Int](0)
     zeroIsNoneIntColumnType.write(Some(10)) should be(10)

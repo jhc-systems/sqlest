@@ -60,7 +60,7 @@ trait BooleanMappedColumnTypes {
 }
 
 trait EnumerationMappedColumnTypes {
-  trait BaseEnumerationColumnType[ValueType, DatabaseType] extends MappedColumnType[ValueType, DatabaseType] { self =>
+  abstract class BaseEnumerationColumnType[ValueType, DatabaseType](override implicit val innerColumnType: ColumnType.Aux[DatabaseType, DatabaseType]) extends MappedColumnType[ValueType, DatabaseType] { self =>
     type WithDefault <: BaseEnumerationColumnType[ValueType, DatabaseType]
 
     val mappings: Seq[(ValueType, DatabaseType)]
@@ -82,8 +82,10 @@ trait EnumerationMappedColumnTypes {
     def withDefault(defaultValue: ValueType): WithDefault
   }
 
-  case class EnumerationColumnType[ValueType, DatabaseType](mappings: (ValueType, DatabaseType)*)(implicit val baseColumnType: BaseColumnType[DatabaseType]) extends BaseEnumerationColumnType[ValueType, DatabaseType] {
+  case class EnumerationColumnType[ValueType, DatabaseType: BaseColumnType](mappings: (ValueType, DatabaseType)*)(override implicit val innerColumnType: ColumnType.Aux[DatabaseType, DatabaseType]) extends BaseEnumerationColumnType[ValueType, DatabaseType] {
     type WithDefault = EnumerationColumnType[ValueType, DatabaseType]
+
+    val baseColumnType = implicitly[BaseColumnType[DatabaseType]]
 
     val default: Option[ValueType] = None
 
@@ -92,8 +94,10 @@ trait EnumerationMappedColumnTypes {
     }
   }
 
-  case class OrderedEnumerationColumnType[ValueType, DatabaseType](mappings: (ValueType, DatabaseType)*)(implicit val baseColumnType: BaseColumnType[DatabaseType]) extends BaseEnumerationColumnType[ValueType, DatabaseType] with OrderedColumnType {
+  case class OrderedEnumerationColumnType[ValueType, DatabaseType: BaseColumnType](mappings: (ValueType, DatabaseType)*)(override implicit val innerColumnType: ColumnType.Aux[DatabaseType, DatabaseType]) extends BaseEnumerationColumnType[ValueType, DatabaseType] with OrderedColumnType {
     type WithDefault = OrderedEnumerationColumnType[ValueType, DatabaseType]
+
+    val baseColumnType = implicitly[BaseColumnType[DatabaseType]]
 
     val default: Option[ValueType] = None
 
