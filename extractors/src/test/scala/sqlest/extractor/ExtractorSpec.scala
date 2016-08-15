@@ -575,4 +575,35 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
       (1, List("third", "fourth"), List((10, List("innerThird", "innerFourth"))))
     ))
   }
+
+  sealed trait Choice extends Product with Serializable { def id: Int; def grouped: List[String] }
+  case class Left(id: Int, grouped: List[String]) extends Choice
+  case class Right(id: Int, grouped: List[String]) extends Choice
+
+  it should "accumulate values even when wrapped inside a ChoiceExtractor" in {
+    val seqRows = List(Seq(0, "first"), Seq(0, "second"), Seq(1, "third"), Seq(2, "forth"), Seq(2, "fifth"))
+
+    val leftExtractor = extract[Left](
+      id = intExtractorAtIndex(0),
+      grouped = stringExtractorAtIndex(1).asList
+    )
+    val rightExtractor = extract[Right](
+      id = intExtractorAtIndex(0),
+      grouped = stringExtractorAtIndex(1).asList
+    )
+
+    val groupedExtractor: GroupedExtractor[Seq[Any], Choice, Int] = intExtractorAtIndex(0).switch(
+      0 -> rightExtractor,
+      1 -> leftExtractor,
+      2 -> rightExtractor
+    ).groupBy(intExtractorAtIndex(0))
+
+    groupedExtractor.extractHeadOption(Nil) should be(None)
+    groupedExtractor.extractHeadOption(seqRows) should be(Some(Right(0, List("first", "second"))))
+    groupedExtractor.extractAll(seqRows) should be(List(
+      Right(0, List("first", "second")),
+      Left(1, List("third")),
+      Right(2, List("forth", "fifth"))
+    ))
+  }
 }

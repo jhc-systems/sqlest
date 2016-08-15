@@ -136,43 +136,55 @@ case class MappedExtractor[Row, A, B](inner: Extractor[Row, A], func: A => B, un
 }
 
 trait ChoiceExtractor[Row, A, B] extends Extractor[Row, B] with SimpleExtractor[Row, B] with SingleRowExtractor[Row, B] {
-  type Accumulator = (inner.Accumulator, Option[B])
+  type ChoiceAccumulator = (Option[B], Option[Any])
+  type Accumulator = (inner.Accumulator, ChoiceAccumulator)
 
   val inner: Extractor[Row, A]
-  val extractors: List[Extractor[Row, _]]
+  val extractors: List[Extractor[Row, _ <: B]]
 
-  protected def selectExtractor[B1 <: B](row: Row, a: A): Extractor[Row, B1]
-
-  protected def runChoice(row: Row, a: A): Option[B] = {
-    val choice = selectExtractor(row, a)
-    choice.emit(choice.initialize(row))
-  }
+  protected def selectExtractor(row: Row, a: A): Extractor[Row, _ <: B]
 
   def initialize(row: Row) = {
-    val innerAcc = inner.initialize(row)
-    val choiceAcc = inner.emit(innerAcc).flatMap { a => runChoice(row, a) }
-    (innerAcc, choiceAcc)
+    val initInner = inner.initialize(row)
+    val emptyChoice = (Option.empty[B], Option.empty[Any])
+
+    val initChoice = for {
+      a <- inner.emit(initInner)
+      extractor = selectExtractor(row, a)
+      accumulator = extractor.initialize(row)
+      choiceEmit = extractor.emit(accumulator)
+    } yield (choiceEmit, Some(accumulator))
+
+    (initInner, initChoice.getOrElse(emptyChoice))
   }
 
   def accumulate(accumulator: Accumulator, row: Row) = {
-    val (prevAcc, _) = accumulator
-    val nextAcc = inner.accumulate(prevAcc, row)
-    val choiceAcc = inner.emit(nextAcc).flatMap { a => runChoice(row, a) }
-    (nextAcc, choiceAcc)
+    val (prevInner, prevChoice @ (_, prevAny)) = accumulator
+    val newInner = inner.accumulate(prevInner, row)
+
+    val newChoice: Option[ChoiceAccumulator] = for {
+      a <- inner.emit(newInner)
+      extractor = selectExtractor(row, a)
+      prevChoice <- prevAny.asInstanceOf[Option[extractor.Accumulator]]
+      newChoice = extractor.accumulate(prevChoice, row)
+      choiceEmit = extractor.emit(newChoice)
+    } yield (choiceEmit, Some(newChoice))
+
+    (newInner, newChoice.getOrElse(prevChoice))
   }
 
   def emit(accumulator: Accumulator) = accumulator match {
-    case (innerAcc, choiceAcc) => choiceAcc
+    case (innerAcc, (choiceEmit, choiceAcc)) => choiceEmit
   }
 }
 
 trait CondExtractor[Row, A, B] extends ChoiceExtractor[Row, A, B] {
   val predicates: List[(A => Boolean, Int)]
 
-  protected def selectExtractor[B1 <: B](row: Row, a: A): Extractor[Row, B1] = {
+  protected def selectExtractor(row: Row, a: A): Extractor[Row, _ <: B] = {
     predicates
       .find { case (p, i) => p(a) }
-      .map { case (p, i) => extractors(i).asInstanceOf[Extractor[Row, B1]] }
+      .map { case (p, i) => extractors(i) }
       .getOrElse { throw new MatchError(s"CondExtractor has no matching predicate for $a") }
   }
 }
@@ -180,10 +192,10 @@ trait CondExtractor[Row, A, B] extends ChoiceExtractor[Row, A, B] {
 trait SwitchExtractor[Row, A, B] extends ChoiceExtractor[Row, A, B] {
   val values: List[(A, Int)]
 
-  protected def selectExtractor[B1 <: B](row: Row, a: A): Extractor[Row, B1] = {
+  protected def selectExtractor(row: Row, a: A): Extractor[Row, _ <: B] = {
     values
       .find { case (v, i) => v == a }
-      .map { case (v, i) => extractors(i).asInstanceOf[Extractor[Row, B1]] }
+      .map { case (v, i) => extractors(i) }
       .getOrElse { throw new MatchError(s"SwitchExtractor has no matching value for $a") }
   }
 }
