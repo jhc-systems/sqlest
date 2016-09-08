@@ -155,6 +155,8 @@ case class Select[A, R <: Relation](
 
   def columns = aliasedColumns.columnList(cols)
 
+  def transform[S <: sqlest.ast.Relation](f: sqlest.ast.Select[A, R] => sqlest.ast.Select[A, S]): sqlest.ast.Select[A, S] = f(this)
+
   def from[R2 <: Relation](relation: R2): Select[A, R2] =
     this.copy(from = relation)
 
