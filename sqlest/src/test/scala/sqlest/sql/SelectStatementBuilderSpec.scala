@@ -560,7 +560,11 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
         .from(MyTable)
         .transform(testTransform _)
     } should equal(
-      """select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2 from mytable inner join two on (one.col2 = two.col2) where (one.col2 <> 'SomeString')""",
+      """select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
+        |from mytable
+        |inner join two
+        |   on (one.col2 = two.col2)
+        |where (one.col2 <> 'SomeString')""".formatSql,
       List(Nil)
     )
   }
