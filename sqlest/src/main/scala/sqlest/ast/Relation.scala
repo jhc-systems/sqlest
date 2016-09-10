@@ -155,6 +155,8 @@ case class Select[A, R <: Relation](
 
   def columns = aliasedColumns.columnList(cols)
 
+  def transform[S <: Relation](f: Select[A, R] => Select[A, S]): Select[A, S] = f(this)
+
   def from[R2 <: Relation](relation: R2): Select[A, R2] =
     this.copy(from = relation)
 
