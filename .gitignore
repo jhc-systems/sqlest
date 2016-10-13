@@ -29,3 +29,8 @@ test.*.db
 # Maven
 log/
 target/
+
+# Ensime
+.ensime
+.ensime_cache/
+project/.ensime
