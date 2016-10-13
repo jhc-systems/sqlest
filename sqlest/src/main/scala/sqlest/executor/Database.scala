@@ -112,11 +112,14 @@ class Session(database: Database) extends Logging {
     }
 
   protected def prepareStatement(connection: Connection, operation: Operation, sql: String, argumentLists: List[List[LiteralColumn[_]]]): PreparedStatement = {
-    prepareStatement(connection, operation, sql, argumentLists, false)
+    prepareStatement(connection, operation, sql, argumentLists, returnKeys = false)
   }
 
   protected def prepareStatement(connection: Connection, operation: Operation, sql: String, argumentLists: List[List[LiteralColumn[_]]], returnKeys: Boolean): PreparedStatement = {
-    val statement = if (returnKeys) connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS) else connection.prepareStatement(sql)
+    val statement =
+      if (returnKeys)
+        connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
+      else connection.prepareStatement(sql)
     setArguments(operation, statement, argumentLists)
     statement
   }
@@ -288,7 +291,13 @@ case class Transaction(database: Database) extends Session(database) {
       val (preprocessedCommand, sql, argumentLists) = database.statementBuilder(command)
       val startTime = new DateTime
       try {
-        val preparedStatement = prepareStatement(connection, preprocessedCommand, sql, argumentLists)
+        val preparedStatement = prepareStatement(
+          connection,
+          preprocessedCommand,
+          sql,
+          argumentLists,
+          returnKeys = true
+        )
         try {
           val result = preparedStatement.executeUpdate
           val rs = preparedStatement.getGeneratedKeys
