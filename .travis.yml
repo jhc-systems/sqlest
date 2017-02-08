@@ -4,10 +4,11 @@ before_install:
   - pip install --user codecov
 
 scala:
-  - 2.11.6
+  - 2.11.8
+  - 2.12.1
 
 script:
-  - sbt clean compile tut coverage test
+  - sbt ++$TRAVIS_SCALA_VERSION clean compile tut coverage test coverageReport
 
 after_success:
   - codecov

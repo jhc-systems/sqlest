@@ -13,15 +13,17 @@ lazy val root = (project in file("."))
   .aggregate(sqlest, extractors, examples)
 
 lazy val sqlest = (project in file("sqlest"))
+  .enablePlugins(spray.boilerplate.BoilerplatePlugin)
   .settings(moduleName := "sqlest")
   .settings(sqlestSettings: _*)
   .settings(
     tutSourceDirectory := file("docs") / "sqlest",
     tutTargetDirectory := file("."),
-    libraryDependencies ++= Seq("com.typesafe.scala-logging" %% "scala-logging" % "3.1.0")
+    libraryDependencies ++= Seq("com.typesafe.scala-logging" %% "scala-logging" % "3.5.0")
   ).dependsOn(extractors)
 
 lazy val extractors = (project in file("extractors"))
+  .enablePlugins(spray.boilerplate.BoilerplatePlugin)
   .settings(moduleName := "sqlest-extractors")
   .settings(sqlestSettings: _*)
   .settings(
@@ -42,7 +44,8 @@ lazy val examples = (project in file("examples"))
 
 lazy val commonSettings = SbtScalariform.scalariformSettings ++ publishingSettings ++ Seq(
   organization := "uk.co.jhc",
-  scalaVersion := "2.11.6",
+  scalaVersion := "2.12.1",
+  crossScalaVersions := List("2.11.8", "2.12.1"),
   scalacOptions ++= Seq(
     "-deprecation",
     "-encoding", "UTF-8",
@@ -59,11 +62,11 @@ lazy val commonSettings = SbtScalariform.scalariformSettings ++ publishingSettin
     .setPreference(DanglingCloseParenthesis, Preserve)
 )
 
-lazy val sqlestSettings = commonSettings ++ scaladocSettings ++ tutSettings ++ Boilerplate.settings ++ Seq(
+lazy val sqlestSettings = commonSettings ++ scaladocSettings ++ tutSettings ++ Seq(
   tutNameFilter := """README.md""".r,
   libraryDependencies ++= Seq(
-    "org.scalatest" %% "scalatest" % "2.2.1" % "test",
-    "com.chuusai" %% "shapeless" % "2.1.0" % "test",
+    "org.scalatest" %% "scalatest" % "3.0.1" % "test",
+    "com.chuusai" %% "shapeless" % "2.3.2" % "test",
     "com.h2database" % "h2" % "1.4.180" % "test"
   )
 )
@@ -78,8 +81,9 @@ lazy val scaladocSettings = SbtSite.site.settings ++ SbtSite.site.includeScalado
   gitRemoteRepo := "git@github.com:jhc-systems/sqlest.git"
 )
 
-lazy val publishingSettings = sonatypeSettings ++ sonatypeReleaseProcess ++ Seq(
+lazy val publishingSettings = sonatypeReleaseProcess ++ Seq(
   // Publishing - http://www.scala-sbt.org/0.13/docs/Using-Sonatype.html
+  releaseCrossBuild := true,
   releasePublishArtifactsAction := PgpKeys.publishSigned.value,
   publishMavenStyle := true,
   publishArtifact in Test := false,
@@ -133,10 +137,10 @@ lazy val sonatypeReleaseProcess = Seq(
     setReleaseVersion,
     commitReleaseVersion,
     tagRelease,
-    publishArtifacts,
+    ReleaseStep(action = Command.process("publishSigned", _), enableCrossBuild = true),
     setNextVersion,
     commitNextVersion,
-    releaseStepCommand("sonatypeRelease"),
+    ReleaseStep(action = Command.process("sonatypeReleaseAll", _), enableCrossBuild = true),
     pushChanges
   )
 )
