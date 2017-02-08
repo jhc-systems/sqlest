@@ -48,7 +48,7 @@ object CSVDefinitions {
 
   // Now define a simple parser
   def parse(input: String): CSV =
-    input.split(scala.util.Properties.lineSeparator).toList.map(_.split(",").toList)
+    input.split("(\\r?\\n)+").toList.map(_.split(",").toList)
 
   // Sample contents of a csv file containing person information
   val csvFile = """
