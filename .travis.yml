@@ -1,5 +1,8 @@
 language: scala
 
+jdk:
+  - oraclejdk8
+
 before_install:
   - pip install --user codecov
 
