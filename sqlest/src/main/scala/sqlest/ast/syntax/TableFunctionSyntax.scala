@@ -20,12 +20,12 @@ import sqlest.ast._
 
 trait TableFunctionSyntax {
 
-  /** Temporary table for a statement: `.leftJoin(table(select(...)))`. */
+  /** Temporary table for a statement: `.leftJoin(table(select(...))).as(...)`. */
   def table[A, R <: Relation](select: Select[A, R]) = new TableFunctionFromSelectBuilder(select)
 
-  /** Helper class to prevent users writing `table()` without `.select(...)`. */
+  /** Helper class to prevent users writing `table()` without `.as(...)`. */
   class TableFunctionFromSelectBuilder[A, R <: Relation](select: Select[A, R]) {
-    def as(alias: String) = TableFunctionFromSelect(select, Some(alias))
+    def as(alias: String) = TableFunctionFromSelect(select, alias)
   }
 
 }

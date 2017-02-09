@@ -109,7 +109,7 @@ case class TableFunctionApplication[+T](
  */
 case class TableFunctionFromSelect[A, R <: Relation](
   select: Select[A, R],
-  aliasedAs: Option[String]
+  aliasedAs: String
 ) extends Relation
 
 /** A join over two relations. */
