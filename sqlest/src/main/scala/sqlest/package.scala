@@ -37,6 +37,7 @@ package object sqlest
     with AggregateFunctionSyntax
     with OlapFunctionSyntax
     with UntypedColumnSyntax
+    with TableFunctionSyntax
     // sqlest.extractor
     with ExtractorSyntax[ResultSet]
     with ColumnExtractorSyntax

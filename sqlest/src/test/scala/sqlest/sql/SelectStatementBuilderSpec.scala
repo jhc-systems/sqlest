@@ -588,4 +588,15 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
       }
     }
   }
+
+  "select table select function" should "not be supported outside DB2" in {
+    intercept[UnsupportedOperationException] {
+      sql {
+        select(TableOne.col1, TableOne.col2, TableTwo.col2, TableTwo.col3)
+          .from(TableOne)
+          .leftJoin(table(select(TableTwo.col2, TableTwo.col3).from(TableTwo).where(TableTwo.col2 === "123")).as("testTableFunctionFromSelect"))
+          .on(TableOne.col2 === TableTwo.col2)
+      }
+    }
+  }
 }

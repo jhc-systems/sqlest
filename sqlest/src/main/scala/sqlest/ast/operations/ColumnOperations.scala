@@ -86,6 +86,7 @@ object ColumnOperations {
     def mapColumns(f: Column[_] => Column[_], selectFunction: Select[_, _ <: Relation] => Select[_, _ <: Relation]): Relation = relation match {
       case table: Table => table
       case TableFunctionApplication(tableName, aliasedAs, parameterColumns, tableFunction) => TableFunctionApplication(tableName, aliasedAs, parameterColumns.map(_.mapColumns(f, selectFunction)), tableFunction)
+      case TableFunctionFromSelect(select, alias) => TableFunctionFromSelect(select, alias)
       case LeftJoin(left, right, condition) => LeftJoin(left.mapColumns(f, selectFunction), right.mapColumns(f, selectFunction), condition.mapColumns(f, selectFunction))
       case LeftExceptionJoin(left, right, condition) => LeftExceptionJoin(left.mapColumns(f, selectFunction), right.mapColumns(f, selectFunction), condition.mapColumns(f, selectFunction))
       case RightJoin(left, right, condition) => RightJoin(left.mapColumns(f, selectFunction), right.mapColumns(f, selectFunction), condition.mapColumns(f, selectFunction))
