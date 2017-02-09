@@ -73,6 +73,7 @@ trait DB2StatementBuilder extends base.StatementBuilder {
 
   override def joinSql(relation: Relation): String = relation match {
     case tableFunctionApplication: TableFunctionApplication[_] => "table(" + functionSql(tableFunctionApplication.tableName, tableFunctionApplication.parameterColumns.map(addTypingToSqlColumn)) + ") as " + identifierSql(tableFunctionApplication.tableAlias)
+    case TableFunctionFromSelect(select, alias) => "table(" + selectSql(select) + ") as " + identifierSql(alias.getOrElse("tableAlias"))
     case LeftExceptionJoin(left, right, condition) => joinSql(left) + " left exception join " + joinSql(right) + " on " + columnSql(condition)
     case RightExceptionJoin(left, right, condition) => joinSql(left) + " right exception join " + joinSql(right) + " on " + columnSql(condition)
     case _ => super.joinSql(relation)

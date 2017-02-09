@@ -138,6 +138,22 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
     )
   }
 
+  "select table select function" should "produce the right sql" in {
+    sql {
+      select(TableOne.col1, TableOne.col2, TableTwo.col2, TableTwo.col3)
+        .from(TableOne)
+        .leftJoin(table(select(TableTwo.col2, TableTwo.col3).from(TableTwo).where(TableTwo.col2 === "123")).as("testTableFunctionFromSelect"))
+        .on(TableOne.col2 === TableTwo.col2)
+    } should equal(
+      s"""
+         |select one.col1 as one_col1, one.col2 as one_col2, two_col2, two_col3
+         |from one left join table(select two.col2 as two_col2, two.col3 as two_col3 from two where (two.col2 = ?)) as testTableFunctionFromSelect
+         |on (one.col2 = two_col2)
+       """.formatSql,
+      List(List("123"))
+    )
+  }
+
   "select with group by rollup" should "produce the right sql" in {
     sql {
       select(sum(MyTable.col1).as("sum"))

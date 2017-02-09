@@ -104,6 +104,14 @@ case class TableFunctionApplication[+T](
   def tableAlias = aliasedAs getOrElse tableName
 }
 
+/**
+ * A temporary table for the given select statement.
+ */
+case class TableFunctionFromSelect[A, R <: Relation](
+  select: Select[A, R],
+  aliasedAs: Option[String]
+) extends Relation
+
 /** A join over two relations. */
 sealed trait Join[R1 <: Relation, R2 <: Relation] extends Relation {
   def left: R1
