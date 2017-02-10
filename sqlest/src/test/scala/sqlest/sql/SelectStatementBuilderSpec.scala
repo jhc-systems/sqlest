@@ -594,7 +594,7 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
       sql {
         select(TableOne.col1, TableOne.col2, TableTwo.col2, TableTwo.col3)
           .from(TableOne)
-          .leftJoin(table(select(TableTwo.col2, TableTwo.col3).from(TableTwo).where(TableTwo.col2 === "123")).as("testTableFunctionFromSelect"))
+          .leftJoin(tableFunction(select(TableTwo.col2, TableTwo.col3).from(TableTwo).where(TableTwo.col2 === "123")).as("testTableFunctionFromSelect"))
           .on(TableOne.col2 === TableTwo.col2)
       }
     }
