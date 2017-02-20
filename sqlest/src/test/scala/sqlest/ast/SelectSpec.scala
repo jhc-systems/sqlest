@@ -54,6 +54,16 @@ class SelectSpec extends FlatSpec with Matchers {
     query.where should equal(Some(MyTable.col1 > 1 && MyTable.col1 < 2))
   }
 
+  "andWhere" should "append new filters" in {
+    val query = select.from(MyTable).where(MyTable.col1 > 1).andWhere(MyTable.col1 < 2)
+    query.where should equal(Some(MyTable.col1 > 1 && MyTable.col1 < 2))
+  }
+
+  "orWhere" should "append new filters" in {
+    val query = select.from(MyTable).where(MyTable.col1 > 1).orWhere(MyTable.col1 < 2)
+    query.where should equal(Some(MyTable.col1 > 1 || MyTable.col1 < 2))
+  }
+
   "repeated calls to select.orderBy()" should "append new orders" in {
     val query = select.from(MyTable).orderBy(MyTable.col1).orderBy(MyTable.col2.desc)
     query.orderBy should equal(List(Order(MyTable.col1, true), Order(MyTable.col2, false)))

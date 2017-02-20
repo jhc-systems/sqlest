@@ -171,6 +171,11 @@ case class Select[A, R <: Relation](
   def where(expr: Column[Boolean]): Select[A, R] =
     this.copy(where = this.where map (_ && expr) orElse Some(expr))
 
+  def andWhere(expr: Column[Boolean]): Select[A, R] = where(expr)
+
+  def orWhere(expr: Column[Boolean]): Select[A, R] =
+    this.copy(where = this.where map (_ || expr) orElse Some(expr))
+
   def startWith(expr: Column[Boolean]): Select[A, R] =
     this.copy(startWith = this.startWith map (_ && expr) orElse Some(expr))
 
@@ -182,6 +187,11 @@ case class Select[A, R <: Relation](
 
   def having(expr: Column[Boolean]): Select[A, R] =
     this.copy(having = this.having map (_ && expr) orElse Some(expr))
+
+  def andHaving(expr: Column[Boolean]): Select[A, R] = having(expr)
+
+  def orHaving(expr: Column[Boolean]): Select[A, R] =
+    this.copy(having = this.having map (_ || expr) orElse Some(expr))
 
   def orderBy(orders: Order*): Select[A, R] =
     this.copy(orderBy = this.orderBy ++ orders)
