@@ -19,23 +19,25 @@ package sqlest.sql.base
 import sqlest.ast._
 
 trait UpdateStatementBuilder extends BaseStatementBuilder {
-  def updateSql(update: Update): String = {
+  def updateSql(update: Update, indent: Int): String = {
     Seq(
       updateTableSql(update.table),
-      updateSetSql(update.set)
+      updateSetSql(update.set, indent)
     ) ++ Seq(
-        updateWhereSql(update.where)
-      ).flatten mkString ("", " ", "")
+        updateWhereSql(update.where, indent)
+      ).flatten mkString (NewLine + padding(indent))
   }
 
   def updateTableSql(table: Table): String =
     s"update ${identifierSql(table.tableName)}"
 
-  def updateSetSql(setters: Seq[Setter[_, _]]): String =
-    "set " + setters.map(setter => identifierSql(setter.column.columnName) + " = " + columnSql(setter.value)).mkString(", ")
+  def updateSetSql(setters: Seq[Setter[_, _]], indent: Int): String = {
+    val setterSql = setters.map(setter => identifierSql(setter.column.columnName) + " = " + columnSql(setter.value, indent))
+    withLineBreaks(setterSql, indent + TabWidth)("set ", ", ", "")
+  }
 
-  def updateWhereSql(where: Option[Column[Boolean]]): Option[String] =
-    where map (where => s"where ${columnSql(where)}")
+  def updateWhereSql(where: Option[Column[Boolean]], indent: Int): Option[String] =
+    where map (where => s"where ${columnSql(where, indent)}")
 
   // -------------------------------------------------
 

@@ -40,10 +40,10 @@ trait StatementBuilder extends BaseStatementBuilder
   }
 
   private def sql(operation: Operation): String = operation match {
-    case select: Select[_, _] => selectSql(select)
-    case insert: Insert => insertSql(insert)
-    case update: Update => updateSql(update)
-    case delete: Delete => deleteSql(delete)
+    case select: Select[_, _] => selectSql(select, 0)
+    case insert: Insert => insertSql(insert, 0)
+    case update: Update => updateSql(update, 0)
+    case delete: Delete => deleteSql(delete, 0)
     case other => sys.error("Unsupported operation type: " + other)
   }
 

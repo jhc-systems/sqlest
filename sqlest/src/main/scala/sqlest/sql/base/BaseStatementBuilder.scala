@@ -20,6 +20,10 @@ import sqlest.ast._
 import sqlest.ast.operations.ColumnOperations._
 
 trait BaseStatementBuilder {
+  protected val MaxWidth = 40
+  protected val TabWidth = 4
+  protected val NewLine = System.lineSeparator
+
   def preprocess(operation: Operation): Operation =
     aliasColumnsFromSubselects(operation)
 
@@ -61,95 +65,152 @@ trait BaseStatementBuilder {
     case Lateral(select: Select[_, _]) => List(select) ++ findSubselects(select.from)
   }
 
-  def columnAliasListSql(columns: Seq[Column[_]]): String =
-    columns.map(column => columnAliasSql(column)).mkString(", ")
+  def padding(indent: Int): String = " " * indent
 
-  def columnAliasSql(column: Column[_]): String = column match {
+  def onNewLine(str: String, indent: Int): String =
+    if (str.isEmpty) str
+    else NewLine + padding(indent) + str
+
+  def withLineBreaks(strs: Seq[String], indent: Int)(initial: String, separator: String, terminator: String) = {
+    if (strs.isEmpty)
+      initial + terminator
+    else {
+      val first = initial + strs.head
+
+      val (sql, _) = strs.tail.foldLeft((first, first.length)) {
+        case ((sql, len), next) =>
+          val nextLen = next.length
+          val newLen = len + separator.length + nextLen
+          if (newLen <= MaxWidth)
+            (sql + separator + next, newLen)
+          else
+            (sql + separator + onNewLine(next, indent), indent + nextLen)
+      }
+
+      sql + terminator
+    }
+  }
+
+  def columnAliasListSql(columns: Seq[Column[_]], indent: Int): String = {
+    val columnList = columns.map(column => columnAliasSql(column, indent))
+
+    if (columnList.isEmpty)
+      ""
+    else
+      withLineBreaks(columnList, indent)("", ", ", "")
+  }
+
+  def columnAliasSql(column: Column[_], indent: Int): String = column match {
     case column: TableColumn[_] =>
-      columnSql(column) + " as " +
+      columnSql(column, indent) + " as " +
         identifierSql(column.columnAlias)
 
     case column: AliasColumn[_] =>
-      columnSql(column) + " as " +
+      columnSql(column, indent) + " as " +
         identifierSql(column.columnAlias)
 
     case column =>
-      columnSql(column)
+      columnSql(column, indent)
   }
 
-  def columnSql(column: Column[_]): String =
-    // findCellExtractorInRelation(column).getOrElse(
+  def columnSql(column: Column[_], indent: Int): String =
     column match {
-      case LiteralColumn(literal) => literalSql(literal)
+      case LiteralColumn(literal) => literalSql(literal, indent)
       case column: ConstantColumn[_] => constantSql(column.columnType, column.value)
-      case column: PrefixFunctionColumn[_] => prefixSql(column.name, column.parameter)
-      case column: InfixFunctionColumn[_] => infixSql(column.name, column.parameter1, column.parameter2)
-      case column: PostfixFunctionColumn[_] => postfixSql(column.name, column.parameter)
-      case column: DoubleInfixFunctionColumn[_] => doubleInfixSql(column.infix1, column.infix2, column.parameter1, column.parameter2, column.parameter3)
-      case SelectColumn(select) => "(" + selectSql(select) + ")"
-      case ExistsColumn(select) => "exists (" + selectSql(aliasColumnsFromSubselects(select).asInstanceOf[Select[_, _ <: Relation]]) + ")"
-      case NotExistsColumn(select) => "not exists (" + selectSql(aliasColumnsFromSubselects(select).asInstanceOf[Select[_, _ <: Relation]]) + ")"
-      case WindowFunctionColumn(partitionByColumns, orders) => windowFunctionSql(partitionByColumns, orders)
-      case column: ScalarFunctionColumn[_] => functionSql(column.name, column.parameters)
+      case column: PrefixFunctionColumn[_] => prefixSql(column.name, column.parameter, indent)
+      case column: InfixFunctionColumn[_] => infixSql(column.name, column.parameter1, column.parameter2, indent)
+      case column: PostfixFunctionColumn[_] => postfixSql(column.name, column.parameter, indent)
+      case column: DoubleInfixFunctionColumn[_] => doubleInfixSql(column.infix1, column.infix2, column.parameter1, column.parameter2, column.parameter3, indent)
+      case SelectColumn(select) => "(" +
+        onNewLine(selectSql(select, indent + TabWidth), indent + TabWidth) +
+        onNewLine(")", indent)
+      case ExistsColumn(select) => "exists (" +
+        onNewLine(selectSql(aliasColumnsFromSubselects(select).asInstanceOf[Select[_, _ <: Relation]], indent + TabWidth), indent + TabWidth) +
+        onNewLine(")", indent)
+      case NotExistsColumn(select) => "not exists (" +
+        onNewLine(selectSql(aliasColumnsFromSubselects(select).asInstanceOf[Select[_, _ <: Relation]], indent + TabWidth), indent + TabWidth) +
+        onNewLine(")", indent)
+      case WindowFunctionColumn(partitionByColumns, orders) =>
+        windowFunctionSql(partitionByColumns, orders, indent)
+      case column: ScalarFunctionColumn[_] => functionSql(column.name, column.parameters, indent)
       case column: KeywordFunctionColumn[_] => column.name
       case column: TableColumn[_] => identifierSql(column.tableAlias) + "." + identifierSql(column.columnName)
-      case column: AliasColumn[_] => columnSql(column.column)
+      case column: AliasColumn[_] => columnSql(column.column, indent)
       case column: ReferenceColumn[_] => column.columnAlias
-      case column: CaseWhenColumn[_] => caseSql(column.whens, None)
-      case column: CaseWhenElseColumn[_] => caseSql(column.whens, Some(column.`else`))
-      case column: CaseColumnColumn[_, _] => caseColumnSql(column.column, column.mappings, None)
-      case column: CaseColumnElseColumn[_, _] => caseColumnSql(column.column, column.mappings, Some(column.`else`))
+      case column: CaseWhenColumn[_] => caseSql(column.whens, None, indent)
+      case column: CaseWhenElseColumn[_] => caseSql(column.whens, Some(column.`else`), indent)
+      case column: CaseColumnColumn[_, _] => caseColumnSql(column.column, column.mappings, None, indent)
+      case column: CaseColumnElseColumn[_, _] => caseColumnSql(column.column, column.mappings, Some(column.`else`), indent)
     }
 
-  def selectSql(select: Select[_, _ <: Relation]): String
+  def selectSql(select: Select[_, _ <: Relation], indent: Int): String
 
-  def prefixSql(op: String, parameter: Column[_]): String =
-    s"($op ${columnSql(parameter)})"
+  def prefixSql(op: String, parameter: Column[_], indent: Int): String =
+    s"($op ${columnSql(parameter, indent)})"
 
-  def infixSql(op: String, parameter1: Column[_], parameter2: Column[_]): String =
-    s"(${columnSql(parameter1)} $op ${columnSql(parameter2)})"
+  def infixSql(op: String, parameter1: Column[_], parameter2: Column[_], indent: Int): String =
+    if (op.isEmpty)
+      s"(${columnSql(parameter1, indent)} ${columnSql(parameter2, indent)})"
+    else
+      s"(${columnSql(parameter1, indent)} $op ${columnSql(parameter2, indent)})"
 
-  def postfixSql(op: String, parameter: Column[_]): String =
-    s"${columnSql(parameter)} $op"
+  def postfixSql(op: String, parameter: Column[_], indent: Int): String =
+    s"${columnSql(parameter, indent)} $op"
 
-  def doubleInfixSql(op1: String, op2: String, parameter1: Column[_], parameter2: Column[_], parameter3: Column[_]): String =
-    s"(${columnSql(parameter1)} $op1 ${columnSql(parameter2)} $op2 ${columnSql(parameter3)})"
+  def doubleInfixSql(op1: String, op2: String, parameter1: Column[_], parameter2: Column[_], parameter3: Column[_], indent: Int): String =
+    s"(${columnSql(parameter1, indent)} $op1 ${columnSql(parameter2, indent)} $op2 ${columnSql(parameter3, indent)})"
 
-  def functionSql(op: String, parameters: Seq[Column[_]]): String =
-    parameters.map(parameter => columnSql(parameter)).mkString(s"$op(", ", ", ")")
+  def functionSql(op: String, parameters: Seq[Column[_]], indent: Int): String = {
+    val paramList = parameters.map(parameter => columnSql(parameter, indent))
+    withLineBreaks(paramList, indent)(s"$op(", ", ", ")")
+  }
 
-  def windowFunctionSql(partitionByColumns: Seq[Column[_]], orders: Seq[Order]) = {
+  def windowFunctionSql(partitions: Seq[Column[_]], orders: Seq[Order], indent: Int) = {
+    val partitionList = partitions.map(column => columnSql(column, indent))
+
     val partitionBy =
-      if (partitionByColumns.isEmpty) ""
-      else s"partition by ${partitionByColumns.map(column => columnSql(column)).mkString(", ")}"
+      if (partitionList.isEmpty) ""
+      else withLineBreaks(partitionList.tail, indent)(s"partition by ${partitionList.head}", ", ", "")
+
+    val orderList = orders.map(order => orderSql(order, indent))
 
     val orderBy =
       if (orders.isEmpty) ""
-      else s"order by ${orderListSql(orders)}"
+      else withLineBreaks(orderList.tail, indent)(s"order by ${orderList.head}", ", ", "")
 
-    (partitionBy + " " + orderBy).trim
+    List(partitionBy, orderBy).filterNot(_.isEmpty).mkString(" ")
   }
 
-  def orderListSql(orders: Seq[Order]) =
-    orders.map(order => orderSql(order)).mkString(", ")
+  def orderListSql(orders: Seq[Order], indent: Int) = {
+    val orderList = orders.map(order => orderSql(order, indent))
+    if (orders.isEmpty) ""
+    else withLineBreaks(orderList, indent)("", ", ", "")
+  }
 
-  def groupListSql(groups: Seq[Group]) =
-    groups.map(group => groupSql(group)).mkString(", ")
+  def groupListSql(groups: Seq[Group], indent: Int) = {
+    val groupList = groups.map(group => groupSql(group, indent))
+    if (groups.isEmpty) ""
+    else withLineBreaks(groupList, indent + TabWidth)("", ", ", "")
+  }
 
-  def orderSql(order: Order) =
+  def orderSql(order: Order, indent: Int) =
     if (order.ascending)
-      columnSql(order.column)
+      columnSql(order.column, indent)
     else
-      columnSql(order.column) + " desc"
+      columnSql(order.column, indent) + " desc"
 
-  def groupSql(group: Group): String = group match {
-    case group: ColumnGroup => columnSql(group.column)
-    case group: TupleGroup => group.groups.map(group => groupSql(group)).mkString("(", ", ", ")")
-    case group: FunctionGroup => group.name + "(" + group.groups.map(group => groupSql(group)).mkString(", ") + ")"
+  def groupSql(group: Group, indent: Int): String = group match {
+    case group: ColumnGroup =>
+      columnSql(group.column, indent)
+    case group: TupleGroup =>
+      val groupList = group.groups.map(group => groupSql(group, indent))
+      withLineBreaks(groupList, indent + TabWidth)("(", ", ", ")")
+    case group: FunctionGroup =>
+      val groupList = group.groups.map(group => groupSql(group, indent))
+      withLineBreaks(groupList, indent + TabWidth)(group.name + "(", ", ", ")")
   }
 
-  def literalSql[A](literal: A) =
-    "?"
+  def literalSql[A](literal: A) = "?"
 
   def constantSql[A](columnType: ColumnType[A], value: A): String = columnType match {
     case BooleanColumnType => value.toString
@@ -175,16 +236,24 @@ trait BaseStatementBuilder {
   def escapeSqlString(string: String) =
     string.replace("'", "''")
 
-  def caseSql(whens: List[When[_]], `else`: Option[Column[_]]) = {
-    val whenSql = whens.map(when => s"when ${columnSql(when.condition)} then ${columnSql(when.result)}").mkString(" ")
-    val elseSql = `else`.map(`else` => s"else ${columnSql(`else`)} ").getOrElse("")
-    s"case $whenSql ${elseSql}end"
+  def caseSql(whens: List[When[_]], `else`: Option[Column[_]], indent: Int) = {
+    val whenSql = whens.map(when => s"when ${columnSql(when.condition, indent + TabWidth)} then ${columnSql(when.result, indent)}").mkString(NewLine + padding(indent + TabWidth))
+    val elseSql = `else`.map(`else` => s"else ${columnSql(`else`, indent + TabWidth)} ").getOrElse("")
+
+    onNewLine(s"case", indent) +
+      onNewLine(whenSql, indent + TabWidth) +
+      onNewLine(elseSql, indent + TabWidth) +
+      onNewLine("end", indent)
   }
 
-  def caseColumnSql(column: Column[_], mappings: List[(Column[_], Column[_])], `else`: Option[Column[_]]) = {
-    val whenSql = mappings.map(mapping => s"when ${columnSql(mapping._1)} then ${columnSql(mapping._2)}").mkString(" ")
-    val elseSql = `else`.map(`else` => s"else ${columnSql(`else`)} ").getOrElse("")
-    s"case ${columnSql(column)} $whenSql ${elseSql}end"
+  def caseColumnSql(column: Column[_], mappings: List[(Column[_], Column[_])], `else`: Option[Column[_]], indent: Int) = {
+    val whenSql = mappings.map(mapping => s"when ${columnSql(mapping._1, indent)} then ${columnSql(mapping._2, indent)}").mkString(NewLine + padding(indent + TabWidth))
+    val elseSql = `else`.map(`else` => s"else ${columnSql(`else`, indent)} ").getOrElse("")
+
+    s"case ${columnSql(column, indent)}" +
+      onNewLine(whenSql, indent + TabWidth) +
+      onNewLine(elseSql, indent + TabWidth) +
+      onNewLine("end", indent)
   }
 
   // -------------------------------------------------

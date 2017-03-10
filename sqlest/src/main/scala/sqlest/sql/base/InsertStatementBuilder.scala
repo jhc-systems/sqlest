@@ -21,21 +21,26 @@ import sqlest.ast._
 trait InsertStatementBuilder extends BaseStatementBuilder {
   selectStatementBuilder: SelectStatementBuilder =>
 
-  def insertSql(insert: Insert): String = insert match {
+  def insertSql(insert: Insert, indent: Int): String = insert match {
     case insert: InsertValues =>
-      s"insert ${insertIntoSql(insert.into)} ${insertColumnsSql(insert.columns)} ${insertValuesSql(insert.columns)}"
+      val insertColumns = insertColumnsSql(insert.columns)
+      val insertValues = insertValuesSql(insert.columns)
+      withLineBreaks(insertColumns, indent)(s"insert ${insertIntoSql(insert.into)} (", ", ", ")") +
+        onNewLine(withLineBreaks(insertValues, indent)(s"values (", ", ", ")"), indent)
     case InsertFromSelect(into, columns, select) =>
-      s"insert ${insertIntoSql(into)} ${insertColumnsSql(columns)} ${selectStatementBuilder.selectSql(select)}"
+      val insertColumns = insertColumnsSql(columns)
+      val insertValues = insertValuesSql(columns)
+      withLineBreaks(insertColumns, indent)(s"insert ${insertIntoSql(into)} (", ", ", ")") +
+        onNewLine(selectStatementBuilder.selectSql(select, indent), indent)
   }
 
   def insertIntoSql(into: Table): String =
     s"into ${identifierSql(into.tableName)}"
 
-  def insertColumnsSql(columns: Seq[TableColumn[_]]): String =
-    columns map (column => identifierSql(column.columnName)) mkString ("(", ", ", ")")
+  def insertColumnsSql(columns: Seq[TableColumn[_]]): Seq[String] =
+    columns.map(column => identifierSql(column.columnName))
 
-  def insertValuesSql(columns: Seq[TableColumn[_]]): String =
-    columns.map(_ => "?") mkString ("values (", ", ", ")")
+  def insertValuesSql(columns: Seq[TableColumn[_]]): Seq[String] = columns.map(_ => "?")
 
   // -------------------------------------------------
 

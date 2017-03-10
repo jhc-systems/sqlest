@@ -181,7 +181,9 @@ class Session(database: Database) extends Logging {
       if (argumentLists.size == 1) argumentLists.head.map(_.value).mkString(", ")
       else argumentLists.map(_.map(_.value).mkString("(", ", ", ")")).mkString(", ")
 
-    s"sql [$sql], arguments [$argumentsLog]${connectionLog}"
+    s"""sql [
+    |$sql
+    |], arguments [$argumentsLog]${connectionLog}""".stripMargin
   }
 }
 
