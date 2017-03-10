@@ -25,12 +25,12 @@ trait InsertStatementBuilder extends BaseStatementBuilder {
     case insert: InsertValues =>
       val insertColumns = insertColumnsSql(insert.columns)
       val insertValues = insertValuesSql(insert.columns)
-      withLineBreaks(insertColumns, indent)(s"insert ${insertIntoSql(insert.into)} (", ", ", ")") +
-        onNewLine(withLineBreaks(insertValues, indent)(s"values (", ", ", ")"), indent)
+      withLineBreaks(insertColumns, indent + TabWidth)(s"insert ${insertIntoSql(insert.into)} (", ", ", ")") +
+        onNewLine(withLineBreaks(insertValues, indent + 7)(s"values (", ", ", ")"), indent)
     case InsertFromSelect(into, columns, select) =>
       val insertColumns = insertColumnsSql(columns)
       val insertValues = insertValuesSql(columns)
-      withLineBreaks(insertColumns, indent)(s"insert ${insertIntoSql(into)} (", ", ", ")") +
+      withLineBreaks(insertColumns, indent + TabWidth)(s"insert ${insertIntoSql(into)} (", ", ", ")") +
         onNewLine(selectStatementBuilder.selectSql(select, indent), indent)
   }
 

@@ -28,7 +28,7 @@ trait BaseStatementBuilderSpec extends FlatSpec with Matchers {
   implicit def statementBuilder: StatementBuilder
 
   def sql(operation: Operation) = {
-    val (_, generatedSql, parameters) = statementBuilder(operation)
+    val (_, generatedSql, parameters, prettySql) = statementBuilder(operation)
     (generatedSql.replaceAll("\\s+", " "), parameters.map(_.map(_.value)))
   }
 

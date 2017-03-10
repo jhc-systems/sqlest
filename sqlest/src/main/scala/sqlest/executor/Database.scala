@@ -83,7 +83,7 @@ class Session(database: Database) extends Logging {
 
   def executeSelect[A](select: Select[_, _])(extractor: ResultSet => A): A =
     withConnection { connection =>
-      val (preprocessedSelect, sql, argumentLists) = database.statementBuilder(select)
+      val (preprocessedSelect, sql, argumentLists, prettySql) = database.statementBuilder(select)
       try {
         val startTime = new DateTime
         val preparedStatement = prepareStatement(connection, preprocessedSelect, sql, argumentLists)
@@ -92,7 +92,7 @@ class Session(database: Database) extends Logging {
           try {
             val result = extractor(resultSet)
             val endTime = new DateTime
-            logger.info(s"Ran sql in ${endTime.getMillis - startTime.getMillis}ms: ${logDetails(connection, sql, argumentLists)}")
+            logger.info(s"Ran sql in ${endTime.getMillis - startTime.getMillis}ms: ${logDetails(connection, prettySql, argumentLists)}")
             result
           } finally {
             try {
@@ -177,12 +177,15 @@ class Session(database: Database) extends Logging {
 
   protected def logDetails(connection: Connection, sql: String, argumentLists: List[List[LiteralColumn[_]]]) = {
     val connectionLog = database.connectionDescription.map(connectionDescription => s", connection [${connectionDescription(connection)}]").getOrElse("")
+
     val argumentsLog =
       if (argumentLists.size == 1) argumentLists.head.map(_.value).mkString(", ")
       else argumentLists.map(_.map(_.value).mkString("(", ", ", ")")).mkString(", ")
 
     s"""sql [
+    |
     |$sql
+    |
     |], arguments [$argumentsLog]${connectionLog}""".stripMargin
   }
 }
@@ -267,14 +270,14 @@ case class Transaction(database: Database) extends Session(database) {
 
   def executeCommand(command: Command): Int =
     withConnection { connection =>
-      val (preprocessedCommand, sql, argumentLists) = database.statementBuilder(command)
+      val (preprocessedCommand, sql, argumentLists, prettySql) = database.statementBuilder(command)
       val startTime = new DateTime
       try {
         val preparedStatement = prepareStatement(connection, preprocessedCommand, sql, argumentLists)
         try {
           val result = preparedStatement.executeBatch.sum
           val endTime = new DateTime
-          logger.info(s"Ran sql in ${endTime.getMillis - startTime.getMillis}ms: ${logDetails(connection, sql, argumentLists)}")
+          logger.info(s"Ran sql in ${endTime.getMillis - startTime.getMillis}ms: ${logDetails(connection, prettySql, argumentLists)}")
           result
         } finally {
           try {
@@ -290,7 +293,7 @@ case class Transaction(database: Database) extends Session(database) {
 
   def executeInsertReturningKeys[T](command: Insert)(implicit columnType: ColumnType[T]): List[T] =
     withConnection { connection =>
-      val (preprocessedCommand, sql, argumentLists) = database.statementBuilder(command)
+      val (preprocessedCommand, sql, argumentLists, prettySql) = database.statementBuilder(command)
       val startTime = new DateTime
       try {
         val preparedStatement = prepareStatement(
@@ -305,7 +308,7 @@ case class Transaction(database: Database) extends Session(database) {
           val rs = preparedStatement.getGeneratedKeys
           val keys = IndexedExtractor[T](1).extractAll(ResultSetIterable(rs))
           val endTime = new DateTime
-          logger.info(s"Ran sql in ${endTime.getMillis - startTime.getMillis}ms: ${logDetails(connection, sql, argumentLists)}")
+          logger.info(s"Ran sql in ${endTime.getMillis - startTime.getMillis}ms: ${logDetails(connection, prettySql, argumentLists)}")
           keys
         } finally {
           try {

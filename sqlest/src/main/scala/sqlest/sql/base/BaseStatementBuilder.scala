@@ -20,9 +20,9 @@ import sqlest.ast._
 import sqlest.ast.operations.ColumnOperations._
 
 trait BaseStatementBuilder {
-  protected val MaxWidth = 40
-  protected val TabWidth = 4
-  protected val NewLine = System.lineSeparator
+  val MaxWidth = 40
+  val TabWidth = 4
+  val NewLine = System.lineSeparator
 
   def preprocess(operation: Operation): Operation =
     aliasColumnsFromSubselects(operation)
