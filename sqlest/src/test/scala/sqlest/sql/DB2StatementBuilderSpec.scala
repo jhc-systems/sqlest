@@ -235,6 +235,19 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
     )
   }
 
+  it should "produce the right SQL for nullable literal columns" in {
+    sql {
+      select(TableThree.col3, TableThree.col4, Option.empty[String].constant.as("testOption"))
+        .from(TableThree)
+    } should equal(
+      s"""
+         |select three.col3 as three_col3, three.col4 as three_col4, cast(null as varchar(256)) as testOption
+         |from three
+       """.formatSql,
+      List(List())
+    )
+  }
+
   "boolean columns" should "produce the right sql" in {
     sql {
       select(MyTable.col1)

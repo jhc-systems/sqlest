@@ -24,19 +24,26 @@ trait DB2StatementBuilder extends base.StatementBuilder {
     addTypingToSqlParams(super.preprocess(operation))
 
   def addTypingToSqlParams(operation: Operation): Operation = operation match {
-    case select: Select[_, _] => select.mapColumns(addTypingToSqlFunctions, select => addTypingToSqlParams(select).asInstanceOf[Select[_, _ <: Relation]])
-    case update: Update => update.mapColumns(addTypingToSqlFunctions, select => addTypingToSqlParams(select).asInstanceOf[Select[_, _ <: Relation]])
-    case insert: Insert => insert.mapColumns(addTypingToSqlFunctions, select => addTypingToSqlParams(select).asInstanceOf[Select[_, _ <: Relation]])
-    case delete: Delete => delete.mapColumns(addTypingToSqlFunctions, select => addTypingToSqlParams(select).asInstanceOf[Select[_, _ <: Relation]])
+    case select: Select[_, _] => select.mapColumns(addTypingToSqlColumn, select => addTypingToSqlParams(select).asInstanceOf[Select[_, _ <: Relation]])
+    case update: Update => update.mapColumns(addTypingToSqlColumn, select => addTypingToSqlParams(select).asInstanceOf[Select[_, _ <: Relation]])
+    case insert: Insert => insert.mapColumns(addTypingToSqlColumn, select => addTypingToSqlParams(select).asInstanceOf[Select[_, _ <: Relation]])
+    case delete: Delete => delete.mapColumns(addTypingToSqlColumn, select => addTypingToSqlParams(select).asInstanceOf[Select[_, _ <: Relation]])
     case _ => operation
   }
 
-  def addTypingToSqlFunctions(column: Column[_]): Column[_] = column match {
-    case scalarFunctionColumn: ScalarFunctionColumn[_] => ScalarFunctionColumn(scalarFunctionColumn.name, scalarFunctionColumn.parameters.map(addTypingToSqlColumn))(scalarFunctionColumn.columnType)
+  def addTypingToSqlColumn(column: Column[_]): Column[_] = column match {
+    case scalarFunctionColumn: ScalarFunctionColumn[_] =>
+      ScalarFunctionColumn(scalarFunctionColumn.name, scalarFunctionColumn.parameters.map(addTypingToLiteralColumn))(scalarFunctionColumn.columnType)
+    case constantColumn: ConstantColumn[_] => constantColumn.columnType match {
+      case optionColumnType: OptionColumnType[_, _] if (constantColumn.value == None || constantColumn.value == null) && optionColumnType.hasNullNullValue =>
+        ScalarFunctionColumn("cast", Seq(PostfixFunctionColumn("as " + castLiteralSql(constantColumn.columnType), constantColumn)(constantColumn.columnType)))(constantColumn.columnType)
+      case _ =>
+        constantColumn
+    }
     case _ => column
   }
 
-  def addTypingToSqlColumn(column: Column[_]): Column[_] = column match {
+  def addTypingToLiteralColumn(column: Column[_]): Column[_] = column match {
     case literalColumn: LiteralColumn[_] => ScalarFunctionColumn("cast", Seq(PostfixFunctionColumn("as " + castLiteralSql(column.columnType), literalColumn)(literalColumn.columnType)))(literalColumn.columnType)
     case _ => column
   }
@@ -72,7 +79,7 @@ trait DB2StatementBuilder extends base.StatementBuilder {
     None
 
   override def joinSql(relation: Relation): String = relation match {
-    case tableFunctionApplication: TableFunctionApplication[_] => "table(" + functionSql(tableFunctionApplication.tableName, tableFunctionApplication.parameterColumns.map(addTypingToSqlColumn)) + ") as " + identifierSql(tableFunctionApplication.tableAlias)
+    case tableFunctionApplication: TableFunctionApplication[_] => "table(" + functionSql(tableFunctionApplication.tableName, tableFunctionApplication.parameterColumns.map(addTypingToLiteralColumn)) + ") as " + identifierSql(tableFunctionApplication.tableAlias)
     case TableFunctionFromSelect(select, alias) => "table(" + selectSql(select) + ") as " + identifierSql(alias)
     case LeftExceptionJoin(left, right, condition) => joinSql(left) + " left exception join " + joinSql(right) + " on " + columnSql(condition)
     case RightExceptionJoin(left, right, condition) => joinSql(left) + " right exception join " + joinSql(right) + " on " + columnSql(condition)
