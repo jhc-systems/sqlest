@@ -65,6 +65,60 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
     )
   }
 
+  "query with optional Some where clause" should "render ok" in {
+    val optionalInt: Option[Int] = Some(2)
+
+    sql {
+      select(MyTable.col1, MyTable.col2)
+        .from(MyTable)
+        .where(MyTable.col1 === 1)
+        .optionWhere(optionalInt.map(someCol2 => MyTable.col2 =!= someCol2))
+    } should equal(
+      s"""
+         |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
+         |from mytable
+         |where ((mytable.col1 = ?) and (mytable.col2 <> ?))
+       """.formatSql,
+      List(List(1, 2))
+    )
+  }
+
+  "query with optional Some where in clause" should "render ok" in {
+    val optionalIntList: Option[List[Int]] = Some(List(2))
+
+    sql {
+      select(MyTable.col1, MyTable.col2)
+        .from(MyTable)
+        .where(MyTable.col1 === 1)
+        .optionWhere(optionalIntList.map(someListCol2 => MyTable.col2.in(someListCol2)))
+    } should equal(
+      s"""
+         |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
+         |from mytable
+         |where ((mytable.col1 = ?) and (mytable.col2 in (?)))
+       """.formatSql,
+      List(List(1, 2))
+    )
+  }
+
+  "query with optional None where clause" should "render ok" in {
+    val optionalInt: Option[Int] = None
+
+    sql {
+      select(MyTable.col1, MyTable.col2)
+        .from(MyTable)
+        .where(MyTable.col1 === 1)
+        .optionWhere(optionalInt.map(noneCol2 => MyTable.col2 =!= noneCol2))
+    } should equal(
+      s"""
+         |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
+         |from mytable
+         |where (mytable.col1 = ?)
+       """.formatSql,
+      List(List(1))
+    )
+  }
+
   "select from a single table" should "produce the right sql" in {
     sql {
       select(MyTable.col1, MyTable.col2)

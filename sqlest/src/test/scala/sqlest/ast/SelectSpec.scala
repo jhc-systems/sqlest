@@ -76,4 +76,31 @@ class SelectSpec extends FlatSpec with Matchers {
 
     select(YourTable.col1).from(YourTable).where(YourTable.col1 in query)
   }
+
+  "optional where" should "append if Some" in {
+    val optionalInt: Option[Int] = Some(2)
+    val query = select.
+      from(MyTable).
+      where(MyTable.col1 > 1).
+      optionWhere(optionalInt.map(someCol1 => MyTable.col1 < someCol1))
+
+    query.where should equal(Some(MyTable.col1 > 1 && MyTable.col1 < 2))
+  }
+
+  "optional where in" should "append if Some" in {
+    val optionalIntList: Option[List[Int]] = Some(List(2))
+    val query = select.
+      from(MyTable).
+      where(MyTable.col1 > 1).
+      optionWhere(optionalIntList.map(someListCol1 => MyTable.col1.in(someListCol1)))
+
+    query.where should equal(Some(MyTable.col1 > 1 && MyTable.col1.in(List(2))))
+  }
+
+  "optional where" should "not append if None" in {
+    val optionalInt: Option[Int] = None
+    val query = select.from(MyTable).where(MyTable.col1 > 1).optionWhere(optionalInt.map(noneCol1 => MyTable.col1 < noneCol1))
+    query.where should equal(Some(MyTable.col1 > 1))
+  }
+
 }

@@ -171,6 +171,9 @@ case class Select[A, R <: Relation](
   def where(expr: Column[Boolean]): Select[A, R] =
     this.copy(where = this.where map (_ && expr) orElse Some(expr))
 
+  def optionWhere(expr: Option[Column[Boolean]]): Select[A, R] =
+    expr.map(e => this.copy(where = this.where map (_ && e) orElse expr)).getOrElse(this)
+
   def startWith(expr: Column[Boolean]): Select[A, R] =
     this.copy(startWith = this.startWith map (_ && expr) orElse Some(expr))
 
