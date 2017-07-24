@@ -56,12 +56,12 @@ trait DB2StatementBuilder extends base.StatementBuilder {
       case mappedColumnType: MappedColumnType[_, _] => castLiteralSql(mappedColumnType.baseColumnType)
     }
 
-  override def selectSql(select: Select[_, _ <: Relation]): String = {
+  override def selectSql(select: Select[_, _ <: Relation], indent: Int): String = {
     val offset = select.offset getOrElse 0L
     if (offset > 0L) {
-      rowNumberSelectSql(select, offset, select.limit)
+      rowNumberSelectSql(select, offset, select.limit, indent)
     } else {
-      super.selectSql(select)
+      super.selectSql(select, indent)
     }
   }
 
@@ -71,40 +71,62 @@ trait DB2StatementBuilder extends base.StatementBuilder {
   override def selectOffsetSql(offset: Option[Long]): Option[String] =
     None
 
-  override def joinSql(relation: Relation): String = relation match {
-    case tableFunctionApplication: TableFunctionApplication[_] => "table(" + functionSql(tableFunctionApplication.tableName, tableFunctionApplication.parameterColumns.map(addTypingToSqlColumn)) + ") as " + identifierSql(tableFunctionApplication.tableAlias)
-    case TableFunctionFromSelect(select, alias) => "table(" + selectSql(select) + ") as " + identifierSql(alias)
-    case LeftExceptionJoin(left, right, condition) => joinSql(left) + " left exception join " + joinSql(right) + " on " + columnSql(condition)
-    case RightExceptionJoin(left, right, condition) => joinSql(left) + " right exception join " + joinSql(right) + " on " + columnSql(condition)
-    case _ => super.joinSql(relation)
+  override def joinSql(relation: Relation, indent: Int): String = relation match {
+    case tableFunctionApplication: TableFunctionApplication[_] => "table(" + functionSql(tableFunctionApplication.tableName, tableFunctionApplication.parameterColumns.map(addTypingToSqlColumn), indent) + ") as " + identifierSql(tableFunctionApplication.tableAlias)
+    case TableFunctionFromSelect(select, alias) =>
+      "table(" +
+        onNewLine(selectSql(select, indent + TabWidth), indent + TabWidth) +
+        onNewLine(") as " + identifierSql(alias), indent)
+    case LeftExceptionJoin(left, right, condition) =>
+      joinSql(left, indent) +
+        onNewLine("left exception join ", indent) +
+        joinSql(right, indent) +
+        onNewLine("on ", indent) +
+        columnSql(condition, indent)
+    case RightExceptionJoin(left, right, condition) =>
+      joinSql(left, indent) +
+        onNewLine("right exception join ", indent) +
+        joinSql(right, indent) +
+        onNewLine("on ", indent) +
+        columnSql(condition, indent)
+    case _ => super.joinSql(relation, indent)
   }
 
-  def rowNumberSelectSql(select: Select[_, _ <: Relation], offset: Long, limit: Option[Long]): String = {
+  def rowNumberSelectSql(select: Select[_, _ <: Relation], offset: Long, limit: Option[Long], indent: Int): String = {
+    val orderBy = selectOrderBySql(select.orderBy, indent).getOrElse("")
+    val whatColumns = Seq(selectWhatSql(select.columns, indent + TabWidth), s"row_number() over ($orderBy) as rownum")
+    val whatSql = withLineBreaks(whatColumns, indent + (TabWidth * 2))("", ", ", "")
+
     val subquery = Seq(
-      s"${selectWhatSql(select.columns)}, row_number() over (${selectOrderBySql(select.orderBy) getOrElse ""}) as rownum",
-      selectFromSql(select.from)
+      whatSql,
+      selectFromSql(select.from, indent + TabWidth)
     ) ++ Seq(
-        selectWhereSql(select.where),
-        selectGroupBySql(select.groupBy)
-      ).flatten mkString " "
+        selectWhereSql(select.where, indent + TabWidth),
+        selectGroupBySql(select.groupBy, indent + TabWidth)
+      ).flatten mkString (NewLine + padding(indent + TabWidth))
 
     val what =
-      select.columns map (col => identifierSql(col.columnAlias)) mkString ", "
+      withLineBreaks(select.columns.map(col => identifierSql(col.columnAlias)), indent)("", ", ", "")
 
     val bounds = limit
       .map(limit => s"rownum between ? and ?")
       .getOrElse(s"rownum >= ?")
 
-    s"with subquery as ($subquery) select $what from subquery where $bounds"
+    s"with subquery as (" +
+      onNewLine(subquery, indent + TabWidth) +
+      onNewLine(")", indent) +
+      onNewLine(s"select $what", indent) +
+      onNewLine("from subquery", indent) +
+      onNewLine(s"where $bounds", indent)
   }
 
-  override def columnSql(column: Column[_]): String =
+  override def columnSql(column: Column[_], indent: Int): String =
     column match {
       case literalColumn: LiteralColumn[_] if literalColumn.columnType == BooleanColumnType =>
         if (literalColumn.value == true) "(? = ?)" else "(? <> ?)"
       case constantColumn: ConstantColumn[_] if constantColumn.columnType == BooleanColumnType =>
         if (constantColumn.value == true) "(0 = 0)" else "(0 <> 0)"
-      case _ => super.columnSql(column)
+      case _ => super.columnSql(column, indent)
     }
 
   override def selectArgs(select: Select[_, _ <: Relation]): List[LiteralColumn[_]] = {

@@ -66,17 +66,23 @@ class InsertStatementBuilderSpec extends BaseStatementBuilderSpec {
     sql {
       insert
         .into(TableOne)
-        .columns(TableOne.col1, TableOne.col2)
-        .values(TableOne.col1 -> "a", TableOne.col2 -> "b")
-        .values(TableOne.col1 -> "c", TableOne.col2 -> "d")
+        .columns(TableOne.col1, TableOne.col2, TableOne.col1, TableOne.col2, TableOne.col1, TableOne.col2)
+        .values(TableOne.col1 -> "a", TableOne.col2 -> "b", TableOne.col1 -> "a", TableOne.col2 -> "b", TableOne.col1 -> "a", TableOne.col2 -> "b")
+        .values(TableOne.col1 -> "c", TableOne.col2 -> "d", TableOne.col1 -> "c", TableOne.col2 -> "d", TableOne.col1 -> "c", TableOne.col2 -> "d")
+        .values(TableOne.col1 -> "e", TableOne.col2 -> "f", TableOne.col1 -> "e", TableOne.col2 -> "f", TableOne.col1 -> "e", TableOne.col2 -> "f")
+        .values(TableOne.col1 -> "g", TableOne.col2 -> "h", TableOne.col1 -> "g", TableOne.col2 -> "h", TableOne.col1 -> "g", TableOne.col2 -> "h")
     } should equal(
       s"""
        |insert
        |into one
-       |(col1, col2)
-       |values (?, ?)
+       |(col1, col2, col1, col2, col1, col2)
+       |values (?, ?, ?, ?, ?, ?)
        """.formatSql,
-      List(List("a", "b"), List("c", "d"))
+      List(
+        List("a", "b", "a", "b", "a", "b"),
+        List("c", "d", "c", "d", "c", "d"),
+        List("e", "f", "e", "f", "e", "f"),
+        List("g", "h", "g", "h", "g", "h"))
     )
   }
 

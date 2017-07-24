@@ -26,7 +26,9 @@ trait StatementBuilder extends BaseStatementBuilder
 
   def apply(operation: Operation) = {
     val preprocessedOperation = preprocess(operation)
-    (preprocessedOperation, sql(preprocessedOperation), argumentLists(preprocessedOperation))
+    val rawSql = sql(preprocessedOperation)
+    val argLists = argumentLists(preprocessedOperation)
+    (preprocessedOperation, rawSql, argLists, prettySql(rawSql, argLists))
   }
 
   def generateRawSql(operation: Operation): String = {
@@ -39,11 +41,56 @@ trait StatementBuilder extends BaseStatementBuilder
       .mkString
   }
 
+  private def prettySql(sql: String, argumentLists: List[List[LiteralColumn[_]]]): String = {
+    def literals(argList: List[LiteralColumn[_]]) = argList.map {
+      case literal: LiteralColumn[a] =>
+        constantSql(literal.columnType, literal.value)
+    }
+
+    val frags = sql.split("\\?")
+    val fragLen = frags.length
+
+    val firstArgs = argumentLists
+      .headOption
+      .toList
+      .flatMap(literals)
+
+    val firstArgsSql = frags.zipAll(firstArgs, "", "").flatMap {
+      case (l, r) => Seq(l, r)
+    }.mkString
+
+    val restArgLists =
+      if (firstArgs.isEmpty) Nil
+      else argumentLists
+        .drop(1)
+        .flatMap(literals)
+        .grouped(firstArgs.length)
+        .toList
+
+    val restArgListsSql = restArgLists.map { argList =>
+      withLineBreaks(argList, 7)("(", ", ", ")")
+    }
+
+    val restArgsSql =
+      if (restArgListsSql.isEmpty)
+        ""
+      else restArgListsSql.mkString(
+        "," + NewLine + padding(7),
+        "," + NewLine + padding(7),
+        ""
+      )
+
+    if (restArgsSql.isEmpty)
+      firstArgsSql
+    else
+      firstArgsSql + restArgsSql
+  }
+
   private def sql(operation: Operation): String = operation match {
-    case select: Select[_, _] => selectSql(select)
-    case insert: Insert => insertSql(insert)
-    case update: Update => updateSql(update)
-    case delete: Delete => deleteSql(delete)
+    case select: Select[_, _] => selectSql(select, 0)
+    case insert: Insert => insertSql(insert, 0)
+    case update: Update => updateSql(update, 0)
+    case delete: Delete => deleteSql(delete, 0)
     case other => sys.error("Unsupported operation type: " + other)
   }
 

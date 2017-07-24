@@ -19,20 +19,19 @@ package sqlest.sql.base
 import sqlest.ast._
 
 trait DeleteStatementBuilder extends BaseStatementBuilder {
-  def deleteSql(delete: Delete): String = {
+  def deleteSql(delete: Delete, indent: Int): String = {
     Seq(
-      "delete",
-      deleteFromSql(delete.from)
+      "delete " + deleteFromSql(delete.from)
     ) ++ Seq(
-        deleteWhereSql(delete.where)
-      ).flatten mkString ("", " ", "")
+        deleteWhereSql(delete.where, indent)
+      ).flatten mkString (NewLine + padding(indent))
   }
 
   def deleteFromSql(from: Table): String =
     s"from ${identifierSql(from.tableName)}"
 
-  def deleteWhereSql(where: Option[Column[Boolean]]): Option[String] =
-    where map (where => s"where ${columnSql(where)}")
+  def deleteWhereSql(where: Option[Column[Boolean]], indent: Int): Option[String] =
+    where map (where => s"where ${columnSql(where, indent)}")
 
   // -------------------------------------------------
 

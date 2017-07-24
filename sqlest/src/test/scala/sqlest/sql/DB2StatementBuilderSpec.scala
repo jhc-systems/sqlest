@@ -51,10 +51,11 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
         .offset(20)
     } should equal(
       s"""
-       |with subquery as
-       |(select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2, row_number() over () as rownum
-         |from mytable
-         |where (mytable.col1 = ?))
+       |with subquery as (
+       |  select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2, row_number() over () as rownum
+       |  from mytable
+       |  where (mytable.col1 = ?)
+       |)
        |select mytable_col1, mytable_col2
        |from subquery
        |where rownum >= ?
@@ -71,10 +72,12 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
         .page(2, 10)
     } should equal(
       s"""
-       |with subquery as
-       |(select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2, row_number() over () as rownum
-         |from mytable
-         |where (mytable.col1 = ?))
+       |with subquery as (
+       |  select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2,
+       |    row_number() over () as rownum
+       |  from mytable
+       |  where (mytable.col1 = ?)
+       |)
        |select mytable_col1, mytable_col2
        |from subquery
        |where rownum between ? and ?
@@ -92,10 +95,12 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
         .page(2, 10)
     } should equal(
       s"""
-       |with subquery as
-       |(select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2, row_number() over (order by mytable.col1) as rownum
-         |from mytable
-         |where (mytable.col1 = ?))
+       |with subquery as (
+       |  select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2,
+       |    row_number() over (order by mytable.col1) as rownum
+       |  from mytable
+       |  where (mytable.col1 = ?)
+       |)
        |select mytable_col1, mytable_col2
        |from subquery
        |where rownum between ? and ?
@@ -113,10 +118,12 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
         .page(15, 16)
     } should equal(
       s"""
-       |with subquery as
-       |(select 1 as a, sum(cast(? as integer)) as b, (3 + ?) as c, row_number() over (order by ?, ? desc) as rownum
-         |from one inner join two on ((? = ?) and (? <> ?))
-         |where ((? = ?) and (? <> ?)))
+       |with subquery as (
+       |  select 1 as a, sum(cast(? as integer)) as b, (3 + ?) as c,
+       |    row_number() over (order by ?, ? desc) as rownum
+       |  from one inner join two on ((? = ?) and (? <> ?))
+       |  where ((? = ?) and (? <> ?))
+       |)
        |select a, b, c
        |from subquery
        |where rownum between ? and ?
@@ -147,7 +154,10 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
     } should equal(
       s"""
          |select one.col1 as one_col1, one.col2 as one_col2, two_col2, two_col3
-         |from one left join table(select two.col2 as two_col2, two.col3 as two_col3 from two where (two.col2 = ?)) as testTableFunctionFromSelect
+         |from one left join table(
+         |  select two.col2 as two_col2, two.col3 as two_col3
+         |  from two where (two.col2 = ?)
+         |) as testTableFunctionFromSelect
          |on (one.col2 = two_col2)
        """.formatSql,
       List(List("123"))

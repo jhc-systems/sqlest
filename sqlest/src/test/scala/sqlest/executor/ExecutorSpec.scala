@@ -303,7 +303,8 @@ class ExecutorSpec extends FlatSpec with Matchers {
 
   it should "generate raw SQL correctly" in {
     TestDatabase(testResultSet).statementBuilder.generateRawSql(optionInsertStatement) should equal(
-      "insert into three (col3, col4) values (1, null)"
+      """insert into three (col3, col4)
+      |values (1, null)""".stripMargin
     )
   }
 
@@ -313,7 +314,12 @@ class ExecutorSpec extends FlatSpec with Matchers {
       optionInsertStatement.execute
     }
 
-    testDatabase.preparedStatement.get.sql shouldBe "insert into three (col3, col4) values (?, ?)"
+    testDatabase.preparedStatement.get.sql shouldBe
+      """
+      |insert into three (col3, col4)
+      |values (?, ?)
+      """.trim.stripMargin
+
     testDatabase.preparedStatement.get.parameters shouldBe Map(1 -> 1, 2 -> null)
   }
 
@@ -325,19 +331,33 @@ class ExecutorSpec extends FlatSpec with Matchers {
 
   it should "generate raw SQL correctly" in {
     TestDatabase(testResultSet).statementBuilder.generateRawSql(mappedOptionInsertStatement1) should equal(
-      "insert into six (trimmedString) values ('a')"
+      """
+      |insert into six (trimmedString)
+      |values ('a')
+      """.trim.stripMargin
     )
 
     testDatabase.statementBuilder.generateRawSql(mappedOptionInsertStatement2) should equal(
-      "insert into six (trimmedString) values ('')"
+      """
+      |insert into six (trimmedString)
+      |values ('')
+      """.trim.stripMargin
     )
 
     testDatabase.statementBuilder.generateRawSql(mappedOptionSelectStatement1) should equal(
-      "select six.zeroIsNoneDateTime as six_zeroIsNoneDateTime from six where (six.zeroIsNoneDateTime = 0)"
+      """
+      |select six.zeroIsNoneDateTime as six_zeroIsNoneDateTime
+      |from six
+      |where (six.zeroIsNoneDateTime = 0)
+      """.trim.stripMargin
     )
 
     testDatabase.statementBuilder.generateRawSql(mappedOptionSelectStatement2) should equal(
-      "select six.zeroIsNoneDateTime as six_zeroIsNoneDateTime from six where (six.zeroIsNoneDateTime = 20150101)"
+      """
+      |select six.zeroIsNoneDateTime as six_zeroIsNoneDateTime
+      |from six
+      |where (six.zeroIsNoneDateTime = 20150101)
+      """.trim.stripMargin
     )
   }
 
@@ -348,14 +368,24 @@ class ExecutorSpec extends FlatSpec with Matchers {
       mappedOptionInsertStatement1.execute
     }
 
-    testDatabase.preparedStatement.get.sql shouldBe "insert into six (trimmedString) values (?)"
+    testDatabase.preparedStatement.get.sql shouldBe
+      """
+      |insert into six (trimmedString)
+      |values (?)
+      """.trim.stripMargin
+
     testDatabase.preparedStatement.get.parameters shouldBe Map(1 -> "a")
 
     testDatabase.withTransaction { implicit transaction =>
       mappedOptionInsertStatement2.execute
     }
 
-    testDatabase.preparedStatement.get.sql shouldBe "insert into six (trimmedString) values (?)"
+    testDatabase.preparedStatement.get.sql shouldBe
+      """
+      |insert into six (trimmedString)
+      |values (?)
+      """.trim.stripMargin
+
     testDatabase.preparedStatement.get.parameters shouldBe Map(1 -> "")
   }
 

@@ -437,7 +437,10 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
       s"""
        |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
        |from mytable
-       |where (mytable.col1 = (select mytable.col1 as mytable_col1 from mytable))
+       |where (mytable.col1 = (
+       |  select mytable.col1 as mytable_col1
+       |  from mytable
+       |))
        """.formatSql,
       List(Nil)
     )
@@ -490,9 +493,10 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
     } should equal(
       s"""
        |select mytable_col1, mytable_col2
-       |from
-       |  (select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
-       |   from mytable) as subselect
+       |from (
+       |  select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
+       |  from mytable
+       |) as subselect
        """.formatSql,
       List(Nil)
     )
@@ -508,12 +512,14 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
     } should equal(
       s"""
        |select mytable_col1, mytable_col2
-       |from mytable 
-       |cross join lateral 
-       |  (select mytable_col1, mytable_col2
-       |    from
-       |    (select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
-       |     from mytable) as subselect2) as subselect1
+       |from mytable
+       |cross join lateral (
+       |  select mytable_col1, mytable_col2
+       |  from (
+       |    select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
+       |    from mytable
+       |  ) as subselect2
+       |) as subselect1
        """.formatSql,
       List(Nil)
     )
@@ -529,12 +535,14 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
     } should equal(
       s"""
        |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
-       |from mytable 
-       |where exists 
-       |  (select mytable_col1, mytable_col2
-       |    from
-       |    (select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
-       |     from mytable) as subselect2)
+       |from mytable
+       |where exists (
+       |  select mytable_col1, mytable_col2
+       |  from (
+       |    select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
+       |    from mytable
+       |  ) as subselect2
+       |)
        """.formatSql,
       List(Nil)
     )
@@ -550,12 +558,14 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
     } should equal(
       s"""
        |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
-       |from mytable 
-       |where not exists 
-       |  (select mytable_col1, mytable_col2
-       |    from
-       |    (select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
-       |     from mytable) as subselect2)
+       |from mytable
+       |where not exists (
+       |  select mytable_col1, mytable_col2
+       |  from (
+       |    select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
+       |    from mytable
+       |  ) as subselect2
+       |)
        """.formatSql,
       List(Nil)
     )
@@ -567,7 +577,7 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
         .from(MyTable)
     } should equal(
       s"""
-       |select (rownumber()  over()) as rownumber
+       |select (rownumber() over()) as rownumber
        |from mytable
        """.formatSql,
       List(Nil)
@@ -578,7 +588,7 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
         .from(MyTable)
     } should equal(
       s"""
-       |select (rownumber()  over(partition by mytable.col1 order by mytable.col2)) as rownumber
+       |select (rownumber() over(partition by mytable.col1 order by mytable.col2)) as rownumber
        |from mytable
        """.formatSql,
       List(Nil)
@@ -596,8 +606,11 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
       s"""
        |select mytable.col1 as mytable_col1
        |from mytable
-       |inner join (select (rownumber()  over(partition by mytable.col1 order by mytable.col2)) as rownumber from mytable)
-       |  on (rownumber = 1)
+       |inner join (
+       |  select (rownumber() over(partition by mytable.col1 order by mytable.col2)) as rownumber
+       |  from mytable
+       |)
+       |on (rownumber = 1)
        """.formatSql,
       List(Nil)
     )

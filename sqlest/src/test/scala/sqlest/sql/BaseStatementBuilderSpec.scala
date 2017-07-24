@@ -23,13 +23,13 @@ import sqlest.ast._
 
 trait BaseStatementBuilderSpec extends FlatSpec with Matchers {
   implicit class StringFormatOps(sql: String) {
-    def formatSql = sql.trim.stripMargin.split(scala.util.Properties.lineSeparator).map(_.trim).mkString(" ")
+    def formatSql = sql.trim.stripMargin.replaceAll("\\s+", " ")
   }
   implicit def statementBuilder: StatementBuilder
 
   def sql(operation: Operation) = {
-    val (_, generatedSql, parameters) = statementBuilder(operation)
-    (generatedSql, parameters.map(_.map(_.value)))
+    val (_, generatedSql, parameters, prettySql) = statementBuilder(operation)
+    (generatedSql.replaceAll("\\s+", " "), parameters.map(_.map(_.value)))
   }
 
   // Test data ----------------------------------

@@ -19,46 +19,46 @@ package sqlest.sql.base
 import sqlest.ast._
 
 trait SelectStatementBuilder extends BaseStatementBuilder {
-  def selectSql(select: Select[_, _ <: Relation]): String = {
+  def selectSql(select: Select[_, _ <: Relation], indent: Int): String = {
     Seq(
-      selectWhatSql(select.columns),
-      selectFromSql(select.from)
+      selectWhatSql(select.columns, indent),
+      selectFromSql(select.from, indent)
     ) ++ Seq(
-        selectWhereSql(select.where),
-        selectStartWithSql(select.startWith),
-        selectConnectBySql(select.connectBy),
-        selectGroupBySql(select.groupBy),
-        selectHavingSql(select.having),
-        selectOrderBySql(select.orderBy),
+        selectWhereSql(select.where, indent),
+        selectStartWithSql(select.startWith, indent),
+        selectConnectBySql(select.connectBy, indent),
+        selectGroupBySql(select.groupBy, indent),
+        selectHavingSql(select.having, indent),
+        selectOrderBySql(select.orderBy, indent),
         selectLimitSql(select.limit),
         selectOffsetSql(select.offset),
-        selectUnionSql(select.union)
-      ).flatten mkString (" ")
+        selectUnionSql(select.union, indent)
+      ).flatten mkString (NewLine + padding(indent))
   }
 
-  def selectWhatSql(columns: Seq[Column[_]]): String =
-    s"select ${columnAliasListSql(columns)}"
+  def selectWhatSql(columns: Seq[Column[_]], indent: Int): String =
+    s"select ${columnAliasListSql(columns, indent + TabWidth)}"
 
-  def selectFromSql(from: Relation): String =
-    s"from ${joinSql(from)}"
+  def selectFromSql(from: Relation, indent: Int): String =
+    s"from ${joinSql(from, indent)}"
 
-  def selectWhereSql(where: Option[Column[Boolean]]): Option[String] =
-    where map (where => s"where ${columnSql(where)}")
+  def selectWhereSql(where: Option[Column[Boolean]], indent: Int): Option[String] =
+    where map (where => s"where ${columnSql(where, indent)}")
 
-  def selectStartWithSql(startWith: Option[Column[Boolean]]): Option[String] =
-    startWith map (startWith => s"start with ${columnSql(startWith)}")
+  def selectStartWithSql(startWith: Option[Column[Boolean]], indent: Int): Option[String] =
+    startWith map (startWith => s"start with ${columnSql(startWith, indent)}")
 
-  def selectConnectBySql(connectBy: Option[Column[Boolean]]): Option[String] =
-    connectBy map (connectBy => s"connect by ${columnSql(connectBy)}")
+  def selectConnectBySql(connectBy: Option[Column[Boolean]], indent: Int): Option[String] =
+    connectBy map (connectBy => s"connect by ${columnSql(connectBy, indent)}")
 
-  def selectGroupBySql(group: Seq[Group]): Option[String] =
-    if (group.isEmpty) None else Some(s"group by ${groupListSql(group)}")
+  def selectGroupBySql(group: Seq[Group], indent: Int): Option[String] =
+    if (group.isEmpty) None else Some(s"group by ${groupListSql(group, indent)}")
 
-  def selectHavingSql(having: Option[Column[Boolean]]): Option[String] =
-    having map (having => s"having ${columnSql(having)}")
+  def selectHavingSql(having: Option[Column[Boolean]], indent: Int): Option[String] =
+    having map (having => s"having ${columnSql(having, indent)}")
 
-  def selectOrderBySql(order: Seq[Order]): Option[String] =
-    if (order.isEmpty) None else Some(s"order by ${orderListSql(order)}")
+  def selectOrderBySql(order: Seq[Order], indent: Int): Option[String] =
+    if (order.isEmpty) None else Some(s"order by ${orderListSql(order, indent)}")
 
   def selectLimitSql(limit: Option[Long]): Option[String] =
     limit map (limit => s"limit ${literalSql(limit)}")
@@ -66,35 +66,67 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
   def selectOffsetSql(offset: Option[Long]): Option[String] =
     offset map (offset => s"offset ${literalSql(offset)}")
 
-  def selectUnionSql(union: Seq[Union[_]]): Option[String] =
-    if (union.isEmpty) None else
+  def selectUnionSql(union: Seq[Union[_]], indent: Int): Option[String] =
+    if (union.isEmpty)
+      None
+    else
       Some(union.map {
-        case Union(select, false) => s"union ${selectSql(select)}"
-        case Union(select, true) => s"union all ${selectSql(select)}"
-      }.mkString(" "))
+        case Union(select, false) => s"union" + onNewLine(selectSql(select, indent), indent)
+        case Union(select, true) => s"union all" + onNewLine(selectSql(select, indent), indent)
+      }.mkString(NewLine + padding(indent)))
 
-  def joinSql(relation: Relation): String = relation match {
+  def joinSql(relation: Relation, indent: Int): String = relation match {
     case table: Table if table.tableName == table.tableAlias => identifierSql(table.tableName)
     case table: Table if table.tableName != table.tableAlias => identifierSql(table.tableName) + " as " + identifierSql(table.tableAlias)
-    case tableFunctionApplication: TableFunctionApplication[_] => functionSql(tableFunctionApplication.tableName, tableFunctionApplication.parameterColumns) + " as " + identifierSql(tableFunctionApplication.tableAlias)
-    case TableFunctionFromSelect(select, alias) => throw new UnsupportedOperationException
-    case LeftJoin(left, right, condition) => joinSql(left) + " left join " + joinSql(right) + " on " + columnSql(condition)
-    case LeftExceptionJoin(left, right, condition) => throw new UnsupportedOperationException
-    case RightJoin(left, right, condition) => joinSql(left) + " right join " + joinSql(right) + " on " + columnSql(condition)
-    case RightExceptionJoin(left, right, condition) => throw new UnsupportedOperationException
-    case InnerJoin(left, right, condition) => joinSql(left) + " inner join " + joinSql(right) + " on " + columnSql(condition)
-    case OuterJoin(left, right, condition) => joinSql(left) + " full outer join " + joinSql(right) + " on " + columnSql(condition)
-    case CrossJoin(left, right) => joinSql(left) + " cross join " + joinSql(right)
-    case select: Select[_, _] => subselectSql(select)
-    case Lateral(select: Select[_, _]) => "lateral " + subselectSql(select)
+    case tableFunctionApplication: TableFunctionApplication[_] => functionSql(tableFunctionApplication.tableName, tableFunctionApplication.parameterColumns, indent) + " as " + identifierSql(tableFunctionApplication.tableAlias)
+    case TableFunctionFromSelect(select, alias) =>
+      throw new UnsupportedOperationException
+    case LeftJoin(left, right, condition) =>
+      joinSql(left, indent) +
+        onNewLine("left join ", indent) +
+        joinSql(right, indent) +
+        onNewLine("on ", indent) +
+        columnSql(condition, indent)
+    case LeftExceptionJoin(left, right, condition) =>
+      throw new UnsupportedOperationException
+    case RightJoin(left, right, condition) =>
+      joinSql(left, indent) +
+        onNewLine("right join ", indent) +
+        joinSql(right, indent) +
+        onNewLine("on ", indent) +
+        columnSql(condition, indent)
+    case RightExceptionJoin(left, right, condition) =>
+      throw new UnsupportedOperationException
+    case InnerJoin(left, right, condition) =>
+      joinSql(left, indent) +
+        onNewLine("inner join ", indent) +
+        joinSql(right, indent) +
+        onNewLine("on ", indent) +
+        columnSql(condition, indent)
+    case OuterJoin(left, right, condition) =>
+      joinSql(left, indent) +
+        onNewLine("full outer join ", indent) +
+        joinSql(right, indent) +
+        onNewLine("on ", indent) +
+        columnSql(condition, indent)
+    case CrossJoin(left, right) =>
+      joinSql(left, indent) +
+        onNewLine("cross join ", indent) +
+        joinSql(right, indent)
+    case select: Select[_, _] =>
+      subselectSql(select, indent)
+    case Lateral(select: Select[_, _]) =>
+      "lateral " + subselectSql(select, indent)
   }
 
-  def subselectSql(select: Select[_, _ <: Relation]) = {
+  def subselectSql(select: Select[_, _ <: Relation], indent: Int) = {
     val alias =
       if (select.subselectAlias.isDefined) " as " + select.subselectAlias.get
       else ""
 
-    "(" + selectSql(select) + ")" + alias
+    "(" +
+      onNewLine(selectSql(select, indent + TabWidth), indent + TabWidth) +
+      onNewLine(")" + alias, indent)
   }
 
   // -------------------------------------------------
