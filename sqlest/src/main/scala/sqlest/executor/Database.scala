@@ -304,9 +304,9 @@ case class Transaction(database: Database) extends Session(database) {
       val statement = connection.createStatement
       try {
         batchCommands foreach { command =>
-          val commandSql = database.statementBuilder.generateRawSql(command)
-          logger.debug(s"Adding batch operation: $commandSql")
-          statement.addBatch(commandSql)
+          val (preprocessedCommand, sql, argumentLists) = database.statementBuilder(command)
+          val preparedStatement: PreparedStatement = prepareStatement(connection, preprocessedCommand, sql, argumentLists)
+          logger.debug(s"Adding batch operation: ${logDetails(connection, sql, argumentLists)}")
         }
 
         statement.executeBatch.toList
