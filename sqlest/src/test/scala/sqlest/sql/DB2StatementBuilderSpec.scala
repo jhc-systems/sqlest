@@ -74,7 +74,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
        |fetch first 10 rows only
        |offset ?
        """.formatSql,
-      List(List(123, 20))
+      List(List(123, 2 * 10))
     )
   }
 
@@ -94,7 +94,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
        |fetch first 10 rows only
        |offset ?
        """.formatSql,
-      List(List(123, 20))
+      List(List(123, 2 * 10))
     )
   }
 
