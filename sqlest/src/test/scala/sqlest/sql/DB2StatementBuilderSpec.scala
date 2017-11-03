@@ -51,15 +51,12 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
         .offset(20)
     } should equal(
       s"""
-       |with subquery as
-       |(select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2, row_number() over () as rownum
-         |from mytable
-         |where (mytable.col1 = ?))
-       |select mytable_col1, mytable_col2
-       |from subquery
-       |where rownum >= ?
+       |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
+       |from mytable
+       |where (mytable.col1 = ?)
+       |offset ?
        """.formatSql,
-      List(List(123, 2 * 10 + 1))
+      List(List(123, 20))
     )
   }
 
@@ -71,15 +68,13 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
         .page(2, 10)
     } should equal(
       s"""
-       |with subquery as
-       |(select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2, row_number() over () as rownum
-         |from mytable
-         |where (mytable.col1 = ?))
-       |select mytable_col1, mytable_col2
-       |from subquery
-       |where rownum between ? and ?
+       |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
+       |from mytable
+       |where (mytable.col1 = ?)
+       |fetch first 10 rows only
+       |offset ?
        """.formatSql,
-      List(List(123, 2 * 10 + 1, 2 * 10 + 10))
+      List(List(123, 20))
     )
   }
 
@@ -92,15 +87,14 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
         .page(2, 10)
     } should equal(
       s"""
-       |with subquery as
-       |(select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2, row_number() over (order by mytable.col1) as rownum
-         |from mytable
-         |where (mytable.col1 = ?))
-       |select mytable_col1, mytable_col2
-       |from subquery
-       |where rownum between ? and ?
+       |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
+       |from mytable
+       |where (mytable.col1 = ?)
+       |order by mytable.col1
+       |fetch first 10 rows only
+       |offset ?
        """.formatSql,
-      List(List(123, 2 * 10 + 1, 2 * 10 + 10))
+      List(List(123, 20))
     )
   }
 
@@ -172,15 +166,15 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
         .optimize(10)
     } should equal(
       s"""
-       |with subquery as
-       |(select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2, row_number() over (order by mytable.col1) as rownum
-         |from mytable
-         |where (mytable.col1 = ?))
-       |select mytable_col1, mytable_col2
-       |from subquery
-       |where rownum between ? and ?
+       |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
+       |from mytable
+       |where (mytable.col1 = ?)
+       |order by mytable.col1
+       |fetch first 10 rows only
+       |offset ?
+       |optimize for 10 rows
        """.formatSql,
-      List(List(123, 11, 20))
+      List(List(123, 10))
     )
   }
 
@@ -193,15 +187,14 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
         .page(15, 16)
     } should equal(
       s"""
-       |with subquery as
-       |(select 1 as a, sum(cast(? as integer)) as b, (3 + ?) as c, row_number() over (order by ?, ? desc) as rownum
-         |from one inner join two on ((? = ?) and (? <> ?))
-         |where ((? = ?) and (? <> ?)))
-       |select a, b, c
-       |from subquery
-       |where rownum between ? and ?
+       |select 1 as a, sum(cast(? as integer)) as b, (3 + ?) as c
+       |from one inner join two on ((? = ?) and (? <> ?))
+       |where ((? = ?) and (? <> ?))
+       |order by ?, ? desc
+       |fetch first 16 rows only
+       |offset ?
        """.formatSql,
-      List(List(2, 4, 13, 14, 5, 6, 7, 8, 9, 10, 11, 12, 15 * 16 + 1, 15 * 16 + 16))
+      List(List(2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 * 16))
     )
   }
 
