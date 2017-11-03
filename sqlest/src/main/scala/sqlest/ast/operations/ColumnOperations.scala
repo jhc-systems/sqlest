@@ -32,6 +32,7 @@ object ColumnOperations {
         select.orderBy.map(_.mapColumns(f, selectFunction)),
         select.limit,
         select.offset,
+        select.optimize,
         select.union.map(_.mapColumns(f, selectFunction)),
         select.subselectAlias
       )(select.aliasedColumns)

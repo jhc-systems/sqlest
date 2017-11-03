@@ -71,6 +71,9 @@ trait DB2StatementBuilder extends base.StatementBuilder {
   override def selectOffsetSql(offset: Option[Long]): Option[String] =
     None
 
+  override def selectOptimizeSql(optimize: Option[Long]): Option[String] =
+    optimize map (optimize => s"optimize for $optimize rows")
+
   override def joinSql(relation: Relation): String = relation match {
     case tableFunctionApplication: TableFunctionApplication[_] => "table(" + functionSql(tableFunctionApplication.tableName, tableFunctionApplication.parameterColumns.map(addTypingToSqlColumn)) + ") as " + identifierSql(tableFunctionApplication.tableAlias)
     case TableFunctionFromSelect(select, alias) => "table(" + selectSql(select) + ") as " + identifierSql(alias)
@@ -120,6 +123,9 @@ trait DB2StatementBuilder extends base.StatementBuilder {
     Nil
 
   override def selectOffsetArgs(limit: Option[Long]): List[LiteralColumn[_]] =
+    Nil
+
+  override def selectOptimizeArgs(optimize: Option[Long]): List[LiteralColumn[_]] =
     Nil
 
   def rowNumberSelectArgs(select: Select[_, _ <: Relation], offset: Long, limit: Option[Long]): List[LiteralColumn[_]] = {

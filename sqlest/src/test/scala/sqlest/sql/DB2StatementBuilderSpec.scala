@@ -104,6 +104,86 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
     )
   }
 
+  "select with optimize" should "produce the right sql" in {
+    sql {
+      select(MyTable.col1, MyTable.col2)
+        .from(MyTable)
+        .where(MyTable.col1 === 123)
+        .optimize(10)
+    } should equal(
+      s"""
+       |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
+       |from mytable
+       |where (mytable.col1 = ?)
+       |optimize for 10 rows
+       """.formatSql,
+      List(List(123))
+    )
+  }
+
+  "select with optimize and limit" should "produce the right sql" in {
+    sql {
+      select(MyTable.col1, MyTable.col2)
+        .from(MyTable)
+        .where(MyTable.col1 === 123)
+        .limit(10)
+        .optimize(10)
+    } should equal(
+      s"""
+       |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
+       |from mytable
+       |where (mytable.col1 = ?)
+       |fetch first 10 rows only
+       |optimize for 10 rows
+       """.formatSql,
+      List(List(123))
+    )
+  }
+
+  "select with optimize and limit and order" should "produce the right sql" in {
+    sql {
+      select(MyTable.col1, MyTable.col2)
+        .from(MyTable)
+        .where(MyTable.col1 === 123)
+        .orderBy(MyTable.col1.asc)
+        .limit(10)
+        .optimize(10)
+    } should equal(
+      s"""
+       |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
+       |from mytable
+       |where (mytable.col1 = ?)
+       |order by mytable.col1
+       |fetch first 10 rows only
+       |optimize for 10 rows
+       """.formatSql,
+      List(List(123))
+    )
+  }
+
+  "select with optimize and limit and order and offset" should "produce the right sql" in {
+    sql {
+      select(MyTable.col1, MyTable.col2)
+        .from(MyTable)
+        .where(MyTable.col1 === 123)
+        .orderBy(MyTable.col1.asc)
+        .limit(10)
+        .offset(10)
+        .optimize(10)
+    } should equal(
+      s"""
+       |with subquery as
+       |(select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2, row_number() over (order by mytable.col1) as rownum
+         |from mytable
+         |where (mytable.col1 = ?))
+       |select mytable_col1, mytable_col2
+       |from subquery
+       |where rownum between ? and ?
+       """.formatSql,
+      List(List(123, 11, 20))
+    )
+  }
+
   "select with multiple placeholders" should "produce the right sql" in {
     sql {
       select(1.constant as "a", sum(2) as "b", (3.constant + 4.column) as "c")

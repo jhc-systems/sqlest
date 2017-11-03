@@ -154,6 +154,7 @@ case class Select[A, R <: Relation](
     orderBy: List[Order] = Nil,
     limit: Option[Long] = None,
     offset: Option[Long] = None,
+    optimize: Option[Long] = None,
     union: List[Union[_]] = Nil,
     subselectAlias: Option[String] = None
 )(implicit val aliasedColumns: AliasedColumns[A]) extends Relation with Query with ColumnSyntax {
@@ -194,6 +195,9 @@ case class Select[A, R <: Relation](
 
   def offset(offset: Long): Select[A, R] =
     this.copy(offset = Some(offset))
+
+  def optimize(optimize: Long): Select[A, R] =
+    this.copy(optimize = Some(optimize))
 
   def page(number: Long, size: Long): Select[A, R] =
     this.copy(limit = Some(size), offset = Some(number * size))

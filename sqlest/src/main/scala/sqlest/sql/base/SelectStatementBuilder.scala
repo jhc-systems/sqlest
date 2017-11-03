@@ -32,6 +32,7 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
         selectOrderBySql(select.orderBy),
         selectLimitSql(select.limit),
         selectOffsetSql(select.offset),
+        selectOptimizeSql(select.optimize),
         selectUnionSql(select.union)
       ).flatten mkString (" ")
   }
@@ -65,6 +66,13 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
 
   def selectOffsetSql(offset: Option[Long]): Option[String] =
     offset map (offset => s"offset ${literalSql(offset)}")
+
+  def selectOptimizeSql(optimize: Option[Long]): Option[String] = {
+    optimize match {
+      case Some(_) => throw new UnsupportedOperationException
+      case None => None
+    }
+  }
 
   def selectUnionSql(union: Seq[Union[_]]): Option[String] =
     if (union.isEmpty) None else
@@ -110,6 +118,7 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
       selectOrderByArgs(select.orderBy) ++
       selectLimitArgs(select.limit) ++
       selectOffsetArgs(select.offset) ++
+      selectOptimizeArgs(select.optimize) ++
       selectUnionArgs(select.union)
   }
 
@@ -146,6 +155,9 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
 
   def selectOffsetArgs(offset: Option[Long]): List[LiteralColumn[_]] =
     offset.map(LiteralColumn[Long](_)).toList
+
+  def selectOptimizeArgs(optimize: Option[Long]): List[LiteralColumn[_]] =
+    Nil
 
   def selectUnionArgs(union: Seq[Union[_]]): List[LiteralColumn[_]] =
     union.toList.map(_.select) flatMap selectArgs
