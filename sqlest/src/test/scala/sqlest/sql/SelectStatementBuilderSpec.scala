@@ -653,4 +653,14 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
       }
     }
   }
+
+  "optimize" should "not be supported outside DB2" in {
+    intercept[UnsupportedOperationException] {
+      sql {
+        select(TableOne.col1, TableOne.col2, TableTwo.col2, TableTwo.col3)
+          .from(TableOne)
+          .optimize(10)
+      }
+    }
+  }
 }
