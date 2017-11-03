@@ -118,6 +118,7 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
       selectOrderByArgs(select.orderBy) ++
       selectLimitArgs(select.limit) ++
       selectOffsetArgs(select.offset) ++
+      selectOptimizeArgs(select.optimize) ++
       selectUnionArgs(select.union)
   }
 
@@ -154,6 +155,9 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
 
   def selectOffsetArgs(offset: Option[Long]): List[LiteralColumn[_]] =
     offset.map(LiteralColumn[Long](_)).toList
+
+  def selectOptimizeArgs(optimize: Option[Long]): List[LiteralColumn[_]] =
+    Nil
 
   def selectUnionArgs(union: Seq[Union[_]]): List[LiteralColumn[_]] =
     union.toList.map(_.select) flatMap selectArgs

@@ -125,6 +125,9 @@ trait DB2StatementBuilder extends base.StatementBuilder {
   override def selectOffsetArgs(limit: Option[Long]): List[LiteralColumn[_]] =
     Nil
 
+  override def selectOptimizeArgs(optimize: Option[Long]): List[LiteralColumn[_]] =
+    Nil
+
   def rowNumberSelectArgs(select: Select[_, _ <: Relation], offset: Long, limit: Option[Long]): List[LiteralColumn[_]] = {
     val subqueryArgs =
       selectWhatArgs(select.columns) ++
