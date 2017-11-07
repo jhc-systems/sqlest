@@ -16,7 +16,7 @@
 
 package sqlest.sql
 
-import org.joda.time.LocalDate
+import org.joda.time.{ DateTime, LocalDate }
 import org.scalatest._
 import org.scalatest.matchers._
 import sqlest._
@@ -652,6 +652,24 @@ class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
           .on(TableOne.col2 === TableTwo.col2)
       }
     }
+  }
+
+  "select with constant date and time values" should "produce valid SQL literals" in {
+    sql {
+      select(TableSix.col1)
+        .from(TableSix)
+        .where(
+          TableSix.col1 > new DateTime(2017, 11, 7, 18, 33, 54, 883).constant &&
+            TableSix.col2 >= new LocalDate(1976, 1, 24).constant &&
+            TableSix.col3 < Option(new LocalDate(1983, 10, 17)).constant
+        )
+    } should equal(
+      s"""
+      |select six.col1 as six_col1
+      |from six
+      |where (((six.col1 > '2017-11-07-18.33.54.883000') and (six.col2 >= '1976-01-24')) and (six.col3 < '1983-10-17'))""".formatSql,
+      List(Nil)
+    )
   }
 
   "optimize" should "not be supported outside DB2" in {

@@ -18,8 +18,13 @@ package sqlest.sql.base
 
 import sqlest.ast._
 import sqlest.ast.operations.ColumnOperations._
+import org.joda.time.{ LocalDate, DateTime }
+import org.joda.time.format.{ DateTimeFormat, DateTimeFormatter }
 
 trait BaseStatementBuilder {
+  val dateTimeFormat: DateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd-HH.mm.ss.SSSSSS")
+  val localDateFormat: DateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd")
+
   def preprocess(operation: Operation): Operation =
     aliasColumnsFromSubselects(operation)
 
@@ -158,8 +163,8 @@ trait BaseStatementBuilder {
     case DoubleColumnType => value.toString
     case BigDecimalColumnType => value.toString
     case StringColumnType => "'" + escapeSqlString(value.toString) + "'"
-    case DateTimeColumnType => value.toString
-    case LocalDateColumnType => value.toString
+    case DateTimeColumnType => "'" + dateTimeFormat.print(value.asInstanceOf[DateTime]) + "'"
+    case LocalDateColumnType => "'" + localDateFormat.print(value.asInstanceOf[LocalDate]) + "'"
     case ByteArrayColumnType => javax.xml.bind.DatatypeConverter.printHexBinary(value.asInstanceOf[Array[Byte]])
     case optionType: OptionColumnType[_, _] => value.asInstanceOf[Option[_]] match {
       case None if optionType.hasNullNullValue => "null"
