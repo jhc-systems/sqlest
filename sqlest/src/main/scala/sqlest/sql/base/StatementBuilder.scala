@@ -22,7 +22,8 @@ trait StatementBuilder extends BaseStatementBuilder
     with SelectStatementBuilder
     with InsertStatementBuilder
     with UpdateStatementBuilder
-    with DeleteStatementBuilder {
+    with DeleteStatementBuilder
+    with MergeStatementBuilder {
 
   def apply(operation: Operation) = {
     val preprocessedOperation = preprocess(operation)
@@ -44,6 +45,21 @@ trait StatementBuilder extends BaseStatementBuilder
     case insert: Insert => insertSql(insert)
     case update: Update => updateSql(update)
     case delete: Delete => deleteSql(delete)
+    case merge: Merge[_] =>
+      val whenMatchedUpdate = merge.whenMatched.map {
+        case MatchedOp(Left(updateOp)) => ("", updateSql(updateOp))
+        case MatchedOp(Right(_)) => ("", "DELETE")
+      }
+      val whenMatchedAndUpdate = merge.whenMatchedAnd.map {
+        case MatchedAndOp(Left(updateOp), and) => (" and " + columnSql(and), updateSql(updateOp))
+        case MatchedAndOp(Right(_), and) => (" and " + columnSql(and), "DELETE")
+      }
+      val whenNotMatchedInsert = merge.whenNotMatched.map(op => insertSql(op.op))
+      merge.using match {
+        case s: Select[_, _] =>
+          mergeSql(merge, selectSql(s), whenMatchedUpdate.map(s => s :: whenMatchedAndUpdate).getOrElse(whenMatchedAndUpdate), whenNotMatchedInsert)
+        case _@ errorType => sys.error("Unsupported merge select type: " + errorType)
+      }
     case other => sys.error("Unsupported operation type: " + other)
   }
 
@@ -52,6 +68,15 @@ trait StatementBuilder extends BaseStatementBuilder
     case insert: Insert => insertArgs(insert)
     case update: Update => List(updateArgs(update))
     case delete: Delete => List(deleteArgs(delete))
+    case merge: Merge[_] => merge.whenMatched.map {
+      case MatchedOp(Left(updateOp)) => updateArgs(updateOp)
+      case MatchedOp(Right(_)) => List()
+    }.getOrElse(List()) ::
+      merge.whenMatchedAnd.map {
+        case MatchedAndOp(Left(updateOp), and) => updateArgs(updateOp)
+        case MatchedAndOp(Right(_), and) => List()
+      } :::
+      merge.whenNotMatched.map(op => insertArgs(op.op)).getOrElse(List())
     case other => sys.error("Unsupported operation type: " + other)
   }
 

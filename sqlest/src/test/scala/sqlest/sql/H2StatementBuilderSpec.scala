@@ -24,6 +24,53 @@ import sqlest.ast._
 class H2StatementBuilderSpec extends BaseStatementBuilderSpec {
   val statementBuilder = H2StatementBuilder
 
+  "merge" should "produce the right sql" in {
+
+    val s = select.from(MyTable)
+    val uSetters = Seq(Setter(MyTable.col1, MyTable.col2))
+    val iSetters = Seq(Setter(MyTable.col1, 123))
+    val c = MyTable.col1 === MyTable.col2
+    val u: Update = update(MyTable).set(uSetters).where(c)
+    val i: Insert = insert.into(MyTable).set(iSetters)
+    val m = merge.into(MyTable).using(s).whenMatched(MatchedOp(Left(u))).whenNotMatched(NotMatchedOp(i)).on(c)
+    sql(m) should equal(
+      s"""
+         |
+       """.stripMargin
+    )
+  }
+
+  "merge with more than one matched op" should "produce the right sql" in {
+
+    val s = select.from(MyTable)
+    val uSetters = Seq(Setter(MyTable.col1, MyTable.col2))
+    val iSetters = Seq(Setter(MyTable.col1, 123))
+    val c = MyTable.col1 === MyTable.col2
+    val u1 = MatchedAndOp(
+      op = Left(update(MyTable).set(uSetters).where(c)),
+      and = MyTable.col1 === MyTable.col2
+    )
+    val u = MatchedOp(
+      op = Left(update(MyTable).set(uSetters).where(c))
+    )
+    val d1 = MatchedAndOp(
+      op = Right(""),
+      and = MyTable.col1 === MyTable.col2
+    )
+    val d2 = MatchedAndOp(
+      op = Right("garbage"),
+      and = MyTable.col2 === MyTable.col1
+    )
+    val opList = List(u1, d1, d2)
+    val i: Insert = insert.into(MyTable).set(iSetters)
+    val m = merge.into(MyTable).using(s).whenMatched(u).whenMatchedAnd(opList).whenNotMatched(NotMatchedOp(i)).on(c)
+    sql(m) should equal(
+      s"""
+         |
+       """.stripMargin
+    )
+  }
+
   "where between" should "produce the right sql" in {
     sql {
       select(MyTable.col1, MyTable.col2)
