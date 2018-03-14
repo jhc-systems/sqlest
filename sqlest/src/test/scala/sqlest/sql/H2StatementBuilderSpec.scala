@@ -63,7 +63,12 @@ class H2StatementBuilderSpec extends BaseStatementBuilderSpec {
     )
     val opList = List(u1, d1, d2)
     val i: Insert = insert.into(MyTable).set(iSetters)
-    val m = merge.into(MyTable).using(s).whenMatched(u).whenMatchedAnd(opList).whenNotMatched(NotMatchedOp(i)).on(c)
+    val m = merge
+      .into(MyTable)
+      .using(s)
+      .whenMatched(u)
+      .whenMatchedAnd(opList)
+      .whenNotMatchedAnd(NotMatchedAndOp(i, c)).on(c)
     sql(m) should equal(
       s"""
          |

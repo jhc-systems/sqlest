@@ -24,12 +24,15 @@ case class Merge[R <: Relation](
     whenMatched: Option[MatchedOp] = None,
     whenMatchedAnd: List[MatchedAndOp] = List(),
     whenNotMatched: Option[NotMatchedOp] = None,
+    whenNotMatchedAnd: List[NotMatchedAndOp] = List(),
     condition: Option[Column[Boolean]] = None
 ) extends Command with ColumnSyntax {
   def whenMatched(op: MatchedOp): Merge[R] = this.copy(whenMatched = this.whenMatched.map(c => c).orElse(Some(op)))
   def whenMatchedAnd(ops: MatchedAndOp): Merge[R] = this.copy(whenMatchedAnd = ops :: this.whenMatchedAnd)
   def whenMatchedAnd(ops: List[MatchedAndOp]): Merge[R] = this.copy(whenMatchedAnd = this.whenMatchedAnd ::: ops)
   def whenNotMatched(op: NotMatchedOp): Merge[R] = this.copy(whenNotMatched = this.whenNotMatched.map(c => c).orElse(Some(op)))
+  def whenNotMatchedAnd(ops: NotMatchedAndOp): Merge[R] = this.copy(whenNotMatchedAnd = ops :: this.whenNotMatchedAnd)
+  def whenNotMatchedAnd(ops: List[NotMatchedAndOp]): Merge[R] = this.copy(whenNotMatchedAnd = this.whenNotMatchedAnd ::: ops)
   def on(condition: Column[Boolean]): Merge[R] = this.copy(condition = this.condition.map(c => c).orElse(Some(condition)))
 }
 
@@ -38,3 +41,4 @@ trait MergeOperation
 case class MatchedOp(op: Either[Update, String]) extends MergeOperation
 case class MatchedAndOp(op: Either[Update, String], and: Column[Boolean]) extends MergeOperation
 case class NotMatchedOp(op: Insert) extends MergeOperation
+case class NotMatchedAndOp(op: Insert, and: Column[Boolean]) extends MergeOperation

@@ -20,7 +20,7 @@ import sqlest.ast._
 
 trait MergeStatementBuilder extends BaseStatementBuilder {
   type MergeType = Merge[_ <: Relation]
-  def mergeSql(merge: MergeType, usingSelect: String, matchedOps: List[(String, String)], notMatchedOp: Option[String]): String = {
+  def mergeSql(merge: MergeType, usingSelect: String, matchedOps: List[(String, String)], notMatchedOp: List[(String, String)]): String = {
     s"merge ${mergeIntoSql(merge.into)} " +
       s"using ($usingSelect) " +
       s"${mergeOnSql(merge.condition.get)} " +
@@ -39,8 +39,9 @@ trait MergeStatementBuilder extends BaseStatementBuilder {
       s"when matched ${and} then ${s}"
   }.mkString("\n")
 
-  def mergeNotMatchedSql(op: Option[String]): String = op.map(s =>
-    s"when not matched then ${s}"
-  ).getOrElse("")
+  def mergeNotMatchedSql(op: List[(String, String)]): String = op.map {
+    case (and, s) =>
+      s"when not matched ${and} then ${s}"
+  }.mkString("\n")
 
 }
