@@ -117,6 +117,8 @@ sealed trait AliasedColumn[A] extends Column[A] with CellExtractor[ResultSet, A]
     }
   }
 
+  override def checkNullValueAndGet[T](t: Option[T]) =
+    t.getOrElse(throw new NullPointerException(s"Tried to extract a null value without an OptionExtractor for column " + columnAlias))
 }
 
 /** Columns from tables. */

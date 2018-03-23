@@ -864,4 +864,14 @@ class ColumnExtractorSpec extends FlatSpec with Matchers {
     ))
   }
 
+  "columns extracting empty data when not expected" should "throw error with column type" in {
+    def results = TestResultSet(TableOne.columns)(
+      Seq(null, null)
+    )
+
+    val exception = intercept[NullPointerException] {
+      TableOne.col1.extractHeadOption(results)
+    }
+    assert(exception.getMessage.contains("one_col1"))
+  }
 }
