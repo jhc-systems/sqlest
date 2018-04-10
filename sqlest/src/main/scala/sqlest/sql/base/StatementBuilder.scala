@@ -47,19 +47,23 @@ trait StatementBuilder extends BaseStatementBuilder
     case delete: Delete => deleteSql(delete)
     case merge: Merge[_] =>
       val whenMatched = merge.whenMatched.map {
-        case MatchedOp(Left(updateOp)) => ("", updateSql(updateOp))
+        case MatchedOp(Left(updateOp)) => ("", s"UPDATE ${updateSetSql(updateOp.set)}")
         case MatchedOp(Right(_)) => ("", "DELETE")
       }
       val whenMatchedAnd = merge.whenMatchedAnd.map {
-        case MatchedAndOp(Left(updateOp), and) => ("and " + columnSql(and), updateSql(updateOp))
-        case MatchedAndOp(Right(_), and) => ("and " + columnSql(and), "DELETE")
+        case MatchedAndOp(Left(updateOp), and) => (s"AND ${columnSql(and)}", s"UPDATE ${updateSetSql(updateOp.set)}")
+        case MatchedAndOp(Right(_), and) => (s"AND ${columnSql(and)}", "DELETE")
       }
       val whenNotMatchedAnd = merge.whenNotMatchedAnd.map {
-        case NotMatchedAndOp(insertOp, and) => ("and " + columnSql(and), insertSql(insertOp))
+        case NotMatchedAndOp(insertValues: InsertValues, and) => (s"AND ${columnSql(and)}", s"INSERT ${insertColumnsSql(insertValues.columns)} ${insertValuesSql(insertValues.columns)}}")
+        case NotMatchedAndOp(InsertFromSelect(into, columns, select), and) => (s"AND ${columnSql(and)}", s"INSERT ${insertColumnsSql(columns)} ${selectSql(select)}")
       }
-      val whenNotMatched = merge.whenNotMatched.map(op => ("", insertSql(op.op)))
+      val whenNotMatched = merge.whenNotMatched.map {
+        case NotMatchedOp(insertValues: InsertValues) => ("", s"INSERT ${insertColumnsSql(insertValues.columns)} ${insertValuesSql(insertValues.columns)}")
+        case NotMatchedOp(InsertFromSelect(into, columns, select)) => ("", s"INSERT ${insertColumnsSql(columns)} ${selectSql(select)}")
+      }
       merge.using match {
-        case s: Select[_, _] =>
+        case (s: Select[_, _], _) =>
           mergeSql(merge, selectSql(s), whenMatched.map(s => s :: whenMatchedAnd).getOrElse(whenMatchedAnd), whenNotMatched.map(s => s :: whenNotMatchedAnd).getOrElse(whenNotMatchedAnd))
         case _@ errorType => sys.error("Unsupported merge select type: " + errorType)
       }
@@ -71,15 +75,27 @@ trait StatementBuilder extends BaseStatementBuilder
     case insert: Insert => insertArgs(insert)
     case update: Update => List(updateArgs(update))
     case delete: Delete => List(deleteArgs(delete))
-    case merge: Merge[_] => merge.whenMatched.map {
-      case MatchedOp(Left(updateOp)) => updateArgs(updateOp)
-      case MatchedOp(Right(_)) => List()
-    }.getOrElse(List()) ::
-      merge.whenMatchedAnd.map {
+    case merge: Merge[_] => {
+      val whenMatched = merge.whenMatched.flatMap {
+        case MatchedOp(Left(updateOp)) => Some(updateArgs(updateOp))
+        case MatchedOp(Right(_)) => None
+      }
+      val whenMatchedAnd = merge.whenMatchedAnd.map {
         case MatchedAndOp(Left(updateOp), and) => updateArgs(updateOp)
-        case MatchedAndOp(Right(_), and) => List()
-      } :::
-      merge.whenNotMatched.map(op => insertArgs(op.op)).getOrElse(List())
+        case MatchedAndOp(Right(_), and) => Nil
+      }
+      val whenNotMatched = merge.whenNotMatched.map(op => insertArgs(op.op))
+      (whenMatched, whenNotMatched, whenMatchedAnd) match {
+        case (None, None, Nil) => Nil
+        case (Some(wm), None, Nil) => List(wm)
+        case (None, Some(wma), Nil) => wma
+        case (Some(wm), Some(wma), Nil) => wm :: wma
+        case (Some(wm), Some(wma), list) => wm :: wma ::: list
+        case (None, Some(wma), list) => wma ::: list
+        case (Some(wm), None, list) => wm :: list
+        case (None, None, list) => list
+      }
+    }
     case other => sys.error("Unsupported operation type: " + other)
   }
 

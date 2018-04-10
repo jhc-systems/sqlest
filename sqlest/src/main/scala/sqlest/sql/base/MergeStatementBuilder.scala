@@ -22,26 +22,26 @@ trait MergeStatementBuilder extends BaseStatementBuilder {
   type MergeType = Merge[_ <: Relation]
   def mergeSql(merge: MergeType, usingSelect: String, matchedOps: List[(String, String)], notMatchedOp: List[(String, String)]): String = {
     s"merge ${mergeIntoSql(merge.into)} " +
-      s"using ($usingSelect) " +
+      s"using ($usingSelect) as ${merge.using._2} " +
       s"${mergeOnSql(merge.condition.get)} " +
       s"${mergeMatchedSql(matchedOps)} " +
       s"${mergeNotMatchedSql(notMatchedOp)}"
   }
 
-  def mergeIntoSql(into: Table): String =
-    s"into ${identifierSql(into.tableName)}"
+  def mergeIntoSql(into: (Table, String)): String =
+    s"into ${identifierSql(into._1.tableName)} as ${into._2}"
 
   def mergeOnSql(condition: Column[Boolean]): String =
     s"on ${columnSql(condition)}"
 
   def mergeMatchedSql(op: List[(String, String)]): String = op.map {
     case (and, s) =>
-      s"when matched ${and} then ${s}"
+      s"when matched $and then $s"
   }.mkString("\n")
 
   def mergeNotMatchedSql(op: List[(String, String)]): String = op.map {
     case (and, s) =>
-      s"when not matched ${and} then ${s}"
+      s"when not matched $and then $s"
   }.mkString("\n")
 
 }
