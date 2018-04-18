@@ -19,8 +19,8 @@ package sqlest.ast
 import sqlest.ast.syntax._
 
 case class Merge[R <: Relation](
-    into: Table,
-    using: R,
+    into: (Table, String),
+    using: (R, String),
     whenMatched: Option[MatchedOp] = None,
     whenMatchedAnd: List[MatchedAndOp] = List(),
     whenNotMatched: Option[NotMatchedOp] = None,
