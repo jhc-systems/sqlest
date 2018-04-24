@@ -55,7 +55,7 @@ trait StatementBuilder extends BaseStatementBuilder
         case MatchedAndOp(Right(_), and) => (s"AND ${columnSql(and)}", "DELETE")
       }
       val whenNotMatchedAnd = merge.whenNotMatchedAnd.map {
-        case NotMatchedAndOp(insertValues: InsertValues, and) => (s"AND ${columnSql(and)}", s"INSERT ${insertColumnsSql(insertValues.columns)} ${insertValuesSql(insertValues.columns)}}")
+        case NotMatchedAndOp(insertValues: InsertValues, and) => (s"AND ${columnSql(and)}", s"INSERT ${insertColumnsSql(insertValues.columns)} ${insertValuesSql(insertValues.columns)}")
         case NotMatchedAndOp(InsertFromSelect(into, columns, select), and) => (s"AND ${columnSql(and)}", s"INSERT ${insertColumnsSql(columns)} ${selectSql(select)}")
       }
       val whenNotMatched = merge.whenNotMatched.map {

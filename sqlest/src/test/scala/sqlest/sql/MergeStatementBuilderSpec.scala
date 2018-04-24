@@ -30,11 +30,17 @@ class MergeStatementBuilderSpec extends BaseStatementBuilderSpec {
     val c = MyTable.col1 === MyTable.col2
     val u: Update = update(MyTable).set(uSetters).where(c)
     val i: Insert = insert.into(MyTable).set(iSetters)
-    val m = merge.into(MyTable).using(s).whenMatched(MatchedOp(Left(u))).whenNotMatched(NotMatchedOp(i)).on(c)
+    val m = merge.into((MyTable, "a"))
+      .using((s, "b"))
+      .whenMatched(MatchedOp(Left(u)))
+      .whenNotMatched(NotMatchedOp(i)).on(c)
     sql(m) should equal(
-      s"""
-         |
-       """.stripMargin
+      s"""merge into mytable as a
+         |using (select  from mytable) as b
+         | on (mytable.col1 = mytable.col2)
+         |  when matched  then UPDATE set col1 = mytable.col2
+         |  when not matched  then INSERT (col1) values (?)""".formatSql,
+      List(List(123))
     )
   }
 
@@ -62,15 +68,20 @@ class MergeStatementBuilderSpec extends BaseStatementBuilderSpec {
     val opList = List(u1, d1, d2)
     val i: Insert = insert.into(MyTable).set(iSetters)
     val m = merge
-      .into(MyTable)
-      .using(s)
+      .into((MyTable, "a"))
+      .using((s, "b"))
       .whenMatched(u)
       .whenMatchedAnd(opList)
       .whenNotMatchedAnd(NotMatchedAndOp(i, c)).on(c)
     sql(m) should equal(
-      s"""
-         |
-       """.stripMargin
+      s"""merge into mytable as a
+         | using (select  from mytable) as b on (mytable.col1 = mytable.col2)
+         |  when matched  then UPDATE set col1 = mytable.col2
+         |  when matched AND (mytable.col1 = mytable.col2) then UPDATE set col1 = mytable.col2
+         |  when matched AND (mytable.col1 = mytable.col2) then DELETE
+         |  when matched AND (mytable.col2 = mytable.col1) then DELETE
+         |  when not matched AND (mytable.col1 = mytable.col2) then INSERT (col1) values (?)""".formatSql,
+      List(List(123))
     )
   }
 }
