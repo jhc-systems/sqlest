@@ -37,4 +37,10 @@ trait ExtractorSyntax[Row] {
     new Tuple1Extractor[Row, [#A1#]]([#e1#])#
 
 ]
+
+[2..22#  def extractCaseClass[Row, A, [#B1#]]([#e1: Extractor[Row, B1]#])(fn: ([#B1#]) => A): MappedExtractor[Row, ([#B1#]), A] =
+    MappedExtractor(new Tuple1Extractor([#e1#]), fn.tupled)#
+
+]
+
 }

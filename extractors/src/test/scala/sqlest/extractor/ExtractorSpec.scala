@@ -112,6 +112,27 @@ class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]
     }
   }
 
+  it should "provide syntax for extracting case classes via extractCaseClass" in {
+    val seqRows = List(Seq(0, "hello"), Seq(2, "bye"), Seq(4, "level"))
+
+    case class Triple(a: Int, b: String, c: Boolean)
+
+    val tripleExtractor: MappedExtractor[Seq[Any], (Int, String, Boolean), Triple] =
+      extractCaseClass(
+        intExtractorAtIndex(0),
+        stringExtractorAtIndex(1).map(_.reverse),
+        intExtractorAtIndex(0).map(_ == 2)
+      )(Triple.apply)
+
+    tripleExtractor.extractHeadOption(Nil) should be(None)
+    tripleExtractor.extractHeadOption(seqRows) should be(Some(Triple(0, "olleh", false)))
+    tripleExtractor.extractAll(seqRows) should be(List(
+      Triple(0, "olleh", false),
+      Triple(2, "eyb", true),
+      Triple(4, "level", false)
+    ))
+  }
+
   it should "upcast safely with asA" in {
     val seqRows = List(Seq(0, "hello"), Seq(2, "bye"), Seq(4, "level"))
 
