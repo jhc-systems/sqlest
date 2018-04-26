@@ -79,12 +79,20 @@ object CSVExtractorExample extends App with ExtractorSyntax[CSVRow] {
   // Create extractors to read the domain classes
   val addressExtractor = extract[Address](houseExtractor, streetExtractor)
 
+  val addressExtractor2 = extractCaseClass(houseExtractor, streetExtractor)(Address.apply)
+
   // Named arguments often enhance the readibility of extractor definitions
   val personExtractor = extract[Person](
     name = nameExtractor,
     age = ageExtractor,
     address = addressExtractor.asOption
   ) // If any value read by the addressExtractor is null, None will be returned
+
+  val personExtractor2 = extractCaseClass(
+    nameExtractor,
+    ageExtractor,
+    addressExtractor2.asOption
+  )(Person.apply)
 
   println(addressExtractor.extractHeadOption(parsedCsv))
   // => Some(Address(1, Old Kent Road))

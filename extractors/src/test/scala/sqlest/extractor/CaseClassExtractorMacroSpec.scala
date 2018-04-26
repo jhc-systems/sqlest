@@ -244,7 +244,7 @@ class CaseClassExtractorMacroSpec extends FlatSpec with Matchers with ExtractorS
         a = intExtractor,
         b = stringExtractor
       ),
-      two = extract(twoExtractor)
+      two = twoExtractor
     )
 
     badNestedExtractor.extractHeadOption(tupleRows) should equal(Some(
