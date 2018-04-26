@@ -19,9 +19,12 @@ package sqlest.executor
 import java.sql.ResultSet
 import sqlest._
 
-case class TestDatabase(resultSet: ResultSet, keyResultSet: Option[ResultSet] = None) extends Database {
+case class TestDatabase(resultSet: ResultSet, keyResultSet: Option[ResultSet] = None, shouldThrow: Boolean = false, verboseExceptionMessages: Boolean = false) extends Database {
   var preparedStatement: Option[AbstractPreparedStatement] = None
   var lastConnection: Option[AbstractConnection] = None
+  override val verboseExceptions = verboseExceptionMessages
+
+  val anException = new Exception("Oh noes!")
 
   def statementBuilder: StatementBuilder = sqlest.sql.H2StatementBuilder
 
@@ -40,14 +43,14 @@ case class TestDatabase(resultSet: ResultSet, keyResultSet: Option[ResultSet] = 
       override def setAutoCommit(autoCommit: Boolean) = {}
       override def createStatement() = new AbstractPreparedStatement {
         val sql = null
-        override def execute(sql: String) = true
+        override def execute(sql: String) = if (shouldThrow) throw anException else true
       }
       override def prepareStatement(inSql: String, columnIndices: Array[Int]) = {
         val statement = new AbstractPreparedStatement {
           val sql = inSql
-          override def executeQuery() = resultSet
-          override def executeUpdate() = 1
-          override def executeBatch() = Array()
+          override def executeQuery() = if (shouldThrow) throw anException else resultSet
+          override def executeUpdate() = if (shouldThrow) throw anException else 1
+          override def executeBatch() = if (shouldThrow) throw anException else Array()
           override def getGeneratedKeys(): java.sql.ResultSet = {
             keyResultSet.getOrElse(null)
           }
@@ -58,9 +61,9 @@ case class TestDatabase(resultSet: ResultSet, keyResultSet: Option[ResultSet] = 
       override def prepareStatement(inSql: String, columnNames: Array[String]) = {
         val statement = new AbstractPreparedStatement {
           val sql = inSql
-          override def executeQuery() = resultSet
-          override def executeUpdate() = 1
-          override def executeBatch() = Array()
+          override def executeQuery() = if (shouldThrow) throw anException else resultSet
+          override def executeUpdate() = if (shouldThrow) throw anException else 1
+          override def executeBatch() = if (shouldThrow) throw anException else Array()
           override def getGeneratedKeys(): java.sql.ResultSet = {
             keyResultSet.getOrElse(null)
           }
@@ -71,9 +74,9 @@ case class TestDatabase(resultSet: ResultSet, keyResultSet: Option[ResultSet] = 
       override def prepareStatement(inSql: String, returnGeneratedKeys: Int) = {
         val statement = new AbstractPreparedStatement {
           val sql = inSql
-          override def executeQuery() = resultSet
-          override def executeUpdate() = 1
-          override def executeBatch() = Array()
+          override def executeQuery() = if (shouldThrow) throw anException else resultSet
+          override def executeUpdate() = if (shouldThrow) throw anException else 1
+          override def executeBatch() = if (shouldThrow) throw anException else Array()
           override def getGeneratedKeys(): java.sql.ResultSet = {
             if (returnGeneratedKeys == java.sql.Statement.RETURN_GENERATED_KEYS)
               keyResultSet.getOrElse(null)
@@ -86,9 +89,9 @@ case class TestDatabase(resultSet: ResultSet, keyResultSet: Option[ResultSet] = 
       override def prepareStatement(inSql: String) = {
         val statement = new AbstractPreparedStatement {
           val sql = inSql
-          override def executeQuery() = resultSet
-          override def executeUpdate() = 1
-          override def executeBatch() = Array()
+          override def executeQuery() = if (shouldThrow) throw anException else resultSet
+          override def executeUpdate() = if (shouldThrow) throw anException else 1
+          override def executeBatch() = if (shouldThrow) throw anException else Array()
           override def getGeneratedKeys(): java.sql.ResultSet = null
         }
         preparedStatement = Some(statement)

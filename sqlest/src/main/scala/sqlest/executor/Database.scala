@@ -30,16 +30,48 @@ import scala.util.control.NonFatal
 import sqlest.extractor.IndexedExtractor
 
 object Database {
-  def withDataSource(dataSource: DataSource, builder: StatementBuilder): Database = new Database {
+  def withDataSource(
+    dataSource: DataSource,
+    builder: StatementBuilder
+  ): Database = new Database {
     def getConnection: Connection = dataSource.getConnection
     val statementBuilder = builder
   }
 
-  def withDataSource(dataSource: DataSource, builder: StatementBuilder, connectionDescription: Connection => String): Database = {
+  def withDataSource(
+    dataSource: DataSource,
+    builder: StatementBuilder,
+    verboseExceptionMessages: Boolean
+  ): Database = new Database {
+    def getConnection: Connection = dataSource.getConnection
+    val statementBuilder = builder
+    override val verboseExceptions = verboseExceptionMessages
+  }
+
+  def withDataSource(
+    dataSource: DataSource,
+    builder: StatementBuilder,
+    connectionDescription: Connection => String
+  ): Database = {
     val inConnectionDescription = connectionDescription
     new Database {
       def getConnection: Connection = dataSource.getConnection
       val statementBuilder = builder
+      override val connectionDescription = Some(inConnectionDescription)
+    }
+  }
+
+  def withDataSource(
+    dataSource: DataSource,
+    builder: StatementBuilder,
+    connectionDescription: Connection => String,
+    verboseExceptionMessages: Boolean
+  ): Database = {
+    val inConnectionDescription = connectionDescription
+    new Database {
+      def getConnection: Connection = dataSource.getConnection
+      val statementBuilder = builder
+      override val verboseExceptions = verboseExceptionMessages
       override val connectionDescription = Some(inConnectionDescription)
     }
   }
@@ -49,6 +81,7 @@ trait Database {
   private[sqlest] def getConnection: Connection
   private[sqlest] def statementBuilder: StatementBuilder
   private[sqlest] def connectionDescription: Option[Connection => String] = None
+  private[sqlest] def verboseExceptions: Boolean = false
 
   def withConnection[A](f: Connection => A): A =
     Session(this).withConnection(f)
@@ -98,6 +131,12 @@ class Session(database: Database) extends Logging {
             if (resultSet != null) resultSet.close
           } catch { case e: SQLException => }
         }
+      } catch {
+        case NonFatal(e) =>
+          if (!database.verboseExceptions)
+            throw e
+          else
+            throw new SqlestException(s"Exception running sql: ${logDetails(connection, sql, argumentLists)}", e)
       } finally {
         try {
           if (preparedStatement != null) preparedStatement.close
@@ -267,6 +306,12 @@ case class Transaction(database: Database) extends Session(database) {
         val endTime = new DateTime
         logger.info(s"Ran sql in ${endTime.getMillis - startTime.getMillis}ms: ${logDetails(connection, sql, argumentLists)}")
         result
+      } catch {
+        case NonFatal(e) =>
+          if (!database.verboseExceptions)
+            throw e
+          else
+            throw new SqlestException(s"Exception running sql: ${logDetails(connection, sql, argumentLists)}", e)
       } finally {
         try {
           if (preparedStatement != null) preparedStatement.close
@@ -292,6 +337,12 @@ case class Transaction(database: Database) extends Session(database) {
         val endTime = new DateTime
         logger.info(s"Ran sql in ${endTime.getMillis - startTime.getMillis}ms: ${logDetails(connection, sql, argumentLists)}")
         keys
+      } catch {
+        case NonFatal(e) =>
+          if (!database.verboseExceptions)
+            throw e
+          else
+            throw new SqlestException(s"Exception running sql: ${logDetails(connection, sql, argumentLists)}", e)
       } finally {
         try {
           if (preparedStatement != null) preparedStatement.close
