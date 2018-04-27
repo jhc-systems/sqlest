@@ -20,12 +20,12 @@ import sqlest.ast.syntax._
 
 case class Merge[R <: Relation](
     into: (Table, String),
-    using: (R, String),
+    using: (Select[_, R], String),
+    condition: Option[Column[Boolean]] = None,
     whenMatched: Option[MatchedOp] = None,
     whenMatchedAnd: List[MatchedAndOp] = List(),
     whenNotMatched: Option[NotMatchedOp] = None,
-    whenNotMatchedAnd: List[NotMatchedAndOp] = List(),
-    condition: Option[Column[Boolean]] = None
+    whenNotMatchedAnd: List[NotMatchedAndOp] = List()
 ) extends Command with ColumnSyntax {
   def whenMatched(op: MatchedOp): Merge[R] = this.copy(whenMatched = this.whenMatched.map(c => c).orElse(Some(op)))
   def whenMatchedAnd(ops: MatchedAndOp): Merge[R] = this.copy(whenMatchedAnd = ops :: this.whenMatchedAnd)

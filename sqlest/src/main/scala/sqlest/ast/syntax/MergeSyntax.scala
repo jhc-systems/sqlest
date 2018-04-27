@@ -24,5 +24,5 @@ trait MergeSyntax {
 }
 
 class MergeBuilder(into: (Table, String)) {
-  def using[R <: Relation](using: (R, String)): Merge[R] = Merge(into, using)
+  def using[R <: Relation](using: (Select[_, R], String)): Merge[R] = Merge(into, using)
 }

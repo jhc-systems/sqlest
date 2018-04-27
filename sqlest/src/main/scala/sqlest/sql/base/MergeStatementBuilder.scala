@@ -22,8 +22,8 @@ trait MergeStatementBuilder extends BaseStatementBuilder {
   type MergeType = Merge[_ <: Relation]
   def mergeSql(merge: MergeType, usingSelect: String, matchedOps: List[(String, String)], notMatchedOp: List[(String, String)]): String = {
     s"merge ${mergeIntoSql(merge.into)}" +
-    s" using ($usingSelect) as ${merge.using._2}" +
-      s" ${mergeOnSql(merge.condition.get)}" +
+      s" using ($usingSelect) as ${merge.using._2}" +
+      s" ${mergeOnSql(merge.condition.getOrElse(ConstantColumn(true)))}" +
       s" ${mergeMatchedSql(matchedOps)}" +
       s" ${mergeNotMatchedSql(notMatchedOp)}"
   }
