@@ -32,8 +32,9 @@ class MergeStatementBuilderSpec extends BaseStatementBuilderSpec {
     val i: Insert = insert.into(MyTable).set(iSetters)
     val m = merge.into((MyTable, "a"))
       .using((s, "b"))
+      .on(c)
       .whenMatched(MatchedOp(Left(u)))
-      .whenNotMatched(NotMatchedOp(i)).on(c)
+      .whenNotMatched(NotMatchedOp(i))
     sql(m) should equal(
       s"""merge into mytable as a
          |using (select  from mytable) as b
@@ -46,34 +47,35 @@ class MergeStatementBuilderSpec extends BaseStatementBuilderSpec {
 
   "merge with more than one matched op" should "produce the right sql" in {
 
-    val s = select.from(MyTable)
-    val uSetters = Seq(Setter(MyTable.col1, MyTable.col2))
-    val iSetters = Seq(Setter(MyTable.col1, 123))
-    val c = MyTable.col1 === MyTable.col2
-    val u1 = MatchedAndOp(
-      op = Left(update(MyTable).set(uSetters).where(c)),
+    val selectOp = select.from(MyTable)
+    val updateSetters = Seq(Setter(MyTable.col1, MyTable.col2))
+    val insertSetters = Seq(Setter(MyTable.col1, 123))
+    val condition = MyTable.col1 === MyTable.col2
+    val updateAndOne = MatchedAndOp(
+      op = Left(update(MyTable).set(updateSetters).where(condition)),
       and = MyTable.col1 === MyTable.col2
     )
-    val u = MatchedOp(
-      op = Left(update(MyTable).set(uSetters).where(c))
+    val updateOp = MatchedOp(
+      op = Left(update(MyTable).set(updateSetters).where(condition))
     )
-    val d1 = MatchedAndOp(
+    val deleteAndOne = MatchedAndOp(
       op = Right(""),
       and = MyTable.col1 === MyTable.col2
     )
-    val d2 = MatchedAndOp(
+    val deleteAndTwo = MatchedAndOp(
       op = Right("garbage"),
       and = MyTable.col2 === MyTable.col1
     )
-    val opList = List(u1, d1, d2)
-    val i: Insert = insert.into(MyTable).set(iSetters)
-    val m = merge
+    val matchedAndOpList = List(updateAndOne, deleteAndOne, deleteAndTwo)
+    val insertOp: Insert = insert.into(MyTable).set(insertSetters)
+    val mergeOp = merge
       .into((MyTable, "a"))
-      .using((s, "b"))
-      .whenMatched(u)
-      .whenMatchedAnd(opList)
-      .whenNotMatchedAnd(NotMatchedAndOp(i, c)).on(c)
-    sql(m) should equal(
+      .using((selectOp, "b"))
+      .on(condition)
+      .whenMatched(updateOp)
+      .whenMatchedAnd(matchedAndOpList)
+      .whenNotMatchedAnd(NotMatchedAndOp(insertOp, condition))
+    sql(mergeOp) should equal(
       s"""merge into mytable as a
          | using (select  from mytable) as b on (mytable.col1 = mytable.col2)
          |  when matched  then UPDATE set col1 = mytable.col2
@@ -84,4 +86,37 @@ class MergeStatementBuilderSpec extends BaseStatementBuilderSpec {
       List(List(123))
     )
   }
+
+  "merge when matched DELETE" should "produce the right sql" in {
+    val selectOp = select.from(MyTable)
+    val condition = MyTable.col1 === MyTable.col2
+    val deleteOp = MatchedOp(
+      op = Right("")
+    )
+    val insertFromSelect = InsertFromSelect(
+      into = MyTable,
+      columns = Seq(MyTable.col1),
+      select = select(MyTable.col1).from(MyTable)
+    )
+    val insertAndOne = NotMatchedAndOp(
+      op = insertFromSelect,
+      and = MyTable.col1 === MyTable.col2
+    )
+    val mergeOp = merge
+      .into((MyTable, "a"))
+      .using((selectOp, "b"))
+      .on(condition)
+      .whenMatched(deleteOp)
+      .whenNotMatchedAnd(insertAndOne)
+    sql(mergeOp) should equal(
+      s"""merge into mytable as a
+         | using (select  from mytable) as b on (mytable.col1 = mytable.col2)
+         |  when matched  then DELETE
+         |   when not matched AND (mytable.col1 = mytable.col2) then INSERT (col1)
+         |    select mytable.col1 as mytable_col1 from mytable""".formatSql,
+      List()
+    )
+
+  }
+
 }

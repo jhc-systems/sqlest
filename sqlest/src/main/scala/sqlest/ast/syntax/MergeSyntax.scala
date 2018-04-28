@@ -20,9 +20,13 @@ import sqlest.ast._
 
 trait MergeSyntax {
   def into(into: (Table, String)) =
-    new MergeBuilder(into)
+    new MergeUsingBuilder(into)
 }
 
-class MergeBuilder(into: (Table, String)) {
-  def using[R <: Relation](using: (Select[_, R], String)): Merge[R] = Merge(into, using)
+class MergeUsingBuilder(into: (Table, String)) {
+  def using[R <: Relation](using: (Select[_, R], String)) = new MergeOnBuilder(into, using)
+}
+
+class MergeOnBuilder[R <: Relation](into: (Table, String), using: (Select[_, R], String)) {
+  def on(condition: Column[Boolean]): Merge[R] = Merge(into, using, condition)
 }

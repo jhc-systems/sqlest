@@ -21,7 +21,7 @@ import sqlest.ast.syntax._
 case class Merge[R <: Relation](
     into: (Table, String),
     using: (Select[_, R], String),
-    condition: Option[Column[Boolean]] = None,
+    condition: Column[Boolean],
     whenMatched: Option[MatchedOp] = None,
     whenMatchedAnd: List[MatchedAndOp] = List(),
     whenNotMatched: Option[NotMatchedOp] = None,
@@ -33,7 +33,6 @@ case class Merge[R <: Relation](
   def whenNotMatched(op: NotMatchedOp): Merge[R] = this.copy(whenNotMatched = this.whenNotMatched.map(c => c).orElse(Some(op)))
   def whenNotMatchedAnd(ops: NotMatchedAndOp): Merge[R] = this.copy(whenNotMatchedAnd = ops :: this.whenNotMatchedAnd)
   def whenNotMatchedAnd(ops: List[NotMatchedAndOp]): Merge[R] = this.copy(whenNotMatchedAnd = this.whenNotMatchedAnd ::: ops)
-  def on(condition: Column[Boolean]): Merge[R] = this.copy(condition = this.condition.map(c => c).orElse(Some(condition)))
 }
 
 trait MergeOperation
