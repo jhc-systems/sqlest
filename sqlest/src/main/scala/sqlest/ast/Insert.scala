@@ -23,6 +23,13 @@ case class InsertValues(into: Table, setterLists: Seq[Seq[Setter[_, _]]]) extend
 
   def columns = setterLists.head.map(_.column)
 
+  def bulkInsert[A](items: Seq[A])(setters: A => Seq[Setter[_, _]]) = {
+    items.foldLeft(this) {
+      case (insertValues, item) =>
+        insertValues.newRecord.set(setters(item))
+    }
+  }
+
   class InsertNewRecordBuilder {
     def set(newRecordSetters: Setter[_, _]*) = {
       if (columns != newRecordSetters.map(_.column)) throw new AssertionError(s"Must set the same columns as previous insert rows")

@@ -43,6 +43,14 @@ class InsertBuilder(into: Table) {
 
   def set(setters: Seq[Setter[_, _]])(implicit d: DummyImplicit) =
     InsertValues(into, Seq(setters))
+
+  def bulkInsert[A](items: Seq[A])(setters: A => Seq[Setter[_, _]]) = {
+    val setterLists = items.foldLeft(Seq[Seq[Setter[_, _]]]()) {
+      case (acc, item) =>
+        acc :+ setters(item)
+    }
+    InsertValues(into, setterLists)
+  }
 }
 
 /** Helper class to prevent users writing `insert.into(...).columns(...)` without `.values(...)` */
