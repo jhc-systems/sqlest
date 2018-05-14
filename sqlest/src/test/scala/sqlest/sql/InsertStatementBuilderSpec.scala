@@ -43,11 +43,32 @@ class InsertStatementBuilderSpec extends BaseStatementBuilderSpec {
     )
   }
 
-  "bulk insert" should "produce the right sql" in {
+  "bulk insert syntax" should "produce the right sql" in {
     sql {
       insert
         .into(TableOne)
         .bulkInsert(Seq(("a1", "b1"), ("a2", "b2"))) { (x: (String, String)) =>
+          Seq(
+            TableOne.col1 -> x._1,
+            TableOne.col2 -> x._2)
+        }
+    } should equal(
+      s"""
+         |insert
+         |into one
+         |(col1, col2)
+         |values (?, ?)
+       """.formatSql,
+      List(List("a1", "b1"), List("a2", "b2"))
+    )
+  }
+
+  "bulk insert on insert" should "produce the right sql" in {
+    sql {
+      insert
+        .into(TableOne)
+        .set(TableOne.col1 -> "a1", TableOne.col2 -> "b1")
+        .bulkInsert(Seq(("a2", "b2"))) { (x: (String, String)) =>
           Seq(
             TableOne.col1 -> x._1,
             TableOne.col2 -> x._2)
