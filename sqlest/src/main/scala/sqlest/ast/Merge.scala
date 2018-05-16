@@ -22,22 +22,31 @@ case class Merge[R <: Relation](
     into: (Table, String),
     using: (Select[_, R], String),
     condition: Column[Boolean],
-    whenMatched: Option[MatchedOp] = None,
-    whenMatchedAnd: List[MatchedAndOp] = List(),
-    whenNotMatched: Option[NotMatchedOp] = None,
-    whenNotMatchedAnd: List[NotMatchedAndOp] = List()
+    whenMatched: Option[Either[Update, DeleteSyntax]] = None,
+    whenMatchedAnd: List[(Either[Update, DeleteSyntax], Column[Boolean])] = List(),
+    whenNotMatched: Option[Insert] = None,
+    whenNotMatchedAnd: List[(Insert, Column[Boolean])] = List()
 ) extends Command with ColumnSyntax {
-  def whenMatched(op: MatchedOp): Merge[R] = this.copy(whenMatched = this.whenMatched.map(c => c).orElse(Some(op)))
-  def whenMatchedAnd(ops: MatchedAndOp): Merge[R] = this.copy(whenMatchedAnd = ops :: this.whenMatchedAnd)
-  def whenMatchedAnd(ops: List[MatchedAndOp]): Merge[R] = this.copy(whenMatchedAnd = this.whenMatchedAnd ::: ops)
-  def whenNotMatched(op: NotMatchedOp): Merge[R] = this.copy(whenNotMatched = this.whenNotMatched.map(c => c).orElse(Some(op)))
-  def whenNotMatchedAnd(ops: NotMatchedAndOp): Merge[R] = this.copy(whenNotMatchedAnd = ops :: this.whenNotMatchedAnd)
-  def whenNotMatchedAnd(ops: List[NotMatchedAndOp]): Merge[R] = this.copy(whenNotMatchedAnd = this.whenNotMatchedAnd ::: ops)
+
+  def whenMatched(op: Update): MergeMatch[R] = MergeMatch(this, MatchedOp(Left(op)))
+  def whenMatched(op: DeleteSyntax): MergeMatch[R] = MergeMatch(this, MatchedOp(Right(op)))
+  def whenNotMatched(op: Insert): MergeMatch[R] = MergeMatch(this, NotMatchedOp(op))
+}
+
+case class MergeMatch[R <: Relation](merge: Merge[R], op: MergeOperation) {
+  def and(columnBoolean: Option[Column[Boolean]]): Merge[R] = {
+    op match {
+      case op: MatchedOp => columnBoolean.map(and =>
+        merge.copy(whenMatchedAnd = (op.op, and) :: merge.whenMatchedAnd))
+        .getOrElse(merge.copy(whenMatched = merge.whenMatched.map(c => c).orElse(Some(op.op))))
+      case op: NotMatchedOp => columnBoolean.map(and =>
+        merge.copy(whenNotMatchedAnd = (op.op, and) :: merge.whenNotMatchedAnd))
+        .getOrElse(merge.copy(whenNotMatched = merge.whenNotMatched.map(c => c).orElse(Some(op.op))))
+    }
+
+  }
 }
 
 trait MergeOperation
-
-case class MatchedOp(op: Either[Update, String]) extends MergeOperation
-case class MatchedAndOp(op: Either[Update, String], and: Column[Boolean]) extends MergeOperation
+case class MatchedOp(op: Either[Update, DeleteSyntax]) extends MergeOperation
 case class NotMatchedOp(op: Insert) extends MergeOperation
-case class NotMatchedAndOp(op: Insert, and: Column[Boolean]) extends MergeOperation

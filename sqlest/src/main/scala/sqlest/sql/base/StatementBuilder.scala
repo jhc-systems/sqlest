@@ -47,20 +47,20 @@ trait StatementBuilder extends BaseStatementBuilder
     case delete: Delete => deleteSql(delete)
     case merge: Merge[_] =>
       val whenMatched = merge.whenMatched.map {
-        case MatchedOp(Left(updateOp)) => ("", s"UPDATE ${updateSetSql(updateOp.set)}")
-        case MatchedOp(Right(_)) => ("", "DELETE")
+        case Left(updateOp) => ("", s"UPDATE ${updateSetSql(updateOp.set)}")
+        case Right(_) => ("", "DELETE")
       }
       val whenMatchedAnd = merge.whenMatchedAnd.map {
-        case MatchedAndOp(Left(updateOp), and) => (s"AND ${columnSql(and)}", s"UPDATE ${updateSetSql(updateOp.set)}")
-        case MatchedAndOp(Right(_), and) => (s"AND ${columnSql(and)}", "DELETE")
+        case (Left(updateOp), and) => (s"AND ${columnSql(and)}", s"UPDATE ${updateSetSql(updateOp.set)}")
+        case (Right(_), and) => (s"AND ${columnSql(and)}", "DELETE")
       }
       val whenNotMatchedAnd = merge.whenNotMatchedAnd.map {
-        case NotMatchedAndOp(insertValues: InsertValues, and) => (s"AND ${columnSql(and)}", s"INSERT ${insertColumnsSql(insertValues.columns)} ${insertValuesSql(insertValues.columns)}")
-        case NotMatchedAndOp(InsertFromSelect(into, columns, select), and) => (s"AND ${columnSql(and)}", s"INSERT ${insertColumnsSql(columns)} ${selectSql(select)}")
+        case (insertValues: InsertValues, and) => (s"AND ${columnSql(and)}", s"INSERT ${insertColumnsSql(insertValues.columns)} ${insertValuesSql(insertValues.columns)}")
+        case (InsertFromSelect(into, columns, select), and) => (s"AND ${columnSql(and)}", s"INSERT ${insertColumnsSql(columns)} ${selectSql(select)}")
       }
       val whenNotMatched = merge.whenNotMatched.map {
-        case NotMatchedOp(insertValues: InsertValues) => ("", s"INSERT ${insertColumnsSql(insertValues.columns)} ${insertValuesSql(insertValues.columns)}")
-        case NotMatchedOp(InsertFromSelect(into, columns, select)) => ("", s"INSERT ${insertColumnsSql(columns)} ${selectSql(select)}")
+        case (insertValues: InsertValues) => ("", s"INSERT ${insertColumnsSql(insertValues.columns)} ${insertValuesSql(insertValues.columns)}")
+        case (InsertFromSelect(into, columns, select)) => ("", s"INSERT ${insertColumnsSql(columns)} ${selectSql(select)}")
       }
       merge.using match {
         case (s: Select[_, _], _) =>
@@ -77,16 +77,16 @@ trait StatementBuilder extends BaseStatementBuilder
     case delete: Delete => List(deleteArgs(delete))
     case merge: Merge[_] => {
       val whenMatched = merge.whenMatched.flatMap {
-        case MatchedOp(Left(updateOp)) => Some(updateArgs(updateOp))
-        case MatchedOp(Right(_)) => None
+        case Left(updateOp) => Some(updateArgs(updateOp))
+        case Right(_) => None
       }
       val whenMatchedAnd = merge.whenMatchedAnd.flatMap {
-        case MatchedAndOp(Left(updateOp), and) => updateArgs(updateOp)
-        case MatchedAndOp(Right(_), and) => Nil
+        case (Left(updateOp), and) => updateArgs(updateOp)
+        case (Right(_), and) => Nil
       }
-      val whenNotMatched = merge.whenNotMatched.map(op => insertArgs(op.op).flatten)
+      val whenNotMatched = merge.whenNotMatched.map(op => insertArgs(op).flatten)
       val whenNotMatchedAnd = merge.whenNotMatchedAnd.flatMap {
-        case NotMatchedAndOp(insert, and) => insertArgs(insert).flatten
+        case (insert, and) => insertArgs(insert).flatten
       }
       (whenMatched, whenNotMatched, whenMatchedAnd, whenNotMatchedAnd) match {
         case (None, None, Nil, Nil) => Nil
