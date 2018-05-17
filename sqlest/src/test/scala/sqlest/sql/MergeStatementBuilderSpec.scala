@@ -24,23 +24,23 @@ class MergeStatementBuilderSpec extends BaseStatementBuilderSpec {
 
   "merge" should "produce the right sql" in {
 
-    val s = select.from(MyTable)
-    val uSetters = Seq(Setter(MyTable.col1, MyTable.col2))
-    val iSetters = Seq(Setter(MyTable.col1, 123))
-    val c = MyTable.col1 === MyTable.col2
-    val u = update(MyTable).set(uSetters).where(c)
-    val i = insert.into(MyTable).set(iSetters)
+    val selectOp = select.from(MyTable)
+    val updateSetters = Seq(Setter(MyTable.col1, MyTable.col2))
+    val insertSetters = Seq(Setter(MyTable.col1, 123))
+    val columnBoolean = MyTable.col1 === MyTable.col2
+    val updateOp = update(MyTable).set(updateSetters).where(columnBoolean)
+    val insertOp = insert.into(MyTable).set(insertSetters)
     val m = merge.into((MyTable, "a"))
-      .using((s, "b"))
-      .on(c)
-      .whenMatched(u).and(None)
-      .whenNotMatched(i).and(None)
+      .using((selectOp, "b"))
+      .on(columnBoolean)
+      .whenMatched(updateOp).and(None)
+      .whenNotMatched(insertOp).and(None)
     sql(m) should equal(
       s"""merge into mytable as a
-         |using (select  from mytable) as b
-         | on (mytable.col1 = mytable.col2)
-         |  when matched  then UPDATE set col1 = mytable.col2
-         |  when not matched  then INSERT (col1) values (?)""".formatSql,
+               |using (select  from mytable) as b
+               | on (mytable.col1 = mytable.col2)
+               |  when matched  then UPDATE set col1 = mytable.col2
+               |  when not matched  then INSERT (col1) values (?)""".formatSql,
       List(List(123))
     )
   }
@@ -50,28 +50,28 @@ class MergeStatementBuilderSpec extends BaseStatementBuilderSpec {
     val selectOp = select.from(MyTable)
     val updateSetters = Seq(Setter(MyTable.col1, MyTable.col2))
     val insertSetters = Seq(Setter(MyTable.col1, 123))
-    val condition = MyTable.col1 === MyTable.col2
-    val updateOne = update(MyTable).set(updateSetters).where(condition)
-    val updateOp = update(MyTable).set(updateSetters).where(condition)
+    val columnBoolean = MyTable.col1 === MyTable.col2
+    val updateOpOne = update(MyTable).set(updateSetters).where(columnBoolean)
+    val updateOpTwo = update(MyTable).set(updateSetters).where(columnBoolean)
     val deleteOp = delete
-    val insertOp: Insert = insert.into(MyTable).set(insertSetters)
+    val insertOp = insert.into(MyTable).set(insertSetters)
     val mergeOp = merge
       .into((MyTable, "a"))
       .using((selectOp, "b"))
-      .on(condition)
-      .whenMatched(updateOp).and(None)
-      .whenMatched(updateOne).and(Some(MyTable.col1 === MyTable.col2))
+      .on(columnBoolean)
+      .whenMatched(updateOpOne).and(None)
+      .whenMatched(updateOpTwo).and(Some(MyTable.col1 === MyTable.col2))
       .whenMatched(deleteOp).and(Some(MyTable.col1 === MyTable.col2))
       .whenMatched(deleteOp).and(Some(MyTable.col2 === MyTable.col1))
-      .whenNotMatched(insertOp).and(Some(condition))
+      .whenNotMatched(insertOp).and(Some(columnBoolean))
     sql(mergeOp) should equal(
       s"""merge into mytable as a
-         | using (select  from mytable) as b on (mytable.col1 = mytable.col2)
-         |  when matched  then UPDATE set col1 = mytable.col2
-         |  when matched AND (mytable.col2 = mytable.col1) then DELETE
-         |  when matched AND (mytable.col1 = mytable.col2) then DELETE
-         |  when matched AND (mytable.col1 = mytable.col2) then UPDATE set col1 = mytable.col2
-         |  when not matched AND (mytable.col1 = mytable.col2) then INSERT (col1) values (?)""".formatSql,
+               | using (select  from mytable) as b on (mytable.col1 = mytable.col2)
+               |  when matched  then UPDATE set col1 = mytable.col2
+               |  when matched AND (mytable.col2 = mytable.col1) then DELETE
+               |  when matched AND (mytable.col1 = mytable.col2) then DELETE
+               |  when matched AND (mytable.col1 = mytable.col2) then UPDATE set col1 = mytable.col2
+               |  when not matched AND (mytable.col1 = mytable.col2) then INSERT (col1) values (?)""".formatSql,
       List(List(123))
     )
   }
@@ -93,13 +93,55 @@ class MergeStatementBuilderSpec extends BaseStatementBuilderSpec {
       .whenNotMatched(insertFromSelect).and(Some(MyTable.col1 === MyTable.col2))
     sql(mergeOp) should equal(
       s"""merge into mytable as a
-         | using (select  from mytable) as b on (mytable.col1 = mytable.col2)
-         |  when matched  then DELETE
-         |   when not matched AND (mytable.col1 = mytable.col2) then INSERT (col1)
-         |    select mytable.col1 as mytable_col1 from mytable""".formatSql,
+               | using (select  from mytable) as b on (mytable.col1 = mytable.col2)
+               |  when matched  then DELETE
+               |   when not matched AND (mytable.col1 = mytable.col2) then INSERT (col1)
+               |    select mytable.col1 as mytable_col1 from mytable""".formatSql,
       List()
     )
-
   }
 
+  "merge when not matched only " should "produces the right sql" in {
+    val selectOp = select.from(MyTable)
+    val condition = MyTable.col1 === MyTable.col2
+    val insertFromSelect = InsertFromSelect(
+      into = MyTable,
+      columns = Seq(MyTable.col1),
+      select = select(MyTable.col1).from(MyTable)
+    )
+    val mergeOp = merge
+      .into((MyTable, "a"))
+      .using((selectOp, "b"))
+      .on(condition)
+      .whenNotMatched(insertFromSelect).and(None)
+    sql(mergeOp) should equal(
+      s"""merge into mytable as a
+           | using (select  from mytable) as b on (mytable.col1 = mytable.col2)  when
+           |  not matched  then INSERT (col1) select mytable.col1 as mytable_col1 from mytable""".formatSql,
+      List(List())
+    )
+  }
+
+  "merge when not matched and when not matched and only " should "produces the right sql" in {
+    val selectOp = select.from(MyTable)
+    val condition = MyTable.col1 === MyTable.col2
+    val insertFromSelect = InsertFromSelect(
+      into = MyTable,
+      columns = Seq(MyTable.col1),
+      select = select(MyTable.col1).from(MyTable)
+    )
+    val mergeOp = merge
+      .into((MyTable, "a"))
+      .using((selectOp, "b"))
+      .on(condition)
+      .whenNotMatched(insertFromSelect).and(None)
+      .whenNotMatched(insertFromSelect).and(Some(MyTable.col1 === MyTable.col2))
+    sql(mergeOp) should equal(
+      s"""merge into mytable as a
+         | using (select  from mytable) as b on (mytable.col1 = mytable.col2)  when
+         |  not matched  then INSERT (col1) select mytable.col1 as mytable_col1 from mytable when
+         |   not matched AND (mytable.col1 = mytable.col2) then INSERT (col1) select mytable.col1 as mytable_col1 from mytable""".formatSql,
+      List(List())
+    )
+  }
 }
