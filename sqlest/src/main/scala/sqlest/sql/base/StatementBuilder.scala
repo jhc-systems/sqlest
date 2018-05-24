@@ -79,33 +79,16 @@ trait StatementBuilder extends BaseStatementBuilder
       val whenMatched = merge.whenMatched.flatMap {
         case Left(updateOp) => Some(updateArgs(updateOp))
         case Right(_) => None
-      }
+      }.toList.flatten
       val whenMatchedAnd = merge.whenMatchedAnd.flatMap {
         case (Left(updateOp), and) => updateArgs(updateOp)
         case (Right(_), and) => Nil
       }
-      val whenNotMatched = merge.whenNotMatched.map(op => insertArgs(op).flatten)
+      val whenNotMatched = merge.whenNotMatched.map(op => insertArgs(op).flatten).toList.flatten
       val whenNotMatchedAnd = merge.whenNotMatchedAnd.flatMap {
         case (insert, and) => insertArgs(insert).flatten
       }
-      (whenMatched, whenNotMatched, whenMatchedAnd, whenNotMatchedAnd) match {
-        case (None, None, Nil, Nil) => Nil
-        case (Some(wm), None, Nil, Nil) => List(wm)
-        case (Some(wm), None, Nil, wnma) => List(wnma)
-        case (None, Some(wnm), Nil, Nil) => List(wnm)
-        case (None, Some(wnm), Nil, wnma) => List(wnm ::: wnma)
-        case (Some(wm), Some(wnm), Nil, Nil) => List(wm ::: wnm)
-        case (Some(wm), Some(wnm), Nil, wnma) => List(wm ::: wnm ::: wnma)
-        case (Some(wm), Some(wnm), wma, Nil) => List(wm ::: wma ::: wnm)
-        case (Some(wm), Some(wnm), wma, wnma) => List(wm ::: wma ::: wnm ::: wnma)
-        case (None, Some(wnm), wma, Nil) => List(wnm ::: wma)
-        case (None, Some(wnm), wma, wnma) => List(wnm ::: wma ::: wnma)
-        case (Some(wm), None, wma, Nil) => List(wm ::: wma)
-        case (Some(wm), None, wma, wnma) => List(wm ::: wma ::: wnma)
-        case (None, None, wma, Nil) => List(wma)
-        case (None, None, wma, wnma) => List(wma ::: wnma)
-        case _ => Nil
-      }
+      List(whenMatched ::: whenNotMatched ::: whenMatchedAnd ::: whenNotMatchedAnd)
     }
     case other => sys.error("Unsupported operation type: " + other)
   }

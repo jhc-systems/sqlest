@@ -97,7 +97,7 @@ class MergeStatementBuilderSpec extends BaseStatementBuilderSpec {
                |  when matched  then DELETE
                |   when not matched AND (mytable.col1 = mytable.col2) then INSERT (col1)
                |    select mytable.col1 as mytable_col1 from mytable""".formatSql,
-      List()
+      List(List())
     )
   }
 
