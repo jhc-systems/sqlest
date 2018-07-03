@@ -16,18 +16,17 @@
 
 package sqlest.ast.syntax
 
-import sqlest.ast.{ Lateral, Relation, Select, ExistsColumn, NotExistsColumn }
+import sqlest.ast._
 
-trait QuerySyntax {
-  object select extends SelectSyntax
-  object insert extends InsertSyntax
-  object update extends UpdateSyntax
-  object delete extends DeleteSyntax
-  object merge extends MergeSyntax
+trait MergeSyntax {
+  def into(into: (Table, String)) =
+    new MergeUsingBuilder(into)
+}
 
-  implicit def selectOps[A, R <: Relation](select: Select[A, R]) = SelectOps(select)
-  def lateral[A, R <: Relation](select: Select[A, R]) = Lateral(select)
-  def exists[A, R <: Relation](select: Select[A, R]) = ExistsColumn(select)
-  def notExists[A, R <: Relation](select: Select[A, R]) = NotExistsColumn(select)
+class MergeUsingBuilder(into: (Table, String)) {
+  def using[R <: Relation](using: (Select[_, R], String)) = new MergeOnBuilder(into, using)
+}
 
+class MergeOnBuilder[R <: Relation](into: (Table, String), using: (Select[_, R], String)) {
+  def on(condition: Column[Boolean]): Merge[R] = Merge(into, using, condition)
 }
