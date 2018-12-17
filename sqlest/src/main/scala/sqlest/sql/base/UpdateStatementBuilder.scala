@@ -29,7 +29,10 @@ trait UpdateStatementBuilder extends BaseStatementBuilder {
   }
 
   def updateTableSql(table: Table): String =
-    s"update ${identifierSql(table.tableName)}"
+    if (table.tableName == table.tableAlias)
+      s"update ${identifierSql(table.tableName)}"
+    else
+      "update " + identifierSql(table.tableName) + " as " + identifierSql(table.tableAlias)
 
   def updateSetSql(setters: Seq[Setter[_, _]]): String =
     "set " + setters.map(setter => identifierSql(setter.column.columnName) + " = " + columnSql(setter.value)).mkString(", ")
