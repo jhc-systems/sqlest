@@ -19,7 +19,7 @@ package sqlest.executor
 import java.sql.ResultSet
 import sqlest._
 
-case class TestDatabase(resultSet: ResultSet, keyResultSet: Option[ResultSet] = None, shouldThrow: Boolean = false, verboseExceptionMessages: Boolean = false, throwExceptionOnPrepare: Boolean = true) extends Database {
+case class TestDatabase(resultSet: ResultSet, keyResultSet: Option[ResultSet] = None, shouldThrow: Boolean = false, verboseExceptionMessages: Boolean = false, throwExceptionOnPrepare: Boolean = false) extends Database {
   var preparedStatement: Option[AbstractPreparedStatement] = None
   var lastConnection: Option[AbstractConnection] = None
   override val verboseExceptions = verboseExceptionMessages
