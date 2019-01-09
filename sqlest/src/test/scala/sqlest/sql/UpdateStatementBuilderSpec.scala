@@ -41,4 +41,23 @@ class UpdateStatementBuilderSpec extends BaseStatementBuilderSpec {
       List(List("a", "b", "c", "d", "e", "f"))
     )
   }
+
+  it should "produce the right sql for an aliased table" in {
+    val tableOneAliased = new TableOne(Some("one_alias"))
+    sql {
+      update(tableOneAliased)
+        .set(
+          tableOneAliased.col1 -> "a",
+          tableOneAliased.col2 -> "b"
+        )
+        .where(tableOneAliased.col1 === "d".column && "e".column === "f".column)
+    } should equal(
+      s"""
+         |update one as one_alias
+         |set col1 = ?, col2 = ?
+         |where ((one_alias.col1 = ?) and (? = ?))
+       """.formatSql,
+      List(List("a", "b", "d", "e", "f"))
+    )
+  }
 }
