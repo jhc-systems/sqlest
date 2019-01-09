@@ -453,6 +453,33 @@ class ExecutorSpec extends FlatSpec with Matchers {
 
     assert(selectException.message.startsWith("Exception running sql"))
     selectException.cause shouldBe database.anException
+
+    val insertException = intercept[SqlestException] {
+      database.withTransaction { implicit transaction =>
+        insertStatement.execute
+      }
+    }
+
+    assert(insertException.message.startsWith("Exception running sql"))
+    insertException.cause shouldBe database.anException
+
+    val insertReturningKeysException = intercept[SqlestException] {
+      database.withTransaction { implicit transaction =>
+        insertStatement.executeReturningKeys[String]
+      }
+    }
+
+    assert(insertReturningKeysException.message.startsWith("Exception running sql"))
+    insertReturningKeysException.cause shouldBe database.anException
+
+    val updateException = intercept[SqlestException] {
+      database.withTransaction { implicit transaction =>
+        updateStatement.execute
+      }
+    }
+
+    assert(updateException.message.startsWith("Exception running sql"))
+    updateException.cause shouldBe database.anException
   }
 
   it should "return the underlying exception on prepare otherwise " in {
@@ -465,5 +492,29 @@ class ExecutorSpec extends FlatSpec with Matchers {
     }
 
     selectException shouldBe database.anException
+
+    val insertException = intercept[Exception] {
+      database.withTransaction { implicit transaction =>
+        insertStatement.execute
+      }
+    }
+
+    insertException shouldBe database.anException
+
+    val insertReturningKeysException = intercept[Exception] {
+      database.withTransaction { implicit transaction =>
+        insertStatement.executeReturningKeys[String]
+      }
+    }
+
+    insertReturningKeysException shouldBe database.anException
+
+    val updateException = intercept[Exception] {
+      database.withTransaction { implicit transaction =>
+        updateStatement.execute
+      }
+    }
+
+    updateException shouldBe database.anException
   }
 }
