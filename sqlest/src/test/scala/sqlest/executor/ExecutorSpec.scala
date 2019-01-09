@@ -441,4 +441,29 @@ class ExecutorSpec extends FlatSpec with Matchers {
 
     updateException shouldBe database.anException
   }
+
+  it should "return verbose exception messages on prepare when configured to do so" in {
+    val database = TestDatabase(testResultSet, Some(keyResultSet), shouldThrow = true, verboseExceptionMessages = true, throwExceptionOnPrepare = true)
+
+    val selectException = intercept[SqlestException] {
+      database.withSession { implicit session =>
+        selectStatement.fetchAll
+      }
+    }
+
+    assert(selectException.message.startsWith("Exception running sql"))
+    selectException.cause shouldBe database.anException
+  }
+
+  it should "return the underlying exception on prepare otherwise " in {
+    val database = TestDatabase(testResultSet, Some(keyResultSet), shouldThrow = true, verboseExceptionMessages = false, throwExceptionOnPrepare = true)
+
+    val selectException = intercept[Exception] {
+      database.withSession { implicit session =>
+        selectStatement.fetchAll
+      }
+    }
+
+    selectException shouldBe database.anException
+  }
 }

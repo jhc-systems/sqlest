@@ -19,7 +19,7 @@ package sqlest.executor
 import java.sql.ResultSet
 import sqlest._
 
-case class TestDatabase(resultSet: ResultSet, keyResultSet: Option[ResultSet] = None, shouldThrow: Boolean = false, verboseExceptionMessages: Boolean = false) extends Database {
+case class TestDatabase(resultSet: ResultSet, keyResultSet: Option[ResultSet] = None, shouldThrow: Boolean = false, verboseExceptionMessages: Boolean = false, throwExceptionOnPrepare: Boolean = true) extends Database {
   var preparedStatement: Option[AbstractPreparedStatement] = None
   var lastConnection: Option[AbstractConnection] = None
   override val verboseExceptions = verboseExceptionMessages
@@ -46,7 +46,8 @@ case class TestDatabase(resultSet: ResultSet, keyResultSet: Option[ResultSet] = 
         override def execute(sql: String) = if (shouldThrow) throw anException else true
       }
       override def prepareStatement(inSql: String, columnIndices: Array[Int]) = {
-        val statement = new AbstractPreparedStatement {
+
+        val statement = if (throwExceptionOnPrepare) throw anException else new AbstractPreparedStatement {
           val sql = inSql
           override def executeQuery() = if (shouldThrow) throw anException else resultSet
           override def executeUpdate() = if (shouldThrow) throw anException else 1
@@ -59,7 +60,7 @@ case class TestDatabase(resultSet: ResultSet, keyResultSet: Option[ResultSet] = 
         statement
       }
       override def prepareStatement(inSql: String, columnNames: Array[String]) = {
-        val statement = new AbstractPreparedStatement {
+        val statement = if (throwExceptionOnPrepare) throw anException else new AbstractPreparedStatement {
           val sql = inSql
           override def executeQuery() = if (shouldThrow) throw anException else resultSet
           override def executeUpdate() = if (shouldThrow) throw anException else 1
@@ -72,7 +73,7 @@ case class TestDatabase(resultSet: ResultSet, keyResultSet: Option[ResultSet] = 
         statement
       }
       override def prepareStatement(inSql: String, returnGeneratedKeys: Int) = {
-        val statement = new AbstractPreparedStatement {
+        val statement = if (throwExceptionOnPrepare) throw anException else new AbstractPreparedStatement {
           val sql = inSql
           override def executeQuery() = if (shouldThrow) throw anException else resultSet
           override def executeUpdate() = if (shouldThrow) throw anException else 1
@@ -87,7 +88,7 @@ case class TestDatabase(resultSet: ResultSet, keyResultSet: Option[ResultSet] = 
         statement
       }
       override def prepareStatement(inSql: String) = {
-        val statement = new AbstractPreparedStatement {
+        val statement = if (throwExceptionOnPrepare) throw anException else new AbstractPreparedStatement {
           val sql = inSql
           override def executeQuery() = if (shouldThrow) throw anException else resultSet
           override def executeUpdate() = if (shouldThrow) throw anException else 1
