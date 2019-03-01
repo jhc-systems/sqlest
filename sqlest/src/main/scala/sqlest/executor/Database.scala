@@ -118,18 +118,28 @@ class Session(database: Database) extends Logging {
     withConnection { connection =>
       val (preprocessedSelect, sql, argumentLists) = database.statementBuilder(select)
       val startTime = new DateTime
-      val preparedStatement = prepareStatement(connection, preprocessedSelect, sql, argumentLists)
       try {
-        val resultSet = preparedStatement.executeQuery
+        val preparedStatement = prepareStatement(connection, preprocessedSelect, sql, argumentLists)
         try {
-          val result = extractor(resultSet)
-          val endTime = new DateTime
-          logger.info(s"Ran sql in ${endTime.getMillis - startTime.getMillis}ms: ${logDetails(connection, sql, argumentLists)}")
-          result
+          val resultSet = preparedStatement.executeQuery
+          try {
+            val result = extractor(resultSet)
+            val endTime = new DateTime
+            logger.info(s"Ran sql in ${endTime.getMillis - startTime.getMillis}ms: ${logDetails(connection, sql, argumentLists)}")
+            result
+          } finally {
+            try {
+              if (resultSet != null) resultSet.close
+            } catch {
+              case e: SQLException =>
+            }
+          }
         } finally {
           try {
-            if (resultSet != null) resultSet.close
-          } catch { case e: SQLException => }
+            if (preparedStatement != null) preparedStatement.close
+          } catch {
+            case e: SQLException =>
+          }
         }
       } catch {
         case NonFatal(e) =>
@@ -137,10 +147,6 @@ class Session(database: Database) extends Logging {
             throw e
           else
             throw new SqlestException(s"Exception running sql: ${logDetails(connection, sql, argumentLists)}", e)
-      } finally {
-        try {
-          if (preparedStatement != null) preparedStatement.close
-        } catch { case e: SQLException => }
       }
     }
 
@@ -300,22 +306,25 @@ case class Transaction(database: Database) extends Session(database) {
     withConnection { connection =>
       val (preprocessedCommand, sql, argumentLists) = database.statementBuilder(command)
       val startTime = new DateTime
-      val preparedStatement = prepareStatement(connection, preprocessedCommand, sql, argumentLists)
+
       try {
-        val result = preparedStatement.executeBatch.sum
-        val endTime = new DateTime
-        logger.info(s"Ran sql in ${endTime.getMillis - startTime.getMillis}ms: ${logDetails(connection, sql, argumentLists)}")
-        result
+        val preparedStatement = prepareStatement(connection, preprocessedCommand, sql, argumentLists)
+        try {
+          val result = preparedStatement.executeBatch.sum
+          val endTime = new DateTime
+          logger.info(s"Ran sql in ${endTime.getMillis - startTime.getMillis}ms: ${logDetails(connection, sql, argumentLists)}")
+          result
+        } finally {
+          try {
+            if (preparedStatement != null) preparedStatement.close
+          } catch { case e: SQLException => }
+        }
       } catch {
         case NonFatal(e) =>
           if (!database.verboseExceptions)
             throw e
           else
             throw new SqlestException(s"Exception running sql: ${logDetails(connection, sql, argumentLists)}", e)
-      } finally {
-        try {
-          if (preparedStatement != null) preparedStatement.close
-        } catch { case e: SQLException => }
       }
     }
 
@@ -323,30 +332,34 @@ case class Transaction(database: Database) extends Session(database) {
     withConnection { connection =>
       val (preprocessedCommand, sql, argumentLists) = database.statementBuilder(command)
       val startTime = new DateTime
-      val preparedStatement = prepareStatement(
-        connection,
-        preprocessedCommand,
-        sql,
-        argumentLists,
-        returnKeys = true
-      )
       try {
-        val result = preparedStatement.executeUpdate
-        val rs = preparedStatement.getGeneratedKeys
-        val keys = IndexedExtractor[T](1).extractAll(ResultSetIterable(rs))
-        val endTime = new DateTime
-        logger.info(s"Ran sql in ${endTime.getMillis - startTime.getMillis}ms: ${logDetails(connection, sql, argumentLists)}")
-        keys
+        val preparedStatement = prepareStatement(
+          connection,
+          preprocessedCommand,
+          sql,
+          argumentLists,
+          returnKeys = true
+        )
+        try {
+          val result = preparedStatement.executeUpdate
+          val rs = preparedStatement.getGeneratedKeys
+          val keys = IndexedExtractor[T](1).extractAll(ResultSetIterable(rs))
+          val endTime = new DateTime
+          logger.info(s"Ran sql in ${endTime.getMillis - startTime.getMillis}ms: ${logDetails(connection, sql, argumentLists)}")
+          keys
+        } finally {
+          try {
+            if (preparedStatement != null) preparedStatement.close
+          } catch {
+            case e: SQLException =>
+          }
+        }
       } catch {
         case NonFatal(e) =>
           if (!database.verboseExceptions)
             throw e
           else
             throw new SqlestException(s"Exception running sql: ${logDetails(connection, sql, argumentLists)}", e)
-      } finally {
-        try {
-          if (preparedStatement != null) preparedStatement.close
-        } catch { case e: SQLException => }
       }
     }
 
