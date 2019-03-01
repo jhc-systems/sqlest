@@ -56,8 +56,20 @@ trait DB2StatementBuilder extends base.StatementBuilder {
       case mappedColumnType: MappedColumnType[_, _] => castLiteralSql(mappedColumnType.baseColumnType)
     }
 
+  override def selectSql(select: Select[_, _ <: Relation]): String = {
+    val offset = select.offset getOrElse 0L
+    if (offset > 0L) {
+      rowNumberSelectSql(select, offset, select.limit)
+    } else {
+      super.selectSql(select)
+    }
+  }
+
   override def selectLimitSql(limit: Option[Long]): Option[String] =
     limit map (limit => s"fetch first $limit rows only")
+
+  override def selectOffsetSql(offset: Option[Long]): Option[String] =
+    None
 
   override def selectOptimizeSql(optimize: Option[Long]): Option[String] =
     optimize map (optimize => s"optimize for $optimize rows")
@@ -70,6 +82,25 @@ trait DB2StatementBuilder extends base.StatementBuilder {
     case _ => super.joinSql(relation)
   }
 
+  def rowNumberSelectSql(select: Select[_, _ <: Relation], offset: Long, limit: Option[Long]): String = {
+    val subquery = Seq(
+      s"${selectWhatSql(select.columns)}, row_number() over (${selectOrderBySql(select.orderBy) getOrElse ""}) as rownum",
+      selectFromSql(select.from)
+    ) ++ Seq(
+        selectWhereSql(select.where),
+        selectGroupBySql(select.groupBy)
+      ).flatten mkString " "
+
+    val what =
+      select.columns map (col => identifierSql(col.columnAlias)) mkString ", "
+
+    val bounds = limit
+      .map(limit => s"rownum between ? and ?")
+      .getOrElse(s"rownum >= ?")
+
+    s"with subquery as ($subquery) select $what from subquery where $bounds"
+  }
+
   override def columnSql(column: Column[_]): String =
     column match {
       case literalColumn: LiteralColumn[_] if literalColumn.columnType == BooleanColumnType =>
@@ -79,8 +110,37 @@ trait DB2StatementBuilder extends base.StatementBuilder {
       case _ => super.columnSql(column)
     }
 
+  override def selectArgs(select: Select[_, _ <: Relation]): List[LiteralColumn[_]] = {
+    val offset = select.offset getOrElse 0L
+    if (offset > 0L) {
+      rowNumberSelectArgs(select, offset, select.limit)
+    } else {
+      super.selectArgs(select)
+    }
+  }
+
   override def selectLimitArgs(limit: Option[Long]): List[LiteralColumn[_]] =
     Nil
+
+  override def selectOffsetArgs(limit: Option[Long]): List[LiteralColumn[_]] =
+    Nil
+
+  override def selectOptimizeArgs(optimize: Option[Long]): List[LiteralColumn[_]] =
+    Nil
+
+  def rowNumberSelectArgs(select: Select[_, _ <: Relation], offset: Long, limit: Option[Long]): List[LiteralColumn[_]] = {
+    val subqueryArgs =
+      selectWhatArgs(select.columns) ++
+        selectOrderByArgs(select.orderBy) ++
+        selectFromArgs(select.from) ++
+        selectWhereArgs(select.where)
+
+    val boundsArgs = limit
+      .map(limit => List(LiteralColumn[Long](offset + 1), LiteralColumn[Long](offset + limit)))
+      .getOrElse(List(LiteralColumn[Long](offset + 1)))
+
+    subqueryArgs ++ boundsArgs
+  }
 
   override def columnArgs(column: Column[_]): List[LiteralColumn[_]] = column match {
     case column: LiteralColumn[_] if column.columnType == BooleanColumnType => List(LiteralColumn(0), LiteralColumn(0))
