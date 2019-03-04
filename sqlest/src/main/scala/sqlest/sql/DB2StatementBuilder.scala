@@ -56,8 +56,29 @@ trait DB2StatementBuilder extends base.StatementBuilder {
       case mappedColumnType: MappedColumnType[_, _] => castLiteralSql(mappedColumnType.baseColumnType)
     }
 
+  override def selectSql(select: Select[_, _ <: Relation]): String = {
+    Seq(
+      selectWhatSql(select.columns),
+      selectFromSql(select.from)
+    ) ++ Seq(
+        selectWhereSql(select.where),
+        selectStartWithSql(select.startWith),
+        selectConnectBySql(select.connectBy),
+        selectGroupBySql(select.groupBy),
+        selectHavingSql(select.having),
+        selectOrderBySql(select.orderBy),
+        selectOffsetSql(select.offset),
+        selectLimitSql(select.limit),
+        selectOptimizeSql(select.optimize),
+        selectUnionSql(select.union)
+      ).flatten mkString (" ")
+  }
+
   override def selectLimitSql(limit: Option[Long]): Option[String] =
     limit map (limit => s"fetch first $limit rows only")
+
+  override def selectOffsetSql(offset: Option[Long]): Option[String] =
+    offset map (offset => s"offset ${literalSql(offset)} rows")
 
   override def selectOptimizeSql(optimize: Option[Long]): Option[String] =
     optimize map (optimize => s"optimize for $optimize rows")
@@ -80,6 +101,9 @@ trait DB2StatementBuilder extends base.StatementBuilder {
     }
 
   override def selectLimitArgs(limit: Option[Long]): List[LiteralColumn[_]] =
+    Nil
+
+  override def selectOptimizeArgs(optimize: Option[Long]): List[LiteralColumn[_]] =
     Nil
 
   override def columnArgs(column: Column[_]): List[LiteralColumn[_]] = column match {

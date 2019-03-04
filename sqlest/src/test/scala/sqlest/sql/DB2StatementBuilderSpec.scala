@@ -54,7 +54,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
        |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
        |from mytable
        |where (mytable.col1 = ?)
-       |offset ?
+       |offset ? rows
        """.formatSql,
       List(List(123, 20))
     )
@@ -71,8 +71,8 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
        |select mytable.col1 as mytable_col1, mytable.col2 as mytable_col2
        |from mytable
        |where (mytable.col1 = ?)
+       |offset ? rows
        |fetch first 10 rows only
-       |offset ?
        """.formatSql,
       List(List(123, 2 * 10))
     )
@@ -91,8 +91,8 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
        |from mytable
        |where (mytable.col1 = ?)
        |order by mytable.col1
+       |offset ? rows
        |fetch first 10 rows only
-       |offset ?
        """.formatSql,
       List(List(123, 2 * 10))
     )
@@ -170,8 +170,8 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
        |from mytable
        |where (mytable.col1 = ?)
        |order by mytable.col1
+       |offset ? rows
        |fetch first 10 rows only
-       |offset ?
        |optimize for 10 rows
        """.formatSql,
       List(List(123, 10))
@@ -191,8 +191,8 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
        |from one inner join two on ((? = ?) and (? <> ?))
        |where ((? = ?) and (? <> ?))
        |order by ?, ? desc
-       |fetch first 16 rows only
-       |offset ?
+       |offset ? rows
+       |fetch first 16 rows only     
        """.formatSql,
       List(List(2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 * 16))
     )
