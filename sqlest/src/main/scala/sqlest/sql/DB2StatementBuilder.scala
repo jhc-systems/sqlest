@@ -103,6 +103,9 @@ trait DB2StatementBuilder extends base.StatementBuilder {
   override def selectLimitArgs(limit: Option[Long]): List[LiteralColumn[_]] =
     Nil
 
+  override def selectOptimizeArgs(optimize: Option[Long]): List[LiteralColumn[_]] =
+    Nil
+
   override def columnArgs(column: Column[_]): List[LiteralColumn[_]] = column match {
     case column: LiteralColumn[_] if column.columnType == BooleanColumnType => List(LiteralColumn(0), LiteralColumn(0))
     case _ => super.columnArgs(column)
