@@ -56,7 +56,7 @@ class DB2StatementBuilderSpec extends BaseStatementBuilderSpec {
        |where (mytable.col1 = ?)
        |offset ? rows
        """.formatSql,
-      List(List(123, 2 * 10))
+      List(List(123, 20))
     )
   }
 
