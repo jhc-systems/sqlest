@@ -95,12 +95,12 @@ lazy val publishingSettings = sonatypeReleaseProcess ++ Seq(
       Some("releases" at nexus + "service/local/staging/deploy/maven2")
   },
   credentials := {
-    Seq("SONATYPE_USER", "SONATYPE_PASSWORD").map(sys.env.get) match {
-      case Seq(Some(user), Some(password)) =>
-        Seq(Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", user, password))
-      case _ =>
-        credentials.value
-    }
+//    Seq("SONATYPE_USER", "SONATYPE_PASSWORD").map(sys.env.get) match {
+//      case Seq(Some(user), Some(password)) =>
+        Seq(Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", "", ""))
+//      case _ =>
+//        credentials.value
+//    }
   },
   pomIncludeRepository := { _ => false },
   pomExtra := (
