@@ -54,11 +54,9 @@ object Database {
     connectionDescription: Connection => String
   ): Database = {
     val inConnectionDescription = connectionDescription
-
     new Database {
       def getConnection: Connection = dataSource.getConnection
       val statementBuilder = builder
-
       override val connectionDescription = Some(inConnectionDescription)
     }
   }
