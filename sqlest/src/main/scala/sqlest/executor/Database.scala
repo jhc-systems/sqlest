@@ -54,9 +54,11 @@ object Database {
     connectionDescription: Connection => String
   ): Database = {
     val inConnectionDescription = connectionDescription
+
     new Database {
       def getConnection: Connection = dataSource.getConnection
       val statementBuilder = builder
+
       override val connectionDescription = Some(inConnectionDescription)
     }
   }
@@ -75,6 +77,24 @@ object Database {
       override val connectionDescription = Some(inConnectionDescription)
     }
   }
+
+  def withDataSource(
+    dataSource: DataSource,
+    builder: StatementBuilder,
+    connectionDescription: Connection => String,
+    verboseExceptionMessages: Boolean,
+    queryTimeoutValue: Integer
+  ): Database = {
+    val inConnectionDescription = connectionDescription
+    new Database {
+      def getConnection: Connection = dataSource.getConnection
+      val statementBuilder = builder
+      override val verboseExceptions = verboseExceptionMessages
+      override val queryTimeout = queryTimeoutValue
+      override val connectionDescription = Some(inConnectionDescription)
+    }
+  }
+
 }
 
 trait Database {
@@ -82,6 +102,7 @@ trait Database {
   private[sqlest] def statementBuilder: StatementBuilder
   private[sqlest] def connectionDescription: Option[Connection => String] = None
   private[sqlest] def verboseExceptions: Boolean = false
+  private[sqlest] def queryTimeout: Integer = 0
 
   def withConnection[A](f: Connection => A): A =
     Session(this).withConnection(f)
@@ -121,11 +142,12 @@ class Session(database: Database) extends Logging {
       try {
         val preparedStatement = prepareStatement(connection, preprocessedSelect, sql, argumentLists)
         try {
+          preparedStatement.setQueryTimeout(database.queryTimeout)
           val resultSet = preparedStatement.executeQuery
           try {
             val result = extractor(resultSet)
             val endTime = new DateTime
-            logger.info(s"Ran sql in ${endTime.getMillis - startTime.getMillis}ms: ${logDetails(connection, sql, argumentLists)}")
+            logger.info(s"Ran sql in ${endTime.getMillis - startTime.getMillis}ms: ${logDetails(connection, sql, argumentLists)} with queryTimeout ${database.queryTimeout}")
             result
           } finally {
             try {
