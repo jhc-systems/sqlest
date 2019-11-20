@@ -81,7 +81,8 @@ object Database {
     builder: StatementBuilder,
     connectionDescription: Connection => String,
     verboseExceptionMessages: Boolean,
-    queryTimeoutValue: Integer
+    queryTimeoutValue: Integer,
+    commandTimeoutValue: Integer
   ): Database = {
     val inConnectionDescription = connectionDescription
     new Database {
@@ -89,6 +90,7 @@ object Database {
       val statementBuilder = builder
       override val verboseExceptions = verboseExceptionMessages
       override val queryTimeout = queryTimeoutValue
+      override val commandTimeout = commandTimeoutValue
       override val connectionDescription = Some(inConnectionDescription)
     }
   }
@@ -101,6 +103,7 @@ trait Database {
   private[sqlest] def connectionDescription: Option[Connection => String] = None
   private[sqlest] def verboseExceptions: Boolean = false
   private[sqlest] def queryTimeout: Integer = 0
+  private[sqlest] def commandTimeout: Integer = 0
 
   def withConnection[A](f: Connection => A): A =
     Session(this).withConnection(f)
@@ -330,6 +333,7 @@ case class Transaction(database: Database) extends Session(database) {
       try {
         val preparedStatement = prepareStatement(connection, preprocessedCommand, sql, argumentLists)
         try {
+          preparedStatement.setQueryTimeout(database.commandTimeout)
           val result = preparedStatement.executeBatch.sum
           val endTime = new DateTime
           logger.info(s"Ran sql in ${endTime.getMillis - startTime.getMillis}ms: ${logDetails(connection, sql, argumentLists)}")
