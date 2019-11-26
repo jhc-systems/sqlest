@@ -85,12 +85,15 @@ object Database {
     commandTimeoutValue: Integer
   ): Database = {
     val inConnectionDescription = connectionDescription
+    val inQueryTimeout = queryTimeoutValue
+    val inCommandTimeout = commandTimeoutValue
+    val inVerboseExceptionMessages = verboseExceptionMessages
     new Database {
       def getConnection: Connection = dataSource.getConnection
       val statementBuilder = builder
-      override val verboseExceptions = verboseExceptionMessages
-      override val queryTimeout = queryTimeoutValue
-      override val commandTimeout = commandTimeoutValue
+      override val verboseExceptions = inVerboseExceptionMessages
+      override val queryTimeout = inQueryTimeout
+      override val commandTimeout = inCommandTimeout
       override val connectionDescription = Some(inConnectionDescription)
     }
   }
@@ -102,8 +105,8 @@ trait Database {
   private[sqlest] def statementBuilder: StatementBuilder
   private[sqlest] def connectionDescription: Option[Connection => String] = None
   private[sqlest] def verboseExceptions: Boolean = false
-  private[sqlest] def queryTimeout: Integer = 0
-  private[sqlest] def commandTimeout: Integer = 0
+  private[sqlest] def queryTimeout: Integer = 20
+  private[sqlest] def commandTimeout: Integer = 60
 
   def withConnection[A](f: Connection => A): A =
     Session(this).withConnection(f)
