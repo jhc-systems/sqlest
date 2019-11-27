@@ -368,6 +368,7 @@ case class Transaction(database: Database) extends Session(database) {
           returnKeys = true
         )
         try {
+          preparedStatement.setQueryTimeout(database.commandTimeout)
           val result = preparedStatement.executeUpdate
           val rs = preparedStatement.getGeneratedKeys
           val keys = IndexedExtractor[T](1).extractAll(ResultSetIterable(rs))
@@ -399,7 +400,7 @@ case class Transaction(database: Database) extends Session(database) {
           logger.debug(s"Adding batch operation: $commandSql")
           statement.addBatch(commandSql)
         }
-
+        statement.setQueryTimeout(database.commandTimeout)
         statement.executeBatch.toList
       } finally {
         try {
