@@ -81,14 +81,19 @@ object Database {
     builder: StatementBuilder,
     connectionDescription: Connection => String,
     verboseExceptionMessages: Boolean,
-    queryTimeoutValue: Integer
+    queryTimeoutValue: Integer,
+    commandTimeoutValue: Integer
   ): Database = {
     val inConnectionDescription = connectionDescription
+    val inQueryTimeout = queryTimeoutValue
+    val inCommandTimeout = commandTimeoutValue
+    val inVerboseExceptionMessages = verboseExceptionMessages
     new Database {
       def getConnection: Connection = dataSource.getConnection
       val statementBuilder = builder
-      override val verboseExceptions = verboseExceptionMessages
-      override val queryTimeout = queryTimeoutValue
+      override val verboseExceptions = inVerboseExceptionMessages
+      override val queryTimeout = inQueryTimeout
+      override val commandTimeout = inCommandTimeout
       override val connectionDescription = Some(inConnectionDescription)
     }
   }
@@ -100,7 +105,8 @@ trait Database {
   private[sqlest] def statementBuilder: StatementBuilder
   private[sqlest] def connectionDescription: Option[Connection => String] = None
   private[sqlest] def verboseExceptions: Boolean = false
-  private[sqlest] def queryTimeout: Integer = 0
+  private[sqlest] def queryTimeout: Integer = 20
+  private[sqlest] def commandTimeout: Integer = 60
 
   def withConnection[A](f: Connection => A): A =
     Session(this).withConnection(f)
@@ -330,6 +336,7 @@ case class Transaction(database: Database) extends Session(database) {
       try {
         val preparedStatement = prepareStatement(connection, preprocessedCommand, sql, argumentLists)
         try {
+          preparedStatement.setQueryTimeout(database.commandTimeout)
           val result = preparedStatement.executeBatch.sum
           val endTime = new DateTime
           logger.info(s"Ran sql in ${endTime.getMillis - startTime.getMillis}ms: ${logDetails(connection, sql, argumentLists)}")
@@ -361,6 +368,7 @@ case class Transaction(database: Database) extends Session(database) {
           returnKeys = true
         )
         try {
+          preparedStatement.setQueryTimeout(database.commandTimeout)
           val result = preparedStatement.executeUpdate
           val rs = preparedStatement.getGeneratedKeys
           val keys = IndexedExtractor[T](1).extractAll(ResultSetIterable(rs))
@@ -392,7 +400,7 @@ case class Transaction(database: Database) extends Session(database) {
           logger.debug(s"Adding batch operation: $commandSql")
           statement.addBatch(commandSql)
         }
-
+        statement.setQueryTimeout(database.commandTimeout)
         statement.executeBatch.toList
       } finally {
         try {

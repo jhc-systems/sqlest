@@ -19,11 +19,12 @@ package sqlest.executor
 import java.sql.ResultSet
 import sqlest._
 
-case class TestDatabase(resultSet: ResultSet, keyResultSet: Option[ResultSet] = None, shouldThrow: Boolean = false, verboseExceptionMessages: Boolean = false, queryTimeoutValue: Integer = 0, throwExceptionOnPrepare: Boolean = false) extends Database {
+case class TestDatabase(resultSet: ResultSet, keyResultSet: Option[ResultSet] = None, shouldThrow: Boolean = false, verboseExceptionMessages: Boolean = false, queryTimeoutValue: Integer = 20, commandTimeoutValue: Integer = 60, throwExceptionOnPrepare: Boolean = false) extends Database {
   var preparedStatement: Option[AbstractPreparedStatement] = None
   var lastConnection: Option[AbstractConnection] = None
   override val verboseExceptions = verboseExceptionMessages
   override val queryTimeout = queryTimeoutValue
+  override val commandTimeout = commandTimeoutValue
 
   val anException = new Exception("Oh noes!")
 
