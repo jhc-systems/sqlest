@@ -33,4 +33,6 @@ target/
 # Ensime
 .ensime
 .ensime_cache/
-project/.ensime
+project/.ensimeextractors/.scannerwork/
+sqlest/.scannerwork/
+extractors/.scannerwork/
