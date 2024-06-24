@@ -18,6 +18,7 @@ package sqlest.sql
 
 import org.scalatest._
 import org.scalatest.matchers._
+import org.joda.time.{ LocalDate, DateTime }
 import sqlest._
 import sqlest.ast._
 
@@ -76,6 +77,13 @@ trait BaseStatementBuilderSpec extends FlatSpec with Matchers {
     val col2 = column[Boolean]("col2")
   }
   object TableFive extends TableFive(None)
+
+  class TableSix(alias: Option[String]) extends Table("six", alias) {
+    val col1 = column[DateTime]("col1")
+    val col2 = column[LocalDate]("col2")
+    val col3 = column[Option[LocalDate]]("col3")
+  }
+  object TableSix extends TableSix(None)
 
   class TestTableFunction(alias: Option[String]) extends TableFunction2[String, String]("testTableFunction", alias) {
     val col5 = column[String]("col5")
