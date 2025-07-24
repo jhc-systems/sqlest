@@ -1,11 +1,6 @@
-import com.typesafe.sbt.pgp.PgpKeys
-import com.typesafe.sbt.SbtGit.GitKeys.gitRemoteRepo
-import com.typesafe.sbt.SbtGhPages
-import com.typesafe.sbt.SbtScalariform
-import com.typesafe.sbt.SbtScalariform.ScalariformKeys
-import com.typesafe.sbt.SbtSite
+import com.github.sbt.git.SbtGit.GitKeys.gitRemoteRepo
+import com.jsuereth.sbtpgp.PgpKeys
 import ReleaseTransformations._
-import scalariform.formatter.preferences._
 
 lazy val root = (project in file("."))
   .settings(commonSettings: _*)
@@ -17,9 +12,9 @@ lazy val sqlest = (project in file("sqlest"))
   .settings(moduleName := "sqlest")
   .settings(sqlestSettings: _*)
   .settings(
-    tutSourceDirectory := file("docs") / "sqlest",
-    tutTargetDirectory := file("."),
-    libraryDependencies ++= Seq("com.typesafe.scala-logging" %% "scala-logging" % "3.5.0")
+    mdocIn := file("docs") / "sqlest",
+    mdocOut := file("."),
+    libraryDependencies ++= Seq("com.typesafe.scala-logging" %% "scala-logging" % "3.9.5")
   ).dependsOn(extractors)
 
 lazy val extractors = (project in file("extractors"))
@@ -27,25 +22,25 @@ lazy val extractors = (project in file("extractors"))
   .settings(moduleName := "sqlest-extractors")
   .settings(sqlestSettings: _*)
   .settings(
-    tutSourceDirectory := file("docs") / "extractors",
-    tutTargetDirectory := file("extractors"),
+    mdocIn := file("docs") / "extractors",
+    mdocOut := file("extractors"),
     libraryDependencies ++= Seq(
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-      "joda-time" % "joda-time" % "2.3",
-      "org.joda" % "joda-convert" % "1.6"
+      "joda-time" % "joda-time" % "2.12.5",
+      "org.joda" % "joda-convert" % "2.2.3"
     )
   )
 
 lazy val examples = (project in file("examples"))
   .settings(commonSettings: _*)
   .settings(noPublishSettings: _*)
-  .settings(libraryDependencies += "com.h2database" % "h2" % "1.4.180")
+  .settings(libraryDependencies += "com.h2database" % "h2" % "2.2.224")
   .dependsOn(sqlest)
 
-lazy val commonSettings = SbtScalariform.scalariformSettings ++ publishingSettings ++ Seq(
+lazy val commonSettings = publishingSettings ++ Seq(
   organization := "uk.co.jhc",
-  scalaVersion := "2.12.1",
-  crossScalaVersions := List("2.11.8", "2.12.1"),
+  scalaVersion := "2.13.11",
+  crossScalaVersions := List("2.12.18", "2.13.11"),
   scalacOptions ++= Seq(
     "-deprecation",
     "-encoding", "UTF-8",
@@ -54,31 +49,32 @@ lazy val commonSettings = SbtScalariform.scalariformSettings ++ publishingSettin
     "-language:higherKinds",
     "-language:implicitConversions",
     "-unchecked",
-    "-Xfatal-warnings",
-    "-Xfuture"
+    "-Xfatal-warnings"
   ),
-  coverageExcludedPackages := "sqlest.examples",
-  ScalariformKeys.preferences := ScalariformKeys.preferences.value
-    .setPreference(DanglingCloseParenthesis, Preserve)
+  coverageExcludedPackages := "sqlest.examples"
 )
 
-lazy val sqlestSettings = commonSettings ++ scaladocSettings ++ tutSettings ++ Seq(
-  tutNameFilter := """README.md""".r,
+lazy val sqlestSettings = commonSettings ++ scaladocSettings ++ mdocSettings ++ Seq(
+  mdocVariables := Map("VERSION" -> version.value),
   libraryDependencies ++= Seq(
-    "org.scalatest" %% "scalatest" % "3.0.1" % "test",
-    "com.chuusai" %% "shapeless" % "2.3.2" % "test",
-    "com.h2database" % "h2" % "1.4.180" % "test"
+    "org.scalatest" %% "scalatest" % "3.2.17" % "test",
+    "com.chuusai" %% "shapeless" % "2.3.10" % "test",
+    "com.h2database" % "h2" % "2.2.224" % "test"
   )
 )
 
 lazy val noPublishSettings = Seq(
-  publish := (),
-  publishLocal := (),
+  publish / skip := true,
+  publishLocal / skip := true,
   publishArtifact := false
 )
 
-lazy val scaladocSettings = SbtSite.site.settings ++ SbtSite.site.includeScaladoc() ++ SbtGhPages.ghpages.settings ++ Seq(
+lazy val scaladocSettings = Seq(
   gitRemoteRepo := "git@github.com:jhc-systems/sqlest.git"
+)
+
+lazy val mdocSettings = Seq(
+  mdocExtraArguments := Seq("--no-link-hygiene")
 )
 
 lazy val publishingSettings = sonatypeReleaseProcess ++ Seq(
@@ -86,7 +82,7 @@ lazy val publishingSettings = sonatypeReleaseProcess ++ Seq(
   releaseCrossBuild := true,
   releasePublishArtifactsAction := PgpKeys.publishSigned.value,
   publishMavenStyle := true,
-  publishArtifact in Test := false,
+  Test / publishArtifact := false,
   publishTo := {
     val nexus = "https://oss.sonatype.org/"
     if (isSnapshot.value)
