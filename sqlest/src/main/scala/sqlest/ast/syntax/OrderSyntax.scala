@@ -24,7 +24,7 @@ trait OrderSyntax {
     def desc = Order(convertToSortedColumn(column), false)
   }
 
-  implicit def orderAsc(column: Column[_]) =
+  implicit def orderAsc(column: Column[_]): Order =
     Order(convertToSortedColumn(column), true)
 
   private def convertToSortedColumn[A](column: Column[A]): Column[_] = {

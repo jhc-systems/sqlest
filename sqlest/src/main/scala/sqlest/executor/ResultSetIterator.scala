@@ -26,7 +26,7 @@ case class ResultSetIterator(resultSet: ResultSet) extends Iterator[ResultSet] {
   private var readNextRow = false
   private var hasNextRow = false
 
-  def next: ResultSet = {
+  def next(): ResultSet = {
     if (!readNextRow) resultSet.next
     readNextRow = false
     resultSet

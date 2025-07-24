@@ -30,13 +30,13 @@ package sqlest.ast
 trait ColumnTypeEquivalence[A, B]
 
 object ColumnTypeEquivalence extends LowPriorityImplicits {
-  implicit def leftOptionColumnTypeEquivalence[A, B](implicit left: ColumnType[Option[A]], right: ColumnType[B], columnTypeEquivalence: ColumnTypeEquivalence[A, B]) =
+  implicit def leftOptionColumnTypeEquivalence[A, B](implicit left: ColumnType[Option[A]], right: ColumnType[B], columnTypeEquivalence: ColumnTypeEquivalence[A, B]): ColumnTypeEquivalence[Option[A], B] =
     new ColumnTypeEquivalence[Option[A], B] {}
 
-  implicit def rightOptionColumnTypeEquivalence[A, B](implicit left: ColumnType[A], right: ColumnType[Option[B]], columnTypeEquivalence: ColumnTypeEquivalence[A, B]) =
+  implicit def rightOptionColumnTypeEquivalence[A, B](implicit left: ColumnType[A], right: ColumnType[Option[B]], columnTypeEquivalence: ColumnTypeEquivalence[A, B]): ColumnTypeEquivalence[A, Option[B]] =
     new ColumnTypeEquivalence[A, Option[B]] {}
 
-  implicit def bothOptionColumnTypeEquivalence[A, B](implicit left: ColumnType[Option[A]], right: ColumnType[Option[B]], columnTypeEquivalence: ColumnTypeEquivalence[A, B]) =
+  implicit def bothOptionColumnTypeEquivalence[A, B](implicit left: ColumnType[Option[A]], right: ColumnType[Option[B]], columnTypeEquivalence: ColumnTypeEquivalence[A, B]): ColumnTypeEquivalence[Option[A], Option[B]] =
     new ColumnTypeEquivalence[Option[A], Option[B]] {}
 
   /**
@@ -105,9 +105,9 @@ object ColumnTypeEquivalence extends LowPriorityImplicits {
 
 trait LowPriorityImplicits {
   // The implicit *OptionColumnTypeEquivalences will clash with this, ensure this is lower priority so options are correctly handled
-  implicit def nonNumericEquivalence[A, B](implicit left: ColumnType[A] { type Database = B }, right: ColumnType[A] { type Database = B }) =
+  implicit def nonNumericEquivalence[A, B](implicit left: ColumnType[A] { type Database = B }, right: ColumnType[A] { type Database = B }): ColumnTypeEquivalence[A, A] =
     new ColumnTypeEquivalence[A, A] {}
 
-  implicit def numericEquivalence[A, B](implicit left: NumericColumnType[A], right: NumericColumnType[B]) =
+  implicit def numericEquivalence[A, B](implicit left: NumericColumnType[A], right: NumericColumnType[B]): ColumnTypeEquivalence[A, B] =
     new ColumnTypeEquivalence[A, B] {}
 }

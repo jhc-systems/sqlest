@@ -61,10 +61,13 @@ case object ByteArrayColumnType extends NonNumericColumnType[Array[Byte]]
  */
 case class OptionColumnType[A, B](nullValue: B, isNull: B => Boolean)(implicit val innerColumnType: ColumnType.Aux[A, B]) extends ColumnType[Option[A]] {
   type Database = B
-  val baseColumnType: BaseColumnType[B] = innerColumnType match {
-    case baseColumnType: ColumnType[A] with BaseColumnType[B] => baseColumnType
-    case optionColumnType: ColumnType[A] with OptionColumnType[A, B] => optionColumnType.baseColumnType
-    case mappedColumnType: ColumnType[A] with MappedColumnType[A, B] => mappedColumnType.baseColumnType
+  val baseColumnType: BaseColumnType[B] = {
+    def extractBaseColumnType(ct: ColumnType[_]): BaseColumnType[_] = ct match {
+      case base: BaseColumnType[_] => base
+      case opt: OptionColumnType[_, _] => opt.baseColumnType
+      case mapped: MappedColumnType[_, _] => mapped.baseColumnType
+    }
+    extractBaseColumnType(innerColumnType).asInstanceOf[BaseColumnType[B]]
   }
 
   def read(database: Option[Database]): Option[Option[A]] = {
@@ -124,23 +127,26 @@ object ColumnType {
   // The ColumnType.Aux type provides access the Database type member on ColumnType
   type Aux[A, B] = ColumnType[A] { type Database = B }
 
-  implicit val booleanColumnType = BooleanColumnType
-  implicit val intColumnType = IntColumnType
-  implicit val longColumnType = LongColumnType
-  implicit val doubleColumnType = DoubleColumnType
-  implicit val bigDecimalColumnType = BigDecimalColumnType
-  implicit val stringColumnType = StringColumnType
-  implicit val dateTimeColumnType = DateTimeColumnType
-  implicit val localDateColumnType = LocalDateColumnType
-  implicit val byteArrayColumnType = ByteArrayColumnType
+  implicit val booleanColumnType: BooleanColumnType.type = BooleanColumnType
+  implicit val intColumnType: IntColumnType.type = IntColumnType
+  implicit val longColumnType: LongColumnType.type = LongColumnType
+  implicit val doubleColumnType: DoubleColumnType.type = DoubleColumnType
+  implicit val bigDecimalColumnType: BigDecimalColumnType.type = BigDecimalColumnType
+  implicit val stringColumnType: StringColumnType.type = StringColumnType
+  implicit val dateTimeColumnType: DateTimeColumnType.type = DateTimeColumnType
+  implicit val localDateColumnType: LocalDateColumnType.type = LocalDateColumnType
+  implicit val byteArrayColumnType: ByteArrayColumnType.type = ByteArrayColumnType
   implicit def materialize[A, B]: MappedColumnType[A, B] = macro MaterializeColumnTypeMacro.materializeImpl[A, B]
 
-  implicit def optionType[A, B](implicit base: ColumnType.Aux[A, B]) = OptionColumnType[A, B](base)
+  implicit def optionType[A, B](implicit base: ColumnType.Aux[A, B]): OptionColumnType[A, B] = OptionColumnType[A, B](base)
 
   implicit class OptionColumnTypeOps[A, B](left: ColumnType.Aux[A, B]) {
-    def toOptionColumnType = left match {
-      case option: ColumnType[A] with OptionColumnType[A, B] => option
-      case base => OptionColumnType.apply[A, base.Database](base)
+    def toOptionColumnType = {
+      if (left.isInstanceOf[OptionColumnType[_, _]]) {
+        left.asInstanceOf[OptionColumnType[A, B]]
+      } else {
+        OptionColumnType.apply[A, left.Database](left)
+      }
     }
   }
 }

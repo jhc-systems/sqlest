@@ -19,7 +19,7 @@ package sqlest.ast.syntax
 import sqlest.ast._
 
 trait GroupSyntax {
-  implicit def columnGroup(column: Column[_]) = ColumnGroup(column)
+  implicit def columnGroup(column: Column[_]): ColumnGroup = ColumnGroup(column)
 
   def cube(columns: Group*) = FunctionGroup("cube", columns.toList)
   def rollUp(columns: Group*) = FunctionGroup("rollup", columns.toList)

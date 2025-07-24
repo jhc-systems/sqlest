@@ -25,7 +25,7 @@ trait QuerySyntax {
   object delete extends DeleteSyntax
   object merge extends MergeSyntax
 
-  implicit def selectOps[A, R <: Relation](select: Select[A, R]) = SelectOps(select)
+  implicit def selectOps[A, R <: Relation](select: Select[A, R]): SelectOps[A, R] = SelectOps(select)
   def lateral[A, R <: Relation](select: Select[A, R]) = Lateral(select)
   def exists[A, R <: Relation](select: Select[A, R]) = ExistsColumn(select)
   def notExists[A, R <: Relation](select: Select[A, R]) = NotExistsColumn(select)

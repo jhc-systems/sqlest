@@ -136,7 +136,7 @@ case class CaseClassExtractorMacro(c: Context) {
 
     val liftedParamTypes = paramTypes.map(liftParam)
 
-    (paramNames, liftedParamTypes, defaultValues).zipped.map {
+    paramNames.lazyZip(liftedParamTypes).lazyZip(defaultValues).map {
       case (paramName, typ, defaultValue) =>
         if (defaultValue.isDefined)
           q"val $paramName: $typ = sqlest.extractor.ConstantExtractor(${defaultValue.get})"

@@ -123,7 +123,7 @@ trait Database {
 
 object Session {
   def apply(database: Database) = new Session(database)
-  implicit def databaseToSession(implicit database: Database) = Session(database)
+  implicit def databaseToSession(implicit database: Database): Session = Session(database)
 }
 
 class Session(database: Database) extends Logging {

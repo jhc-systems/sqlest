@@ -1,6 +1,7 @@
 package sqlest.examples
 
 import sqlest._
+import sqlest.executor.Database
 
 trait DatabaseExample {
   // Configure a DataSource
@@ -15,7 +16,7 @@ trait DatabaseExample {
 
   // Use the DataSource and the StatementBuilder to create an implicit database
   // This database is used in all execute calls
-  implicit val database = Database.withDataSource(dataSource, statementBuilder)
+  implicit val database: Database = Database.withDataSource(dataSource, statementBuilder)
 
   executeRawSql("drop table fruit")
   executeRawSql("""
