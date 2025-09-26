@@ -18,10 +18,10 @@ package sqlest.untyped
 
 import sqlest._
 import sqlest.extractor.TestResultSet
-import org.scalatest._
-import org.scalatest.matchers._
+import org.scalatest.flatspec._
+import org.scalatest.matchers.should._
 
-class ExtractorFinderSpec extends FlatSpec with Matchers {
+class ExtractorFinderSpec extends AnyFlatSpec with Matchers {
   import TestData._
 
   "cell extractor finder" should "find a cell extractor in a single extractor" in {

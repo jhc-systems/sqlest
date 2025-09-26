@@ -23,7 +23,7 @@ libraryDependencies ++= Seq(
 )
 ```
 
-sqlest is available for Scala 2.11
+sqlest is available for Scala 2.12 and 2.13
 
 ## Examples
 ### Database Connection

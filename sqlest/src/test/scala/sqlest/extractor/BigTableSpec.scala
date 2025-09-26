@@ -18,14 +18,14 @@ package sqlest
 package extractor
 
 import java.sql.ResultSet
-import org.scalatest._
-import org.scalatest.matchers._
+import org.scalatest.flatspec._
+import org.scalatest.matchers.should._
 
 /**
  * Proof-of-concept implementation of a table, domain class and extractor
  * with more than 22 fields in them. It's not pretty but it works.
  */
-class BigTableSpec extends FlatSpec with Matchers {
+class BigTableSpec extends AnyFlatSpec with Matchers {
   class TableOne(alias: Option[String]) extends Table("one", alias) {
     val col1 = column[Int]("col1")
     val col2 = column[Int]("col2")

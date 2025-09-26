@@ -20,7 +20,7 @@ import sqlest._
 import sqlest.ast._
 
 class MergeStatementBuilderSpec extends BaseStatementBuilderSpec {
-  implicit def statementBuilder = new base.StatementBuilder {}
+  implicit def statementBuilder : StatementBuilder = new base.StatementBuilder {}
 
   "merge" should "produce the right sql" in {
 

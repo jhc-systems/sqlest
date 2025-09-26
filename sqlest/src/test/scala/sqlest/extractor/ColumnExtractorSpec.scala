@@ -17,11 +17,11 @@
 package sqlest.extractor
 
 import org.joda.time.{ DateTime, LocalDate }
-import org.scalatest._
-import org.scalatest.matchers._
+import org.scalatest.flatspec._
+import org.scalatest.matchers.should._
 import sqlest._
 
-class ColumnExtractorSpec extends FlatSpec with Matchers {
+class ColumnExtractorSpec extends AnyFlatSpec with Matchers {
   import TestData._
 
   case class Inner(b: Int, c: List[Int])

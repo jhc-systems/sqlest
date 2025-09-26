@@ -1,11 +1,9 @@
 // Dependency resolution to fix version conflicts
 ThisBuild / libraryDependencySchemes += "org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always
 
-addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.2")
+addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.5.5")
 
 addSbtPlugin("com.github.sbt" % "sbt-pgp" % "2.2.1")
-
-addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.10.0")
 
 addSbtPlugin("io.spray" % "sbt-boilerplate" % "0.6.1")
 

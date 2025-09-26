@@ -16,19 +16,19 @@
 
 package sqlest.ast
 
-import org.scalatest._
-import org.scalatest.matchers._
+import org.scalatest.flatspec._
+import org.scalatest.matchers.should._
 import shapeless.test.illTyped
 import sqlest._
 
-class ColumnSpec extends FlatSpec with Matchers {
+class ColumnSpec extends AnyFlatSpec with Matchers {
 
   sealed trait Size
   case object Small extends Size
   case object Medium extends Size
   case object Large extends Size
   object Size {
-    implicit val sizeColumnType = EnumerationColumnType[Size, String](Small -> "S", Medium -> "M", Large -> "L")
+    implicit val sizeColumnType : EnumerationColumnType[Size, String] = EnumerationColumnType[Size, String](Small -> "S", Medium -> "M", Large -> "L")
   }
 
   case class WrappedInt(int: Int)

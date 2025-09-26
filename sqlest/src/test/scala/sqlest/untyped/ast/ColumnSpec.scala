@@ -17,11 +17,11 @@
 package sqlest.untyped.ast
 
 import org.joda.time._
-import org.scalatest._
-import org.scalatest.matchers._
+import org.scalatest.flatspec._
+import org.scalatest.matchers.should._
 import sqlest._
 
-class ColumnSpec extends FlatSpec with Matchers {
+class ColumnSpec extends AnyFlatSpec with Matchers {
 
   class TableOne(alias: Option[String]) extends Table("one", alias) {
     val intCol = column[Int]("intCol")

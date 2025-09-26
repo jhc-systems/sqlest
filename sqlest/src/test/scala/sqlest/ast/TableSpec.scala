@@ -16,11 +16,11 @@
 
 package sqlest.ast
 
-import org.scalatest._
-import org.scalatest.matchers._
+import org.scalatest.flatspec._
+import org.scalatest.matchers.should._
 import sqlest._
 
-class TableSpec extends FlatSpec with Matchers {
+class TableSpec extends AnyFlatSpec with Matchers {
   class SimpleTable(alias: Option[String]) extends Table("mytable", alias)
   object SimpleTable extends SimpleTable(None)
 

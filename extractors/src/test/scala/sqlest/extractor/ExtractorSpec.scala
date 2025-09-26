@@ -16,11 +16,13 @@
 
 package sqlest.extractor
 
-import org.scalatest._
-import org.scalatest.matchers._
+import org.scalatest.flatspec._
+import org.scalatest.flatspec._
+import org.scalatest.matchers.should._
+import org.scalatest.prop._
 import shapeless.test.illTyped
 
-class ExtractorSpec extends FlatSpec with Matchers with ExtractorSyntax[Seq[Any]] {
+class ExtractorSpec extends AnyFlatSpec with Matchers with ExtractorSyntax[Seq[Any]] {
 
   sealed trait Superclass {
     def a: Int

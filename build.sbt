@@ -26,21 +26,21 @@ lazy val extractors = (project in file("extractors"))
     mdocOut := file("extractors"),
     libraryDependencies ++= Seq(
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-      "joda-time" % "joda-time" % "2.12.5",
-      "org.joda" % "joda-convert" % "2.2.3"
+      "joda-time" % "joda-time" % "2.14.0",
+      "org.joda" % "joda-convert" % "3.0.1"
     )
   )
 
 lazy val examples = (project in file("examples"))
   .settings(commonSettings: _*)
   .settings(noPublishSettings: _*)
-  .settings(libraryDependencies += "com.h2database" % "h2" % "2.2.224")
+  .settings(libraryDependencies += "com.h2database" % "h2" % "2.3.232")
   .dependsOn(sqlest)
 
 lazy val commonSettings = publishingSettings ++ Seq(
   organization := "uk.co.jhc",
-  scalaVersion := "2.13.11",
-  crossScalaVersions := List("2.12.18", "2.13.11"),
+  scalaVersion := "2.13.15",
+  crossScalaVersions := List("2.12.18", "2.13.15"),
   scalacOptions ++= Seq(
     "-deprecation",
     "-encoding", "UTF-8",
@@ -57,9 +57,9 @@ lazy val commonSettings = publishingSettings ++ Seq(
 lazy val sqlestSettings = commonSettings ++ scaladocSettings ++ mdocSettings ++ Seq(
   mdocVariables := Map("VERSION" -> version.value),
   libraryDependencies ++= Seq(
-    "org.scalatest" %% "scalatest" % "3.2.17" % "test",
-    "com.chuusai" %% "shapeless" % "2.3.10" % "test",
-    "com.h2database" % "h2" % "2.2.224" % "test"
+    "org.scalatest" %% "scalatest" % "3.2.18" % "test",
+    "com.chuusai" %% "shapeless" % "2.3.12" % "test",
+    "com.h2database" % "h2" % "2.3.232" % "test"
   )
 )
 
@@ -84,20 +84,17 @@ lazy val publishingSettings = sonatypeReleaseProcess ++ Seq(
   publishMavenStyle := true,
   Test / publishArtifact := false,
   publishTo := {
-    val nexus = "https://oss.sonatype.org/"
+    val nexus = "https://nexus-proxy.lighthouse.jhc.uk/nexus/content/repositories/"
     if (isSnapshot.value)
-      Some("snapshots" at nexus + "content/repositories/snapshots")
+      Some("snapshots" at nexus + "snapshots")
     else
-      Some("releases" at nexus + "service/local/staging/deploy/maven2")
+      Some("releases" at nexus + "releases")
   },
-  credentials := {
-    Seq("SONATYPE_USER", "SONATYPE_PASSWORD").map(sys.env.get) match {
-      case Seq(Some(user), Some(password)) =>
-        Seq(Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", user, password))
-      case _ =>
-        credentials.value
-    }
-  },
+  credentials += Credentials(
+    "Sonatype Nexus Repository Manager",
+    "nexus-proxy.lighthouse.jhc.uk",
+    "dev", "jhcjhc"
+  ),
   pomIncludeRepository := { _ => false },
   pomExtra := (
     <url>https://github.com/jhc-systems/sqlest</url>
@@ -136,7 +133,7 @@ lazy val sonatypeReleaseProcess = Seq(
     ReleaseStep(action = Command.process("publishSigned", _), enableCrossBuild = true),
     setNextVersion,
     commitNextVersion,
-    ReleaseStep(action = Command.process("sonatypeReleaseAll", _), enableCrossBuild = true),
+    ReleaseStep(action = Command.process("sonaRelease", _), enableCrossBuild = true),
     pushChanges
   )
 )

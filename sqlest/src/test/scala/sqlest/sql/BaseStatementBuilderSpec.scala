@@ -16,12 +16,12 @@
 
 package sqlest.sql
 
-import org.scalatest._
-import org.scalatest.matchers._
+import org.scalatest.flatspec._
+import org.scalatest.matchers.should._
 import sqlest._
 import sqlest.ast._
 
-trait BaseStatementBuilderSpec extends FlatSpec with Matchers {
+trait BaseStatementBuilderSpec extends AnyFlatSpec with Matchers {
   implicit class StringFormatOps(sql: String) {
     def formatSql = sql.trim.stripMargin.split(scala.util.Properties.lineSeparator).map(_.trim).mkString(" ")
   }
@@ -45,8 +45,8 @@ trait BaseStatementBuilderSpec extends FlatSpec with Matchers {
     val col2 = column[String]("col2")
   }
   object TableOne extends TableOne(None) {
-    implicit val tableTwoJoinCondition = JoinCondition[TableOne, TableTwo](_.col2 === _.col2)
-    implicit val testTableFunctionJoinCondition = JoinCondition[TableOne, TestTableFunction](_.col1 === _.col6)
+    implicit val tableTwoJoinCondition : JoinCondition[TableOne, TableTwo] = JoinCondition[TableOne, TableTwo](_.col2 === _.col2)
+    implicit val testTableFunctionJoinCondition : JoinCondition[TableOne, TestTableFunction] = JoinCondition[TableOne, TestTableFunction](_.col1 === _.col6)
   }
 
   class TableTwo(alias: Option[String]) extends Table("two", alias) {

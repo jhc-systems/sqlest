@@ -16,13 +16,13 @@
 
 package sqlest.ast.syntax
 
-import org.scalatest._
-import org.scalatest.matchers._
+import org.scalatest.flatspec._
+import org.scalatest.matchers.should._
 import shapeless.test.illTyped
 import sqlest._
 import sqlest.ast._
 
-class UpdateSyntaxSpec extends FlatSpec with Matchers {
+class UpdateSyntaxSpec extends AnyFlatSpec with Matchers {
   class MyTable(alias: Option[String]) extends Table("mytable", alias) {
     val col1 = column[Int]("col1")
     val col2 = column[Int]("col2")

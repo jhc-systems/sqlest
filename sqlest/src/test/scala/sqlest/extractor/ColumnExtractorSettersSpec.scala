@@ -17,8 +17,8 @@
 package sqlest.extractor
 
 import org.joda.time.{ DateTime, LocalDate }
-import org.scalatest._
-import org.scalatest.matchers._
+import org.scalatest.flatspec._
+import org.scalatest.matchers.should._
 import sqlest._
 import sqlest.ast.Setter
 
@@ -46,7 +46,7 @@ object Multiple {
 
 case class DefaultParams(a: Int, b: String = "sweet")
 
-class ColumnExtractorSettersSpec extends FlatSpec with Matchers {
+class ColumnExtractorSettersSpec extends AnyFlatSpec with Matchers {
 
   val oneExtractor = extract[One](
     a = FirstTable.col1,

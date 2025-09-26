@@ -36,3 +36,4 @@ target/
 project/.ensimeextractors/.scannerwork/
 sqlest/.scannerwork/
 extractors/.scannerwork/
+.bsp/
