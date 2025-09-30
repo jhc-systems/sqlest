@@ -49,7 +49,10 @@ lazy val commonSettings = publishingSettings ++ Seq(
     "-language:higherKinds",
     "-language:implicitConversions",
     "-unchecked",
-    "-Xfatal-warnings"
+    "-Xfatal-warnings"//,
+//    "-Ystatistics:typer",
+//    "-Xlog-implicit-conversions",
+//    "-Xlog-implicits"
   ),
   coverageExcludedPackages := "sqlest.examples"
 )

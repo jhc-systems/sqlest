@@ -53,9 +53,9 @@ class ColumnSpec extends AnyFlatSpec with Matchers {
   object TableOne extends TableOne(None)
 
   "option column equivalences" should "allow binary operators involving base types and their option types" in {
-    (literalColumn(1) =!= 2) should equal(InfixFunctionColumn[Boolean]("<>", 1, 2))
-    (literalColumn(Some(1)) =!= 2) should equal(InfixFunctionColumn[Boolean]("<>", Some(1), 2))
-    (literalColumn(1) =!= Option.empty[Int]) should equal(InfixFunctionColumn[Boolean]("<>", 1, Option.empty[Int]))
+    (literalColumn(1) =!= 2) should equal(InfixFunctionColumn[Boolean]("<>", 1 : Int, 2 : Int))
+    (literalColumn(Some(1)) =!= 2) should equal(InfixFunctionColumn[Boolean]("<>", Some(1), 2: Int))
+    (literalColumn(1) =!= Option.empty[Int]) should equal(InfixFunctionColumn[Boolean]("<>", 1 : Int, Option.empty[Int]))
     (literalColumn(Some(1)) =!= Option.empty[Int]) should equal(InfixFunctionColumn[Boolean]("<>", Some(1), Option.empty[Int]))
   }
 
@@ -72,11 +72,11 @@ class ColumnSpec extends AnyFlatSpec with Matchers {
 
   "option column equivalences" should "allow binary operators involving mapped and unmapped types" in {
     val expr1 = (TableOne.col1 === 1)
-    expr1 should equal(InfixFunctionColumn[Boolean]("=", TableOne.col1, 1))
+    expr1 should equal(InfixFunctionColumn[Boolean]("=", TableOne.col1, 1 : Int))
     expr1.parameter2.columnType should equal(TableOne.col1.columnType)
 
     val expr2 = (TableOne.col3 === 1)
-    expr2 should equal(InfixFunctionColumn[Boolean]("=", TableOne.col3, 1))
+    expr2 should equal(InfixFunctionColumn[Boolean]("=", TableOne.col3, 1 : Int))
     expr2.parameter2.columnType should equal(TableOne.col3.columnType)
 
     val expr3 = (TableOne.col5 === "Hi!")

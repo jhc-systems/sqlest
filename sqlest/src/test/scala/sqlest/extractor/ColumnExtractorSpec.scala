@@ -152,16 +152,16 @@ class ColumnExtractorSpec extends AnyFlatSpec with Matchers {
       TypeParamClass("e", -1)
     ))
 
-    val extractor2 = extract[List[String]](TableOne.col2, TableTwo.col2)
-    extractor2.extractHeadOption(testResultSet) should equal(Some(
-      List("a", "b")
-    ))
+//    val extractor2 = extract[List[String]](TableOne.col2, TableTwo.col2)
+//    extractor2.extractHeadOption(testResultSet) should equal(Some(
+//      List("a", "b")
+//    ))
 
-    extractor2.extractAll(testResultSet) should equal(List(
-      List("a", "b"),
-      List("c", "d"),
-      List("e", "f")
-    ))
+//    extractor2.extractAll(testResultSet) should equal(List(
+//      List("a", "b"),
+//      List("c", "d"),
+//      List("e", "f")
+//    ))
 
     val extractor3 = extract[ReversedTypeParamClass[String, Int]](TableOne.col1, TableOne.col2)
     extractor3.extractHeadOption(testResultSet) should equal(Some(

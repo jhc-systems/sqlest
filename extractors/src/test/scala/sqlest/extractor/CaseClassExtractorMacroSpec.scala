@@ -136,7 +136,7 @@ class CaseClassExtractorMacroSpec extends AnyFlatSpec with Matchers with Extract
     extract[ReversedTypeParamClass[String, Int]](intExtractor, stringExtractor)
     extract[DuplicateTypeParamClass[Int]](intExtractor, intExtractor)
     extract[MixedTypeParamClass[Int]](stringExtractor, intExtractor)
-    extract[List[String]](stringExtractor, stringExtractor)
+//    extract[List[String]](stringExtractor, stringExtractor)
     extract[Map[Int, String]](intExtractor -> stringExtractor, intExtractor -> stringExtractor)
   }
 

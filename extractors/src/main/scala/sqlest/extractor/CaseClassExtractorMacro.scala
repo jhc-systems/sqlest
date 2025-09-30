@@ -152,7 +152,7 @@ case class CaseClassExtractorMacro(c: Context) {
       if (applyMethod.isVarargs)
         treeTypes.init :+
           (paramTypes.last match {
-            case TypeRef(_, `repeatedParamClass`, typ :: Nil) => tq"scala.collection.Seq[$typ]"
+            case TypeRef(_, `repeatedParamClass`, typ :: Nil) => tq"Seq[$typ]"
           })
       else treeTypes
 
