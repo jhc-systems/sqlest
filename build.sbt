@@ -14,7 +14,7 @@ lazy val sqlest = (project in file("sqlest"))
   .settings(
     mdocIn := file("docs") / "sqlest",
     mdocOut := file("."),
-    libraryDependencies ++= Seq("com.typesafe.scala-logging" %% "scala-logging" % "3.9.5")
+    libraryDependencies ++= Seq("com.typesafe.scala-logging" %% "scala-logging" % "3.9.6")
   ).dependsOn(extractors)
 
 lazy val extractors = (project in file("extractors"))
@@ -34,13 +34,13 @@ lazy val extractors = (project in file("extractors"))
 lazy val examples = (project in file("examples"))
   .settings(commonSettings: _*)
   .settings(noPublishSettings: _*)
-  .settings(libraryDependencies += "com.h2database" % "h2" % "2.3.232")
+  .settings(libraryDependencies += "com.h2database" % "h2" % "2.4.240")
   .dependsOn(sqlest)
 
 lazy val commonSettings = publishingSettings ++ Seq(
   organization := "uk.co.jhc",
-  scalaVersion := "2.13.15",
-  crossScalaVersions := List("2.12.18", "2.13.15"),
+  scalaVersion := "2.13.16",
+  crossScalaVersions := List("2.12.15", "2.13.16"),
   scalacOptions ++= Seq(
     "-deprecation",
     "-encoding", "UTF-8",
@@ -60,9 +60,9 @@ lazy val commonSettings = publishingSettings ++ Seq(
 lazy val sqlestSettings = commonSettings ++ scaladocSettings ++ mdocSettings ++ Seq(
   mdocVariables := Map("VERSION" -> version.value),
   libraryDependencies ++= Seq(
-    "org.scalatest" %% "scalatest" % "3.2.18" % "test",
-    "com.chuusai" %% "shapeless" % "2.3.12" % "test",
-    "com.h2database" % "h2" % "2.3.232" % "test"
+    "org.scalatest" %% "scalatest" % "3.2.19" % "test",
+    "com.chuusai" %% "shapeless" % "2.3.13" % "test",
+    "com.h2database" % "h2" % "2.4.240" % "test"
   )
 )
 
