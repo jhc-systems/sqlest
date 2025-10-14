@@ -44,16 +44,17 @@ case class CaseClassExtractorMacro(c: Context) {
 
     // Construct extractor methods for this case class corresponding to each apply method
     val liftedApplyMethods = applyMethods.map(liftApplyMethod(_, unapplyMethod, typeOfRow, typeOfA, typeArgs, companion))
-
     // import scala.language.dynamics to avoid having to do so at the call site
     q"""
       import scala.language.dynamics
       import scala.language.experimental.macros
+      import scala.collection.immutable.List
       new Dynamic {
         ..$liftedApplyMethods
         def apply(extractor: sqlest.extractor.Extractor[$typeOfRow, $typeOfA] with sqlest.extractor.SimpleExtractor[$typeOfRow, $typeOfA]) = extractor
         def applyDynamic(method: String)(args: Any*): sqlest.extractor.Extractor[$typeOfRow, $typeOfA] with sqlest.extractor.SimpleExtractor[$typeOfRow, $typeOfA] = macro sqlest.extractor.AbortMacro.apply
         def applyDynamicNamed(method: String)(args: (String, Any)*): sqlest.extractor.Extractor[$typeOfRow, $typeOfA] with sqlest.extractor.SimpleExtractor[$typeOfRow, $typeOfA] = macro sqlest.extractor.AbortMacro.apply
+        def sqlestUnapplyList[A](x: List[A]) : Some[List[A]] = { Some(List.unapplySeq(x).toSeq.toList)}
       }
     """
   }
@@ -90,10 +91,14 @@ case class CaseClassExtractorMacro(c: Context) {
     val tupleExtractorParams = buildExtractorParams(applyMethod, typeOfRow, caseClassParamNames, appliedTypeArgTypes)
 
     val unapply = unapplyMethod match {
-      case Some(unapplyMethod) => q"Some($companion.$unapplyMethod)"
-      case None => q"None"
+      case Some(unapplyMethod) => if (unapplyMethod.toString().equals("method unapplySeq")
+      && (companion.toString().equals("object List"))) {
+        q"Some(sqlestUnapplyList)"
+    } else {
+      q"Some($companion.$unapplyMethod)"
     }
-
+    case None => q"None"
+    }
     q"""
       def apply(..$applyParams) = new sqlest.extractor.MappedExtractor[$typeOfRow, $tupleType, $typeOfA](
         new $tupleExtractor(..$tupleExtractorParams) with sqlest.extractor.ProductExtractorNames {
@@ -137,11 +142,11 @@ case class CaseClassExtractorMacro(c: Context) {
     val liftedParamTypes = paramTypes.map(liftParam)
 
     paramNames.lazyZip(liftedParamTypes).lazyZip(defaultValues).map {
-      case (paramName, typ, defaultValue) =>
-        if (defaultValue.isDefined)
-          q"val $paramName: $typ = sqlest.extractor.ConstantExtractor(${defaultValue.get})"
-        else
-          q"val $paramName: $typ"
+        case (paramName, typ, defaultValue) =>
+          if (defaultValue.isDefined)
+            q"val $paramName: $typ = sqlest.extractor.ConstantExtractor(${defaultValue.get})"
+          else
+            q"val $paramName: $typ"
     }
   }
 
