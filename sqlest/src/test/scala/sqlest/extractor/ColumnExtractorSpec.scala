@@ -16,7 +16,7 @@
 
 package sqlest.extractor
 
-import org.joda.time.{ DateTime, LocalDate }
+import java.time.{ LocalDateTime, LocalDate }
 import org.scalatest.flatspec._
 import org.scalatest.matchers.should._
 import sqlest._
@@ -48,8 +48,8 @@ class ColumnExtractorSpec extends AnyFlatSpec with Matchers {
     TableFive.bigDecimalCol.extractHeadOption(results) should be(Some(BigDecimal(2.818)))
     TableFive.booleanColumn.extractHeadOption(results) should be(Some(true))
     TableFive.stringColumn.extractHeadOption(results) should be(Some("Hello mars"))
-    TableFive.dateTimeCol.extractHeadOption(results) should be(Some(new DateTime(timestamp)))
-    TableFive.localDateCol.extractHeadOption(results) should be(Some(new LocalDate(date)))
+    TableFive.dateTimeCol.extractHeadOption(results) should be(Some(timestamp.toLocalDateTime))
+    TableFive.localDateCol.extractHeadOption(results) should be(Some(date.toLocalDate))
     TableFive.byteArrayCol.extractHeadOption(results).map(_.toList) should be(Some(Array[Byte](1, 127).toList))
   }
 
@@ -73,13 +73,13 @@ class ColumnExtractorSpec extends AnyFlatSpec with Matchers {
     )
 
     extractor.extractHeadOption(testResultSet) should equal(Some(
-      (Some(WrappedString("test")), Some(WrappedInt(5)), Some(new LocalDate(2015, 1, 1)), new LocalDate(date), new DateTime(date).withTimeAtStartOfDay)
+      (Some(WrappedString("test")), Some(WrappedInt(5)), Some(LocalDate.of(2015, 1, 1)), date.toLocalDate, date.toLocalDate.atStartOfDay)
     ))
 
     extractor.extractAll(testResultSet) should equal(List(
-      (Some(WrappedString("test")), Some(WrappedInt(5)), Some(new LocalDate(2015, 1, 1)), new LocalDate(date), new DateTime(date).withTimeAtStartOfDay),
-      (Some(WrappedString(" test")), None, Some(new LocalDate(2100, 1, 1)), new LocalDate(date), new DateTime(date).withTimeAtStartOfDay),
-      (None, None, None, new LocalDate(date), new DateTime(date).withTimeAtStartOfDay)
+      (Some(WrappedString("test")), Some(WrappedInt(5)), Some(LocalDate.of(2015, 1, 1)), date.toLocalDate, date.toLocalDate.atStartOfDay),
+      (Some(WrappedString(" test")), None, Some(LocalDate.of(2100, 1, 1)), date.toLocalDate, date.toLocalDate.atStartOfDay),
+      (None, None, None, date.toLocalDate, date.toLocalDate.atStartOfDay)
     ))
   }
 

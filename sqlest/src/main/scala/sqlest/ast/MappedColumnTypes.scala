@@ -16,7 +16,7 @@
 
 package sqlest.ast
 
-import org.joda.time.{ DateTime, LocalDate }
+import java.time.{ LocalDateTime, LocalDate }
 
 /** Standard set of MappedColumnTypes for various column types: */
 trait MappedColumnTypes
@@ -145,23 +145,23 @@ trait LocalDateMappedColumnTypes {
       val month = (database % 10000) / 100
       val day = database % 100
 
-      new LocalDate(year, month, day)
+      LocalDate.of(year, month, day)
     }
 
     def mappedWrite(value: LocalDate) =
-      value.getYear * 10000 + value.getMonthOfYear * 100 + value.getDayOfMonth
+      value.getYear * 10000 + value.getMonthValue * 100 + value.getDayOfMonth
   }
 
-  case object LocalDateFromDateTimeColumnType extends MappedColumnType[LocalDate, DateTime] {
+  case object LocalDateFromDateTimeColumnType extends MappedColumnType[LocalDate, LocalDateTime] {
     val baseColumnType = DateTimeColumnType
-    def mappedRead(database: DateTime) = database.toLocalDate
-    def mappedWrite(value: LocalDate) = value.toDateTimeAtStartOfDay
+    def mappedRead(database: LocalDateTime) = database.toLocalDate
+    def mappedWrite(value: LocalDate) = value.atStartOfDay
   }
 
-  case object DateTimeFromLocalDateColumnType extends MappedColumnType[DateTime, LocalDate] {
+  case object DateTimeFromLocalDateColumnType extends MappedColumnType[LocalDateTime, LocalDate] {
     val baseColumnType = LocalDateColumnType
-    def mappedRead(database: LocalDate) = database.toDateTimeAtStartOfDay
-    def mappedWrite(value: DateTime) = value.toLocalDate
+    def mappedRead(database: LocalDate) = database.atStartOfDay
+    def mappedWrite(value: LocalDateTime) = value.toLocalDate
   }
 }
 

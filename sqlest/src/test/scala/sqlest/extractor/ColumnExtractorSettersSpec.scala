@@ -16,7 +16,7 @@
 
 package sqlest.extractor
 
-import org.joda.time.{ DateTime, LocalDate }
+import java.time.{ LocalDateTime, LocalDate }
 import org.scalatest.flatspec._
 import org.scalatest.matchers.should._
 import sqlest._

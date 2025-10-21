@@ -16,7 +16,7 @@
 
 package sqlest.executor
 
-import org.joda.time.LocalDate
+import java.time.LocalDate
 import org.scalatest.flatspec._
 import org.scalatest.matchers.should._
 import scala.concurrent.{ Await, Future }
@@ -57,7 +57,7 @@ class ExecutorSpec extends AnyFlatSpec with Matchers {
   val mappedOptionSelectStatement2 = {
     select(TableSix.zeroIsNoneLocalDate)
       .from(TableSix)
-      .where(TableSix.zeroIsNoneLocalDate === Some(new LocalDate(2015, 1, 1)))
+      .where(TableSix.zeroIsNoneLocalDate === Some(LocalDate.of(2015, 1, 1)))
   }
   val deleteStatement = delete.from(TableOne).where(TableOne.col2 === "12")
 

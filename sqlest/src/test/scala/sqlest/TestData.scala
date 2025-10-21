@@ -17,7 +17,7 @@
 package sqlest
 
 import java.sql.ResultSet
-import org.joda.time.{ DateTime, LocalDate }
+import java.time.{ LocalDateTime, LocalDate }
 import sqlest.extractor.TestResultSet
 import sqlest.executor.ResultSetIterable
 import sqlest.extractor.AbstractResultSet
@@ -57,7 +57,7 @@ object TestData {
     val bigDecimalCol = column[BigDecimal]("bigDecimalCol")
     val booleanColumn = column[Boolean]("booleanColumn")
     val stringColumn = column[String]("stringColumn")
-    val dateTimeCol = column[DateTime]("dateTimeCol")
+    val dateTimeCol = column[LocalDateTime]("dateTimeCol")
     val localDateCol = column[LocalDate]("localDateCol")
     val byteArrayCol = column[Array[Byte]]("byteArrayCol")
 
@@ -74,7 +74,7 @@ object TestData {
     val zeroIsNoneWrappedInt = column[Option[WrappedInt]]("zeroIsNoneWrappedInt")(ZeroIsNoneColumnType[WrappedInt, Int])
     val zeroIsNoneLocalDate = column[Option[LocalDate]]("zeroIsNoneDateTime")(ZeroIsNoneColumnType(YyyyMmDdColumnType))
     val localDateFromDateTime = column[LocalDate]("localDateFromDateTime")(LocalDateFromDateTimeColumnType)
-    val dateTimeFromLocalDate = column[DateTime]("dateTimeFromLocalDate")(DateTimeFromLocalDateColumnType)
+    val dateTimeFromLocalDate = column[LocalDateTime]("dateTimeFromLocalDate")(DateTimeFromLocalDateColumnType)
     def columns = List(trimmedString, zeroIsNoneWrappedInt, zeroIsNoneLocalDate, localDateFromDateTime, dateTimeFromLocalDate)
   }
   object TableSix extends TableSix(None)
