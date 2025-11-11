@@ -38,7 +38,7 @@ lazy val examples = (project in file("examples"))
 lazy val commonSettings = publishingSettings ++ Seq(
   organization := "uk.co.jhc",
   scalaVersion := "2.13.16",
-  crossScalaVersions := List("2.12.15", "2.13.16"),
+  crossScalaVersions := List("2.13.16"),
   scalacOptions ++= Seq(
     "-deprecation",
     "-encoding", "UTF-8",
