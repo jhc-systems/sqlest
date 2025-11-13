@@ -16,9 +16,9 @@
 
 package sqlest.ast
 
-import java.sql.ResultSet
-import java.time.{LocalDateTime, LocalDate}
 import sqlest.extractor.CellExtractor
+
+import java.sql.ResultSet
 
 /**
  * A column, column literal, or column expression.
@@ -111,8 +111,8 @@ sealed trait AliasedColumn[A] extends Column[A] with CellExtractor[ResultSet, A]
       case BigDecimalColumnType => Option(resultSet.getBigDecimal(columnAlias)).map(BigDecimal.apply)
       case BooleanColumnType => checkNull(resultSet.getBoolean(columnAlias))
       case StringColumnType => checkNull(resultSet.getString(columnAlias))
-      case DateTimeColumnType => checkNull(resultSet.getTimestamp(columnAlias).toLocalDateTime)
-      case LocalDateColumnType => checkNull(resultSet.getDate(columnAlias).toLocalDate)
+      case DateTimeColumnType => Option(resultSet.getTimestamp(columnAlias)).map(t => t.toLocalDateTime)
+      case LocalDateColumnType => Option(resultSet.getDate(columnAlias)).map(d => d.toLocalDate)
       case ByteArrayColumnType => checkNull(resultSet.getBytes(columnAlias))
     }
   }
