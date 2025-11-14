@@ -23,12 +23,12 @@ import scala.util.Try
 object Iso8601 {
   // We can read two formats: with and without milliseconds:
 
-  val msFormat = DateTimeFormatter.ISO_LOCAL_DATE_TIME
+  val msFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS[VV]")
 
-  val secsFormat = DateTimeFormatter.ISO_OFFSET_DATE_TIME
+  val secsFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss[VV]")
 
   // yyyy-MM-dd
-  val dateFormat = DateTimeFormatter.ISO_LOCAL_DATE
+  val dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
   // We write in seconds format by default:
   val defaultFormat = msFormat
