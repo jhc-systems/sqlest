@@ -2,7 +2,7 @@ package sqlest.extractor
 
 import sqlest.ast._
 import java.sql.ResultSet
-import java.time.{ LocalDateTime, LocalDate }
+import org.joda.time.{ DateTime, LocalDate }
 
 /**
  * An extractor that has an index associated with it.
@@ -31,8 +31,8 @@ case class IndexedExtractor[A](index: Int)(implicit val columnType: ColumnType[A
       case BigDecimalColumnType => Option(resultSet.getBigDecimal(index)).map(BigDecimal.apply)
       case BooleanColumnType => checkNull(resultSet.getBoolean(index))
       case StringColumnType => checkNull(resultSet.getString(index))
-      case DateTimeColumnType => checkNull(resultSet.getTimestamp(index).toLocalDateTime)
-      case LocalDateColumnType => checkNull(resultSet.getDate(index).toLocalDate)
+      case DateTimeColumnType => checkNull(new DateTime(resultSet.getTimestamp(index)))
+      case LocalDateColumnType => checkNull(new LocalDate(resultSet.getDate(index)))
       case ByteArrayColumnType => checkNull(resultSet.getBytes(index))
     }
   }

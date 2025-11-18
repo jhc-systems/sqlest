@@ -16,6 +16,7 @@
 
 package sqlest.extractor
 
+import org.joda.time.DateTime
 import scala.collection.immutable.{ Queue, ListMap }
 
 sealed trait Extractor[Row, A] extends ChoiceExtractorSyntax[Row, A] {

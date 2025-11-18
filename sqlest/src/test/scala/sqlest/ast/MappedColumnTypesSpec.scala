@@ -16,7 +16,7 @@
 
 package sqlest.ast
 
-import java.time.LocalDate
+import org.joda.time.LocalDate
 import org.scalatest.flatspec._
 import org.scalatest.matchers.should._
 
@@ -105,10 +105,10 @@ class MappedColumnTypeSpec extends AnyFlatSpec with Matchers with MappedColumnTy
   }
 
   "YyyyMmDdColumnType" should "convert integers to date times" in {
-    YyyyMmDdColumnType.write(LocalDate.of(1999, 12, 31)) should be(19991231)
-    YyyyMmDdColumnType.write(LocalDate.of(2000, 1, 1)) should be(20000101)
-    YyyyMmDdColumnType.read(Some(19991231)) should be(Some(LocalDate.of(1999, 12, 31)))
-    YyyyMmDdColumnType.read(Some(20000101)) should be(Some(LocalDate.of(2000, 1, 1)))
+    YyyyMmDdColumnType.write(new LocalDate(1999, 12, 31)) should be(19991231)
+    YyyyMmDdColumnType.write(new LocalDate(2000, 1, 1)) should be(20000101)
+    YyyyMmDdColumnType.read(Some(19991231)) should be(Some(new LocalDate(1999, 12, 31)))
+    YyyyMmDdColumnType.read(Some(20000101)) should be(Some(new LocalDate(2000, 1, 1)))
   }
 
   "MappedColumnType.compose" should "compose read and write operations" in {
@@ -127,8 +127,8 @@ class MappedColumnTypeSpec extends AnyFlatSpec with Matchers with MappedColumnTy
     val chainedComposedMappedColumn =
       YyyyMmDdColumnType.compose(
         MappedBooleanColumnType(
-          LocalDate.of(1999, 12, 31),
-          LocalDate.of(2000, 1, 1)
+          new LocalDate(1999, 12, 31),
+          new LocalDate(2000, 1, 1)
         ).compose(
             MappedColumnType[Option[Int], Boolean](
               db => if (db) Some(1) else None,

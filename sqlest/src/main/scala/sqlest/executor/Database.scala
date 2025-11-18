@@ -23,7 +23,7 @@ import sqlest.util.Logging
 
 import java.sql.{ Connection, Date => JdbcDate, DriverManager, ResultSet, PreparedStatement, Statement, SQLException, Timestamp => JdbcTimestamp, Types => JdbcTypes }
 import javax.sql.DataSource
-import java.time.{ LocalDateTime, LocalDate }
+import org.joda.time.{ DateTime, LocalDate }
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.util.{ DynamicVariable, Try, Success, Failure }
 import scala.util.control.NonFatal
@@ -142,7 +142,7 @@ class Session(database: Database) extends Logging {
   def executeSelect[A](select: Select[_, _])(extractor: ResultSet => A): A =
     withConnection { connection =>
       val (preprocessedSelect, sql, argumentLists) = database.statementBuilder(select)
-      val startTime = LocalDateTime.now
+      val startTime = new DateTime
       try {
         val preparedStatement = prepareStatement(connection, preprocessedSelect, sql, argumentLists)
         try {
@@ -150,8 +150,8 @@ class Session(database: Database) extends Logging {
           val resultSet = preparedStatement.executeQuery
           try {
             val result = extractor(resultSet)
-            val endTime = LocalDateTime.now
-            logger.info(s"Ran sql in ${(endTime.getNano - startTime.getNano) / 100000}ms: ${logDetails(connection, sql, argumentLists)} with queryTimeout ${database.queryTimeout}")
+            val endTime = new DateTime
+            logger.info(s"Ran sql in ${endTime.getMillis - startTime.getMillis}ms: ${logDetails(connection, sql, argumentLists)} with queryTimeout ${database.queryTimeout}")
             result
           } finally {
             try {
@@ -213,8 +213,8 @@ class Session(database: Database) extends Logging {
     case BigDecimalColumnType => statement.setBigDecimal(index, value.asInstanceOf[BigDecimal].bigDecimal)
     case StringColumnType => statement.setString(index, value.asInstanceOf[String])
     case ByteArrayColumnType => statement.setBytes(index, value.asInstanceOf[Array[Byte]])
-    case DateTimeColumnType => statement.setTimestamp(index, new JdbcTimestamp(value.asInstanceOf[LocalDateTime].getNano / 100000))
-    case LocalDateColumnType => statement.setDate(index, new JdbcDate(value.asInstanceOf[LocalDate].atStartOfDay.getNano / 100000))
+    case DateTimeColumnType => statement.setTimestamp(index, new JdbcTimestamp(value.asInstanceOf[DateTime].getMillis))
+    case LocalDateColumnType => statement.setDate(index, new JdbcDate(value.asInstanceOf[LocalDate].toDate.getTime))
     case mappedType: MappedColumnType[A, _] => setArgument(statement, index, mappedType.baseColumnType, mappedType.write(value.asInstanceOf[A]))
     case optionType: OptionColumnType[_, _] => value.asInstanceOf[Option[_]] match {
       case None if optionType.hasNullNullValue =>
@@ -331,15 +331,15 @@ case class Transaction(database: Database) extends Session(database) {
   def executeCommand(command: Command): Int =
     withConnection { connection =>
       val (preprocessedCommand, sql, argumentLists) = database.statementBuilder(command)
-      val startTime = LocalDateTime.now
+      val startTime = new DateTime
 
       try {
         val preparedStatement = prepareStatement(connection, preprocessedCommand, sql, argumentLists)
         try {
           preparedStatement.setQueryTimeout(database.commandTimeout)
           val result = preparedStatement.executeBatch.sum
-          val endTime = LocalDateTime.now
-          logger.info(s"Ran sql in ${(endTime.getNano - startTime.getNano) / 100000}ms: ${logDetails(connection, sql, argumentLists)}")
+          val endTime = new DateTime
+          logger.info(s"Ran sql in ${endTime.getMillis - startTime.getMillis}ms: ${logDetails(connection, sql, argumentLists)}")
           result
         } finally {
           try {
@@ -358,7 +358,7 @@ case class Transaction(database: Database) extends Session(database) {
   def executeInsertReturningKeys[T](command: Insert)(implicit columnType: ColumnType[T]): List[T] =
     withConnection { connection =>
       val (preprocessedCommand, sql, argumentLists) = database.statementBuilder(command)
-      val startTime = LocalDateTime.now
+      val startTime = new DateTime
       try {
         val preparedStatement = prepareStatement(
           connection,
@@ -372,8 +372,8 @@ case class Transaction(database: Database) extends Session(database) {
           val result = preparedStatement.executeUpdate
           val rs = preparedStatement.getGeneratedKeys
           val keys = IndexedExtractor[T](1).extractAll(ResultSetIterable(rs))
-          val endTime = LocalDateTime.now
-          logger.info(s"Ran sql in ${(endTime.getNano - startTime.getNano) / 100000}ms: ${logDetails(connection, sql, argumentLists)}")
+          val endTime = new DateTime
+          logger.info(s"Ran sql in ${endTime.getMillis - startTime.getMillis}ms: ${logDetails(connection, sql, argumentLists)}")
           keys
         } finally {
           try {

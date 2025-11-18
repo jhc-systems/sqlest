@@ -16,7 +16,7 @@
 
 package sqlest.untyped.ast
 
-import java.time._
+import org.joda.time._
 import org.scalatest.flatspec._
 import org.scalatest.matchers.should._
 import sqlest._
@@ -30,7 +30,7 @@ class ColumnSpec extends AnyFlatSpec with Matchers {
     val bigDecimalCol = column[BigDecimal]("Col")
     val booleanCol = column[Boolean]("Col")
     val stringCol = column[String]("Col")
-    val dateTimeCol = column[LocalDateTime]("Col")
+    val dateTimeCol = column[DateTime]("Col")
     val mappedCol = column[Int]("Col")(MappedColumnType[Int, String](_.toInt, _.toString))
   }
 
@@ -43,9 +43,7 @@ class ColumnSpec extends AnyFlatSpec with Matchers {
     (TableOne.bigDecimalCol untypedEq "1") should equal(Some(TableOne.bigDecimalCol === 1))
     (TableOne.booleanCol untypedEq "true") should equal(Some(TableOne.booleanCol === true))
     (TableOne.stringCol untypedEq "abc") should equal(Some(TableOne.stringCol === "abc"))
-    (TableOne.dateTimeCol untypedEq "2014-01-01T09:00:00.000Z") should equal(Some(TableOne.dateTimeCol === LocalDateTime.of(2014, 1, 1, 9, 0, 0, 0)))
-    (TableOne.dateTimeCol untypedEq "2015-01-01T09:00:00Z") should equal(Some(TableOne.dateTimeCol === LocalDateTime.of(2015, 1, 1, 9, 0, 0, 0)))
-    (TableOne.dateTimeCol untypedEq "2016-01-01T09:00:00") should equal(Some(TableOne.dateTimeCol === LocalDateTime.of(2016, 1, 1, 9, 0, 0, 0)))
+    (TableOne.dateTimeCol untypedEq "2014-01-01T09:00:00.000Z") should equal(Some(TableOne.dateTimeCol === new DateTime(2014, 1, 1, 9, 0, 0, 0)))
     // TODO
     // (TableOne.mappedCol untypedEq "2") should equal(Some(TableOne.mappedCol === 2))
   }

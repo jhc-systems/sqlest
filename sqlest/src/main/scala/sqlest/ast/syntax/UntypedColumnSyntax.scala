@@ -16,7 +16,7 @@
 
 package sqlest.ast.syntax
 
-import java.time.{ LocalDateTime, LocalDate }
+import org.joda.time.{ DateTime, LocalDate }
 import scala.reflect.runtime.{ universe => ru }
 import scala.util.Try
 import sqlest.ast._
@@ -35,7 +35,7 @@ class UntypedColumnHelpers extends ColumnSyntax {
   }
   def bigDecimalArgument(arg: String) = Try(BigDecimal(arg)).toOption
   def dateTimeArgument(arg: String) = Iso8601.unapply(arg)
-  def localDateArgument(arg: String) = Try(Iso8601.unapply(arg).get.toLocalDate).toOption
+  def localDateArgument(arg: String) = Iso8601.unapply(arg).map(new LocalDate(_))
   def byteArrayArgument(arg: String) = Try {
     // Custom hex string to byte array conversion
     if (arg.length % 2 != 0) throw new IllegalArgumentException("Hex string must have even length")

@@ -16,28 +16,30 @@
 
 package sqlest.util
 
-import java.time._
-import java.time.format.DateTimeFormatter
+import org.joda.time._
+import org.joda.time.format._
 import scala.util.Try
 
 object Iso8601 {
   // We can read two formats: with and without milliseconds:
 
-  val msFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS[VV]")
+  // yyyy-mm-ddThh:mm:ss.ssssZ
+  val msFormat = ISODateTimeFormat.dateTime()
 
-  val secsFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss[VV]")
+  // yyyy-mm-ddThh:mm:ssZ
+  val secsFormat = ISODateTimeFormat.dateTimeNoMillis()
 
   // yyyy-MM-dd
-  val dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+  val dateFormat = ISODateTimeFormat.date()
 
   // We write in seconds format by default:
   val defaultFormat = msFormat
 
-  def unapply(str: String): Option[LocalDateTime] =
-    Try(LocalDateTime parse (str, msFormat)).toOption orElse
-      Try(LocalDateTime parse (str, secsFormat)).toOption orElse
-      Try((LocalDate parse (str, dateFormat)).atStartOfDay).toOption
+  def unapply(str: String): Option[DateTime] =
+    Try(msFormat parseDateTime str).toOption orElse
+      Try(secsFormat parseDateTime str).toOption orElse
+      Try(dateFormat parseDateTime str).toOption
 
-  def apply(date: LocalDateTime) =
-    defaultFormat.format(date atZone ZoneId.of("UTC"))
+  def apply(date: DateTime) =
+    defaultFormat.print(date withZone DateTimeZone.UTC)
 }

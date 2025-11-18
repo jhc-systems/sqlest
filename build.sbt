@@ -25,7 +25,9 @@ lazy val extractors = (project in file("extractors"))
     mdocIn := file("docs") / "extractors",
     mdocOut := file("extractors"),
     libraryDependencies ++= Seq(
-      "org.scala-lang" % "scala-reflect" % scalaVersion.value
+      "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+      "joda-time" % "joda-time" % "2.14.0",
+      "org.joda" % "joda-convert" % "3.0.1"
     )
   )
 
