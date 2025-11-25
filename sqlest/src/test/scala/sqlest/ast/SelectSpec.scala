@@ -16,11 +16,11 @@
 
 package sqlest.ast
 
-import org.scalatest._
-import org.scalatest.matchers._
+import org.scalatest.flatspec._
+import org.scalatest.matchers.should._
 import sqlest._
 
-class SelectSpec extends FlatSpec with Matchers {
+class SelectSpec extends AnyFlatSpec with Matchers {
   class MyTable(alias: Option[String]) extends Table("mytable", alias) {
     val col1 = column[Int]("col1")
     val col2 = column[Int]("col2")

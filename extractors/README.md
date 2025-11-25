@@ -28,7 +28,7 @@ libraryDependencies ++= Seq(
 )
 ```
 
-sqlest-extractors is available for Scala 2.11
+sqlest-extractors is available for Scala 2.12 and 2.13
 
 ## Overview
 Table data consists of multiple `Rows` of cells.

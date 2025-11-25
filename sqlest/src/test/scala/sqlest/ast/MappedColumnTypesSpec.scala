@@ -17,10 +17,10 @@
 package sqlest.ast
 
 import org.joda.time.LocalDate
-import org.scalatest._
-import org.scalatest.matchers._
+import org.scalatest.flatspec._
+import org.scalatest.matchers.should._
 
-class MappedColumnTypeSpec extends FlatSpec with Matchers with MappedColumnTypes {
+class MappedColumnTypeSpec extends AnyFlatSpec with Matchers with MappedColumnTypes {
   "MappedBooleanColumnType" should "convert database values to booleans" in {
     val BooleanIntColumnType = MappedBooleanColumnType(1, 0)
 

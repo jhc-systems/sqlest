@@ -17,8 +17,8 @@
 package sqlest.executor
 
 import org.joda.time.LocalDate
-import org.scalatest._
-import org.scalatest.matchers._
+import org.scalatest.flatspec._
+import org.scalatest.matchers.should._
 import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration._
 import scala.util.Try
@@ -28,10 +28,10 @@ import sqlest.extractor.TestResultSet
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class ExecutorSpec extends FlatSpec with Matchers {
+class ExecutorSpec extends AnyFlatSpec with Matchers {
   import TestData._
 
-  implicit def testDatabase = TestDatabase(testResultSet)
+  implicit def testDatabase : TestDatabase = TestDatabase(testResultSet)
 
   val selectStatement = select(TableOne.col1, TableOne.col2).from(TableOne)
   val updateStatement = update(TableOne).set(TableOne.col1 -> 123).where(TableOne.col2 === "12")
@@ -203,7 +203,7 @@ class ExecutorSpec extends FlatSpec with Matchers {
       Future(updateStatement.execute)
     }
     val result = Try(Await.result(transaction, 20.seconds))
-    result shouldBe 'success
+    result shouldBe Symbol("success")
     database.lastConnection.get.closed shouldBe true
   }
 
@@ -213,7 +213,7 @@ class ExecutorSpec extends FlatSpec with Matchers {
       Future(updateStatement.execute)
     }
     val result = Try(Await.result(transaction, 20.seconds))
-    result shouldBe 'success
+    result shouldBe Symbol("success")
     database.lastConnection.get.committed shouldBe true
   }
 
@@ -227,7 +227,7 @@ class ExecutorSpec extends FlatSpec with Matchers {
       }
     }
     val result = Try(Await.result(transaction, 20.seconds))
-    result shouldBe 'success
+    result shouldBe Symbol("success")
     database.lastConnection.get.closed shouldBe true
     database.lastConnection.get.rolledBack shouldBe true
     database.lastConnection.get.committed shouldBe false
@@ -239,7 +239,7 @@ class ExecutorSpec extends FlatSpec with Matchers {
       throw new Exception("Catastrophic error")
     }
     val result = Try(Await.result(transaction, 20.seconds))
-    result shouldBe 'failure
+    result shouldBe Symbol("failure")
     database.lastConnection.get.closed shouldBe true
     database.lastConnection.get.rolledBack shouldBe true
     database.lastConnection.get.committed shouldBe false
@@ -251,7 +251,7 @@ class ExecutorSpec extends FlatSpec with Matchers {
       Future(throw new Exception("Catastrophic error"))
     }
     val result = Try(Await.result(transaction, 20.seconds))
-    result shouldBe 'failure
+    result shouldBe Symbol("failure")
     database.lastConnection.get.closed shouldBe true
     database.lastConnection.get.rolledBack shouldBe true
     database.lastConnection.get.committed shouldBe false

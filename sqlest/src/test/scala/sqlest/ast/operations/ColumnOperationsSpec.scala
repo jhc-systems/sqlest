@@ -16,12 +16,12 @@
 
 package sqlest.ast.operations
 
-import org.scalatest._
-import org.scalatest.matchers._
+import org.scalatest.flatspec._
+import org.scalatest.matchers.should._
 import sqlest._
 import sqlest.ast.operations.ColumnOperations._
 
-class ColumnOperationsSpec extends FlatSpec with Matchers {
+class ColumnOperationsSpec extends AnyFlatSpec with Matchers {
 
   class TableOne(alias: Option[String]) extends Table("one", alias) {
     val col1 = column[Int]("col1")

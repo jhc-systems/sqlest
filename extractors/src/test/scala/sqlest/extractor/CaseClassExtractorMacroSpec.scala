@@ -16,7 +16,9 @@
 
 package sqlest.extractor
 
-import org.scalatest._
+import org.scalatest.flatspec._
+import org.scalatest.matchers.should._
+import org.scalatest.prop._
 import shapeless.test.illTyped
 
 // TODO: The CaseClassExtractorMacro macro has issues with path-dependent types.
@@ -34,7 +36,7 @@ case object Circle extends Shape
 case object Tetrahedron extends Shape
 case object Plane extends Shape
 
-class CaseClassExtractorMacroSpec extends FlatSpec with Matchers with ExtractorSyntax[Tuple3[Shape, Int, String]] with PathDependenceTestData {
+class CaseClassExtractorMacroSpec extends AnyFlatSpec with Matchers with ExtractorSyntax[Tuple3[Shape, Int, String]] with PathDependenceTestData {
 
   case class One(a: Int, b: String)
   case class Two(a: String, b: Shape)

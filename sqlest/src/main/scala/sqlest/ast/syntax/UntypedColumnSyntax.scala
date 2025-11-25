@@ -36,7 +36,11 @@ class UntypedColumnHelpers extends ColumnSyntax {
   def bigDecimalArgument(arg: String) = Try(BigDecimal(arg)).toOption
   def dateTimeArgument(arg: String) = Iso8601.unapply(arg)
   def localDateArgument(arg: String) = Iso8601.unapply(arg).map(new LocalDate(_))
-  def byteArrayArgument(arg: String) = Try(javax.xml.bind.DatatypeConverter.parseHexBinary(arg)).toOption
+  def byteArrayArgument(arg: String) = Try {
+    // Custom hex string to byte array conversion
+    if (arg.length % 2 != 0) throw new IllegalArgumentException("Hex string must have even length")
+    arg.grouped(2).map(Integer.parseInt(_, 16).toByte).toArray
+  }.toOption
   def mappedArgument[A](arg: String, columnType: ColumnType[A]): Option[A] = (columnType match {
     case IntColumnType => intArgument(arg)
     case LongColumnType => longArgument(arg)

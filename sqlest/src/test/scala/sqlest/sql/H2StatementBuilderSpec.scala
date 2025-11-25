@@ -16,8 +16,8 @@
 
 package sqlest.sql
 
-import org.scalatest._
-import org.scalatest.matchers._
+import org.scalatest.flatspec._
+import org.scalatest.matchers.should._
 import sqlest._
 import sqlest.ast._
 

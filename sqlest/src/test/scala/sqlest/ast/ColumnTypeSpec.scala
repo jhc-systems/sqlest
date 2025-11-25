@@ -16,11 +16,11 @@
 
 package sqlest.ast
 
-import org.scalatest._
-import org.scalatest.matchers._
+import org.scalatest.flatspec._
+import org.scalatest.matchers.should._
 import sqlest._
 
-class ColumnTypeSpec extends FlatSpec with Matchers {
+class ColumnTypeSpec extends AnyFlatSpec with Matchers {
   "basic data types" should "have implicit ColumnTypes" in {
     implicitly[ColumnType[Boolean]]
     implicitly[ColumnType[Int]]

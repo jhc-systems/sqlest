@@ -16,12 +16,12 @@
 
 package sqlest.ast.syntax
 
-import org.scalatest._
-import org.scalatest.matchers._
+import org.scalatest.flatspec._
+import org.scalatest.matchers.should._
 import sqlest._
 import sqlest.ast._
 
-class CaseSyntaxSpec extends FlatSpec with Matchers {
+class CaseSyntaxSpec extends AnyFlatSpec with Matchers {
   val zeroIsNoneColumnType = ZeroIsNoneColumnType[Int, Int]
   class MyTable(alias: Option[String]) extends Table("mytable", alias) {
     val col1 = column[Int]("col1")

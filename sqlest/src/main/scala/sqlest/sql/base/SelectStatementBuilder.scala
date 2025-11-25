@@ -84,6 +84,7 @@ trait SelectStatementBuilder extends BaseStatementBuilder {
   def joinSql(relation: Relation): String = relation match {
     case table: Table if table.tableName == table.tableAlias => identifierSql(table.tableName)
     case table: Table if table.tableName != table.tableAlias => identifierSql(table.tableName) + " as " + identifierSql(table.tableAlias)
+    case table: Table => identifierSql(table.tableName) // catch-all for Table cases
     case tableFunctionApplication: TableFunctionApplication[_] => functionSql(tableFunctionApplication.tableName, tableFunctionApplication.parameterColumns) + " as " + identifierSql(tableFunctionApplication.tableAlias)
     case TableFunctionFromSelect(select, alias) => throw new UnsupportedOperationException
     case LeftJoin(left, right, condition) => joinSql(left) + " left join " + joinSql(right) + " on " + columnSql(condition)

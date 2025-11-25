@@ -16,13 +16,13 @@
 
 package sqlest.sql
 
-import org.scalatest._
-import org.scalatest.matchers._
+import org.scalatest.flatspec._
+import org.scalatest.matchers.should._
 import sqlest._
 import sqlest.ast.{ Setter, LiteralColumn }
 
 class InsertStatementBuilderSpec extends BaseStatementBuilderSpec {
-  implicit def statementBuilder = new base.StatementBuilder {}
+  implicit def statementBuilder : StatementBuilder = new base.StatementBuilder {}
 
   "insert" should "produce the right sql" in {
     sql {

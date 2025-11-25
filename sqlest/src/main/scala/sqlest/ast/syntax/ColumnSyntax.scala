@@ -49,15 +49,22 @@ trait ColumnSyntax {
   /**
    * This implicit allows the use of `TableColumn -> Column` in setters
    */
-  implicit def columnSetterPair[A, B](pair: (TableColumn[A], Column[B]))(implicit equivalence: ColumnTypeEquivalence[A, B]) =
-    Setter[A, B](pair._1, pair._2)
+  implicit def columnSetterPair[A, B](pair: (TableColumn[A], Column[B]))(implicit equivalence: ColumnTypeEquivalence[A, B]): Setter[A, B] = {
+    val (column, value) = pair
+    val (_, alignedValue) = ColumnTypeEquivalence.alignColumnTypes(column, value)
+    new Setter(column, alignedValue.asInstanceOf[Column[B]])
+  }
 
   /**
    * This implicit allows the use of `TableColumn -> Value` in setters,
    * as opposed to `TableColumn -> Column` as is actually required:
    */
-  implicit def literalSetterPair[A, B](pair: (TableColumn[A], B))(implicit valueType: ColumnType[B], equivalence: ColumnTypeEquivalence[A, B]) =
-    Setter[A, B](pair._1, pair._2.column)
+  implicit def literalSetterPair[A, B](pair: (TableColumn[A], B))(implicit valueType: ColumnType[B], equivalence: ColumnTypeEquivalence[A, B]): Setter[A, B] = {
+    val (column, value) = pair
+    val valueColumn = value.column(valueType)
+    val (_, alignedValue) = ColumnTypeEquivalence.alignColumnTypes(column, valueColumn)
+    new Setter(column, alignedValue.asInstanceOf[Column[B]])
+  }
 
   implicit class AliasColumnOps[A](left: Column[A]) {
     def as(alias: String) = left match {
@@ -74,7 +81,7 @@ trait ColumnSyntax {
   /**
    * This implicit conversion allows using as a column: a select statement which selects a single column
    */
-  implicit def SelectColumnOps[A](select: Select[AliasedColumn[A], _ <: Relation]) =
+  implicit def SelectColumnOps[A](select: Select[AliasedColumn[A], _ <: Relation]): SelectColumn[A] =
     SelectColumn(select)(select.cols.columnType)
 
   implicit class NullableColumnsOps[A](column: Column[A]) {
@@ -82,7 +89,7 @@ trait ColumnSyntax {
       val columnIsNull = PostfixFunctionColumn[Boolean]("is null", column)
 
       column.columnType match {
-        case optionColumnType: OptionColumnType[A, _] if !optionColumnType.hasNullNullValue =>
+        case optionColumnType: OptionColumnType[A, _] @unchecked if !optionColumnType.hasNullNullValue =>
           columnIsNull || InfixFunctionColumn[Boolean]("=", column, ConstantColumn[A](None.asInstanceOf[A])(optionColumnType))
         case _ =>
           columnIsNull
@@ -93,7 +100,7 @@ trait ColumnSyntax {
       val columnIsNotNull = PostfixFunctionColumn[Boolean]("is not null", column)
 
       column.columnType match {
-        case optionColumnType: OptionColumnType[A, _] if !optionColumnType.hasNullNullValue =>
+        case optionColumnType: OptionColumnType[A, _] @unchecked if !optionColumnType.hasNullNullValue =>
           columnIsNotNull && InfixFunctionColumn[Boolean]("<>", column, ConstantColumn[A](None.asInstanceOf[A])(optionColumnType))
         case _ =>
           columnIsNotNull

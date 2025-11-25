@@ -17,13 +17,13 @@
 package sqlest.sql
 
 import org.joda.time.LocalDate
-import org.scalatest._
-import org.scalatest.matchers._
+import org.scalatest.flatspec._
+import org.scalatest.matchers.should._
 import sqlest._
 import sqlest.ast._
 
 class SelectStatementBuilderSpec extends BaseStatementBuilderSpec {
-  implicit def statementBuilder = new base.StatementBuilder {}
+  implicit def statementBuilder : StatementBuilder = new base.StatementBuilder {}
 
   "empty query" should "render ok" in {
     sql {

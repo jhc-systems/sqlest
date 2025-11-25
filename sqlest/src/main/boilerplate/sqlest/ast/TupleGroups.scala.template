@@ -18,10 +18,10 @@ package sqlest.ast
 
 trait TupleGroups {
 
-  implicit def TupleGroup0(t: Unit) =
+  implicit def TupleGroup0(t: Unit): TupleGroup =
     TupleGroup(Nil)
 
-[#  implicit def TupleGroup1(t: Tuple1[[#Column[_]#]]) =
+[#  implicit def TupleGroup1(t: Tuple1[[#Column[_]#]]): TupleGroup =
     TupleGroup(List([#ColumnGroup(t._1)#]))#
 
 ]

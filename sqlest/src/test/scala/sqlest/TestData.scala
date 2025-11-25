@@ -69,7 +69,7 @@ object TestData {
   case class WrappedInt(inner: Int)
   class TableSix(alias: Option[String]) extends Table("six", alias) {
     // Check that the implicit TrimmedStringColumnType gets applied to the trimmedString column
-    implicit val tsct = TrimmedStringColumnType
+    implicit val tsct: TrimmedStringColumnType.type = TrimmedStringColumnType
     val trimmedString = column[Option[WrappedString]]("trimmedString")(BlankIsNoneColumnType)
     val zeroIsNoneWrappedInt = column[Option[WrappedInt]]("zeroIsNoneWrappedInt")(ZeroIsNoneColumnType[WrappedInt, Int])
     val zeroIsNoneLocalDate = column[Option[LocalDate]]("zeroIsNoneDateTime")(ZeroIsNoneColumnType(YyyyMmDdColumnType))
@@ -104,5 +104,5 @@ object TestData {
     override def next(): Boolean = { hasNext = !hasNext; hasNext }
   }
 
-  implicit def resultSetIterable(resultSet: ResultSet) = ResultSetIterable(resultSet)
+  implicit def resultSetIterable(resultSet: ResultSet) : ResultSetIterable = ResultSetIterable(resultSet)
 }

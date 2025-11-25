@@ -16,14 +16,14 @@
 
 package sqlest.ast
 
-import org.scalatest._
-import org.scalatest.matchers._
+import org.scalatest.flatspec._
+import org.scalatest.matchers.should._
 import shapeless.test.illTyped
 import sqlest._
 
 case class ValueClassString(string: String) extends AnyVal
 
-abstract class BaseColumnTypeEquivalenceSpec extends FlatSpec with Matchers with GlobalStringMappedColumn {
+abstract class BaseColumnTypeEquivalenceSpec extends AnyFlatSpec with Matchers with GlobalStringMappedColumn {
   import GlobalStringMappedColumn._
 
   case class WrappedString(string: String)

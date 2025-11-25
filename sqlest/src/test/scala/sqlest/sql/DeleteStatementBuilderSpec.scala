@@ -16,13 +16,13 @@
 
 package sqlest.sql
 
-import org.scalatest._
-import org.scalatest.matchers._
+import org.scalatest.flatspec._
+import org.scalatest.matchers.should._
 import sqlest._
 import sqlest.ast._
 
 class DeleteStatementBuilderSpec extends BaseStatementBuilderSpec {
-  implicit def statementBuilder = new base.StatementBuilder {}
+  implicit def statementBuilder : StatementBuilder = new base.StatementBuilder {}
 
   "delete" should "produce the right sql" in {
     sql {

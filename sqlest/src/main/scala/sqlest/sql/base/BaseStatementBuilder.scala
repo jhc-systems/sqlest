@@ -160,7 +160,10 @@ trait BaseStatementBuilder {
     case StringColumnType => "'" + escapeSqlString(value.toString) + "'"
     case DateTimeColumnType => value.toString
     case LocalDateColumnType => value.toString
-    case ByteArrayColumnType => javax.xml.bind.DatatypeConverter.printHexBinary(value.asInstanceOf[Array[Byte]])
+    case ByteArrayColumnType => {
+      val bytes = value.asInstanceOf[Array[Byte]]
+      bytes.map("%02x".format(_)).mkString.toUpperCase
+    }
     case optionType: OptionColumnType[_, _] => value.asInstanceOf[Option[_]] match {
       case None if optionType.hasNullNullValue => "null"
       case None => constantSql(optionType.baseColumnType.asInstanceOf[ColumnType[Any]], optionType.nullValue)

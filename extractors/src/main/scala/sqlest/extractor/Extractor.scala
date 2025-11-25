@@ -56,17 +56,17 @@ trait SimpleExtractor[Row, A] {
   def extractHeadOption(rows: Iterable[Row]): Option[A] = {
     val rowIterator = rows.iterator
     if (rowIterator.hasNext) {
-      Some(checkNullValueAndGet(emit(initialize(rowIterator.next))))
+      Some(checkNullValueAndGet(emit(initialize(rowIterator.next()))))
     } else None
   }
 
   def extractAll(rows: Iterable[Row]): List[A] = {
     val rowIterator = rows.iterator
     if (rowIterator.hasNext) {
-      var accumulator = Queue(checkNullValueAndGet(emit(initialize(rowIterator.next))))
+      var accumulator = Queue(checkNullValueAndGet(emit(initialize(rowIterator.next()))))
 
       while (rowIterator.hasNext)
-        accumulator = accumulator :+ checkNullValueAndGet(emit(initialize(rowIterator.next)))
+        accumulator = accumulator :+ checkNullValueAndGet(emit(initialize(rowIterator.next())))
 
       accumulator.toList
     } else Nil
@@ -315,10 +315,10 @@ case class GroupedExtractor[Row, A, B](inner: Extractor[Row, A], groupBy: Extrac
   def extractHeadOption(rows: Iterable[Row]): Option[A] = {
     val rowIterator = rows.iterator
     if (rowIterator.hasNext) {
-      var accumulator = initialize(rowIterator.next)
+      var accumulator = initialize(rowIterator.next())
 
       while (rowIterator.hasNext && accumulator.size == 1)
-        accumulator = accumulate(accumulator, rowIterator.next)
+        accumulator = accumulate(accumulator, rowIterator.next())
 
       checkNullValueAndGet(emit(accumulator)).headOption
     } else None
@@ -327,10 +327,10 @@ case class GroupedExtractor[Row, A, B](inner: Extractor[Row, A], groupBy: Extrac
   def extractAll(rows: Iterable[Row]): List[A] = {
     val rowIterator = rows.iterator
     if (rowIterator.hasNext) {
-      var accumulator = initialize(rowIterator.next)
+      var accumulator = initialize(rowIterator.next())
 
       while (rowIterator.hasNext)
-        accumulator = accumulate(accumulator, rowIterator.next)
+        accumulator = accumulate(accumulator, rowIterator.next())
 
       checkNullValueAndGet(emit(accumulator))
     } else Nil
